@@ -1,0 +1,52 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "description": "User profiles",
+      "fields": {
+        "email": "string",
+        "displayName": "string",
+        "role": "string",
+        "createdAt": "timestamp"
+      }
+    },
+    {
+      "name": "taxCalculations",
+      "description": "Saved tax calculations for users",
+      "fields": {
+        "userId": "string",
+        "income": "number",
+        "investments": "number",
+        "category": "string",
+        "location": "string",
+        "netTax": "number",
+        "grossTax": "number",
+        "createdAt": "timestamp"
+      }
+    },
+    {
+      "name": "favorites",
+      "description": "User saved articles and policies",
+      "fields": {
+        "userId": "string",
+        "articleId": "string",
+        "title": "string",
+        "url": "string",
+        "type": "string",
+        "createdAt": "timestamp"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "parent": "users",
+      "child": "taxCalculations",
+      "type": "one-to-many"
+    },
+    {
+      "parent": "users",
+      "child": "favorites",
+      "type": "one-to-many"
+    }
+  ]
+}
