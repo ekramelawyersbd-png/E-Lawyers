@@ -49,8 +49,8 @@ export function Auth() {
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-emerald-700 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-md mb-6">
-            E
+          <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center p-1 bg-emerald-800/10 shadow-sm mb-6 overflow-hidden">
+            <img src="/logo.png" alt="E-Lawyers Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             {isLogin ? 'Welcome back' : 'Create an account'}

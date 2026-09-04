@@ -21,6 +21,7 @@ import { Team } from './pages/Team';
 import { VatGuide } from './pages/VatGuide';
 import { Contact } from './pages/Contact';
 import { Auth } from './pages/Auth';
+import { FaqPage } from './pages/FaqPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="training" element={<TrainingHub />} />
           <Route path="search" element={<Search />} />
           <Route path="glossary" element={<Glossary />} />
+          <Route path="faq" element={<FaqPage />} />
           <Route path="tax-calculator" element={<TaxCalculator />} />
           <Route path="corporate-planner" element={<CorporateTaxPlanner />} />
           <Route path="policy-analysis" element={<TaxPolicyAnalysis />} />

@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Calendar, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export function Contact() {
@@ -6,11 +6,23 @@ export function Contact() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Contact Us' }]} />
       
-      <div className="text-center max-w-2xl mx-auto mb-16 mt-8">
+      <div className="text-center max-w-2xl mx-auto mb-10 mt-8">
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Get in Touch</h1>
-        <p className="text-lg text-slate-600">
+        <p className="text-lg text-slate-600 mb-8">
           Need legal advice or tax consultation? Our team of experts is here to help you navigate your business compliance needs.
         </p>
+
+        {/* Direct Appointment Portal Action */}
+        <a
+          href="https://appointment.accounticca.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+        >
+          <Calendar className="w-5 h-5 text-emerald-100" />
+          <span>Schedule Online Consultation via Appointment Portal</span>
+          <ExternalLink className="w-4 h-4 text-emerald-200" />
+        </a>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
@@ -53,6 +65,25 @@ export function Contact() {
                     Gulshan Avenue, Dhaka-1212<br />
                     Bangladesh
                   </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-emerald-600 shrink-0 shadow-sm border border-emerald-100">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 mb-1">Online Appointment</h3>
+                  <p className="text-slate-600 mb-2">Book a direct slot with our legal and tax consultants.</p>
+                  <a
+                    href="https://appointment.accounticca.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-800 underline underline-offset-4"
+                  >
+                    <span>Go to appointment portal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -99,6 +130,19 @@ export function Contact() {
               <button type="button" className="w-full bg-emerald-600 text-white rounded-xl px-6 py-4 font-bold hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-md">
                 <Send className="w-5 h-5" /> Send Message
               </button>
+
+              <div className="text-center pt-2">
+                <span className="text-xs text-slate-500 font-medium">Need an immediate legal appointment? </span>
+                <a
+                  href="https://appointment.accounticca.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold text-emerald-700 hover:text-emerald-800 underline inline-flex items-center gap-1"
+                >
+                  <span>Book with a lawyer now</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
           </form>
         </div>

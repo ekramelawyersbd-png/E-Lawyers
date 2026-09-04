@@ -1,6 +1,6 @@
 import { teamMembers } from '../data/teamData';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { Linkedin, Facebook, Youtube, MessageCircle, Mail, Phone } from 'lucide-react';
+import { Linkedin, Facebook, Youtube, MessageCircle, Mail, Phone, Calendar, ExternalLink } from 'lucide-react';
 
 export function Team() {
   return (
@@ -9,9 +9,19 @@ export function Team() {
       
       <div className="mb-10 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Professional Team</h1>
-        <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-600 text-lg max-w-2xl mx-auto mb-6">
           Meet the dedicated legal, tax, and corporate experts at E-Lawyers committed to delivering excellence.
         </p>
+        <a
+          href="https://appointment.accounticca.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all"
+        >
+          <Calendar className="w-4 h-4 text-emerald-100" />
+          <span>Book Consultation with Legal & Tax Team</span>
+          <ExternalLink className="w-4 h-4 text-emerald-200" />
+        </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -70,6 +80,19 @@ export function Team() {
                     <Phone className="w-4 h-4" />
                   </a>
                 )}
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <a
+                  href="https://appointment.accounticca.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-center py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Book Consultation</span>
+                  <ExternalLink className="w-3 h-3 text-emerald-600" />
+                </a>
               </div>
             </div>
           </div>

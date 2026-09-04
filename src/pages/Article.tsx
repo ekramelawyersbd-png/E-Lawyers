@@ -4,19 +4,19 @@ import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { saveItem, removeItem, isItemSaved } from '../utils/readingList';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText } from 'lucide-react';
+import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
 import { Comments } from '../components/Comments';
+import { SocialShareButtons } from '../components/SocialShareButtons';
 
 export function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
-  const [showShareToast, setShowShareToast] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -61,13 +61,6 @@ export function Article() {
     }
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShowShareToast(true);
-    setTimeout(() => setShowShareToast(false), 3000);
-  };
-
-  
   const searchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -123,21 +116,16 @@ export function Article() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button onClick={toggleSave} className={`p-2.5 rounded-full border ${isSaved ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}>
+                  <button 
+                    onClick={toggleSave} 
+                    title={isSaved ? "Remove from bookmarks" : "Bookmark this article"}
+                    aria-label={isSaved ? "Remove from bookmarks" : "Bookmark this article"}
+                    className={`p-2.5 rounded-xl border transition-colors ${isSaved ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                  >
                     <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
                   </button>
-                  <div className="flex gap-1 border-l border-slate-200 pl-2">
-                    <button className="p-2 text-slate-400 hover:text-[#1877F2] transition-colors"><Facebook className="w-4 h-4" /></button>
-                    <button className="p-2 text-slate-400 hover:text-[#1DA1F2] transition-colors"><Twitter className="w-4 h-4" /></button>
-                    <button className="p-2 text-slate-400 hover:text-[#0A66C2] transition-colors"><Linkedin className="w-4 h-4" /></button>
-                    <div className="relative">
-                      <button onClick={handleShare} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"><LinkIcon className="w-4 h-4" /></button>
-                      {showShareToast && (
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                          Link copied!
-                        </div>
-                      )}
-                    </div>
+                  <div className="border-l border-slate-200 pl-2">
+                    <SocialShareButtons title={article.title} summary={article.excerpt} variant="compact" />
                   </div>
                 </div>
               </div>
@@ -164,7 +152,7 @@ export function Article() {
             </div>
 
             {/* Tags */}
-            <div className="flex items-center gap-3 py-6 border-y border-slate-200 mb-12 flex-wrap">
+            <div className="flex items-center gap-3 py-6 border-y border-slate-200 mb-8 flex-wrap">
               <span className="text-sm font-bold text-slate-900">Related Tags:</span>
               {article.tags.map(tag => (
                 <Link key={tag} to={`/search?q=${encodeURIComponent(tag)}`} className="text-sm bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors">
@@ -172,6 +160,13 @@ export function Article() {
                 </Link>
               ))}
             </div>
+
+            {/* Social Media Sharing Banner */}
+            <SocialShareButtons 
+              title={article.title} 
+              summary={article.excerpt} 
+              variant="banner" 
+            />
 
             {/* Suggested Reading Footer Section */}
             {relatedArticles.length > 0 && (
@@ -219,12 +214,24 @@ export function Article() {
                   Our experts are ready to assist you with corporate compliance, tax filing, and legal documentation.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <Link to="/contact" className="bg-white text-emerald-900 px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-md">
-                    Consult a Lawyer
-                  </Link>
-                  <Link to="/contact" className="bg-emerald-700 text-white border border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors">
-                    Request Legal Service
-                  </Link>
+                  <a 
+                    href="https://appointment.accounticca.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="bg-white text-emerald-900 px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-md inline-flex items-center justify-center gap-2"
+                  >
+                    <span>Consult a Lawyer</span>
+                    <ExternalLink className="w-4 h-4 text-emerald-700" />
+                  </a>
+                  <a 
+                    href="https://appointment.accounticca.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="bg-emerald-700 text-white border border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors inline-flex items-center justify-center gap-2"
+                  >
+                    <span>Request Legal Service</span>
+                    <ExternalLink className="w-4 h-4 text-emerald-200" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -285,6 +292,25 @@ export function Article() {
                 </div>
               </div>
 
+              {/* Quick Share Widget */}
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <Share2 className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Share Insight</h3>
+                </div>
+                <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                  Share this statutory analysis with your professional network and colleagues.
+                </p>
+                <div className="bg-slate-50 p-2 rounded-2xl border border-slate-100 flex items-center justify-center">
+                  <SocialShareButtons 
+                    title={article.title} 
+                    summary={article.excerpt} 
+                    variant="compact" 
+                    className="justify-center w-full"
+                  />
+                </div>
+              </div>
+
               {/* Advertisement / Service Banner */}
               <div className="bg-slate-900 p-8 rounded-3xl text-center text-white shadow-lg relative overflow-hidden border border-slate-800">
                 <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
@@ -292,9 +318,15 @@ export function Article() {
                 </div>
                 <h3 className="text-xl font-bold mb-3 relative z-10">Company Registration Service</h3>
                 <p className="text-slate-400 text-sm mb-6 relative z-10">End-to-end RJSC incorporation and trade license acquisition.</p>
-                <Link to="/contact" className="inline-block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-colors relative z-10 shadow-md">
-                  Learn More
-                </Link>
+                <a 
+                  href="https://appointment.accounticca.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-colors relative z-10 shadow-md"
+                >
+                  <span>Book Consultation</span>
+                  <ExternalLink className="w-4 h-4 text-emerald-200" />
+                </a>
               </div>
 
             </div>

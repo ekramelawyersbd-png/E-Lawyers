@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
 import { BookmarkSectionButton } from '../components/BookmarkSectionButton';
 import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
+import { FAQ } from '../components/FAQ';
 
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
@@ -120,12 +121,24 @@ export function Home() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4">
-                <Link to="/contact" className="bg-white text-slate-900 hover:bg-slate-100 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md">
-                  Consult a Lawyer
-                </Link>
-                <Link to="/contact" className="bg-emerald-600 text-white hover:bg-emerald-500 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md">
-                  Get Legal Advice
-                </Link>
+                <a 
+                  href="https://appointment.accounticca.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-white text-slate-900 hover:bg-slate-100 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md"
+                >
+                  <span>Consult a Lawyer</span>
+                  <ExternalLink className="w-4 h-4 text-emerald-700" />
+                </a>
+                <a 
+                  href="https://appointment.accounticca.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-emerald-600 text-white hover:bg-emerald-500 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md"
+                >
+                  <span>Get Legal Advice</span>
+                  <ExternalLink className="w-4 h-4 text-emerald-200" />
+                </a>
               </div>
             </div>
 
@@ -391,16 +404,31 @@ export function Home() {
               Our expert team of corporate lawyers, tax consultants, and VAT specialists are ready to help your business grow securely.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <Link to="/contact" className="w-full sm:w-auto bg-white text-emerald-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg">
-                Book Consultation
-              </Link>
-              <Link to="/contact" className="w-full sm:w-auto bg-emerald-700 text-white hover:bg-emerald-600 border border-emerald-500 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg">
-                Request Callback
-              </Link>
+              <a 
+                href="https://appointment.accounticca.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full sm:w-auto bg-white text-emerald-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
+              >
+                <span>Book Consultation</span>
+                <ExternalLink className="w-5 h-5 text-emerald-800" />
+              </a>
+              <a 
+                href="https://appointment.accounticca.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full sm:w-auto bg-emerald-700 text-white hover:bg-emerald-600 border border-emerald-500 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
+              >
+                <span>Request Callback</span>
+                <ExternalLink className="w-5 h-5 text-emerald-200" />
+              </a>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Frequently Asked Legal & Tax Queries */}
+      <FAQ />
 
       {/* 10. Newsletter Subscription */}
             <section id="newsletter" className={`py-20 px-4 sm:px-6 lg:px-8 text-center relative group transition-colors ${isHighContrast ? 'bg-black border-t-[6px] border-yellow-400' : 'bg-emerald-50 border-t border-emerald-100'}`}>

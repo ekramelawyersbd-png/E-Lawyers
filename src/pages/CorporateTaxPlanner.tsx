@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2 } from 'lucide-react';
+import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 
 type CompanyCategory = 
@@ -341,13 +341,24 @@ export function CorporateTaxPlanner() {
               )}
             </div>
             
-            <div className="p-6 bg-slate-50 border-t border-slate-200">
+            <div className="p-6 bg-slate-50 border-t border-slate-200 space-y-3">
               <p className="text-xs text-slate-500 flex items-start gap-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
                   Disclaimer: This planner provides estimates based on standard rules from the Finance Act 2026. Actual tax liability may vary based on non-allowable expenses, detailed depreciation schedules, and other specific adjustments. Always consult a certified tax professional.
                 </span>
               </p>
+              <div className="pt-2">
+                <a
+                  href="https://appointment.accounticca.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-100/60 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition-colors"
+                >
+                  <span>Book Consultation with Corporate Tax Specialist</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
         </div>

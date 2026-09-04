@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { saveItem, removeItem, isItemSaved } from '../utils/readingList';
-import { Search, BookOpen, AlertCircle, FileText, Loader2, Bookmark } from 'lucide-react';
+import { Search, BookOpen, AlertCircle, FileText, Loader2, Bookmark, Calendar, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -177,6 +177,20 @@ export function TaxPolicyAnalysis() {
             <div className="markdown-body">
               <Markdown remarkPlugins={[remarkGfm]}>{analysisResult}</Markdown>
             </div>
+          </div>
+
+          <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500 font-medium">Need formal statutory legal opinion or tailored corporate tax advice?</p>
+            <a
+              href="https://appointment.accounticca.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors shrink-0"
+            >
+              <Calendar className="w-3.5 h-3.5 text-emerald-100" />
+              <span>Book Legal Consultation</span>
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-100" />
+            </a>
           </div>
         </div>
       )}

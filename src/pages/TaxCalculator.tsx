@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart } from 'lucide-react';
+import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { TaxHistory, SavedCalculation } from '../components/calculator/TaxHistory';
 import { useAuth } from '../contexts/AuthContext';
@@ -521,6 +521,26 @@ export function TaxCalculator() {
                   </ResponsiveContainer>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Direct Consultation Link */}
+          {calculation.grossTax > 0 && (
+            <div className="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-base font-bold text-white mb-1">Need help filing your income tax return?</h4>
+                <p className="text-xs text-emerald-100">Schedule a 1-on-1 advisory with certified tax lawyers and consultants.</p>
+              </div>
+              <a
+                href="https://appointment.accounticca.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white text-emerald-900 hover:bg-emerald-50 px-5 py-2.5 rounded-xl font-bold text-xs shadow transition-colors shrink-0"
+              >
+                <Calendar className="w-4 h-4 text-emerald-700" />
+                <span>Book Tax Consultation</span>
+                <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
+              </a>
             </div>
           )}
         </div>
