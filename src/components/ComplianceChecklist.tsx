@@ -1,26 +1,30 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, Bell, Calendar, X, CalendarPlus, ExternalLink } from 'lucide-react';
+import { LegalTooltip } from './LegalTooltip';
 
 const REQUIREMENTS = [
   {
     id: 'schedule-x',
     title: 'Schedule X',
-    description: 'A statutory return containing updated company information, including shareholding and director details.'
+    description: 'A statutory return containing updated company information, including shareholding and director details.',
+    tooltip: 'An annual summary of share capital, shareholders, and directors required by the Registrar of Joint Stock Companies (RJSC).'
   },
   {
     id: 'audited-financials',
     title: 'Audited Financial Statements',
-    description: 'Financial statements prepared and audited according to applicable accounting and auditing requirements.'
+    description: 'Financial statements prepared and audited according to applicable accounting and auditing requirements.',
   },
   {
     id: 'form-23b',
     title: 'Form 23B',
-    description: 'A notice submitted by the appointed auditor regarding acceptance of the audit assignment.'
+    description: 'A notice submitted by the appointed auditor regarding acceptance of the audit assignment.',
+    tooltip: 'The official statutory notice filed by a newly appointed auditor confirming their acceptance to audit the company.'
   },
   {
     id: 'icab-dvc',
     title: 'ICAB Document Verification Code (DVC)',
-    description: 'Audit reports submitted through RJSC must include the required Document Verification Code (DVC) issued by ICAB.'
+    description: 'Audit reports submitted through RJSC must include the required Document Verification Code (DVC) issued by ICAB.',
+    tooltip: 'A unique code issued by the Institute of Chartered Accountants of Bangladesh (ICAB) to authenticate audit reports.'
   }
 ];
 
@@ -141,7 +145,7 @@ export function ComplianceChecklist() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-indigo-900 mb-1.5">
-                When was your Annual General Meeting (AGM)?
+                When was your <LegalTooltip term="Annual General Meeting (AGM)" definition="A mandatory yearly gathering of a company's interested shareholders where the directors present an annual report containing information for shareholders about the company's performance and strategy.">Annual General Meeting (AGM)</LegalTooltip>?
               </label>
               <input 
                 type="date" 
@@ -250,7 +254,11 @@ export function ComplianceChecklist() {
               
               <div className="flex-1">
                 <h4 className={`font-semibold text-base transition-colors ${isChecked ? 'text-emerald-900' : 'text-slate-900'}`}>
-                  {req.title}
+                  {req.tooltip ? (
+                    <LegalTooltip term={req.title} definition={req.tooltip}>{req.title}</LegalTooltip>
+                  ) : (
+                    req.title
+                  )}
                 </h4>
                 <p className={`text-sm mt-1 leading-relaxed ${isChecked ? 'text-emerald-700/80' : 'text-slate-500'}`}>
                   {req.description}
