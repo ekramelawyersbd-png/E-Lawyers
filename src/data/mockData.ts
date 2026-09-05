@@ -49,6 +49,224 @@ export const categories: { id: string; name: Category; description: string }[] =
 
 export const mockArticles: Article[] = [
   {
+    id: 'how-to-use-ai-agents-to-push-project-github-safely',
+    title: 'How to Use AI Agents to Push Your Complete Project to GitHub Safely',
+    excerpt: 'Learn how to securely and efficiently push your complete software projects to GitHub using AI agents with proper instructions, workflows, and best practices.',
+    content: `# How to Use AI Agents to Push Your Complete Project to GitHub Safely
+
+Artificial Intelligence has changed the way developers build, manage, and maintain software projects. Modern AI coding assistants can analyze code, fix issues, prepare repositories, and even help push complete projects to GitHub. However, without proper instructions, an AI agent may create unnecessary changes or overlook important security steps.
+
+A well-defined AI instruction system ensures that your project is reviewed, optimized, and uploaded to GitHub following professional development practices.
+
+## Why Give Proper Instructions to an AI Agent?
+
+AI agents can perform complex development tasks, but they need clear guidance. A proper instruction helps the AI understand:
+
+* How to review the existing codebase
+* Which files need improvement
+* How to prepare a GitHub repository
+* How to protect sensitive information
+* How to create professional commits
+* How to verify the final deployment
+
+Without proper instructions, AI may push incomplete code, expose credentials, or create unnecessary changes.
+
+## Step 1: Analyze the Entire Project
+
+Before pushing anything to GitHub, the AI agent should first understand the project structure.
+
+The AI should review:
+
+* Project folders and files
+* Framework and technology stack
+* Dependencies and packages
+* Configuration files
+* Environment settings
+* Existing errors or warnings
+
+This analysis helps identify problems before publishing the project.
+
+## Step 2: Improve Code Quality
+
+Before creating a Git commit, the AI should verify that the project follows development standards.
+
+The AI should:
+
+* Fix syntax errors
+* Remove unused code
+* Improve file organization
+* Update outdated dependencies
+* Apply consistent formatting
+* Check application performance
+
+The goal is to push clean, maintainable, and production-ready code.
+
+## Step 3: Prepare the GitHub Repository
+
+A professional repository requires proper documentation and configuration.
+
+The AI should create or update:
+
+### README.md
+
+The README file should include:
+
+* Project overview
+* Features
+* Installation instructions
+* Usage guide
+* Technology stack
+* Environment setup instructions
+
+### .gitignore
+
+The AI must ensure unnecessary files are excluded, such as:
+
+* node_modules
+* Build folders
+* Local configuration files
+* Environment variables
+
+### Security Check
+
+Before pushing, the AI must remove:
+
+* API keys
+* Database passwords
+* Secret tokens
+* Private credentials
+
+Sensitive information should never be uploaded to GitHub.
+
+## Step 4: Initialize Git and Create Commit
+
+Once the project is ready, the AI agent should manage Git properly.
+
+Typical Git workflow:
+
+\`\`\`bash
+git status
+git add .
+git commit -m "Complete project setup and improvements"
+\`\`\`
+
+A meaningful commit message helps developers understand project history.
+
+## Step 5: Push the Project to GitHub
+
+After reviewing all changes, the AI can connect the repository and push the code.
+
+Example commands:
+
+\`\`\`bash
+git branch -M main
+git remote add origin <GITHUB_REPOSITORY_URL>
+git push -u origin main
+\`\`\`
+
+The AI should never force push unless specifically requested because it may overwrite important work.
+
+## Step 6: Verify the Repository
+
+After uploading, the AI should confirm:
+
+* All files are available on GitHub
+* Repository structure is correct
+* Documentation works properly
+* The project can be cloned successfully
+* Build and installation instructions are accurate
+
+A final verification prevents deployment problems later.
+
+## Best Practices for AI-Powered GitHub Management
+
+When using AI agents with GitHub, follow these rules:
+
+### Always Review Before Push
+
+AI-generated changes should always be checked using:
+
+\`\`\`bash
+git diff
+\`\`\`
+
+before committing.
+
+### Keep Commits Organized
+
+Use clear commit messages:
+
+**Good:**
+\`\`\`
+Add authentication system
+\`\`\`
+
+**Bad:**
+\`\`\`
+Update files
+\`\`\`
+
+### Never Upload Secrets
+
+Always protect:
+
+* \`.env\` files
+* Private keys
+* Credentials
+* Production configuration
+
+### Test Before Publishing
+
+Run:
+
+* Build commands
+* Automated tests
+* Application checks
+
+before pushing to the repository.
+
+## Example AI Instruction for GitHub Push
+
+\`\`\`
+You are an expert software engineer and GitHub repository manager.
+
+Analyze the complete project.
+Review all files and dependencies.
+Fix issues and improve code quality.
+Prepare README.md and .gitignore.
+Remove sensitive information.
+Review all changes before committing.
+Create a professional Git commit.
+Push the complete project to GitHub.
+Verify the repository after upload.
+Provide a final report with changes and repository details.
+\`\`\`
+
+## Conclusion
+
+AI agents can significantly speed up software development and GitHub management, but success depends on providing clear instructions. A structured workflow ensures that your project is secure, optimized, documented, and ready for collaboration.
+
+By combining AI automation with proper Git practices, developers can save time while maintaining professional-quality code management.`,
+    categoryId: 'startup',
+    author: mockAuthors.a1,
+    category: 'Business & Startup', publishedAt: new Date().toISOString(),
+    readTime: 5, likes: 215, comments: 24,
+    imageUrl: 'https://images.unsplash.com/photo-1674027444485-cec3da58eef4?auto=format&fit=crop&w=1200&q=80',
+    tags: ['AI', 'GitHub', 'Software Engineering', 'Git', 'DevOps', 'Best Practices', 'Automation']
+  },
+  {
+    id: 'required-documents-rjsc-annual-return-filing-bangladesh',
+    title: 'Required Documents for RJSC Annual Return Filing in Bangladesh | Complete Guide',
+    excerpt: 'Understand the essential documents required for RJSC Annual Return Filing in Bangladesh and ensure proper corporate compliance with Schedule X, audited financial statements, Form 23B, and ICAB DVC requirements.',
+    content: `# RJSC Return Filing in Bangladesh \n\nThe Office of the Registrar of Joint Stock Companies and Firms (RJSC) is the regulatory authority responsible for company registration and post-registration compliance activities in Bangladesh. Under laws such as the Companies Act, 1994, Partnership Act, 1932, and Societies Registration Act, 1860, RJSC manages corporate records and ensures that registered entities maintain required compliance obligations.\n\nOne of the key post-registration activities handled through the RJSC platform is Return Filing. Registered companies, partnerships, and other entities can use the RJSC online portal to submit required information, review previously submitted returns, update records where applicable, and obtain filing records.\n\n## Why RJSC Return Filing Matters\n\nRegular return filing helps businesses:\n\n* Maintain compliance with regulatory requirements\n* Keep company information updated with RJSC records\n* Avoid potential compliance complications\n* Maintain proper corporate documentation for future business activities\n\n## RJSC Online Filing Services\n\nThe RJSC portal provides digital access to return filing-related services. Users can log in to their registered accounts to manage submissions and access available filing features.\n\nRJSC also provides a Fee Calculator facility to help users estimate applicable filing charges before completing their submissions.\n\n## Professional Support for Corporate Compliance\n\nCorporate compliance requirements can become complex, especially for companies managing multiple statutory obligations. Many organizations choose to work with professional corporate secretarial service providers to assist with:\n\n* Annual return filing support\n* Corporate record maintenance\n* Compliance tracking\n* Pending or delayed filing management (“catch-up filings”)\n\nProfessional guidance can help companies maintain accurate records and complete compliance activities more efficiently. \n\n---\n\n# RJSC Annual Return Filing in Bangladesh – Requirements, Deadlines & Compliance Guide\n\nThe Office of the Registrar of Joint Stock Companies and Firms (RJSC) plays a central role in maintaining corporate compliance records in Bangladesh. Every registered company is required to submit annual returns and related documents to keep its corporate information updated and maintain legal compliance.\n\nAnnual return filing is not only a regulatory obligation but also an essential part of maintaining a company’s good standing with RJSC. Failure to complete required filings within the applicable timelines may result in penalties, compliance complications, and additional administrative procedures.\n\n## Understanding RJSC Annual Return Filing\n\nAn annual return provides RJSC with updated information about a company’s:\n\n* Share capital structure\n* Shareholders and members\n* Directors and company officers\n* Corporate status and statutory records\n\nThe filing process ensures that the government database contains accurate and current information about registered companies.\n\n## Statutory Filing Timeline\n\nUnder the Companies Act, 1994, companies are required to complete annual return submissions within prescribed timelines after conducting their Annual General Meeting (AGM).\n\nKey timeline requirements include:\n\n### Schedule X Filing\n\nSchedule X generally contains important company information, including:\n\n* Summary of share capital\n* List of shareholders or members\n* Details of directors and company officers\n\nCompanies are required to submit Schedule X within the statutory period following the AGM.\n\n### Audited Financial Statements Submission\n\nCompanies must also submit audited financial statements as part of their annual compliance obligations. These documents provide financial transparency and demonstrate proper corporate reporting.\n\nLate submission may lead to additional compliance issues and possible penalties according to applicable laws and regulations.\n\n## Required Documents for RJSC Annual Return Filing\n\nCommon documents involved in annual return filing include:\n\n### 1. Schedule X\nA statutory return containing updated company information, including shareholding and director details.\n\n### 2. Audited Financial Statements\nFinancial statements prepared and audited according to applicable accounting and auditing requirements.\n\n### 3. Form 23B\nA notice submitted by the appointed auditor regarding acceptance of the audit assignment.\n\n### 4. ICAB Document Verification Code (DVC)\nAudit reports submitted through RJSC must include the required Document Verification Code (DVC) issued under the system of the Institute of Chartered Accountants of Bangladesh (ICAB).\n\nThe DVC requirement helps verify the authenticity of audit documents and strengthens financial reporting transparency.\n\n## Digital RJSC Filing Process\n\nRJSC has introduced an online filing system to simplify corporate compliance activities. Through the official RJSC portal, companies can:\n\n* Upload required documents\n* Submit annual returns electronically\n* Calculate applicable filing fees\n* Complete digital payment procedures\n* Maintain electronic filing records\n\nThe digital workflow reduces manual paperwork and provides a more efficient compliance process.\n\n## Importance of Timely Annual Return Filing\n\nMaintaining timely annual return compliance helps companies:\n\n* Preserve good legal standing\n* Keep corporate records updated\n* Avoid unnecessary penalties and complications\n* Support business credibility with investors, banks, and stakeholders\n* Maintain proper corporate governance practices\n\n## Professional Assistance for RJSC Compliance\n\nAnnual return filing involves multiple documents, statutory requirements, and regulatory procedures. Many companies seek professional corporate secretarial support to manage:\n\n* Annual return preparation\n* Document review\n* RJSC submission support\n* Compliance monitoring\n* Pending filing regularization\n\nProfessional assistance can help businesses reduce administrative risks and maintain continuous compliance.\n\n---\n**Disclaimer**\n*The information provided in this article is intended for general informational and educational purposes only and should not be considered legal, accounting, financial, or professional compliance advice.*\n\n*The content provides an overview of RJSC annual return filing requirements based on available regulatory information. While efforts have been made to ensure accuracy, laws, procedures, forms, filing requirements, fees, and deadlines may change due to updates from regulatory authorities.*\n\n*This article does not guarantee compliance outcomes and should not be used as a substitute for professional advice. Companies should verify the latest requirements directly through the official RJSC portal and consult qualified corporate secretarial, legal, or accounting professionals before submitting statutory filings.*\n\n*The authors, publishers, and associated service providers shall not be responsible for any penalties, losses, delays, or consequences arising from reliance on the information provided in this article.*\n\n*This content does not establish a professional-client relationship between the reader and any advisor or organization.*`,
+    categoryId: 'corporate',
+    author: mockAuthors.a1,
+    category: 'Corporate Law', publishedAt: new Date().toISOString(),
+    readTime: 6, likes: 124, comments: 18,
+    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+    tags: ['RJSC', 'Annual Return', 'Bangladesh', 'Corporate Compliance', 'Schedule X', 'Company Law', 'DVC']
+  },
+  {
     id: 'income-tax-calculation-guide-2026-27',
     title: 'Bangladesh Income Tax Calculation Guide 2026-27: Tax Slabs, Rebates and Examples',
     excerpt: 'A comprehensive guide explaining the updated individual income tax rates, tax-free limits, investment rebates, minimum tax requirements for 2026-27.',

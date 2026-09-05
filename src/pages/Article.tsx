@@ -13,6 +13,8 @@ import { ReadAloudButton } from '../components/ReadAloudButton';
 import { Comments } from '../components/Comments';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 
+import { ComplianceChecklist } from '../components/ComplianceChecklist';
+
 export function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -150,6 +152,11 @@ export function Article() {
             <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 prose-img:rounded-2xl prose-img:border prose-img:border-slate-200 mb-16">
               <Markdown remarkPlugins={[remarkGfm]}>{article.content}</Markdown>
             </div>
+
+            {/* Conditional RJSC Checklist Injection */}
+            {article.id === 'required-documents-rjsc-annual-return-filing-bangladesh' && (
+              <ComplianceChecklist />
+            )}
 
             {/* Tags */}
             <div className="flex items-center gap-3 py-6 border-y border-slate-200 mb-8 flex-wrap">
