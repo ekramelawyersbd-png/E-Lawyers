@@ -2,9 +2,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
-import { saveItem, removeItem, isItemSaved } from '../utils/readingList';
+import { isItemSaved } from '../utils/readingList';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff } from 'lucide-react';
+import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -13,6 +13,8 @@ import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
 import { Comments } from '../components/Comments';
 import { SocialShareButtons } from '../components/SocialShareButtons';
+import { useAuth } from '../contexts/AuthContext';
+import { saveBookmark, removeBookmark } from '../services/bookmarkService';
 
 import { ComplianceChecklist } from '../components/ComplianceChecklist';
 import { ImageCarousel } from '../components/ImageCarousel';
@@ -28,7 +30,9 @@ import { NewsletterSignup } from '../components/NewsletterSignup';
 export function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
+  const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -67,13 +71,14 @@ export function Article() {
     );
   }
 
-  const toggleSave = () => {
-    if (!id) return;
+  const toggleSave = async () => {
+    if (!id || !article) return;
     if (isSaved) {
-      removeItem(id);
+      await removeBookmark(id, user);
       setIsSaved(false);
+      setSaveFeedback(null);
     } else {
-      saveItem({
+      await saveBookmark({
         id,
         title: article.title,
         type: 'article',
@@ -81,9 +86,15 @@ export function Article() {
         dateSaved: new Date().toISOString(),
         offlineContent: article.content,
         offlineExcerpt: article.excerpt,
-        offlineImageUrl: article.imageUrl
-      });
+        offlineImageUrl: article.imageUrl,
+        category: article.category,
+        categoryId: article.categoryId,
+        readTime: article.readTime,
+        authorName: article.author?.name
+      }, user);
       setIsSaved(true);
+      setSaveFeedback(user ? 'Saved to your private Saved Items on your Dashboard' : 'Saved locally on this device. Sign in to sync across devices');
+      setTimeout(() => setSaveFeedback(null), 4500);
     }
   };
 
@@ -188,29 +199,52 @@ export function Article() {
                     <p className="font-bold text-slate-900">{article.author.name}</p>
                     <div className="flex items-center gap-3 text-sm text-slate-500">
                       <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
+                      <span>&bull;</span>
+                      <a href="#professional-comments-section" className="flex items-center gap-1 text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
+                        <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Discussion</span>
+                      </a>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button 
-                    id="article-bookmark-btn"
-                    onClick={toggleSave} 
-                    title={isSaved ? "Remove from bookmarked guides" : "Bookmark this legal guide"}
-                    aria-label={isSaved ? "Remove from bookmarked guides" : "Bookmark this legal guide"}
-                    className={`px-4 py-2.5 rounded-xl border font-semibold transition-all flex items-center gap-2 ${
-                      isSaved 
-                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' 
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
-                    }`}
-                  >
-                    <Bookmark className={`w-4 h-4 transition-transform active:scale-125 duration-150 ${isSaved ? 'fill-current text-emerald-600' : ''}`} />
-                    <span className="hidden sm:inline text-sm">{isSaved ? "Bookmarked" : "Bookmark Guide"}</span>
-                  </button>
-                  <div className="border-l border-slate-200 pl-2">
-                    <SocialShareButtons title={article.title} summary={article.excerpt} variant="compact" />
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-2">
+                    <button 
+                      id="article-bookmark-btn"
+                      onClick={toggleSave} 
+                      title={isSaved ? "Remove from Saved Items" : "Save this article to your private Dashboard"}
+                      aria-label={isSaved ? "Remove from Saved Items" : "Save this article to your private Dashboard"}
+                      className={`px-4 py-2.5 rounded-xl border font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                        isSaved 
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' 
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
+                      }`}
+                    >
+                      <Bookmark className={`w-4 h-4 transition-transform active:scale-125 duration-150 ${isSaved ? 'fill-current text-emerald-600' : ''}`} />
+                      <span className="hidden sm:inline text-sm">{isSaved ? "Saved to Dashboard" : "Save Article"}</span>
+                    </button>
                   </div>
+
+                  {saveFeedback && (
+                    <div id="bookmark-save-feedback" className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs shadow-xs animate-in fade-in">
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{saveFeedback}</span>
+                      <Link to="/dashboard?tab=saved" className="font-bold underline ml-1 hover:text-emerald-950">
+                        View Dashboard &rarr;
+                      </Link>
+                    </div>
+                  )}
                 </div>
+              </div>
+
+              {/* Top Social Sharing Bar (LinkedIn, Facebook, WhatsApp, Copy Link) */}
+              <div className="pt-6">
+                <SocialShareButtons 
+                  title={article.title} 
+                  summary={article.excerpt} 
+                  variant="top-bar" 
+                />
               </div>
             </header>
 
@@ -268,11 +302,11 @@ export function Article() {
               ))}
             </div>
 
-            {/* Social Media Sharing Banner */}
+            {/* Bottom Social Media Sharing & Networking Bar */}
             <SocialShareButtons 
               title={article.title} 
               summary={article.excerpt} 
-              variant="banner" 
+              variant="bottom-bar" 
             />
 
             {/* Suggested Reading Footer Section */}
@@ -343,8 +377,8 @@ export function Article() {
               </div>
             </div>
 
-            {/* 11. Comments Section */}
-            <Comments articleId={article.id} />
+            {/* 11. Professional Comments & Peer Discussion Section */}
+            <Comments articleId={article.id} articleTitle={article.title} />
 
           </div>
 

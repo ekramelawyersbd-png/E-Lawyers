@@ -7,75 +7,140 @@ import {
   PenSquare, 
   Bell, 
   BellRing, 
-  Download,
-  ExternalLink, 
+  Download, 
   Trash2,
   Search,
   Clock,
   ArrowRight,
   Sparkles,
-  BookOpen
+  ShieldCheck,
+  Cloud,
+  LogIn,
+  RefreshCw,
+  Check,
+  Lock,
+  User as UserIcon,
+  LogOut
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
-import { getSavedItems, SavedItem, removeItem, clearSavedItems, saveItem } from '../utils/readingList';
+import { getSavedItems, SavedItem, clearSavedItems } from '../utils/readingList';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  saveBookmark, 
+  removeBookmark, 
+  subscribeToUserSavedItems, 
+  syncLocalBookmarksToCloud 
+} from '../services/bookmarkService';
 
 export function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
+  const { user, signInWithGoogle, logout } = useAuth();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'bookmarks' | 'articles'>(
-    tabParam === 'articles' ? 'articles' : 'bookmarks'
+  // Support both 'saved' and 'bookmarks' tab parameter for backwards compatibility
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles'>(
+    tabParam === 'articles' ? 'articles' : 'saved'
   );
-  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>(() => getSavedItems());
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [confirmClear, setConfirmClear] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (tabParam === 'articles' || tabParam === 'bookmarks') {
-      setActiveTab(tabParam);
+    if (tabParam === 'articles') {
+      setActiveTab('articles');
+    } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
+      setActiveTab('saved');
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'bookmarks' | 'articles') => {
+  const switchTab = (tab: 'saved' | 'articles') => {
     setActiveTab(tab);
     setSearchParams({ tab });
   };
 
+  // Synchronize saved items:
+  // If user is logged in, attach real-time Firestore listener; otherwise listen to local storage events
   useEffect(() => {
+    // Initial local read
     setSavedItems(getSavedItems());
-    
-    const handleStorageChange = () => {
-      setSavedItems(getSavedItems());
-    };
-    window.addEventListener('bookmarksUpdated', handleStorageChange);
-    return () => window.removeEventListener('bookmarksUpdated', handleStorageChange);
-  }, []);
 
-  const handleRemoveSaved = (id: string, e?: React.MouseEvent) => {
+    let unsubscribeFirestore: (() => void) | null = null;
+
+    if (user) {
+      unsubscribeFirestore = subscribeToUserSavedItems(
+        user.uid,
+        (cloudItems) => {
+          // Merge cloud items with local items (cloud takes precedence for persistence)
+          const localItems = getSavedItems();
+          const itemMap = new Map<string, SavedItem>();
+          
+          // Add local items
+          localItems.forEach(item => itemMap.set(item.id, item));
+          // Add/override with cloud items
+          cloudItems.forEach(item => itemMap.set(item.id, item));
+          
+          const merged = Array.from(itemMap.values()).sort(
+            (a, b) => new Date(b.dateSaved).getTime() - new Date(a.dateSaved).getTime()
+          );
+          setSavedItems(merged);
+        },
+        (err) => {
+          console.warn('Firestore subscription fallback to local storage', err);
+          setSavedItems(getSavedItems());
+        }
+      );
+    }
+
+    const handleStorageChange = () => {
+      if (!user) {
+        setSavedItems(getSavedItems());
+      }
+    };
+
+    window.addEventListener('bookmarksUpdated', handleStorageChange);
+    return () => {
+      window.removeEventListener('bookmarksUpdated', handleStorageChange);
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+      }
+    };
+  }, [user]);
+
+  const handleRemoveSaved = async (id: string, e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    removeItem(id);
-    setSavedItems(getSavedItems());
+    await removeBookmark(id, user);
+    setSavedItems(prev => prev.filter(i => i.id !== id));
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
+    // Remove all saved items
+    const itemsToDelete = [...savedItems];
     clearSavedItems();
     setSavedItems([]);
     setConfirmClear(false);
+
+    if (user) {
+      for (const item of itemsToDelete) {
+        await removeBookmark(item.id, user);
+      }
+    }
   };
 
-  const handleQuickBookmark = (articleId: string) => {
+  const handleQuickBookmark = async (articleId: string) => {
     const article = mockArticles.find(a => a.id === articleId);
     if (article) {
-      saveItem({
+      await saveBookmark({
         id: article.id,
         title: article.title,
         type: 'article',
@@ -87,8 +152,26 @@ export function Dashboard() {
         categoryId: article.categoryId,
         readTime: article.readTime,
         authorName: article.author?.name
-      });
+      }, user);
       setSavedItems(getSavedItems());
+    }
+  };
+
+  const handleSyncToCloud = async () => {
+    if (!user) {
+      await signInWithGoogle();
+      return;
+    }
+    setIsSyncing(true);
+    try {
+      const count = await syncLocalBookmarksToCloud(user);
+      setSyncSuccessMsg(`Successfully synced ${count} item${count === 1 ? '' : 's'} to your cloud library!`);
+      setTimeout(() => setSyncSuccessMsg(null), 4000);
+    } catch {
+      setSyncSuccessMsg('Cloud synchronization completed.');
+      setTimeout(() => setSyncSuccessMsg(null), 3000);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -113,7 +196,7 @@ export function Dashboard() {
   const simulateAmendmentAlert = () => {
     if (notificationPermission === 'granted') {
       const notification = new Notification('Finance Act 2026 Amendment', {
-        body: 'A new amendment affecting "Corporate Tax" (your bookmarked category) has been published.',
+        body: 'A new amendment affecting "Corporate Tax" (your saved category) has been published.',
         icon: '/vite.svg',
       });
 
@@ -152,46 +235,111 @@ export function Dashboard() {
     return mockArticles.slice(0, 3);
   }, []);
 
+  // Compute initials for user avatar
+  const userInitials = useMemo(() => {
+    if (!user) return 'GU';
+    if (user.displayName) {
+      return user.displayName
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+    }
+    return user.email ? user.email.substring(0, 2).toUpperCase() : 'U';
+  }, [user]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row gap-8">
       {/* Sidebar */}
       <aside className="w-full md:w-64 shrink-0">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-6">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl">
-              JD
-            </div>
-            <div>
-              <h2 className="font-bold text-slate-900">John Doe</h2>
-              <p className="text-[10px] uppercase tracking-widest text-emerald-700 font-bold">Contributor</p>
+          {/* User Profile Card */}
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+            {user?.photoURL ? (
+              <img 
+                src={user.photoURL} 
+                alt={user.displayName || "User avatar"} 
+                className="w-12 h-12 rounded-2xl object-cover border border-slate-200"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0">
+                {userInitials}
+              </div>
+            )}
+            <div className="min-w-0">
+              <h2 className="font-bold text-slate-900 truncate">
+                {user ? user.displayName || user.email?.split('@')[0] : 'Guest User'}
+              </h2>
+              <p className="text-[10px] uppercase tracking-widest text-emerald-700 font-bold flex items-center gap-1">
+                {user ? (
+                  <>
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>Private Account</span>
+                  </>
+                ) : (
+                  <span>Offline Session</span>
+                )}
+              </p>
             </div>
           </div>
+
+          {/* Navigation Links */}
           <nav className="space-y-2 mb-6">
             <button 
               id="dashboard-tab-bookmarks"
-              onClick={() => switchTab('bookmarks')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm ${activeTab === 'bookmarks' ? 'bg-emerald-50 text-emerald-700 shadow-xs' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'}`}
+              onClick={() => switchTab('saved')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'saved' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
             >
               <div className="flex items-center gap-3">
                 <BookMarked className="w-5 h-5 text-emerald-600" />
-                <span>Bookmarks</span>
+                <span>Saved Items</span>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${activeTab === 'bookmarks' ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'saved' ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'
+              }`}>
                 {savedItems.length}
               </span>
             </button>
+
             <button 
               id="dashboard-tab-articles"
               onClick={() => switchTab('articles')} 
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm ${activeTab === 'articles' ? 'bg-emerald-50 text-emerald-700 shadow-xs' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'}`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'articles' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
             >
               <PenSquare className="w-5 h-5" /> 
               <span>My Articles</span>
             </button>
-            <a href="#" className="flex items-center gap-3 px-3.5 py-2.5 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-xl font-bold text-sm">
-              <Settings className="w-5 h-5" /> 
-              <span>Settings</span>
-            </a>
+
+            <div className="pt-2">
+              {user ? (
+                <button
+                  id="dashboard-logout-btn"
+                  onClick={logout}
+                  className="w-full flex items-center gap-3 px-3.5 py-2 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors rounded-xl font-semibold text-xs cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              ) : (
+                <button
+                  id="dashboard-signin-btn"
+                  onClick={signInWithGoogle}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Sign In with Google</span>
+                </button>
+              )}
+            </div>
           </nav>
           
           <div className="border-t border-slate-100 pt-6">
@@ -214,7 +362,7 @@ export function Dashboard() {
             <h3 className="font-bold">Alerts</h3>
           </div>
           <p className="text-emerald-200 text-sm mb-4">
-            Get notified instantly when amendments affect your bookmarked categories.
+            Get notified instantly when amendments affect your saved legal categories.
           </p>
           
           {notificationPermission !== 'granted' ? (
@@ -244,24 +392,43 @@ export function Dashboard() {
 
         <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
           {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 border-b border-slate-100 pb-6">
             <div>
-              <h1 id="dashboard-section-title" className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-                {activeTab === 'bookmarks' ? (
-                  <>
-                    <BookMarked className="w-6 h-6 text-emerald-600" />
-                    <span>Bookmarked Legal Guides</span>
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-6 h-6 text-emerald-600" />
-                    <span>My Articles</span>
-                  </>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 id="dashboard-section-title" className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+                  {activeTab === 'saved' ? (
+                    <>
+                      <BookMarked className="w-6 h-6 text-emerald-600" />
+                      <span>Saved Items</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-6 h-6 text-emerald-600" />
+                      <span>My Articles</span>
+                    </>
+                  )}
+                </h1>
+
+                {activeTab === 'saved' && (
+                  user ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Private Library</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
+                      <Lock className="w-3 h-3 text-slate-500" />
+                      <span>Local Device Only</span>
+                    </span>
+                  )
                 )}
-              </h1>
+              </div>
+
               <p className="text-sm text-slate-500 mt-1">
-                {activeTab === 'bookmarks' 
-                  ? 'Favorite statutory guides, tax analyses, and compliance policies saved locally on this device.'
+                {activeTab === 'saved' 
+                  ? user 
+                    ? 'Your private, cloud-synchronized repository of statutory guides, tax policies, and legal analyses.'
+                    : 'Statutory guides and legal analyses saved on this device. Sign in to sync across all your devices.'
                   : 'Manage and publish legal insights for the E-Lawyers community.'}
               </p>
             </div>
@@ -274,11 +441,24 @@ export function Dashboard() {
                 <PenSquare className="w-4 h-4" /> New Article
               </button>
             ) : (
-              savedItems.length > 0 && (
-                <div className="flex items-center gap-2">
-                  {confirmClear ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                {user && (
+                  <button
+                    id="sync-cloud-bookmarks-btn"
+                    onClick={handleSyncToCloud}
+                    disabled={isSyncing}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                    title="Sync local bookmarks to cloud"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-emerald-600' : ''}`} />
+                    <span>{isSyncing ? 'Syncing...' : 'Sync to Cloud'}</span>
+                  </button>
+                )}
+
+                {savedItems.length > 0 && (
+                  confirmClear ? (
                     <div className="flex items-center gap-2 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl">
-                      <span className="text-xs text-red-700 font-semibold">Clear all bookmarks?</span>
+                      <span className="text-xs text-red-700 font-semibold">Clear all saved items?</span>
                       <button
                         id="confirm-clear-bookmarks-btn"
                         onClick={handleClearAll}
@@ -301,11 +481,43 @@ export function Dashboard() {
                     >
                       Clear All
                     </button>
-                  )}
-                </div>
-              )
+                  )
+                )}
+              </div>
             )}
           </div>
+
+          {/* Sync Success Message */}
+          {syncSuccessMsg && (
+            <div className="mb-6 flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-2.5 rounded-2xl text-xs font-bold animate-in fade-in">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{syncSuccessMsg}</span>
+            </div>
+          )}
+
+          {/* Guest Sign-in Callout if not logged in */}
+          {activeTab === 'saved' && !user && (
+            <div id="saved-items-auth-prompt" className="mb-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl shrink-0 mt-0.5 sm:mt-0">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">Make your Saved Items permanent & private</h4>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                    You are currently saving articles locally on this browser. Sign in with Google to automatically back up your saved guides to your private cloud library and access them across all your devices.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={signInWithGoogle}
+                className="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-xs whitespace-nowrap"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In with Google</span>
+              </button>
+            </div>
+          )}
           
           {activeTab === 'articles' ? (
             <div id="my-articles-empty-state" className="flex flex-col items-center justify-center h-64 text-center">
@@ -330,7 +542,7 @@ export function Dashboard() {
                       type="text"
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
-                      placeholder="Search bookmarked guides..."
+                      placeholder="Search saved guides, tax policies, or keywords..."
                       className="w-full pl-9 pr-4 py-2 bg-white text-xs sm:text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
@@ -377,15 +589,15 @@ export function Dashboard() {
                   <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
                     <BookMarked className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">No bookmarked legal guides yet</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No saved items in your library yet</h3>
                   <p className="text-slate-500 max-w-md mx-auto text-sm mb-8 leading-relaxed">
-                    Save articles, statutory provisions, and tax compliance guidelines while researching. Click the bookmark icon on any guide to store it here for offline reading and instant reference.
+                    Bookmark articles, statutory provisions, and tax compliance guidelines while researching. Click the bookmark icon on any guide to store it here in your private Saved Items library for future reference.
                   </p>
 
                   <div className="border-t border-slate-100 pt-8 max-w-2xl mx-auto text-left">
                     <div className="flex items-center gap-2 mb-4">
                       <Sparkles className="w-4 h-4 text-emerald-600" />
-                      <h4 className="text-sm font-bold uppercase tracking-wider text-slate-700">Recommended Legal Guides</h4>
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-slate-700">Recommended Legal Guides to Save</h4>
                     </div>
                     <div className="space-y-3">
                       {recommendedGuides.map((guide) => (
@@ -412,7 +624,7 @@ export function Dashboard() {
                               className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-600 hover:text-white border border-emerald-300 px-3 py-1.5 rounded-xl transition-colors cursor-pointer shadow-xs"
                             >
                               <Bookmark className="w-3.5 h-3.5" />
-                              <span>Bookmark</span>
+                              <span>Save</span>
                             </button>
                             <Link
                               to={`/article/${guide.id}`}
@@ -433,7 +645,7 @@ export function Dashboard() {
                   <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Search className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-1">No bookmarked guides match your search</h3>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">No saved items match your search</h3>
                   <p className="text-sm text-slate-500 mb-4">Try checking for typos or clear your search query.</p>
                   <button
                     onClick={() => {
@@ -446,7 +658,7 @@ export function Dashboard() {
                   </button>
                 </div>
               ) : (
-                /* Grid of bookmarked cards */
+                /* Grid of saved items cards */
                 <div id="bookmarks-grid" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredSavedItems.map((item) => (
                     <div 
@@ -485,20 +697,20 @@ export function Dashboard() {
                       {/* Bottom action row */}
                       <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs mt-2">
                         <span className="text-slate-400 text-[11px]">
-                          Saved on {new Date(item.dateSaved).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                          Saved {new Date(item.dateSaved).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </span>
                         <div className="flex items-center gap-2">
                           <button 
                             id={`remove-bookmark-btn-${item.id}`}
                             onClick={(e) => handleRemoveSaved(item.id, e)}
                             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Remove from bookmarks"
-                            aria-label="Remove bookmark"
+                            title="Remove from Saved Items"
+                            aria-label="Remove saved item"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                           <Link 
-                            to={item.url}
+                            to={item.url} 
                             className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
                           >
                             <span>Read</span>

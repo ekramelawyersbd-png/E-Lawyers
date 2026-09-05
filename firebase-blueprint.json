@@ -35,6 +35,24 @@
         "type": "string",
         "createdAt": "timestamp"
       }
+    },
+    {
+      "name": "comments",
+      "description": "Professional discussions and commentary among lawyers and accountants on articles",
+      "fields": {
+        "articleId": "string",
+        "userId": "string",
+        "authorName": "string",
+        "authorEmail": "string",
+        "designation": "string",
+        "organization": "string",
+        "topicTag": "string",
+        "statutoryRef": "string",
+        "text": "string",
+        "parentId": "string",
+        "helpfulCount": "number",
+        "createdAt": "timestamp"
+      }
     }
   ],
   "relationships": [
@@ -46,6 +64,11 @@
     {
       "parent": "users",
       "child": "favorites",
+      "type": "one-to-many"
+    },
+    {
+      "parent": "users",
+      "child": "comments",
       "type": "one-to-many"
     }
   ]
