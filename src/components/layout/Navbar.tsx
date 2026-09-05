@@ -17,11 +17,13 @@ import {
   ScrollText, 
   ShieldCheck, 
   Newspaper,
-  HelpCircle
+  HelpCircle,
+  Bookmark
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
+import { getSavedItems } from '../../utils/readingList';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +39,17 @@ export function Navbar() {
   
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [savedBookmarkCount, setSavedBookmarkCount] = useState(() => getSavedItems().length);
+
+  useEffect(() => {
+    const updateCount = () => setSavedBookmarkCount(getSavedItems().length);
+    window.addEventListener('bookmarksUpdated', updateCount);
+    window.addEventListener('storage', updateCount);
+    return () => {
+      window.removeEventListener('bookmarksUpdated', updateCount);
+      window.removeEventListener('storage', updateCount);
+    };
+  }, []);
 
   const blogCategories = [
     { 
@@ -430,12 +443,41 @@ export function Navbar() {
                <Search className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                <input name="search" type="text" placeholder="Search..." className="bg-slate-100 border border-transparent rounded-full py-2 pl-9 pr-3 text-xs sm:text-sm w-36 xl:w-52 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:border-emerald-200 text-slate-900 transition-all focus:w-48 xl:focus:w-64 shadow-inner" />
             </form>
+            {/* Bookmarks Icon Button */}
+            <Link
+              to="/dashboard?tab=bookmarks"
+              id="navbar-bookmarks-btn"
+              title="Saved Bookmarks"
+              aria-label="View saved legal bookmarks"
+              className={cn(
+                "relative p-2 rounded-xl transition-colors flex items-center justify-center",
+                location.pathname === '/dashboard' && location.search.includes('tab=bookmarks')
+                  ? "bg-emerald-100 text-emerald-800"
+                  : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
+              )}
+            >
+              <Bookmark className="w-5 h-5" />
+              {savedBookmarkCount > 0 && (
+                <span 
+                  id="navbar-bookmarks-count"
+                  className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center shadow-xs"
+                >
+                  {savedBookmarkCount}
+                </span>
+              )}
+            </Link>
+
             {user ? (
               <div className="hidden sm:flex items-center gap-3">
-                <span className="text-xs sm:text-sm font-bold text-slate-700 max-w-[120px] truncate">{user.displayName || user.email?.split('@')[0]}</span>
+                <Link 
+                  to="/dashboard?tab=bookmarks"
+                  className="text-xs sm:text-sm font-bold text-slate-700 max-w-[120px] truncate hover:text-emerald-700 transition-colors"
+                >
+                  {user.displayName || user.email?.split('@')[0]}
+                </Link>
                 <button 
                   onClick={logout}
-                  className="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors"
+                  className="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   Log Out
                 </button>
@@ -562,6 +604,29 @@ export function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Mobile Bookmarks */}
+            <Link
+              to="/dashboard?tab=bookmarks"
+              id="mobile-bookmarks-link"
+              className={cn(
+                "flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
+                location.pathname === '/dashboard' && location.search.includes('tab=bookmarks') 
+                  ? "text-emerald-700 bg-emerald-50" 
+                  : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+              )}
+              onClick={() => setIsOpen(false)}
+            >
+              <div className="flex items-center gap-3">
+                <Bookmark className="w-5 h-5 text-emerald-600" />
+                <span>Bookmarks</span>
+              </div>
+              {savedBookmarkCount > 0 && (
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                  {savedBookmarkCount}
+                </span>
+              )}
+            </Link>
 
             {/* Mobile Community */}
             <Link

@@ -18,35 +18,33 @@ export function BookmarkButton({
   type?: 'article' | 'policy';
   className?: string;
 }) {
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(() => isItemSaved(id));
   const [firebaseDocId, setFirebaseDocId] = useState<string | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
-    const checkStatus = async () => {
+    setIsSaved(isItemSaved(id));
+
+    const checkFirebaseStatus = async () => {
       if (user) {
         try {
           const q = query(collection(db, 'favorites'), where('userId', '==', user.uid), where('articleId', '==', id));
           const snapshot = await getDocs(q);
           if (!snapshot.empty) {
-            setIsSaved(true);
             setFirebaseDocId(snapshot.docs[0].id);
           } else {
-            setIsSaved(false);
             setFirebaseDocId(null);
           }
-        } catch (e) {
-          console.error("Error checking favorite", e);
+        } catch {
+          // ignore firebase offline / permission errors
         }
-      } else {
-        setIsSaved(isItemSaved(id));
       }
     };
     
-    checkStatus();
+    checkFirebaseStatus();
     
     const handleStorageChange = () => {
-      if (!user) setIsSaved(isItemSaved(id));
+      setIsSaved(isItemSaved(id));
     };
     
     window.addEventListener('bookmarksUpdated', handleStorageChange);
@@ -57,19 +55,33 @@ export function BookmarkButton({
     e.preventDefault(); // Prevent navigating if inside a Link
     e.stopPropagation();
     
+    const nextSaved = !isSaved;
+    setIsSaved(nextSaved);
+
+    // Always update localStorage first for instant, reliable local bookmarking
+    if (nextSaved) {
+      saveItem({
+        id,
+        title,
+        type,
+        url,
+        dateSaved: new Date().toISOString()
+      });
+    } else {
+      removeItem(id);
+    }
+
+    // Secondary: If user is authenticated, sync with Firestore in background
     if (user) {
-      if (isSaved && firebaseDocId) {
-        // Remove from Firebase
+      if (!nextSaved && firebaseDocId) {
         try {
           const { doc } = await import('firebase/firestore');
           await deleteDoc(doc(db, 'favorites', firebaseDocId));
-          setIsSaved(false);
           setFirebaseDocId(null);
-        } catch (err) {
-          console.error("Error removing favorite", err);
+        } catch {
+          // background sync error ignored
         }
-      } else {
-        // Add to Firebase
+      } else if (nextSaved && !firebaseDocId) {
         try {
           const docRef = await addDoc(collection(db, 'favorites'), {
             userId: user.uid,
@@ -79,37 +91,27 @@ export function BookmarkButton({
             type,
             createdAt: serverTimestamp()
           });
-          setIsSaved(true);
           setFirebaseDocId(docRef.id);
-        } catch (err) {
-          console.error("Error adding favorite", err);
+        } catch {
+          // background sync error ignored
         }
       }
-    } else {
-      // Local storage fallback
-      if (isSaved) {
-        removeItem(id);
-      } else {
-        saveItem({
-          id,
-          title,
-          type,
-          url,
-          dateSaved: new Date().toISOString()
-        });
-      }
-      setIsSaved(!isSaved);
-      window.dispatchEvent(new Event('bookmarksUpdated'));
     }
   };
 
   return (
     <button 
+      id={`bookmark-btn-${id}`}
+      type="button"
       onClick={toggleSave}
-      title={isSaved ? "Remove Bookmark" : "Bookmark"}
+      title={isSaved ? "Remove from bookmarks" : "Bookmark this guide"}
+      aria-label={isSaved ? "Remove from bookmarks" : "Bookmark this guide"}
       className={className}
     >
-      <Bookmark className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} />
+      <Bookmark 
+        className={`w-5 h-5 transition-transform active:scale-125 duration-150 ${isSaved ? "fill-current text-emerald-600" : ""}`} 
+        fill={isSaved ? "currentColor" : "none"} 
+      />
     </button>
   );
 }

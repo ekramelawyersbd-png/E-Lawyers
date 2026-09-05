@@ -95,6 +95,26 @@ async function startServer() {
     }
   });
 
+  app.post("/api/subscribe-newsletter", (req, res) => {
+    try {
+      const { email, name, topics, sourceCategory, sourceArticleTitle } = req.body;
+      if (!email || typeof email !== "string" || !email.includes("@")) {
+        return res.status(400).json({ error: "A valid email address is required." });
+      }
+
+      console.log(`[Newsletter Subscription] ${email} (${name || "Subscriber"}) registered for: ${Array.isArray(topics) ? topics.join(", ") : "All Topics"} (Source: ${sourceArticleTitle || sourceCategory || "Article Page"})`);
+
+      res.json({
+        success: true,
+        message: "Successfully subscribed to legal & tax intelligence updates.",
+        email,
+      });
+    } catch (error) {
+      console.error("Error in newsletter subscription:", error);
+      res.status(500).json({ error: "Failed to process newsletter subscription." });
+    }
+  });
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

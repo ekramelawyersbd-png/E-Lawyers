@@ -1,14 +1,37 @@
 import { BookmarkButton } from '../components/BookmarkButton';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { format } from 'date-fns';
-import { Search as SearchIcon } from 'lucide-react';
+import { Search as SearchIcon, History, X } from 'lucide-react';
+
+const RECENT_SEARCHES_KEY = 'elawyers_recent_searches';
+const MAX_RECENT_SEARCHES = 5;
 
 export function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const [inputValue, setInputValue] = useState(query);
   const [results, setResults] = useState(mockArticles);
+
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.slice(0, MAX_RECENT_SEARCHES);
+        }
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    setInputValue(query);
+  }, [query]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -21,48 +44,160 @@ export function Search() {
         article.category.toLowerCase().includes(lowerQuery)
       );
       setResults(filtered);
+
+      const trimmed = query.trim();
+      if (trimmed) {
+        setRecentSearches(prev => {
+          const updated = [trimmed, ...prev.filter(item => item.toLowerCase() !== trimmed.toLowerCase())].slice(0, MAX_RECENT_SEARCHES);
+          try {
+            localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+          } catch {
+            // ignore localStorage quota errors
+          }
+          return updated;
+        });
+      }
     } else {
       setResults(mockArticles);
     }
   }, [query]);
 
+  const handleSelectRecent = (term: string) => {
+    setInputValue(term);
+    setSearchParams({ q: term });
+  };
+
+  const handleRemoveRecent = (termToRemove: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRecentSearches(prev => {
+      const updated = prev.filter(term => term !== termToRemove);
+      try {
+        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const handleClearAllRecent = () => {
+    setRecentSearches([]);
+    try {
+      localStorage.removeItem(RECENT_SEARCHES_KEY);
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12">
-        <h1 className="text-3xl font-bold text-slate-900 mb-6">Search Results</h1>
+        <h1 id="search-page-title" className="text-3xl font-bold text-slate-900 mb-6">Search Results</h1>
         <form 
+          id="search-page-form"
           className="relative max-w-2xl"
           onSubmit={(e) => {
             e.preventDefault();
-            const form = e.target as HTMLFormElement;
-            const input = form.elements.namedItem('search') as HTMLInputElement;
-            setSearchParams({ q: input.value.trim() });
+            const trimmed = inputValue.trim();
+            if (trimmed) {
+              setSearchParams({ q: trimmed });
+            } else {
+              setSearchParams({});
+            }
           }}
         >
           <SearchIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
+            id="search-page-input"
             name="search"
             type="text" 
-            defaultValue={query}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="Search for articles, VAT, tax rules..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm text-slate-900"
+            className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm text-slate-900"
           />
+          {inputValue && (
+            <button
+              id="search-input-clear-btn"
+              type="button"
+              onClick={() => {
+                setInputValue('');
+                setSearchParams({});
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+              aria-label="Clear search input"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </form>
+
+        {recentSearches.length > 0 && (
+          <div id="recent-searches-section" className="mt-4 flex flex-wrap items-center gap-2 max-w-2xl">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mr-1 shrink-0">
+              <History className="w-3.5 h-3.5 text-slate-400" />
+              <span>Recent Searches:</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {recentSearches.map((term, index) => {
+                const isActive = query.toLowerCase() === term.toLowerCase();
+                return (
+                  <button
+                    key={`${term}-${index}`}
+                    id={`recent-search-chip-${index}`}
+                    type="button"
+                    onClick={() => handleSelectRecent(term)}
+                    className={`group inline-flex items-center gap-1.5 pl-3 pr-2 py-1 text-xs font-medium rounded-full transition-colors border ${
+                      isActive
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-xs'
+                    }`}
+                  >
+                    <span>{term}</span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Remove "${term}" from recent searches`}
+                      onClick={(e) => handleRemoveRecent(term, e)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleRemoveRecent(term, e as any);
+                        }
+                      }}
+                      className="p-0.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors ml-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              id="clear-all-recent-searches-btn"
+              type="button"
+              onClick={handleClearAllRecent}
+              className="text-xs text-slate-400 hover:text-slate-600 transition-colors ml-2 hover:underline cursor-pointer"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-800">
+        <h2 id="search-results-heading" className="text-lg font-bold text-slate-800">
           {query ? `Showing results for "${query}"` : 'All Articles'}
         </h2>
-        <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+        <span id="search-results-count" className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
           {results.length} found
         </span>
       </div>
 
       {results.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div id="search-results-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map(article => (
-            <Link key={article.id} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden">
+            <Link key={article.id} id={`search-result-article-${article.id}`} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden">
               <div className="aspect-video w-full overflow-hidden">
                 <img 
                   src={article.imageUrl} 
@@ -98,7 +233,7 @@ export function Search() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div id="search-no-results" className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <SearchIcon className="w-8 h-8 text-slate-400" />
           </div>

@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  FileSignature
+  FileSignature,
+  Bookmark
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -138,7 +139,19 @@ export function QuickAccessDrawer() {
           })}
         </div>
         
-        <div className="p-4 border-t border-slate-100 bg-slate-50">
+        <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2">
+          <Link
+            to="/dashboard?tab=bookmarks"
+            id="drawer-bookmarks-link"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center justify-between w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-bold transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Bookmark className="w-4 h-4 text-emerald-600" />
+              <span>Bookmarked Guides</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-emerald-600" />
+          </Link>
           <Link 
             to="/tools" 
             onClick={() => setIsOpen(false)}

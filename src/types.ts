@@ -25,6 +25,8 @@ export interface Author {
 export interface Article {
   id: string;
   title: string;
+  metaTitle?: string;
+  metaDescription?: string;
   excerpt: string;
   content: string;
   categoryId: string;

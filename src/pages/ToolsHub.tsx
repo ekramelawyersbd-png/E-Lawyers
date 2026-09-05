@@ -2,6 +2,7 @@ import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
+import { Gallery } from '../components/Gallery';
 
 export function ToolsHub() {
   
@@ -199,6 +200,31 @@ export function ToolsHub() {
           </button>
         </div>
       )}
+
+      <div className="mt-16">
+        <Gallery 
+          items={[
+            {
+              id: 'tax-slab-infographic',
+              title: 'Tax Slab 2026-2027',
+              description: 'Visual breakdown of the latest income tax slabs for individual taxpayers.',
+              imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80'
+            },
+            {
+              id: 'surcharge-flowchart',
+              title: 'Surcharge Calculation Guide',
+              description: 'Step-by-step flowchart for determining net wealth surcharge applicability.',
+              imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80'
+            },
+            {
+              id: 'tds-rates-summary',
+              title: 'TDS Rates Summary',
+              description: 'Quick reference infographic for Withholding Tax Rules and TDS rates.',
+              imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80'
+            }
+          ]}
+        />
+      </div>
 
       <div className="mt-16">
         <RJSCFeeEstimator />

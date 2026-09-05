@@ -1,19 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { saveItem, removeItem, isItemSaved } from '../utils/readingList';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink } from 'lucide-react';
+import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import React from 'react';
 import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
 import { Comments } from '../components/Comments';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 
 import { ComplianceChecklist } from '../components/ComplianceChecklist';
+import { ImageCarousel } from '../components/ImageCarousel';
+import { useImageLoader } from '../hooks/useImageLoader';
+import { MarkdownImage } from '../components/MarkdownImage';
+import { TableOfContents } from '../components/TableOfContents';
+import { LegalAlertBanner } from '../components/LegalAlertBanner';
+import { PenaltyFlowchart } from '../components/PenaltyFlowchart';
+import { Section272Checklist as Section272ComplianceChecklist } from '../components/Section272Checklist';
+import { RelatedArticles, getRecommendedArticles } from '../components/RelatedArticles';
+import { NewsletterSignup } from '../components/NewsletterSignup';
 
 export function Article() {
   const { id } = useParams();
@@ -30,7 +40,18 @@ export function Article() {
   }, [id]);
 
   const article = mockArticles.find(a => a.id === id);
+
+  useEffect(() => {
+    if (article) {
+      document.title = article.metaTitle || `${article.title} | Accounticca E-Lawyers`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', article.metaDescription || article.excerpt);
+      }
+    }
+  }, [article]);
   const popularArticles = mockArticles.slice(0, 4);
+  const { isLoaded: isFeaturedLoaded, hasError: hasFeaturedError } = useImageLoader(article?.imageUrl);
 
 
 
@@ -57,7 +78,10 @@ export function Article() {
         title: article.title,
         type: 'article',
         url: `/article/${id}`,
-        dateSaved: new Date().toISOString()
+        dateSaved: new Date().toISOString(),
+        offlineContent: article.content,
+        offlineExcerpt: article.excerpt,
+        offlineImageUrl: article.imageUrl
       });
       setIsSaved(true);
     }
@@ -72,9 +96,51 @@ export function Article() {
     }
   };
 
-  const relatedArticles = mockArticles
-    .filter(a => a.id !== article.id && (a.categoryId === article.categoryId || a.tags.some(t => article.tags.includes(t))))
-    .slice(0, 3);
+  const relatedArticles = useMemo(
+    () => getRecommendedArticles(article, mockArticles, 4).map(r => r.article),
+    [article]
+  );
+
+  const markdownComponents = useMemo(() => ({
+    h2: ({ node, children, ...props }: any) => {
+      const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const isFlowchartTarget = article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && id === 'mandatory-hearing-before-imposing-penalty';
+
+      return (
+        <>
+          <h2 id={id} className="scroll-mt-28" {...props}>{children}</h2>
+          {isFlowchartTarget && <PenaltyFlowchart />}
+        </>
+      );
+    },
+    h3: ({ node, children, ...props }: any) => {
+      const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      return <h3 id={id} className="scroll-mt-28" {...props}>{children}</h3>;
+    },
+    p: ({ node, children }: any) => {
+      const elementChildren = React.Children.toArray(children);
+      
+      const isOnlyImages = elementChildren.length > 0 && elementChildren.every((child: any) => {
+        if (typeof child === 'string') {
+          return child.trim() === '';
+        }
+        return React.isValidElement(child) && (child.props as any)?.node?.tagName === 'img';
+      });
+
+      const imageElements = elementChildren.filter((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === 'img');
+
+      if (isOnlyImages && imageElements.length > 1) {
+        const carouselImages = imageElements.map((img: any) => ({
+          src: img.props.src,
+          alt: img.props.alt
+        }));
+        return <ImageCarousel images={carouselImages} />;
+      }
+      
+      return <p>{children}</p>;
+    },
+    img: ({ node, ...props }: any) => <MarkdownImage {...props} />
+  }), [article.id]);
 
   return (
     <>
@@ -92,11 +158,22 @@ export function Article() {
           {/* Main Content Area */}
           <div className="lg:col-span-8">
             
+            {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
+              <LegalAlertBanner />
+            )}
+
             {/* 1. Article Header Section */}
             <header className="mb-10">
-              <Link to={`/category/${article.categoryId}`} className="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md mb-6">
-                {article.category}
-              </Link>
+              <div className="flex items-center gap-3 mb-6 flex-wrap">
+                <Link to={`/category/${article.categoryId}`} className="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">
+                  {article.category}
+                </Link>
+                <div className="flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">
+                  <Clock className="w-3.5 h-3.5" />
+                  {calculateReadingTime(article.content)} min read
+                </div>
+              </div>
+              
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
                 {article.title}
               </h1>
@@ -111,20 +188,24 @@ export function Article() {
                     <p className="font-bold text-slate-900">{article.author.name}</p>
                     <div className="flex items-center gap-3 text-sm text-slate-500">
                       <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
-                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {calculateReadingTime(article.content)} min read</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button 
+                    id="article-bookmark-btn"
                     onClick={toggleSave} 
-                    title={isSaved ? "Remove from bookmarks" : "Bookmark this article"}
-                    aria-label={isSaved ? "Remove from bookmarks" : "Bookmark this article"}
-                    className={`p-2.5 rounded-xl border transition-colors ${isSaved ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                    title={isSaved ? "Remove from bookmarked guides" : "Bookmark this legal guide"}
+                    aria-label={isSaved ? "Remove from bookmarked guides" : "Bookmark this legal guide"}
+                    className={`px-4 py-2.5 rounded-xl border font-semibold transition-all flex items-center gap-2 ${
+                      isSaved 
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' 
+                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
+                    }`}
                   >
-                    <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                    <Bookmark className={`w-4 h-4 transition-transform active:scale-125 duration-150 ${isSaved ? 'fill-current text-emerald-600' : ''}`} />
+                    <span className="hidden sm:inline text-sm">{isSaved ? "Bookmarked" : "Bookmark Guide"}</span>
                   </button>
                   <div className="border-l border-slate-200 pl-2">
                     <SocialShareButtons title={article.title} summary={article.excerpt} variant="compact" />
@@ -134,11 +215,22 @@ export function Article() {
             </header>
 
             {/* Featured Image */}
-            <div className="mb-10 rounded-3xl overflow-hidden border border-slate-200 shadow-sm relative aspect-[16/9] bg-slate-100">
+            <div className="mb-10 rounded-3xl overflow-hidden border border-slate-200 shadow-sm relative aspect-[16/9] bg-slate-100 mx-auto max-w-[70%]">
+              {!isFeaturedLoaded && !hasFeaturedError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-100 animate-pulse">
+                  <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+                </div>
+              )}
+              {hasFeaturedError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-400">
+                  <ImageOff className="w-8 h-8 mb-2 text-slate-300" />
+                  <span className="text-sm">Failed to load featured image</span>
+                </div>
+              )}
               <img 
                 src={article.imageUrl} 
                 alt={article.title} 
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-opacity duration-500 absolute inset-0 ${isFeaturedLoaded && !hasFeaturedError ? 'opacity-100' : 'opacity-0'}`}
               />
             </div>
 
@@ -149,13 +241,21 @@ export function Article() {
             </div>
 
             {/* 2-7. Article Content Area (Markdown) */}
-            <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 prose-img:rounded-2xl prose-img:border prose-img:border-slate-200 mb-16">
-              <Markdown remarkPlugins={[remarkGfm]}>{article.content}</Markdown>
+            <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
+              <Markdown 
+                remarkPlugins={[remarkGfm]}
+                components={markdownComponents}
+              >
+                {article.content}
+              </Markdown>
             </div>
 
-            {/* Conditional RJSC Checklist Injection */}
+            {/* Conditional Checklists Injection */}
             {article.id === 'required-documents-rjsc-annual-return-filing-bangladesh' && (
               <ComplianceChecklist />
+            )}
+            {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
+              <Section272ComplianceChecklist />
             )}
 
             {/* Tags */}
@@ -266,6 +366,9 @@ export function Article() {
                 </form>
               </div>
 
+              {/* Table of Contents */}
+              <TableOfContents content={article.content} />
+
               {/* Categories */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Categories</h3>
@@ -280,6 +383,26 @@ export function Article() {
                   ))}
                 </ul>
               </div>
+
+              {/* Related Articles (Sidebar) */}
+              {relatedArticles.length > 0 && (
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-emerald-600" /> Related Articles
+                  </h3>
+                  <div className="space-y-4">
+                    {relatedArticles.slice(0, 3).map(rel => (
+                      <Link key={rel.id} to={`/article/${rel.id}`} className="flex gap-4 group">
+                        <img src={rel.imageUrl} alt={rel.title} className="w-16 h-16 rounded-xl object-cover border border-slate-100 shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 transition-colors line-clamp-2 mb-1">{rel.title}</h4>
+                          <span className="text-[10px] uppercase tracking-widest text-emerald-600 font-bold">{rel.category}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Popular Posts */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
@@ -343,41 +466,14 @@ export function Article() {
       </div>
 
       {/* 9. Related Articles */}
-      <div className="bg-slate-50 py-16 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl font-bold text-slate-900">Related Articles</h2>
-            <Link to={`/category/${article.categoryId}`} className="text-emerald-700 font-bold hover:text-emerald-800 transition-colors hidden sm:flex items-center gap-2">
-              View Category <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {relatedArticles.map(rel => (
-              <Link key={rel.id} to={`/article/${rel.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden h-full">
-                <div className="aspect-[16/9] w-full overflow-hidden relative">
-                  <img 
-                    src={rel.imageUrl} 
-                    alt={rel.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-2 block">{rel.category}</span>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-tight">
-                    {rel.title}
-                  </h3>
-                  <p className="text-slate-600 text-sm line-clamp-2 flex-1 mb-4">
-                    {rel.excerpt}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 border-t border-slate-100 pt-4 mt-auto">
-                    <User className="w-3.5 h-3.5" /> {rel.author.name}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+      <RelatedArticles currentArticle={article} maxItems={4} />
+
+      {/* 10. Newsletter Signup */}
+      <NewsletterSignup 
+        currentCategory={article.category}
+        sourceArticleTitle={article.title}
+        sourceArticleId={article.id}
+      />
     </>
   );
 }
