@@ -12,6 +12,7 @@ import React from 'react';
 import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
 import { Comments } from '../components/Comments';
+import { ChecklistExporter } from '../components/ChecklistExporter';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 import { useAuth } from '../contexts/AuthContext';
 import { saveBookmark, removeBookmark } from '../services/bookmarkService';
@@ -390,6 +391,7 @@ export function Article() {
               </div>
             </div>
 
+            <ChecklistExporter articleId={article.id} />
             {/* 11. Professional Comments & Peer Discussion Section */}
             <Comments articleId={article.id} articleTitle={article.title} />
 

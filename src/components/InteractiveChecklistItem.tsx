@@ -31,8 +31,19 @@ export function InteractiveChecklistItem({ articleId, children, ...props }: Inte
   useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem(storageKey);
-    if (stored === 'true') {
-      setIsChecked(true);
+    if (stored) {
+      if (stored === 'true') {
+        setIsChecked(true);
+        // Migrate to new format
+        localStorage.setItem(storageKey, JSON.stringify({ checked: true, text: extractText(children) }));
+      } else if (stored === 'false') {
+        setIsChecked(false);
+      } else {
+        try {
+          const parsed = JSON.parse(stored);
+          setIsChecked(parsed.checked);
+        } catch(e) {}
+      }
     }
   }, [storageKey]);
 
@@ -49,7 +60,7 @@ export function InteractiveChecklistItem({ articleId, children, ...props }: Inte
     e.stopPropagation();
     const nextState = !isChecked;
     setIsChecked(nextState);
-    localStorage.setItem(storageKey, String(nextState));
+    localStorage.setItem(storageKey, JSON.stringify({ checked: nextState, text: extractText(children) }));
   };
 
   if (!mounted) {

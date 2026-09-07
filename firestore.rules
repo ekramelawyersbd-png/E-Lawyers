@@ -37,7 +37,7 @@ service cloud.firestore {
       // Any reader can read comments on legal articles
       allow read: if true;
       // Allow creation if articleId, authorName, and text are provided
-      allow create: if request.resource.data.articleId is string
+      allow create: if isAuthenticated() && request.resource.data.articleId is string
                     && request.resource.data.authorName is string
                     && request.resource.data.text is string;
       // Allow updating helpful/endorsement count, or if author updates their comment
