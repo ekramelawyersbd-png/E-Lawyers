@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
@@ -160,7 +160,7 @@ export function Home() {
                       <img src={featuredArticle.author.avatarUrl} alt={featuredArticle.author.name} className="w-8 h-8 rounded-full border-2 border-slate-700" />
                       <div>
                         <p className="text-xs font-bold text-white">{featuredArticle.author.name}</p>
-                        <p className="text-[10px] text-slate-400">{format(new Date(featuredArticle.publishedAt), 'MMM d, yyyy')}</p>
+                        <p className="text-[10px] text-slate-400">{format(new Date(featuredArticle.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(featuredArticle.content)} min read</p>
                       </div>
                     </div>
                     <span className="text-emerald-400 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -213,7 +213,7 @@ export function Home() {
                     <img src={article.author.avatarUrl} alt={article.author.name} className="w-8 h-8 rounded-full border border-slate-200" />
                     <div>
                       <p className="text-xs font-bold text-slate-900">{article.author.name}</p>
-                      <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{format(new Date(article.publishedAt), 'MMM d, yyyy')}</p>
+                      <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{format(new Date(article.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(article.content)} min read</p>
                     </div>
                   </div>
                   <BookmarkButton id={article.id} title={article.title} url={`/article/${article.id}`} className="text-slate-400 hover:text-emerald-600 transition-colors" />
@@ -325,7 +325,10 @@ export function Home() {
                     <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div>
-                    <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1 block">{article.category}</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">{article.category}</span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-1"><Clock className="w-3 h-3"/> {calculateReadingTime(article.content)} min read</span>
+                    </div>
                     <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors mb-2 leading-tight">{article.title}</h3>
                     <p className="text-sm text-slate-500 line-clamp-2">{article.excerpt}</p>
                   </div>

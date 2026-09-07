@@ -26,6 +26,7 @@ import { PenaltyFlowchart } from '../components/PenaltyFlowchart';
 import { Section272Checklist as Section272ComplianceChecklist } from '../components/Section272Checklist';
 import { RelatedArticles, getRecommendedArticles } from '../components/RelatedArticles';
 import { NewsletterSignup } from '../components/NewsletterSignup';
+import { InteractiveChecklistItem } from '../components/InteractiveChecklistItem';
 
 export function Article() {
   const { id } = useParams();
@@ -150,7 +151,19 @@ export function Article() {
       
       return <p>{children}</p>;
     },
-    img: ({ node, ...props }: any) => <MarkdownImage {...props} />
+    img: ({ node, ...props }: any) => <MarkdownImage {...props} />,
+    ul: ({ node, children, ...props }: any) => {
+      if (article.id === 'personal-income-tax-return-submission-guide-2025-2026') {
+        return <ul className="list-none pl-0 space-y-3 my-6" {...props}>{children}</ul>;
+      }
+      return <ul {...props}>{children}</ul>;
+    },
+    li: ({ node, children, ...props }: any) => {
+      if (article.id === 'personal-income-tax-return-submission-guide-2025-2026') {
+        return <InteractiveChecklistItem articleId={article.id} {...props}>{children}</InteractiveChecklistItem>;
+      }
+      return <li {...props}>{children}</li>;
+    }
   }), [article.id]);
 
   return (
@@ -456,6 +469,14 @@ export function Article() {
                 </div>
               </div>
 
+              {/* Newsletter Signup in Sidebar (Direct Firestore Persistence) */}
+              <NewsletterSignup 
+                variant="sidebar"
+                currentCategory={article.category}
+                sourceArticleTitle={article.title}
+                sourceArticleId={article.id}
+              />
+
               {/* Quick Share Widget */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
@@ -504,6 +525,7 @@ export function Article() {
 
       {/* 10. Newsletter Signup */}
       <NewsletterSignup 
+        variant="full-width"
         currentCategory={article.category}
         sourceArticleTitle={article.title}
         sourceArticleId={article.id}

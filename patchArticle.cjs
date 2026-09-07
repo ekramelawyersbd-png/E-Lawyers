@@ -1,21 +1,23 @@
 const fs = require('fs');
-let content = fs.readFileSync('src/pages/Article.tsx', 'utf8');
+const filePath = 'src/data/mockData.ts';
+let content = fs.readFileSync(filePath, 'utf8');
 
-if (!content.includes('ReadAloudButton')) {
-  content = content.replace(
-    "import { ReadProgress } from '../components/ReadProgress';",
-    "import { ReadProgress } from '../components/ReadProgress';\nimport { ReadAloudButton } from '../components/ReadAloudButton';"
-  );
+// The article content is wrapped in \` \` so we can replace within it.
+// We only want to replace '* ' or '*   ' with '* [ ] ' inside the specific article.
+// Let's use a regex to replace the content of that specific article.
+
+const articleId = "id: 'personal-income-tax-return-submission-guide-2025-2026',";
+const startIndex = content.indexOf(articleId);
+if (startIndex !== -1) {
+  const endIndex = content.indexOf('},', startIndex);
+  let articleStr = content.substring(startIndex, endIndex);
+  
+  // replace '*   ' or '* ' with '* [ ] '
+  articleStr = articleStr.replace(/\*\s+/g, '* [ ] ');
+  
+  content = content.substring(0, startIndex) + articleStr + content.substring(endIndex);
+  fs.writeFileSync(filePath, content);
+  console.log('Patched mockData.ts');
+} else {
+  console.log('Article not found');
 }
-
-const target = `            {/* 2-7. Article Content Area (Markdown) */}`;
-const replacement = `            {/* Read Aloud controls */}
-            <div className="mb-8 flex items-center justify-between border-b border-slate-100 pb-4">
-              <span className="text-sm font-bold text-slate-500">Audio Version</span>
-              <ReadAloudButton content={article.content} title={article.title} />
-            </div>
-
-            {/* 2-7. Article Content Area (Markdown) */}`;
-
-content = content.replace(target, replacement);
-fs.writeFileSync('src/pages/Article.tsx', content);

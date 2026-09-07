@@ -45,5 +45,17 @@ service cloud.firestore {
       // Allow author to delete their own comment
       allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isOwner(resource.data.userId));
     }
+
+    // Professional Legal & Tax Newsletter Subscribers
+    match /newsletterSubscribers/{subscriberId} {
+      // Allow reading for subscribers or admin/system
+      allow read: if true;
+      // Allow any visitor to subscribe with valid email formatting
+      allow create, update: if request.resource.data.email is string 
+                            && request.resource.data.email.size() <= 150
+                            && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$');
+      // Allow unsubscribing/deleting if owner
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email);
+    }
   }
 }

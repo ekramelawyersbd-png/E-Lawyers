@@ -1,169 +1,241 @@
 const fs = require('fs');
 
-const contentText = `# Bangladesh Content Creators and Freelancers Get 0% Income Tax & VAT Exemption Under Finance Act 2026
+const articleData = `{
+    id: 'personal-income-tax-return-submission-guide-2025-2026',
+    title: 'Personal Income Tax Return Submission Guide 2025–2026',
+    metaTitle: 'Personal Income Tax Return Checklist 2025-2026 Bangladesh',
+    metaDescription: 'Detailed checklist of documents required for submitting a Personal Income Tax Return for the Financial Year 2025–2026 in Bangladesh.',
+    excerpt: 'A comprehensive checklist and guide for individual taxpayers in Bangladesh to prepare and submit their personal income tax return for the Tax Year 2025-2026 (Income Year 2024-2025).',
+    content: \`**Income Year:** 01 July 2024 to 30 June 2025  
+**Tax Year:** 01 July 2025 to 30 June 2026  
 
-## A New Era for Bangladesh’s Digital Economy
+Filing a personal income tax return requires proper documentation to declare income, assets, investments, expenses, and tax benefits accurately. Maintaining complete records helps taxpayers avoid complications and ensures smooth submission of the income tax return.
 
-The digital economy of Bangladesh is growing rapidly, with thousands of individuals building careers through content creation, freelancing, online businesses, and digital services. Recognizing the importance of this emerging sector, the **Finance Act 2026** has introduced significant tax benefits for individual **Content Creators and Freelancers**.
+Below is a detailed checklist of documents required for submitting a Personal Income Tax Return for the Financial Year 2025–2026.
 
-These new changes aim to encourage creativity, entrepreneurship, and digital innovation by reducing financial barriers for people working in the online ecosystem.
+## 1. Primary Information of Assessee (Taxpayer)
 
-Under the latest updates, income from **Content Creation (কনটেন্ট ক্রিয়েশন)** and **Freelancing (ফ্রিল্যান্সিং)** receives complete exemption from **Income Tax**, while services provided by content creators and freelancers are also exempt from **VAT**.
+Every taxpayer should provide the following basic documents and information:
+
+*   e-TIN Certificate (Electronic Taxpayer Identification Number)
+*   National Identity Card (NID) Copy / Passport Copy (for non-residents)
+*   Recent Passport Size Photograph (especially for first-time return submission)
+*   Current and Permanent Address Details
+*   Previous Year's Income Tax Return Copy (if applicable)
+*   Mobile Number and Email Address
+*   Bank Account Information
+*   Taxpayer Status Information
+    *   Resident / Non-resident status
+    *   Any changes in personal information
+
+## 2. Documents Required for Employees (Income from Salary)
+
+Individuals receiving salary income should prepare:
+
+*   **Salary Certificate from Employer**
+    *   Basic salary
+    *   House rent allowance
+    *   Medical allowance
+    *   Bonus
+    *   Other benefits
+*   Monthly Salary Statement / Payslip
+*   **Bank Statement** showing salary credit transactions
+*   **Provident Fund Information**
+    *   Employee contribution details
+    *   Employer contribution details
+*   Tax Deduction at Source (TDS) Certificate / Challan
+*   **Investment Documents for Tax Rebate**
+    *   Life insurance premium
+    *   DPS contribution
+    *   Approved savings instruments
+    *   Pension schemes
+
+## 3. Documents Required for Business Income
+
+Business owners, traders, and entrepreneurs need to submit:
+
+*   Updated Trade License
+*   Business Registration Documents
+*   Investment Information
+*   Sales and Purchase Records
+*   Profit and Loss Statement
+*   Income Statement
+*   Balance Sheet / Statement of Financial Position
+*   Bank Account Statements Related to Business
+*   VAT Documents (if applicable)
+*   **Business Expense Records**
+    *   Rent expenses
+    *   Employee salaries
+    *   Utility bills
+    *   Other operational costs
+
+## 4. Documents for House Property / Rental Income
+
+Taxpayers earning rental income should provide:
+
+*   House Ownership Documents
+*   Rental Agreement
+*   Rent Collection Receipts
+*   Bank Statement Showing Rental Income
+*   Property Tax / Holding Tax Documents
+*   Loan Documents (if property purchased through loan)
+*   Interest Payment Certificate from Bank
+*   Repair and Maintenance Expense Documents
+*   Other Property-Related Expenses
+
+## 5. Other Income Documents
+
+For additional income sources, taxpayers should provide:
+
+**Agricultural Income:**
+*   Agricultural land ownership documents
+*   Income calculation details
+*   Sales receipts of agricultural products
+*   Proof of agricultural expenses
+
+**Other Income:**
+*   Proof of any additional income source
+*   Receipt or supporting documents
+*   Investment income records
+*   Commission or consultancy income documents
+
+## 6. Tax-Free Income Documents
+
+Tax-free income must also be reported with proper evidence. Required documents may include:
+
+*   Remittance Income Certificate
+*   Foreign Income Documents
+*   Dividend Income Certificate
+*   Capital Gain Documents
+*   Income from Government-approved tax-exempt sources
+*   Final Settlement Documents with Proof of Income
+
+## 7. Property and Asset Information Documents
+
+Taxpayers must provide information about their assets and wealth. Required documents:
+
+**Land and Building:**
+*   Land Purchase Deed
+*   Mutation Documents
+*   RAJUK/Authority Approved Plan (if applicable)
+*   Flat Purchase Agreement
+*   Developer Agreement
+*   Construction Cost Details
+
+**Vehicles:**
+*   Vehicle Registration Certificate
+*   Car Purchase Invoice
+*   Tax Token Information
+*   Fitness Certificate
+
+**Other Assets:**
+*   Jewellery Purchase Documents
+*   Furniture Purchase Information
+*   Electronic Equipment Details
+*   Valuable Asset Purchase Documents
+
+**Loans:**
+*   Bank Loan Certificate
+*   Loan Outstanding Statement
+*   Documents of Loans Given to Others
+
+## 8. Investment, Interest, Profit & Dividend Income Documents
+
+For investment-related income, submit:
+
+*   Savings Certificate Profit Statement
+*   Prize Bond Information
+*   FDR Interest Certificate
+*   DPS Profit Certificate
+*   Bank Interest Certificate
+*   Insurance Policy Documents
+*   Life Insurance Premium Payment Certificate
+*   Provident Fund Contribution Statement
+*   Pension Scheme Contribution Documents
+*   Zakat Fund Contribution / Donation Evidence
+*   **Investment Documents**
+    *   Shares
+    *   Stocks
+    *   Approved Debentures
+    *   Mutual Funds
+
+## 9. Documents for Tax Rebate Claim
+
+To claim available tax rebates, taxpayers should keep:
+
+*   Life insurance premium certificate
+*   Investment certificate
+*   DPS certificate
+*   Approved savings instrument documents
+*   Donation receipts
+*   Zakat payment evidence
+*   Retirement benefit contribution documents
+
+## 10. Bank and Financial Documents
+
+Important financial records include:
+
+*   Personal bank statements
+*   Fixed Deposit (FDR) statements
+*   DPS statements
+*   Loan statements
+*   Credit card statements (if applicable)
+*   Investment account statements
+
+## 11. Checklist Before Submitting Your Tax Return
+
+Before submitting your return for Tax Year 2025–2026, make sure:
+
+*   ✅ All income sources are properly declared
+*   ✅ Assets and liabilities information is updated
+*   ✅ Bank statements are collected
+*   ✅ Investment documents are available
+*   ✅ Tax deduction certificates are collected
+*   ✅ Previous year's return has been reviewed
+*   ✅ Supporting documents are properly organized
+
+> **Important Note:** The deadline for submitting an individual income tax return for the Tax Year 2025–2026 should be confirmed according to the latest notification issued by the National Board of Revenue (NBR), Bangladesh.
+
+Submitting a complete and accurate tax return helps taxpayers maintain compliance and avoid future complications.
 
 ---
 
-# 1. Income Tax Exemption for Content Creators & Freelancers (0% Tax)
+### Need Assistance with Personal Income Tax Return Submission?
 
-According to **Section 156 of the Finance Act 2026**, amendments have been made to **Part 1 of the Sixth Schedule of the Income Tax Act 2023**, which contains the list of tax-exempt income.
+Professional tax consultants can help with:
 
-Through this amendment, income generated from:
+*   Individual tax return preparation
+*   Income calculation
+*   Asset declaration
+*   Tax rebate calculation
+*   Online return submission
+*   Tax planning and compliance support
 
-* Content Creation (কনটেন্ট ক্রিয়েশন)
-* Freelancing (ফ্রিল্যান্সিং)
+*Prepare your Personal Income Tax Return for Financial Year 2025–2026 with proper documentation and expert guidance.*\`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    author: mockAuthors.a1,
+    publishedAt: new Date().toISOString(),
+    readTime: 8,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=2000',
+    tags: [
+      'Income Tax Return',
+      'Tax Year 2025-2026',
+      'Income Tax Bangladesh',
+      'Tax Checklist',
+      'NBR',
+      'Individual Taxpayer'
+    ],
+    likes: 342,
+    comments: 45,
+    isExpertOpinion: true
+  },`;
 
-has been included as **tax-exempt income**.
+const filePath = 'src/data/mockData.ts';
+let content = fs.readFileSync(filePath, 'utf8');
 
-### What does this mean?
+const insertionPoint = 'export const mockArticles: Article[] = [';
+content = content.replace(insertionPoint, insertionPoint + '\\n  ' + articleData);
 
-For eligible individual content creators and freelancers:
-
-* Income tax rate becomes **0%**
-* Earnings from content creation and freelancing activities are fully exempt from income tax
-* Digital professionals can retain more of their earnings and invest in growing their work
-
-This is a major step toward recognizing digital creators as an important part of Bangladesh’s economic development.
-
----
-
-# 2. VAT Exemption on Content Creator & Freelancer Services (0% VAT)
-
-Along with income tax benefits, the Finance Act 2026 also provides VAT relief for digital service providers.
-
-According to **Section 20 of the Finance Act 2026**, the **Second Schedule of the Value Added Tax and Supplementary Duty Act 2012** has been amended.
-
-The amendment adds:
-
-**“Services provided by Content Creators and Freelancers (কনটেন্ট ক্রিয়েটর ও ফ্রিল্যান্সার কর্তৃক প্রদত্ত সেবা)”**
-
-to the list of VAT-exempt services.
-
-### Impact of this VAT exemption:
-
-Content creators and freelancers providing digital services will benefit from:
-
-* No VAT on their eligible services
-* Lower compliance burden
-* More opportunities to grow digital businesses
-* Increased competitiveness in local and international markets
-
----
-
-# Why This Update Matters for Bangladesh’s Creator Economy
-
-Over the past few years, Bangladesh has witnessed a rapid increase in:
-
-* YouTube creators
-* Facebook content creators
-* Social media influencers
-* Video producers
-* Graphic designers
-* Digital marketers
-* Software freelancers
-* Online educators
-* Remote service providers
-
-These professionals contribute significantly to the digital economy by earning from local and international platforms.
-
-The Finance Act 2026 recognizes that the creator economy is not just entertainment—it is becoming a serious source of employment, innovation, and foreign currency earnings.
-
----
-
-# Benefits for New and Existing Digital Professionals
-
-## 1. Encourages More People to Enter Digital Careers
-
-Tax and VAT exemptions reduce financial pressure on beginners who want to start careers in freelancing or content creation.
-
-Students, young entrepreneurs, and creative professionals can explore digital opportunities with greater confidence.
-
-## 2. Supports Digital Entrepreneurship
-
-Many creators invest their income into:
-
-* Better equipment
-* Professional software
-* Team expansion
-* Business development
-* Skill improvement
-
-With reduced tax obligations, more resources can be directed toward growth.
-
-## 3. Strengthens Bangladesh’s Position in the Global Market
-
-Bangladeshi freelancers already work with clients worldwide. These policy changes can help create a more competitive environment for digital professionals.
-
----
-
-# Who Can Benefit From These Exemptions?
-
-The exemptions are designed for individuals earning income through activities such as:
-
-* YouTube content creation
-* Facebook and Instagram content production
-* Video production
-* Online educational content
-* Freelance programming
-* Web development services
-* Graphic design
-* Digital marketing services
-* Other eligible digital creative services
-
-However, individuals should maintain proper records and follow applicable legal and regulatory requirements.
-
----
-
-# A Positive Step Toward the Future of Digital Bangladesh
-
-The introduction of **0% income tax and VAT exemptions** for content creators and freelancers under the Finance Act 2026 represents a significant milestone for Bangladesh’s digital sector.
-
-These policies can help:
-
-* Promote innovation
-* Encourage entrepreneurship
-* Create more digital jobs
-* Support young professionals
-* Expand Bangladesh’s creator economy
-
-As the world continues moving toward digital-first careers, supportive policies like these can play an important role in building a stronger and more sustainable digital ecosystem in Bangladesh.
-
-**The future of digital careers in Bangladesh is becoming stronger every day.**`;
-
-const newArticleStr = "  {\n" +
-  "    id: 'finance-act-2026-freelancers',\n" +
-  "    title: 'Bangladesh Content Creators and Freelancers Get 0% Income Tax & VAT Exemption Under Finance Act 2026',\n" +
-  "    excerpt: 'The Finance Act 2026 introduces 0% income tax and VAT exemptions for individual content creators and freelancers, boosting Bangladesh\\'s digital economy.',\n" +
-  "    content: " + JSON.stringify(contentText) + ",\n" +
-  "    categoryId: 'tax',\n" +
-  "    category: 'Tax Updates',\n" +
-  "    author: mockAuthors.a1,\n" +
-  "    publishedAt: new Date().toISOString(),\n" +
-  "    readTime: 5,\n" +
-  "    imageUrl: 'https://images.unsplash.com/photo-1593642532744-d37706f57321?auto=format&fit=crop&q=80&w=800',\n" +
-  "    tags: ['Tax', 'VAT', 'Finance Act 2026', 'Freelancers', 'Content Creators'],\n" +
-  "    likes: 128,\n" +
-  "    comments: 24,\n" +
-  "    isExpertOpinion: true\n" +
-  "  },";
-
-let mockDataFile = fs.readFileSync('src/data/mockData.ts', 'utf8');
-
-const targetStr = 'export const mockArticles: Article[] = [';
-const insertionPoint = mockDataFile.indexOf(targetStr) + targetStr.length;
-
-if (insertionPoint > targetStr.length - 1) {
-    mockDataFile = mockDataFile.slice(0, insertionPoint) + '\n' + newArticleStr + mockDataFile.slice(insertionPoint);
-    fs.writeFileSync('src/data/mockData.ts', mockDataFile);
-    console.log("Successfully added the new article!");
-} else {
-    console.log("Failed to find insertion point.");
-}
+fs.writeFileSync(filePath, content);
+console.log('Successfully prepended the article!');

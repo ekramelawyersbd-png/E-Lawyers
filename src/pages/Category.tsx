@@ -81,7 +81,7 @@ export function Category() {
                   <img src={article.author.avatarUrl} alt={article.author.name} className="w-8 h-8 rounded-full object-cover" onError={(e) => { const target = e.target as HTMLImageElement; target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(article.author.name)}&background=047857&color=fff`; }} />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-slate-900">{article.author.name}</span>
-                    <span className="text-xs text-slate-500">{calculateReadingTime(article.content)} min read</span>
+                    <span className="text-xs text-slate-500 flex items-center gap-1"><Clock className="w-3 h-3" /> {calculateReadingTime(article.content)} min read</span>
                   </div>
                 </div>
               </div>

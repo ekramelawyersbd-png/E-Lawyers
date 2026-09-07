@@ -53,6 +53,25 @@
         "helpfulCount": "number",
         "createdAt": "timestamp"
       }
+    },
+    {
+      "name": "newsletterSubscribers",
+      "description": "Captured professional email subscribers for legal and tax updates",
+      "fields": {
+        "email": "string",
+        "name": "string",
+        "designation": "string",
+        "organization": "string",
+        "topics": "array",
+        "frequency": "string",
+        "source": "string",
+        "sourceArticleId": "string",
+        "sourceArticleTitle": "string",
+        "status": "string",
+        "subscribedAt": "string",
+        "userId": "string",
+        "updatedAt": "timestamp"
+      }
     }
   ],
   "relationships": [

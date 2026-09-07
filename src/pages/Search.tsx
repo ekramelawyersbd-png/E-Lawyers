@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { format } from 'date-fns';
-import { Search as SearchIcon, History, X } from 'lucide-react';
+import { calculateReadingTime } from '../utils/readingTime';
+import { Search as SearchIcon, History, X, Clock } from 'lucide-react';
 
 const RECENT_SEARCHES_KEY = 'elawyers_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
@@ -208,7 +209,10 @@ export function Search() {
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest mb-4">
                   <span className="text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md">{article.category}</span>
-                  <span className="text-slate-400">{format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
+                  <span className="text-slate-400 flex items-center gap-1">
+                    {format(new Date(article.publishedAt), 'MMM d, yyyy')} • 
+                    <Clock className="w-3 h-3" /> {calculateReadingTime(article.content)} min
+                  </span>
                 </div>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">

@@ -1,10 +1,33 @@
 import { Link } from 'react-router-dom';
 import { Calendar, ExternalLink } from 'lucide-react';
+import { NewsletterSignup } from '../NewsletterSignup';
 
 export function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Professional Newsletter Signup Banner in Footer */}
+        <div className="mb-14 pb-14 border-b border-slate-800">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Statutory & Tax Intelligence</span>
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-2">
+                Stay Ahead of Bangladesh Law & Tax Updates
+              </h3>
+              <p className="text-slate-400 text-xs md:text-sm leading-relaxed max-w-xl">
+                Subscribe for curated practitioner digests of latest NBR circulars, SROs, RJSC corporate deadlines, and High Court precedents.
+              </p>
+            </div>
+            <div className="lg:col-span-7">
+              <NewsletterSignup variant="footer" />
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-6 group">

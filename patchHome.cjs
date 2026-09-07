@@ -1,22 +1,32 @@
 const fs = require('fs');
-
 let content = fs.readFileSync('src/pages/Home.tsx', 'utf8');
 
-// 1. Import CopySectionButton
-if (!content.includes('CopySectionButton')) {
-  content = content.replace(
-    "import { format } from 'date-fns';",
-    "import { format } from 'date-fns';\nimport { CopySectionButton } from '../components/CopySectionButton';"
-  );
-}
+// Add Clock to lucide-react import
+content = content.replace(
+  "import { ArrowRight",
+  "import { ArrowRight, Clock"
+);
 
-// 2. Modify section
-const target = `<section className="py-20 px-4 sm:px-6 lg:px-8 bg-emerald-50 border-t border-emerald-100 text-center">`;
-const replacement = `<section className="py-20 px-4 sm:px-6 lg:px-8 bg-emerald-50 border-t border-emerald-100 text-center relative group">
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
-          <CopySectionButton content="Stay Updated with Legal & Tax News\n\nSubscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox.\n\nBy subscribing, you agree to our Privacy Policy and Terms of Service." />
-        </div>`;
+// Add reading time to featuredArticle
+content = content.replace(
+  "{format(new Date(featuredArticle.publishedAt), 'MMM d, yyyy')}</p>",
+  "{format(new Date(featuredArticle.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(featuredArticle.content)} min read</p>"
+);
 
-content = content.replace(target, replacement);
+// Add reading time to recentArticles
+content = content.replace(
+  "{format(new Date(article.publishedAt), 'MMM d, yyyy')}</p>",
+  "{format(new Date(article.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(article.content)} min read</p>"
+);
+
+// Add reading time to popularArticles
+content = content.replace(
+  "<span className=\"text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1 block\">{article.category}</span>",
+  `<div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">{article.category}</span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-1"><Clock className="w-3 h-3"/> {calculateReadingTime(article.content)} min read</span>
+                    </div>`
+);
 
 fs.writeFileSync('src/pages/Home.tsx', content);
+console.log('patched Home.tsx');
