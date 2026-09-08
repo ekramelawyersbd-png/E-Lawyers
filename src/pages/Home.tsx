@@ -10,6 +10,7 @@ import { BookmarkSectionButton } from '../components/BookmarkSectionButton';
 import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
+import { NewsletterSignup } from '../components/NewsletterSignup';
 
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
@@ -485,39 +486,7 @@ By subscribing, you agree to our Privacy Policy and Terms of Service."
           <p className={`${['text-base', 'text-lg', 'text-xl', 'text-2xl'][newsFontScale]} mb-10 transition-all ${isHighContrast ? 'text-yellow-400 font-bold tracking-wide' : 'text-slate-600'}`}>
             Subscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox.
           </p>
-          <form className={`p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row gap-2 border shadow-sm transition-colors ${isHighContrast ? 'bg-black border-4 border-yellow-400' : 'bg-white border-slate-200'}`}>
-            <input 
-              type="text" 
-              name="name"
-              autoComplete="name"
-              placeholder="Your Name" 
-              className={`flex-1 bg-transparent border-none py-3 px-6 focus:outline-none focus:ring-0 ${isHighContrast ? 'text-white placeholder:text-white/50 font-bold' : 'text-slate-900 placeholder:text-slate-400'}`}
-              required
-            />
-            <div className={`hidden md:block w-px h-8 self-center transition-colors ${isHighContrast ? 'bg-yellow-400' : 'bg-slate-200'}`}></div>
-            <input 
-              type="email" 
-              name="email"
-              autoComplete="email"
-              placeholder="Email Address" 
-              className={`flex-1 bg-transparent border-none py-3 px-6 focus:outline-none focus:ring-0 ${isHighContrast ? 'text-white placeholder:text-white/50 font-bold' : 'text-slate-900 placeholder:text-slate-400'}`}
-              required
-            />
-            <div className={`hidden md:block w-px h-8 self-center transition-colors ${isHighContrast ? 'bg-yellow-400' : 'bg-slate-200'}`}></div>
-            <input 
-              type="tel" 
-              name="tel"
-              autoComplete="tel"
-              placeholder="Phone Number" 
-              className={`flex-1 bg-transparent border-none py-3 px-6 focus:outline-none focus:ring-0 ${isHighContrast ? 'text-white placeholder:text-white/50 font-bold' : 'text-slate-900 placeholder:text-slate-400'}`}
-            />
-            <button 
-              type="submit" 
-              className={`px-8 py-4 rounded-xl md:rounded-full font-bold transition-all hover:scale-105 whitespace-nowrap shadow-sm ${isHighContrast ? 'bg-yellow-400 text-black hover:bg-yellow-300 uppercase tracking-widest' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
-            >
-              Subscribe Now
-            </button>
-          </form>
+          <div className="text-left mt-8 max-w-2xl mx-auto"><NewsletterSignup variant="full-width" /></div>
           <p className={`text-xs mt-6 transition-colors ${isHighContrast ? 'text-white font-bold' : 'text-slate-500'}`}>By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
           <SectionNote id="newsletter-section" isHighContrast={isHighContrast} />
         </div>

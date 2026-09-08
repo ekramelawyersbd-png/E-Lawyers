@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { calculateReadingTime } from '../utils/readingTime';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Clock } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export function Category() {
