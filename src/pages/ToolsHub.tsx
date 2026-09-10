@@ -163,30 +163,38 @@ export function ToolsHub() {
             key={tool.name}
             to={tool.path}
             title={tool.tooltip}
-            className="relative group bg-white rounded-3xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all hover:border-emerald-200 flex flex-col items-center text-center gap-4"
+            className="relative group bg-white rounded-[2rem] border border-slate-200/60 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 hover:border-emerald-200 overflow-hidden flex flex-col items-center text-center gap-5 z-10"
           >
+            {/* Background glow effect on hover */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
             <button 
               onClick={(e) => hideTool(e, tool.name)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+              className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
               title="Hide this tool"
             >
               <X className="w-4 h-4" />
             </button>
-            <div className={`p-5 rounded-3xl shrink-0 ${tool.color}`}>
-
+            
+            <div className={`relative p-5 rounded-[1.5rem] shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-inner ${tool.color}`}>
+              {/* Inner subtle ring */}
+              <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/5" />
               {tool.icon}
             </div>
-            <div>
+            
+            <div className="relative z-10 mt-2">
               <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">
                 {tool.name}
               </h3>
-              <p className="text-slate-600 leading-relaxed text-sm">
+              <p className="text-slate-500 leading-relaxed text-sm group-hover:text-slate-700 transition-colors">
                 {tool.description}
               </p>
             </div>
+            
+            {/* Bottom accent line */}
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-full group-hover:translate-y-0" />
           </Link>
         ))}
-      
       </div>
       
       {hiddenTools.length > 0 && (

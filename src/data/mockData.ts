@@ -48,6 +48,912 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+
+  {
+    id: 'rjsc-registration-fees',
+    title: 'RJSC Registration Fees in Bangladesh: Complete Guide',
+    excerpt: 'A comprehensive guide on RJSC registration fees for private companies, public companies, societies, and partnership firms in Bangladesh.',
+    content: `![RJSC Building](https://images.unsplash.com/photo-1577495508048-b635879837f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80)
+
+# RJSC Registration Fees in Bangladesh: Complete Guide for Companies, Societies & Partnership Firms
+
+Source: Registrar of Joint Stock Companies and Firms (RJSC), Bangladesh
+
+---
+
+## English Version
+
+### Introduction
+The Registrar of Joint Stock Companies and Firms (RJSC) is the government authority responsible for registering companies, societies, trade organizations, and partnership firms in Bangladesh.
+
+Before starting a business entity, applicants must pay different types of fees, including:
+- Stamp fees
+- Registration fees
+- Document filing fees
+- Authorized capital-related fees
+- Digital certificate fees (where applicable)
+
+The exact registration cost depends on the type of organization and its structure.
+
+### 1. Private Company Registration Fee
+
+![Corporate Law and Documents](https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1000)
+*(Under Companies Act, 1994)*
+A private limited company is one of the most common business structures in Bangladesh.
+
+**Stamp Fees**
+| Document | Fee |
+| :--- | :--- |
+| Memorandum of Association (MOA) | BDT 2,000 |
+
+*Articles of Association (AOA) - Stamp Fee:*
+| Authorized Capital | Stamp Fee |
+| :--- | :--- |
+| Up to BDT 40,00,000 | BDT 10,000 |
+| Above BDT 40,00,000 to BDT 12,00,00,000 | BDT 30,000 |
+| Above BDT 12,00,00,000 | BDT 50,000 |
+
+**Registration Fees**
+A private company requires filing 6 documents (5 forms + 1 MOA & AOA).
+- Calculation: 6 × BDT 200 = **BDT 1,200**
+
+**Authorized Share Capital Fee**
+| Authorized Capital | Additional Fee |
+| :--- | :--- |
+| Up to BDT 20,000 | No fee |
+| Above BDT 20,000 to BDT 50,000 | No fee |
+| Above BDT 50,000 to BDT 10,00,000 | No fee |
+| Above BDT 10,00,000 to BDT 50,00,000 | BDT 80 per additional BDT 1,00,000 |
+| Above BDT 50,00,000 | BDT 130 per additional BDT 1,00,000 |
+
+- Digital Certificate Supply Fee: **BDT 0**
+
+### 2. Public Company Registration Fee
+*(Under Companies Act, 1994)*
+Public companies require more documentation compared to private companies.
+
+**Stamp Fees**
+| Document | Fee |
+| :--- | :--- |
+| MOA | BDT 2,000 |
+
+*Articles of Association:*
+| Authorized Capital | Stamp Fee |
+| :--- | :--- |
+| Up to BDT 40,00,000 | BDT 10,000 |
+| Above BDT 40,00,000 to BDT 12,00,00,000 | BDT 30,000 |
+| Above BDT 12,00,00,000 | BDT 50,000 |
+
+**Registration Fees**
+Public companies require 7 or 8 forms + MOA & AOA.
+- 8 documents = **BDT 1,600**
+- 9 documents = **BDT 1,800**
+
+**Authorized Capital Fee**
+The calculation method is the same as a private company.
+- Digital Certificate Fee: **BDT 0**
+
+### 3. Foreign Company Registration Fee
+Foreign companies registering in Bangladesh need to submit required documents to RJSC.
+
+| Item | Fee |
+| :--- | :--- |
+| Filing 6 documents | BDT 3,000 |
+| Memorandum & Articles of Association | BDT 3,000 |
+| **Total basic fee** | **BDT 6,000** |
+
+### 4. Trade Organization Registration Fee
+
+![Business Meeting and Planning](https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=1000)
+
+**Stamp Fee**
+- Memorandum of Association: **Free**
+- Articles of Association: **BDT 300**
+
+**Registration Fee**
+- Document Filing (7 documents): 7 × BDT 400 = **BDT 2,800**
+
+*Member-Based Fee:*
+| Number of Members | Fee |
+| :--- | :--- |
+| Up to 20 members | BDT 1,000 |
+| 20–100 members | BDT 2,500 |
+| Above 100 members | BDT 300 per additional 100 members |
+| Unlimited members | BDT 7,500 |
+
+- Digital Certificate Fee: **BDT 0**
+
+### 5. Society Registration Fee
+*(Under Societies Registration Act, 1860)*
+
+| Item | Fee |
+| :--- | :--- |
+| Registration Fee | BDT 15,000 |
+| Registration Filing Fee | BDT 800 |
+| Digital Certificate | Free |
+
+### 6. Partnership Firm Registration Fee
+*(Under Partnership Act, 1932)*
+
+| Item | Fee |
+| :--- | :--- |
+| Registration Fee | BDT 5,000 |
+| Registration Filing Fee | BDT 500 |
+| Digital Certificate | Free |
+
+### Summary Table
+| Entity Type | Main Registration Cost |
+| :--- | :--- |
+| Private Company | Depends on capital + approx. BDT 1,200 filing fee |
+| Public Company | Depends on capital + BDT 1,600–1,800 filing fee |
+| Foreign Company | Approx. BDT 6,000 |
+| Trade Organization | Filing + membership-based fee |
+| Society | BDT 15,800 |
+| Partnership Firm | BDT 5,500 |
+
+---
+
+## বাংলা সংস্করণ
+
+### বাংলাদেশে RJSC নিবন্ধন ফি: সম্পূর্ণ গাইড
+বাংলাদেশে কোনো ব্যবসা প্রতিষ্ঠান বা সংগঠন আইনগতভাবে প্রতিষ্ঠা করতে হলে যৌথমূলধন কোম্পানি ও ফার্মসমূহের পরিদপ্তর (RJSC)-এ নিবন্ধন করতে হয়।
+
+RJSC-তে নিবন্ধনের সময় সাধারণত নিচের ফিগুলো প্রদান করতে হয়:
+- স্ট্যাম্প ফি
+- নিবন্ধন ফি
+- ডকুমেন্ট ফাইলিং ফি
+- অনুমোদিত মূলধন অনুযায়ী ফি
+- ডিজিটাল সার্টিফিকেট ফি
+
+### ১. প্রাইভেট কোম্পানি নিবন্ধন ফি
+
+![Corporate Law and Documents](https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1000)
+
+**স্ট্যাম্প ফি**
+- মেমোরেন্ডাম অব এসোসিয়েশন (MOA): **২,০০০ টাকা**
+
+*আর্টিকেল অব এসোসিয়েশন (AOA):*
+| অনুমোদিত মূলধন | ফি |
+| :--- | :--- |
+| ৪০ লাখ টাকা পর্যন্ত | ১০,০০০ টাকা |
+| ৪০ লাখের বেশি থেকে ১২ কোটি টাকা পর্যন্ত | ৩০,০০০ টাকা |
+| ১২ কোটির বেশি | ৫০,০০০ টাকা |
+
+**নিবন্ধন ফি**
+প্রাইভেট কোম্পানির জন্য ৫টি ফর্ম এবং ১টি MOA ও AOA (মোট ৬টি ডকুমেন্ট)।
+- মোট: ৬ × ২০০ = **১,২০০ টাকা**
+
+**অনুমোদিত শেয়ার মূলধন ফি**
+| মূলধন | ফি |
+| :--- | :--- |
+| ২০,০০০ টাকা পর্যন্ত | শূন্য |
+| ২০,০০০–৫০,০০০ টাকা | শূন্য |
+| ৫০,০০০–১০ লাখ টাকা | শূন্য |
+| ১০ লাখ–৫০ লাখ টাকা | প্রতি ১ লাখে ৮০ টাকা |
+| ৫০ লাখের বেশি | প্রতি ১ লাখে ১৩০ টাকা |
+
+- ডিজিটাল সার্টিফিকেট ফি: **শূন্য**
+
+### ২. পাবলিক কোম্পানি নিবন্ধন ফি
+**স্ট্যাম্প ফি**
+- MOA: **২,০০০ টাকা**
+
+*AOA:*
+| অনুমোদিত মূলধন | ফি |
+| :--- | :--- |
+| ৪০ লাখ পর্যন্ত | ১০,০০০ টাকা |
+| ৪০ লাখ–১২ কোটি | ৩০,০০০ টাকা |
+| ১২ কোটির বেশি | ৫০,০০০ টাকা |
+
+**ডকুমেন্ট ফাইলিং ফি**
+- ৮টি হলে: **১,৬০০ টাকা**
+- ৯টি হলে: **১,৮০০ টাকা**
+অনুমোদিত মূলধনের ফি প্রাইভেট কোম্পানির মতো একই নিয়মে হিসাব করা হয়।
+
+### ৩. বিদেশি কোম্পানি নিবন্ধন ফি
+| বিষয় | ফি |
+| :--- | :--- |
+| ৬টি ডকুমেন্ট ফাইলিং | ৩,০০০ টাকা |
+| MOA ও AOA | ৩,০০০ টাকা |
+| **মোট** | **৬,০০০ টাকা** |
+
+### ৪. ট্রেড অর্গানাইজেশন নিবন্ধন ফি
+
+![Business Meeting and Planning](https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=1000)
+
+**স্ট্যাম্প ফি**
+- MOA: শূন্য
+- AOA: ৩০০ টাকা
+
+**নিবন্ধন ফি**
+- ডকুমেন্ট ফাইলিং: ৭ × ৪০০ = **২,৮০০ টাকা**
+
+*সদস্য সংখ্যার ভিত্তিতে:*
+| সদস্য সংখ্যা | ফি |
+| :--- | :--- |
+| ২০ জন পর্যন্ত | ১,০০০ টাকা |
+| ২০–১০০ জন | ২,৫০০ টাকা |
+| ১০০ জনের বেশি | প্রতি ১০০ জনে ৩০০ টাকা |
+| অসীম সদস্য | ৭,৫০০ টাকা |
+
+### ৫. সমিতি (Society) নিবন্ধন ফি
+*(সোসাইটি নিবন্ধন আইন, ১৮৬০ অনুযায়ী)*
+
+| বিষয় | ফি |
+| :--- | :--- |
+| নিবন্ধন ফি | ১৫,০০০ টাকা |
+| ফাইলিং ফি | ৮০০ টাকা |
+| ডিজিটাল সার্টিফিকেট | শূন্য |
+
+### ৬. পার্টনারশিপ ফার্ম নিবন্ধন ফি
+*(পার্টনারশিপ আইন, ১৯৩২ অনুযায়ী)*
+
+| বিষয় | ফি |
+| :--- | :--- |
+| নিবন্ধন ফি | ৫,০০০ টাকা |
+| ফাইলিং ফি | ৫০০ টাকা |
+| ডিজিটাল সার্টিফিকেট | শূন্য |
+
+### উপসংহার
+RJSC নিবন্ধনের মোট খরচ নির্ভর করে প্রতিষ্ঠানের ধরন, অনুমোদিত মূলধন এবং প্রয়োজনীয় ডকুমেন্টের সংখ্যার ওপর। ব্যবসা শুরু করার আগে সঠিক প্রতিষ্ঠান কাঠামো নির্বাচন করলে ভবিষ্যতের আইনি ও আর্থিক ব্যবস্থাপনা সহজ হয়।`,
+    author: mockAuthors.a1,
+    category: 'Corporate Law',
+    categoryId: 'corporate',
+    publishedAt: new Date().toISOString(),
+    readTime: '8',
+    tags: ['RJSC', 'Company Registration', 'Corporate Law', 'Business Setup', 'Bangladesh'],
+    imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=1200&h=600'
+  },
+  {
+    id: 'income-tax-circular-2026-2027-expense-deductions-business-restructuring',
+    title: 'Income Tax Circular 2026–2027: Changes in Expense Deductions & Business Restructuring',
+    metaTitle: 'Income Tax Circular 2026-2027 Changes Bangladesh',
+    metaDescription: 'The Income Tax Circular 2026–2027 introduces several important amendments affecting business expense deductions, related-party definitions, and corporate restructuring.',
+    excerpt: 'The Income Tax Circular 2026–2027 introduces several important amendments under the Income Tax Act, 2023, affecting business expense deductions, related-party definitions, corporate restructuring, and startup compliance.',
+    content: `The Income Tax Circular 2026–2027 introduces several important amendments under the Income Tax Act, 2023, affecting business expense deductions, related-party definitions, corporate restructuring, partnership firm dissolution, and startup compliance procedures.
+
+These reforms aim to improve tax transparency, establish consistent interpretations of tax provisions, encourage business formalization, and strengthen digital tax administration.
+
+## 1. Expense Deduction Rules: New Limits on Pharmaceutical Free Sample Expenses
+
+The pharmaceutical sector plays a significant role in Bangladesh’s economy, where free sample distribution is a common promotional practice. To regulate tax deductions related to such expenses, the Income Tax Circular 2026–2027 introduces specific limits for deductible free sample distribution expenses.
+
+Under the revised framework, pharmaceutical companies can claim free sample distribution expenses as deductible costs only within prescribed turnover-based limits.
+
+### Turnover-Based Deduction Limits
+
+| Annual Turnover of Pharmaceutical Business | Maximum Allowable Deduction for Free Sample Expenses |
+| :--- | :--- |
+| Up to BDT 10 crore | 2% of turnover |
+| BDT 10 crore to BDT 20 crore | 1.5% of turnover |
+| Above BDT 20 crore | 1% of turnover |
+
+#### Example
+
+**Company A**
+* Annual turnover: BDT 8 crore
+* Maximum allowable free sample expense: 8 crore × 2% = BDT 16 lakh
+
+**Company B**
+* Annual turnover: BDT 15 crore
+* Maximum allowable free sample expense: 15 crore × 1.5% = BDT 22.5 lakh
+
+**Company C**
+* Annual turnover: BDT 50 crore
+* Maximum allowable free sample expense: 50 crore × 1% = BDT 50 lakh
+
+### Business Impact on Pharmaceutical Companies
+
+The new limits require pharmaceutical companies to:
+* Maintain proper documentation of free sample distribution
+* Monitor promotional and marketing expenses carefully
+* Align sales promotion budgets with tax deduction limits
+* Separate deductible and non-deductible expenses during tax computation
+
+Any amount exceeding the prescribed limit may not be allowed as a tax-deductible expense.
+
+## 2. Standard Definition of Associated Enterprise (AE) Under Section 2(86A)
+
+The Income Tax Circular 2026–2027 introduces a standardized definition of **Associated Enterprise (AE)** through the insertion of Section 2(86A) in the Income Tax Act, 2023.
+
+Previously, the interpretation of associated enterprises could vary depending on the specific chapter or provision of the tax law. The new definition creates a uniform understanding across all sections of the Act.
+
+### Importance of the New AE Definition
+
+The standardized definition will be applicable in areas such as:
+* Related-party transactions
+* Transfer pricing matters
+* Cross-border business arrangements
+* Corporate restructuring transactions
+
+### Impact on Businesses
+
+Companies involved in transactions with related entities should review their existing structures to determine whether any entity qualifies as an associated enterprise under the revised definition.
+
+This will help ensure:
+* Consistent tax treatment
+* Better compliance management
+* Reduced disputes with tax authorities
+
+## 3. Capital Gains Exemption on Firm-to-Company Conversion (Section 61)
+
+The circular introduces a significant relief measure for businesses converting from partnership firms into companies.
+
+Under Section 61, capital gains arising from the transfer of assets during conversion of a partnership firm into a company will be exempt from tax if certain conditions are fulfilled.
+
+The exemption applies to the transfer of:
+* Tangible assets (land, buildings, machinery, equipment, etc.)
+* Intangible assets (goodwill, intellectual property, rights, etc.)
+
+### Conditions for Tax Exemption
+
+To qualify for the exemption:
+1. Existing partners of the partnership firm must hold at least **50% voting power** in the newly formed company.
+2. The partners must continue maintaining such ownership position for at least **5 years**.
+
+### Benefits of This Provision
+
+The amendment encourages businesses to move from informal partnership structures toward corporate entities. Key benefits include:
+* Easier business restructuring
+* No immediate capital gains tax burden
+* Encouragement of corporate growth
+* Improved access to investment opportunities
+
+## 4. Tax Clearance Requirement for Partnership Firm Dissolution (Section 256)
+
+The Income Tax Circular 2026–2027 introduces a new compliance requirement for registered partnership firms.
+
+Under Section 256, a registered partnership firm cannot be dissolved, or be removed from the Registrar of Joint Stock Companies and Firms (RJSC) without submitting an official **Tax Clearance Certificate** issued by the **Deputy Commissioner of Taxes (DCT)**.
+
+### Purpose of the Requirement
+
+This amendment ensures that businesses complete their tax obligations before legal dissolution. It helps the government to:
+* Recover outstanding tax liabilities
+* Prevent tax avoidance through business closure
+* Maintain accurate business records
+
+### Impact on Partnership Firms
+
+Before applying for dissolution, firms must ensure:
+* All tax returns are submitted
+* Outstanding tax liabilities are settled
+* Required tax clearance is obtained
+
+This introduces an additional compliance step in the business closure process.
+
+## 5. Read-Only Digital Access for Startups (Section 129.4)
+
+The circular introduces a revised digital monitoring framework for startups.
+
+Under Section 129.4, tax authorities will receive **"Read Only" access** to startup record platforms. This replaces previous provisions that allowed broader permanent access.
+
+### Purpose of the Amendment
+
+The change aims to create a balance between:
+
+**Tax Monitoring Requirements**
+* Verification of startup records
+* Ensuring tax compliance
+* Regulatory supervision
+
+**Data Protection Measures**
+* Protecting startup information
+* Preventing unauthorized modification
+* Maintaining system integrity
+
+### Impact on Startups
+
+Startups will benefit from improved data security as tax authorities will only be able to review information without changing or controlling platform records. This creates a more transparent and secure compliance environment for emerging businesses.
+
+## Conclusion
+
+The amendments introduced through the Income Tax Circular 2026–2027 reflect Bangladesh’s move toward a more structured, transparent, and technology-driven tax environment.
+
+While businesses will receive benefits such as capital gains exemption during restructuring and greater clarity in tax definitions, they must also strengthen compliance practices regarding expense deductions, dissolution procedures, and digital record management.
+
+Companies should review their operational policies and tax strategies to ensure alignment with the updated provisions of the Income Tax Act, 2023.
+
+---
+
+# বাংলা ব্লগ পোস্ট
+## আয়কর সার্কুলার ২০২৬–২০২৭: ব্যয় কর্তন, ব্যবসায়িক পুনর্গঠন, বিলুপ্তি ও স্টার্টআপ সংক্রান্ত গুরুত্বপূর্ণ পরিবর্তন
+
+আয়কর সার্কুলার ২০২৬–২০২৭ বাংলাদেশের আয়কর আইন, ২০২৩-এ ব্যবসায়িক ব্যয় কর্তন, সংশ্লিষ্ট প্রতিষ্ঠান (Associated Enterprise), অংশীদারি প্রতিষ্ঠান থেকে কোম্পানিতে রূপান্তর, ব্যবসা বিলুপ্তি এবং স্টার্টআপ ব্যবস্থাপনা সংক্রান্ত বেশ কিছু গুরুত্বপূর্ণ সংশোধনী এনেছে।
+
+এই পরিবর্তনগুলোর মূল উদ্দেশ্য হলো কর ব্যবস্থায় স্বচ্ছতা বৃদ্ধি, কর আইনের বিভিন্ন ধারার মধ্যে সামঞ্জস্য তৈরি, ব্যবসার আনুষ্ঠানিক রূপান্তরকে উৎসাহিত করা এবং ডিজিটাল কর প্রশাসনকে আরও শক্তিশালী করা।
+
+### ১. ব্যয় কর্তন সংক্রান্ত নতুন নিয়ম: ফার্মাসিউটিক্যাল কোম্পানির ফ্রি স্যাম্পল ব্যয়ের সীমা
+
+বাংলাদেশের ফার্মাসিউটিক্যাল খাতে চিকিৎসক ও স্বাস্থ্যসেবা পেশাজীবীদের কাছে বিনামূল্যে নমুনা (Free Sample) বিতরণ একটি প্রচলিত বিপণন কার্যক্রম।
+
+তবে আয়কর সার্কুলার ২০২৬–২০২৭ অনুযায়ী, ফার্মাসিউটিক্যাল কোম্পানিগুলোর ফ্রি স্যাম্পল বিতরণ ব্যয় কর কর্তনের ক্ষেত্রে নির্দিষ্ট সীমা নির্ধারণ করা হয়েছে।
+
+অর্থাৎ, কোম্পানিগুলো তাদের টার্নওভারের নির্দিষ্ট শতাংশ পর্যন্ত ফ্রি স্যাম্পল ব্যয় করযোগ্য আয় নির্ধারণের সময় কর্তনযোগ্য হিসেবে দাবি করতে পারবে।
+
+#### টার্নওভার অনুযায়ী ফ্রি স্যাম্পল ব্যয়ের অনুমোদিত সীমা
+
+| বার্ষিক টার্নওভার | অনুমোদিত ফ্রি স্যাম্পল ব্যয় |
+| :--- | :--- |
+| ১০ কোটি টাকা পর্যন্ত | টার্নওভারের ২% |
+| ১০ কোটি টাকা থেকে ২০ কোটি টাকা পর্যন্ত | টার্নওভারের ১.৫% |
+| ২০ কোটি টাকার বেশি | টার্নওভারের ১% |
+
+#### উদাহরণ
+
+**কোম্পানি–A**
+* বার্ষিক টার্নওভার: ৮ কোটি টাকা
+* অনুমোদিত ফ্রি স্যাম্পল ব্যয়: ৮ কোটি × ২% = ১৬ লাখ টাকা
+
+**কোম্পানি–B**
+* বার্ষিক টার্নওভার: ১৫ কোটি টাকা
+* অনুমোদিত ফ্রি স্যাম্পল ব্যয়: ১৫ কোটি × ১.৫% = ২২.৫ লাখ টাকা
+
+**কোম্পানি–C**
+* বার্ষিক টার্নওভার: ৫০ কোটি টাকা
+* অনুমোদিত ফ্রি স্যাম্পল ব্যয়: ৫০ কোটি × ১% = ৫০ লাখ টাকা
+
+#### ফার্মাসিউটিক্যাল কোম্পানির ওপর প্রভাব
+
+নতুন নিয়ম অনুযায়ী কোম্পানিগুলোকে:
+* ফ্রি স্যাম্পল বিতরণের সঠিক রেকর্ড সংরক্ষণ করতে হবে
+* প্রচারণামূলক ব্যয় নিয়ন্ত্রণ করতে হবে
+* ট্যাক্স রিটার্নে ব্যয়ের সঠিক হিসাব দেখাতে হবে
+* অনুমোদিত সীমার বেশি ব্যয় হলে তার কর প্রভাব বিবেচনা করতে হবে
+
+নির্ধারিত সীমার অতিরিক্ত ব্যয় কর কর্তনের সুবিধা নাও পেতে পারে।
+
+### ২. Associated Enterprise (AE)-এর নতুন সংজ্ঞা (ধারা ২(৮৬A))
+
+আয়কর সার্কুলার ২০২৬–২০২৭ অনুযায়ী, Associated Enterprise (AE) বা সংশ্লিষ্ট প্রতিষ্ঠানের জন্য একটি একক ও মানসম্মত সংজ্ঞা ধারা ২(৮৬A)-এর মাধ্যমে অন্তর্ভুক্ত করা হয়েছে।
+
+এর আগে আয়কর আইনের বিভিন্ন অধ্যায়ে Associated Enterprise-এর ব্যাখ্যায় পার্থক্য দেখা যেত। নতুন সংজ্ঞার মাধ্যমে পুরো Income Tax Act, 2023 জুড়ে একই ব্যাখ্যা প্রযোজ্য হবে।
+
+#### এই পরিবর্তনের গুরুত্ব
+
+এই সংজ্ঞা প্রযোজ্য হবে:
+* Related party transaction
+* Transfer pricing
+* আন্তর্জাতিক লেনদেন
+* গ্রুপ কোম্পানির কার্যক্রম
+* ব্যবসায়িক পুনর্গঠন
+
+#### ব্যবসার ওপর প্রভাব
+
+যেসব কোম্পানি সহযোগী প্রতিষ্ঠান, গ্রুপ কোম্পানি বা বিদেশি অংশীদারের সাথে লেনদেন করে, তাদের নতুন সংজ্ঞা অনুযায়ী সম্পর্ক বিশ্লেষণ করতে হবে। এর ফলে কর হিসাবের সামঞ্জস্য বৃদ্ধি পাবে, কর সংক্রান্ত বিরোধ কমবে এবং কমপ্লায়েন্স ব্যবস্থাপনা সহজ হবে।
+
+### ৩. অংশীদারি প্রতিষ্ঠান থেকে কোম্পানিতে রূপান্তরে মূলধনী লাভ কর অব্যাহতি (ধারা ৬১)
+
+আয়কর সার্কুলার ২০২৬–২০২৭ ব্যবসা পুনর্গঠনের ক্ষেত্রে একটি গুরুত্বপূর্ণ সুবিধা প্রদান করেছে।
+
+কোনো Partnership Firm যদি একটি Company-তে রূপান্তরিত হয়, তাহলে সেই রূপান্তরের সময় সম্পদ হস্তান্তর থেকে সৃষ্ট মূলধনী লাভ (Capital Gain) করমুক্ত হতে পারে।
+
+এই সুবিধা প্রযোজ্য হবে:
+* দৃশ্যমান সম্পদ (Tangible Assets): জমি, ভবন, যন্ত্রপাতি
+* অদৃশ্য সম্পদ (Intangible Assets): গুডউইল, মেধাস্বত্ব, অন্যান্য অধিকার
+
+#### কর অব্যাহতির শর্তসমূহ
+
+এই সুবিধা পাওয়ার জন্য:
+১. নতুন কোম্পানিতে অংশীদারদের কমপক্ষে **৫০% ভোটিং ক্ষমতা** থাকতে হবে।
+২. এই ৫০% ভোটিং ক্ষমতা কমপক্ষে **৫ বছর** পর্যন্ত বজায় রাখতে হবে।
+
+#### ব্যবসার জন্য সুবিধা
+
+এই বিধান ব্যবসাকে অংশীদারি কাঠামো থেকে কর্পোরেট কাঠামোতে রূপান্তর করতে উৎসাহিত করবে, তাৎক্ষণিক মূলধনী লাভ করের চাপ কমাবে, এবং দীর্ঘমেয়াদি ব্যবসায়িক সম্প্রসারণ সহজ করবে।
+
+### ৪. অংশীদারি প্রতিষ্ঠান বিলুপ্তিতে ট্যাক্স ক্লিয়ারেন্স বাধ্যতামূলক (ধারা ২৫৬)
+
+নতুন বিধান অনুযায়ী, কোনো নিবন্ধিত অংশীদারি প্রতিষ্ঠান (Registered Partnership Firm) বিলুপ্ত বা RJSC থেকে অপসারণের আগে কর সংক্রান্ত আনুষ্ঠানিকতা সম্পন্ন করতে হবে।
+
+প্রতিষ্ঠানটি বিলুপ্ত বা অপসারণ করা যাবে না যদি না **Deputy Commissioner of Taxes (DCT)** কর্তৃক ইস্যুকৃত **Tax Clearance Certificate** জমা দেওয়া হয়।
+
+#### এই নিয়মের উদ্দেশ্য
+
+এই বিধানের মাধ্যমে সরকার নিশ্চিত করতে চায় যে প্রতিষ্ঠানের কোনো বকেয়া কর দায় নেই, কর রিটার্ন সম্পন্ন হয়েছে এবং ব্যবসা বন্ধের আগে যথাযথ কর সমাধান করা হয়েছে।
+
+#### অংশীদারি প্রতিষ্ঠানের ওপর প্রভাব
+
+বিলুপ্তির আগে প্রতিষ্ঠানকে বকেয়া কর পরিশোধ করতে হবে, প্রয়োজনীয় রিটার্ন জমা দিতে হবে এবং Tax Clearance Certificate সংগ্রহ করতে হবে।
+
+### ৫. স্টার্টআপের জন্য Read-Only ডিজিটাল অ্যাক্সেস (ধারা ১২৯.৪)
+
+আয়কর সার্কুলার ২০২৬–২০২৭ স্টার্টআপ প্ল্যাটফর্মের তথ্য ব্যবস্থাপনায় নতুন নিয়ম চালু করেছে।
+
+ধারা ১২৯.৪ অনুযায়ী, কর কর্তৃপক্ষ স্টার্টআপের রেকর্ড প্ল্যাটফর্মে **"Read Only" Access** পাবে। অর্থাৎ, কর কর্মকর্তারা তথ্য দেখতে পারবেন, কিন্তু কোনো তথ্য পরিবর্তন বা সম্পাদনা করতে পারবেন না।
+
+#### নতুন ব্যবস্থার উদ্দেশ্য
+
+এই পরিবর্তনের মাধ্যমে কর প্রশাসনের প্রয়োজন (তথ্য যাচাই ও কমপ্লায়েন্স পর্যবেক্ষণ) এবং স্টার্টআপের তথ্য নিরাপত্তা (ডেটা সুরক্ষা ও সিস্টেমের অখণ্ডতা বজায় রাখা) এর মধ্যে ভারসাম্য তৈরি করা হয়েছে।
+
+### উপসংহার
+
+আয়কর সার্কুলার ২০২৬–২০২৭ বাংলাদেশের ব্যবসায়িক কর ব্যবস্থাকে আরও কাঠামোবদ্ধ, স্বচ্ছ এবং প্রযুক্তিনির্ভর করার একটি গুরুত্বপূর্ণ পদক্ষেপ।
+
+ফ্রি স্যাম্পল ব্যয়ের সীমা, Associated Enterprise-এর একক সংজ্ঞা, অংশীদারি প্রতিষ্ঠান থেকে কোম্পানিতে রূপান্তরের কর সুবিধা এবং স্টার্টআপের জন্য Read-Only অ্যাক্সেস—সবগুলো পরিবর্তন ব্যবসার কর পরিকল্পনা ও কমপ্লায়েন্স ব্যবস্থাপনায় গুরুত্বপূর্ণ প্রভাব ফেলবে।
+
+কোম্পানিগুলোকে নতুন বিধান অনুযায়ী তাদের ব্যয় ব্যবস্থাপনা, ব্যবসায়িক কাঠামো এবং কর পরিকল্পনা পুনর্মূল্যায়ন করা উচিত।`,
+    categoryId: 'business',
+    category: 'Business & Startup',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80',
+    publishedAt: '2026-09-09T21:52:36.485Z',
+    author: mockAuthors.a3,
+    readTime: 6,
+    tags: ['Income Tax Circular 2026-2027', 'Expense Deductions', 'Pharmaceuticals', 'Associated Enterprise', 'Business Restructuring'], likes: 0, comments: 0
+  },
+
+  {
+    id: 'retained-earnings-dividend-distribution-rules-2026-2027-bangladesh',
+    title: 'Retained Earnings & Dividend Distribution Rules 2026–2027: Major Changes for Listed Companies',
+    metaTitle: 'Retained Earnings & Dividend Rules 2026-2027 Bangladesh Listed Companies',
+    metaDescription: 'The Income Tax Circular 2026–2027 introduces significant reforms regarding retained earnings and dividend distribution policies for listed companies in Bangladesh.',
+    excerpt: 'The Income Tax Circular 2026–2027 introduces significant reforms regarding retained earnings and dividend distribution policies for listed companies in Bangladesh, including mandatory cash dividend requirements and stock dividend taxes.',
+    content: `The Income Tax Circular 2026–2027 introduces significant reforms regarding retained earnings and dividend distribution policies for listed companies in Bangladesh. The amendments aim to encourage fair distribution of profits among shareholders, improve corporate governance, and ensure greater transparency in financial practices.
+
+The key changes include a mandatory cash dividend requirement, taxation on excessive stock dividend distribution, and a revised definition of deemed dividends under the Income Tax Act, 2023.
+
+## Mandatory Cash Dividend Requirement Under Section 22
+
+One of the most important amendments relates to the minimum cash dividend distribution requirement for listed companies.
+
+According to Section 22, listed companies (except):
+* Banks
+* Insurance companies
+* Leasing companies
+* Finance companies
+
+must distribute at least:
+
+**30% of their post-tax net profit as cash dividends**
+
+This means companies cannot retain the majority of their profits without providing an appropriate return to shareholders.
+
+### Additional Tax for Failure to Meet the 30% Cash Dividend Threshold
+
+If a company distributes cash dividends below the required 30% level, an additional tax will be imposed.
+
+**Additional Tax Rate: 10%**
+
+The tax will apply to the dividend deficit amount, which is calculated as:
+> Required Cash Dividend (30% of post-tax profit) – Actual Cash Dividend Distributed
+
+#### Example
+Assume a listed company has:
+* Post-tax net profit: BDT 100 crore
+* Required cash dividend (30%): BDT 30 crore
+* Actual cash dividend declared: BDT 20 crore
+
+**Dividend shortfall:**
+BDT 30 crore – BDT 20 crore = BDT 10 crore
+
+**Additional tax:**
+10% × BDT 10 crore = BDT 1 crore
+
+Therefore, the company will have to pay an additional tax of BDT 1 crore on the dividend deficit.
+
+### Purpose of the Mandatory Dividend Rule
+
+The introduction of this requirement aims to:
+* Prevent excessive accumulation of retained earnings
+* Protect shareholder interests
+* Encourage efficient utilization of company profits
+* Improve investor confidence in the capital market
+
+Companies will need to carefully evaluate their profit retention strategies and dividend policies to avoid additional tax liabilities.
+
+## Tax on Stock Dividends Under Section 23
+
+The circular also introduces stricter rules regarding stock dividend distribution.
+
+Under Section 23, listed companies (excluding banks, insurance companies, leasing companies, and finance companies) will face additional tax if they prioritize stock dividends over cash dividends.
+
+A 10% tax will be applicable in the following situations:
+
+**1. Stock Dividend Exceeds Cash Dividend**
+If the value of stock dividends distributed is higher than the cash dividend distributed, the additional tax will apply.
+
+**2. Declaration of Only Stock Dividend**
+If a company declares stock dividends without any cash dividend, the company will also be subject to the 10% tax.
+
+### Impact of Stock Dividend Tax
+
+Stock dividends increase shareholders’ ownership percentage through additional shares but do not provide immediate cash returns.
+
+The new rule encourages companies to:
+* Maintain a balanced dividend policy
+* Provide actual cash returns to investors
+* Avoid using stock dividends as a substitute for cash payments
+
+## Revision of Deemed Dividend Rules Under Section 2(81)
+
+The Income Tax Circular 2026–2027 also narrows the scope of the deemed dividend provision under Section 2(81).
+
+Previously, certain loans or advances provided by companies could potentially be treated as deemed dividends.
+
+Under the revised rule:
+> Advance loans or payments provided by a company will be considered deemed dividends only when granted to a natural person (স্বাভাবিক ব্যক্তি).
+
+### Key Change
+
+The revised provision excludes non-natural persons such as:
+* Companies
+* Organizations
+* Other legal entities
+
+from this deemed dividend classification.
+
+### Business Impact
+
+This amendment provides greater clarity for corporate transactions involving related entities.
+
+Companies providing:
+* Inter-company advances
+* Corporate loans
+* Business-related payments
+
+will have reduced risk of such transactions being treated as deemed dividends, provided the recipient is not a natural person.
+
+## Overall Impact on Companies
+
+The updated dividend and retained earnings rules will significantly influence corporate financial planning.
+
+Companies will need to focus on:
+
+**1. Stronger Dividend Planning**
+Listed companies must ensure compliance with the 30% minimum cash dividend requirement.
+
+**2. Better Profit Distribution Strategies**
+Companies should balance retained earnings with shareholder return expectations.
+
+**3. Careful Use of Stock Dividends**
+Excessive reliance on stock dividends may result in additional tax costs.
+
+**4. Review of Related-Party Transactions**
+Companies should reassess loan and advance arrangements involving individuals to avoid deemed dividend implications.
+
+## Conclusion
+
+The amendments introduced through the Income Tax Circular 2026–2027 represent a major shift toward shareholder-focused corporate taxation in Bangladesh.
+
+The mandatory cash dividend rule, stock dividend tax provisions, and revised deemed dividend definition aim to create greater transparency, strengthen corporate governance, and ensure that company profits are distributed more effectively.
+
+Listed companies should review their dividend policies, retained earnings strategies, and related-party transactions to remain compliant with the updated requirements under the Income Tax Act, 2023.
+
+---
+
+# বাংলা ব্লগ পোস্ট
+## সংরক্ষিত মুনাফা ও লভ্যাংশ বিতরণ নীতিমালা ২০২৬–২০২৭: তালিকাভুক্ত কোম্পানির জন্য গুরুত্বপূর্ণ পরিবর্তন
+
+আয়কর সার্কুলার ২০২৬–২০২৭ তালিকাভুক্ত কোম্পানিগুলোর সংরক্ষিত মুনাফা (Retained Earnings) এবং লভ্যাংশ বিতরণ নীতিমালায় গুরুত্বপূর্ণ পরিবর্তন এনেছে।
+
+এই সংশোধনীর মূল উদ্দেশ্য হলো শেয়ারহোল্ডারদের ন্যায্য রিটার্ন নিশ্চিত করা, কর্পোরেট গভর্ন্যান্স শক্তিশালী করা এবং কোম্পানির মুনাফা ব্যবহারে অধিক স্বচ্ছতা নিশ্চিত করা।
+
+নতুন বিধানের আওতায় নগদ লভ্যাংশ বিতরণের বাধ্যবাধকতা, স্টক ডিভিডেন্ডের ওপর কর এবং ডিমড ডিভিডেন্ডের সংজ্ঞায় পরিবর্তন আনা হয়েছে।
+
+### ধারা ২২ অনুযায়ী বাধ্যতামূলক নগদ লভ্যাংশ বিতরণ
+
+নতুন বিধান অনুযায়ী, তালিকাভুক্ত কোম্পানিগুলোকে (ব্যতিক্রম ব্যতীত) তাদের কর পরবর্তী নিট মুনাফার নির্দিষ্ট অংশ নগদ লভ্যাংশ হিসেবে বিতরণ করতে হবে।
+
+এই বিধান প্রযোজ্য নয়:
+* ব্যাংক
+* বীমা কোম্পানি
+* লিজিং কোম্পানি
+* ফাইন্যান্স কোম্পানি
+
+তালিকাভুক্ত অন্যান্য কোম্পানিকে কমপক্ষে:
+**কর পরবর্তী নিট মুনাফার ৩০% নগদ লভ্যাংশ হিসেবে বিতরণ করতে হবে।**
+
+#### ৩০% নগদ লভ্যাংশ বিতরণে ব্যর্থ হলে অতিরিক্ত কর
+
+যদি কোনো কোম্পানি নির্ধারিত ৩০% নগদ লভ্যাংশ বিতরণ না করে, তাহলে ঘাটতি পরিমাণের ওপর অতিরিক্ত কর আরোপ হবে।
+
+**অতিরিক্ত করের হার: ১০%**
+
+এই কর হিসাব করা হবে:
+> প্রয়োজনীয় ৩০% নগদ লভ্যাংশ – প্রকৃত বিতরণকৃত নগদ লভ্যাংশ
+
+#### উদাহরণ
+
+একটি কোম্পানির:
+* কর পরবর্তী মুনাফা = ১০০ কোটি টাকা
+* প্রয়োজনীয় নগদ লভ্যাংশ (৩০%) = ৩০ কোটি টাকা
+* প্রকৃত নগদ লভ্যাংশ = ২০ কোটি টাকা
+
+**ঘাটতি:**
+৩০ কোটি – ২০ কোটি = ১০ কোটি টাকা
+
+**অতিরিক্ত কর:**
+১০ কোটি × ১০% = ১ কোটি টাকা
+
+অর্থাৎ কোম্পানিকে অতিরিক্ত ১ কোটি টাকা কর প্রদান করতে হবে।
+
+### স্টক ডিভিডেন্ডের ওপর কর (ধারা ২৩)
+
+নতুন বিধান অনুযায়ী, তালিকাভুক্ত কোম্পানি যদি নগদ লভ্যাংশের তুলনায় বেশি স্টক ডিভিডেন্ড প্রদান করে, তাহলে অতিরিক্ত কর প্রযোজ্য হবে।
+
+এই বিধান প্রযোজ্য নয়:
+* ব্যাংক
+* বীমা কোম্পানি
+* লিজিং কোম্পানি
+* ফাইন্যান্স কোম্পানি
+
+১০% কর প্রযোজ্য হবে যখন:
+**১. স্টক ডিভিডেন্ড নগদ ডিভিডেন্ডের চেয়ে বেশি হলে**
+অথবা,
+**২. শুধুমাত্র স্টক ডিভিডেন্ড ঘোষণা করলে**
+
+এই ক্ষেত্রে মোট বিতরণকৃত স্টক ডিভিডেন্ডের ওপর ১০% কর আরোপ করা হবে।
+
+### ডিমড ডিভিডেন্ড বিধানের পরিবর্তন (ধারা ২(৮১))
+
+আয়কর সার্কুলার ২০২৬–২০২৭ অনুযায়ী, ডিমড ডিভিডেন্ডের সংজ্ঞায় পরিবর্তন আনা হয়েছে।
+
+নতুন নিয়ম অনুযায়ী:
+> কোনো কোম্পানির প্রদত্ত অগ্রিম ঋণ বা অর্থ প্রদান শুধুমাত্র তখনই ডিমড ডিভিডেন্ড হিসেবে বিবেচিত হবে যখন তা কোনো স্বাভাবিক ব্যক্তিকে প্রদান করা হয়।
+
+#### গুরুত্বপূর্ণ পরিবর্তন
+এখন থেকে নিম্নোক্ত প্রতিষ্ঠানগুলো এই বিধানের আওতায় পড়বে না:
+* অন্য কোম্পানি
+* প্রতিষ্ঠান
+* অন্যান্য আইনগত সত্তা
+
+#### ব্যবসার ওপর প্রভাব
+এই পরিবর্তনের ফলে কোম্পানিগুলোকে:
+* লভ্যাংশ নীতি পুনর্বিবেচনা করতে হবে
+* সংরক্ষিত মুনাফা ব্যবহারে সতর্ক হতে হবে
+* স্টক ডিভিডেন্ড প্রদানের ক্ষেত্রে কর প্রভাব বিবেচনা করতে হবে
+* ব্যক্তি পর্যায়ের ঋণ বা অগ্রিম প্রদানের ক্ষেত্রে সতর্ক থাকতে হবে
+
+### উপসংহার
+
+আয়কর সার্কুলার ২০২৬–২০২৭ এর নতুন লভ্যাংশ ও সংরক্ষিত মুনাফা সংক্রান্ত বিধান বাংলাদেশের কর্পোরেট খাতে গুরুত্বপূর্ণ পরিবর্তন আনবে।
+
+৩০% বাধ্যতামূলক নগদ লভ্যাংশ বিতরণ, স্টক ডিভিডেন্ডের ওপর ১০% কর এবং ডিমড ডিভিডেন্ডের সীমিত প্রয়োগ—এসব পরিবর্তন শেয়ারহোল্ডারদের স্বার্থ রক্ষা এবং কর্পোরেট স্বচ্ছতা বৃদ্ধিতে গুরুত্বপূর্ণ ভূমিকা রাখবে।
+
+তালিকাভুক্ত কোম্পানিগুলোকে তাদের ডিভিডেন্ড পলিসি, রিটেইনড আর্নিংস ব্যবস্থাপনা এবং সংশ্লিষ্ট পক্ষের লেনদেন নতুন বিধানের সাথে সামঞ্জস্যপূর্ণ করতে হবে।`,
+    categoryId: 'corporate',
+    category: 'Corporate Law',
+    imageUrl: 'https://images.unsplash.com/photo-1590283603385-18ff3858415c?auto=format&fit=crop&q=80',
+    publishedAt: '2026-09-09T21:47:24.971Z',
+    author: mockAuthors.a2,
+    readTime: 5,
+    tags: ['Dividend Policy', 'Retained Earnings', 'Income Tax Act 2023', 'Listed Companies', 'Bangladesh']
+  },
+
+  {
+    id: 'corporate-tax-framework-2026-2027-bangladesh',
+    title: 'Corporate Tax Framework 2026–2027: Five-Year Tax Stability and Special Rules for Mobile Operators',
+    metaTitle: 'Corporate Tax Framework 2026-2027 Bangladesh Mobile Operators',
+    metaDescription: 'The Income Tax Circular 2026–2027 introduces a five-year corporate tax rate stability period and special rules for non-publicly traded mobile operators in Bangladesh.',
+    excerpt: 'The Income Tax Circular 2026–2027 introduces important changes in Bangladesh’s corporate taxation framework, focusing on tax rate stability and compliance-based benefits for businesses.',
+    content: `The Income Tax Circular 2026–2027 introduces important changes in Bangladesh’s corporate taxation framework, focusing on tax rate stability and compliance-based benefits for businesses. One of the most notable reforms is the introduction of a five-year corporate tax rate stability period, along with specific tax provisions for non-publicly traded mobile phone companies.
+
+These changes are expected to provide businesses with greater certainty in financial planning while encouraging transparent and banking-based business transactions.
+
+## Five-Year Corporate Tax Rate Stability (Assessment Years 2026–2027 to 2030–2031)
+
+Under the new tax framework, corporate tax rates will remain unchanged for a period of five assessment years, covering:
+
+* Assessment Year 2026–2027
+* Assessment Year 2027–2028
+* Assessment Year 2028–2029
+* Assessment Year 2029–2030
+* Assessment Year 2030–2031
+
+This long-term tax rate stability is designed to reduce uncertainty for companies and support better strategic decision-making.
+
+### Business Impact
+
+The five-year fixed tax rate structure will help companies to:
+
+* Prepare accurate long-term financial forecasts
+* Improve investment planning
+* Evaluate expansion projects with more confidence
+* Maintain consistency in tax budgeting
+
+For investors and businesses, predictable taxation creates a more stable operating environment and improves confidence in future business decisions.
+
+## Special Corporate Tax Rate for Non-Publicly Traded Mobile Operators
+
+The circular also specifies a special tax provision for non-publicly traded mobile phone companies.
+
+Such mobile operators will be subject to:
+
+**45% Corporate Tax Rate**
+
+However, this tax rate is applicable only when the company ensures that:
+
+> All business transactions during the income year are conducted through banking channels.
+
+This condition emphasizes the government’s focus on increasing transparency and reducing cash-based transactions.
+
+### Importance of Banking Channel Compliance
+
+Mobile operators must ensure that their business activities, including:
+
+* Revenue collection
+* Supplier payments
+* Operational transactions
+* Financial settlements
+
+are conducted through recognized banking systems. Maintaining proper banking records will be essential for companies to comply with the prescribed tax framework.
+
+## Conclusion
+
+The corporate tax reforms introduced through the Income Tax Circular 2026–2027 provide businesses with greater tax certainty while promoting transparent financial practices.
+
+The five-year tax stability framework will support long-term business planning, whereas the 45% tax provision for non-publicly traded mobile operators highlights the importance of maintaining proper banking channel transactions.
+
+Companies should review their tax strategies and transaction processes to ensure full compliance with the updated requirements.
+
+---
+
+# বাংলা ব্লগ পোস্ট
+## কর্পোরেট কর কাঠামো ২০২৬–২০২৭: পাঁচ বছরের কর স্থিতিশীলতা ও মোবাইল অপারেটরদের জন্য বিশেষ কর ব্যবস্থা
+
+আয়কর সার্কুলার ২০২৬–২০২৭ বাংলাদেশের কর ব্যবস্থায় গুরুত্বপূর্ণ কিছু পরিবর্তন নিয়ে এসেছে। এর মধ্যে অন্যতম হলো কোম্পানির কর হারের জন্য পাঁচ বছরের স্থিতিশীল কাঠামো এবং অ-পাবলিকলি ট্রেডেড মোবাইল ফোন কোম্পানির জন্য বিশেষ কর বিধান।
+
+এই পরিবর্তনের মূল উদ্দেশ্য হলো ব্যবসার জন্য দীর্ঘমেয়াদি পরিকল্পনা সহজ করা এবং আর্থিক লেনদেনে স্বচ্ছতা বৃদ্ধি করা।
+
+### পাঁচ বছরের জন্য কর হারের স্থিতিশীলতা (Assessment Year ২০২৬–২০২৭ থেকে ২০৩০–২০৩১)
+
+নতুন কর কাঠামো অনুযায়ী, কোম্পানিগুলোর জন্য নির্ধারিত কর হার টানা পাঁচটি কর বছরে অপরিবর্তিত থাকবে।
+
+এই সময়কাল অন্তর্ভুক্ত করবে:
+
+* কর বছর ২০২৬–২০২৭
+* কর বছর ২০২৭–২০২৮
+* কর বছর ২০২৮–২০২৯
+* কর বছর ২০২৯–২০৩০
+* কর বছর ২০৩০–২০৩১
+
+#### ব্যবসার ওপর প্রভাব
+
+পাঁচ বছরের কর হার স্থিতিশীল থাকার ফলে কোম্পানিগুলো:
+
+* দীর্ঘমেয়াদি আর্থিক পরিকল্পনা আরও সহজে করতে পারবে
+* বিনিয়োগ সিদ্ধান্ত গ্রহণে সুবিধা পাবে
+* ভবিষ্যৎ কর ব্যয় পূর্বাভাস দিতে পারবে
+* ব্যবসা সম্প্রসারণ পরিকল্পনা আরও কার্যকরভাবে করতে পারবে
+
+কর ব্যবস্থায় স্থায়িত্ব থাকলে দেশি ও বিদেশি বিনিয়োগকারীদের আস্থা বৃদ্ধি পায় এবং ব্যবসায়িক সিদ্ধান্ত গ্রহণ আরও সহজ হয়।
+
+### অ-পাবলিকলি ট্রেডেড মোবাইল ফোন কোম্পানির জন্য ৪৫% কর হার
+
+আয়কর সার্কুলার ২০২৬–২০২৭ অনুযায়ী, অ-পাবলিকলি ট্রেডেড মোবাইল ফোন কোম্পানির জন্য কর হার নির্ধারণ করা হয়েছে:
+
+**৪৫% কর হার**
+
+তবে এই কর হার প্রযোজ্য হবে শুধুমাত্র একটি গুরুত্বপূর্ণ শর্ত পূরণ সাপেক্ষে। শর্তটি হলো:
+
+> আয় বছরে কোম্পানির সকল ব্যবসায়িক লেনদেন ব্যাংকিং চ্যানেলের মাধ্যমে সম্পন্ন করতে হবে।
+
+#### ব্যাংকিং চ্যানেলের মাধ্যমে লেনদেনের গুরুত্ব
+
+মোবাইল অপারেটরদের নিশ্চিত করতে হবে যে তাদের সকল গুরুত্বপূর্ণ আর্থিক কার্যক্রম যেমন:
+
+* গ্রাহকের কাছ থেকে রাজস্ব গ্রহণ
+* সরবরাহকারীকে অর্থ প্রদান
+* অপারেশনাল খরচ পরিশোধ
+* অন্যান্য আর্থিক নিষ্পত্তি
+
+স্বীকৃত ব্যাংকিং ব্যবস্থার মাধ্যমে সম্পন্ন হচ্ছে। এতে আর্থিক স্বচ্ছতা বৃদ্ধি পাবে এবং কর সংক্রান্ত জটিলতা কমবে।
+
+### উপসংহার
+
+আয়কর সার্কুলার ২০২৬–২০২৭ কর ব্যবস্থায় স্থিতিশীলতা ও স্বচ্ছতার ওপর বিশেষ গুরুত্ব দিয়েছে।
+
+পাঁচ বছরের জন্য কর হার অপরিবর্তিত রাখার সিদ্ধান্ত কোম্পানিগুলোকে দীর্ঘমেয়াদি পরিকল্পনা করতে সহায়তা করবে। একইসঙ্গে, অ-পাবলিকলি ট্রেডেড মোবাইল কোম্পানির ক্ষেত্রে ৪৫% কর হার প্রয়োগের শর্ত হিসেবে ব্যাংকিং চ্যানেলে সব লেনদেন পরিচালনার বিষয়টি ব্যবসায়িক স্বচ্ছতার গুরুত্ব তুলে ধরে।
+
+কোম্পানিগুলোকে নতুন কর কাঠামোর সঙ্গে সামঞ্জস্য রেখে তাদের আর্থিক পরিকল্পনা ও লেনদেন ব্যবস্থাপনা পর্যালোচনা করা উচিত।`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80',
+    publishedAt: '2026-09-09T21:45:30.064Z',
+    author: mockAuthors.a1,
+    readTime: 4,
+    tags: ['Corporate Tax', 'Finance Act', 'Bangladesh', 'Mobile Operators', 'Tax Stability']
+  },
+
   {
     id: 'personal-income-tax-return-submission-guide-2025-2026',
     title: 'Personal Income Tax Return Submission Guide 2025–2026',
@@ -2973,9 +3879,7 @@ Documentary evidence such as financial records, transaction documents, ownership
     publishedAt: new Date().toISOString(),
     readTime: 5,
     imageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=2000',
-    tags: ['Bangladesh Income Tax Act 2023', 'Section 272 penalty', 'tax concealment penalty Bangladesh', 'hidden income penalty', 'concealed assets tax law', 'NBR income tax rules', 'taxpayer rights Bangladesh'],
-    likes: 0,
-    comments: 0
+    tags: ['Bangladesh Income Tax Act 2023', 'Section 272 penalty', 'tax concealment penalty Bangladesh', 'hidden income penalty', 'concealed assets tax law', 'NBR income tax rules', 'taxpayer rights Bangladesh']
   },
   {
     id: 'income-tax-circular-2026-2027-pdf-download',

@@ -268,121 +268,99 @@ export function SocialShareButtons({
     );
   }
 
-  // 3. Bottom Social Sharing Bar / Banner: High-impact professional dissemination section
+  // 3. Bottom Social Sharing Bar
   return (
-    <section 
+    <div 
       id="bottom-article-social-share-bar"
-      aria-label="Professional social sharing and dissemination bar (bottom)"
+      aria-label="Professional social sharing row"
       className={cn(
-        "bg-gradient-to-br from-slate-50 via-emerald-50/40 to-slate-50 border border-emerald-100/90 rounded-3xl p-6 sm:p-7 my-10 shadow-xs",
+        "flex flex-col sm:flex-row sm:items-center gap-4 py-8 border-y border-slate-200 my-10",
         className
       )}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-emerald-100/70">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
-            <Share2 className="w-3.5 h-3.5" />
-            <span>Professional Networking &amp; Content Dissemination</span>
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-slate-900">
-            Share this statutory analysis with your legal &amp; accounting network
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 max-w-2xl">
-            Help fellow advocates, chartered accountants, and corporate leaders navigate statutory compliance and regulatory changes in Bangladesh.
-          </p>
-        </div>
-
-        {/* Native share button if supported */}
-        {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-          <button
-            type="button"
-            onClick={handleNativeShare}
-            className="sm:self-center inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 transition-colors shadow-xs shrink-0 cursor-pointer"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            <span>Share via Device</span>
-          </button>
-        )}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-bold text-slate-900">Share this insight:</span>
       </div>
 
-      {/* Social Platforms Action Row */}
-      <div className="pt-5 flex flex-wrap items-center gap-3">
-        {/* LinkedIn Button - Primary professional channel */}
+      <div className="flex flex-wrap items-center gap-2">
         <a
           id="bottom-share-linkedin-btn"
           href={shareLinks.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#0A66C2] hover:bg-[#084e96] shadow-xs hover:shadow transition-all duration-150 active:scale-95 cursor-pointer"
+          title="Share on LinkedIn"
+          className="p-2.5 rounded-full text-slate-500 hover:text-white hover:bg-[#0A66C2] bg-slate-100 transition-all duration-150 cursor-pointer"
         >
           <Linkedin className="w-4 h-4 shrink-0" />
-          <span>Share on LinkedIn</span>
         </a>
 
-        {/* Facebook Button */}
         <a
           id="bottom-share-facebook-btn"
           href={shareLinks.facebook}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#1877F2] hover:bg-[#0e5fc5] shadow-xs hover:shadow transition-all duration-150 active:scale-95 cursor-pointer"
+          title="Share on Facebook"
+          className="p-2.5 rounded-full text-slate-500 hover:text-white hover:bg-[#1877F2] bg-slate-100 transition-all duration-150 cursor-pointer"
         >
           <Facebook className="w-4 h-4 shrink-0" />
-          <span>Share on Facebook</span>
         </a>
 
-        {/* WhatsApp Button - Very popular for chamber & audit firms */}
+        <a
+          href={shareLinks.twitter}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Post on X (Twitter)"
+          className="p-2.5 rounded-full text-slate-500 hover:text-white hover:bg-slate-900 bg-slate-100 transition-all duration-150 cursor-pointer"
+        >
+          <Twitter className="w-4 h-4 shrink-0" />
+        </a>
+
         <a
           id="bottom-share-whatsapp-btn"
           href={shareLinks.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#25D366] hover:bg-[#1faa52] shadow-xs hover:shadow transition-all duration-150 active:scale-95 cursor-pointer"
+          title="Share via WhatsApp"
+          className="p-2.5 rounded-full text-slate-500 hover:text-white hover:bg-[#25D366] bg-slate-100 transition-all duration-150 cursor-pointer"
         >
           <WhatsAppIcon className="w-4 h-4 shrink-0" />
-          <span>Share via WhatsApp</span>
         </a>
 
-        {/* X / Twitter Button */}
-        <a
-          href={shareLinks.twitter}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-black shadow-xs hover:shadow transition-all duration-150 active:scale-95 cursor-pointer"
-        >
-          <Twitter className="w-4 h-4 shrink-0" />
-          <span className="hidden sm:inline">Post on X</span>
-        </a>
+        <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block"></div>
 
-        {/* Email Button */}
-        <a
-          href={shareLinks.email}
-          title="Share via Email"
-          className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-xs transition-all duration-150 cursor-pointer"
-        >
-          <Mail className="w-4 h-4 text-slate-500 shrink-0" />
-          <span>Email</span>
-        </a>
-
-        {/* Copy Link Button */}
         <div className="relative">
           <button
             id="bottom-share-copy-btn"
             type="button"
             onClick={handleCopyLink}
+            title="Copy link"
             className={cn(
-              "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 shadow-xs border cursor-pointer",
+              "p-2.5 rounded-full transition-all duration-150 cursor-pointer flex items-center justify-center",
               copied
-                ? "bg-emerald-600 text-white border-emerald-600 ring-2 ring-emerald-300/50"
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900"
             )}
           >
-            {copied ? <Check className="w-4 h-4 shrink-0" /> : <Copy className="w-4 h-4 text-slate-500 shrink-0" />}
-            <span>{copied ? "Link Copied!" : "Copy Article Link"}</span>
+            {copied ? <Check className="w-4 h-4 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
           </button>
+          {copied && (
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-[11px] font-medium px-2 py-1 rounded shadow-lg whitespace-nowrap z-30 pointer-events-none animate-in fade-in zoom-in-95">
+              Link copied!
+            </div>
+          )}
         </div>
+        
+        {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+          <button
+            type="button"
+            onClick={handleNativeShare}
+            title="Share via Device"
+            className="p-2.5 rounded-full text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-all duration-150 cursor-pointer"
+          >
+            <Share2 className="w-4 h-4 shrink-0" />
+          </button>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
-

@@ -18,12 +18,16 @@ import {
   ShieldCheck, 
   Newspaper,
   HelpCircle,
-  Bookmark
+  Bookmark,
+  Settings,
+  LayoutDashboard,
+  LogOut
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { getSavedItems } from '../../utils/readingList';
+import { LanguageToggle } from '../LanguageToggle';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,15 +35,27 @@ export function Navbar() {
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [mobileBlogOpen, setMobileBlogOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   
   const blogDropdownRef = useRef<HTMLDivElement>(null);
   const resourcesDropdownRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const blogTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const location = useLocation();
   const { user, logout } = useAuth();
   const [savedBookmarkCount, setSavedBookmarkCount] = useState(() => getSavedItems().length);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const updateCount = () => setSavedBookmarkCount(getSavedItems().length);
@@ -156,6 +172,9 @@ export function Navbar() {
       if (resourcesDropdownRef.current && !resourcesDropdownRef.current.contains(event.target as Node)) {
         setResourcesOpen(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -166,6 +185,7 @@ export function Navbar() {
     setBlogOpen(false);
     setResourcesOpen(false);
     setIsOpen(false);
+    setUserMenuOpen(false);
   }, [location.pathname]);
 
   const handleBlogMouseEnter = () => {
@@ -191,10 +211,24 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all print:hidden">
-      {/* Single-line Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 gap-4">
+    <header 
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300 ease-in-out print:hidden",
+        isScrolled && !isOpen ? "pt-4 px-4 sm:px-6 lg:px-8" : "bg-transparent px-0"
+      )}
+    >
+      <div 
+        className={cn(
+          "max-w-7xl mx-auto transition-all duration-300 ease-in-out",
+          isScrolled && !isOpen
+            ? "bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-[24px] border border-slate-200/50 px-4 sm:px-6"
+            : "bg-white/95 sm:bg-transparent px-4 sm:px-6 lg:px-8 border-b border-transparent"
+        )}
+      >
+        <div className={cn(
+          "flex justify-between items-center gap-4 transition-all duration-300 ease-in-out",
+          isScrolled && !isOpen ? "h-16" : "h-20"
+        )}>
           {/* Logo */}
           <div className="flex items-center shrink-0">
             <Link to="/" className="flex items-center gap-3 group">
@@ -429,6 +463,7 @@ export function Navbar() {
           
           {/* Right actions: Search + Auth + Mobile menu toggle */}
           <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+            <LanguageToggle className="hidden sm:flex" />
             <form 
               className="hidden md:block relative text-slate-400 focus-within:text-emerald-600"
               onSubmit={(e) => {
@@ -443,44 +478,95 @@ export function Navbar() {
                <Search className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                <input name="search" type="text" placeholder="Search..." className="bg-slate-100 border border-transparent rounded-full py-2 pl-9 pr-3 text-xs sm:text-sm w-36 xl:w-52 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:border-emerald-200 text-slate-900 transition-all focus:w-48 xl:focus:w-64 shadow-inner" />
             </form>
+            
+            {/* Help / Support Icon */}
+            <div className="relative group hidden sm:block">
+              <Link
+                to="/community"
+                className="p-2 rounded-xl transition-colors flex items-center justify-center text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
+                aria-label="Help & FAQ"
+              >
+                <HelpCircle className="w-5 h-5" />
+              </Link>
+              <div className="absolute top-full right-1/2 translate-x-1/2 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 bg-slate-900 text-white text-xs rounded-xl p-3 shadow-xl z-50">
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                <p className="font-bold mb-1">Need assistance?</p>
+                <p className="text-slate-300">Browse FAQs and community support.</p>
+              </div>
+            </div>
+
             {/* Bookmarks Icon Button */}
-            <Link
-              to="/dashboard?tab=bookmarks"
-              id="navbar-bookmarks-btn"
-              title="Saved Bookmarks"
-              aria-label="View saved legal bookmarks"
-              className={cn(
-                "relative p-2 rounded-xl transition-colors flex items-center justify-center",
-                location.pathname === '/dashboard' && location.search.includes('tab=bookmarks')
-                  ? "bg-emerald-100 text-emerald-800"
-                  : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
-              )}
-            >
-              <Bookmark className="w-5 h-5" />
-              {savedBookmarkCount > 0 && (
-                <span 
-                  id="navbar-bookmarks-count"
-                  className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center shadow-xs"
-                >
-                  {savedBookmarkCount}
-                </span>
-              )}
-            </Link>
+            {user && (
+              <Link
+                to="/dashboard?tab=bookmarks"
+                id="navbar-bookmarks-btn"
+                title="Saved Bookmarks"
+                aria-label="View saved legal bookmarks"
+                className={cn(
+                  "relative p-2 rounded-xl transition-colors flex items-center justify-center",
+                  location.pathname === '/dashboard' && location.search.includes('tab=bookmarks')
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
+                )}
+              >
+                <Bookmark className="w-5 h-5" />
+                {savedBookmarkCount > 0 && (
+                  <span 
+                    id="navbar-bookmarks-count"
+                    className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center shadow-xs"
+                  >
+                    {savedBookmarkCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {user ? (
-              <div className="hidden sm:flex items-center gap-3">
-                <Link 
-                  to="/dashboard?tab=bookmarks"
-                  className="text-xs sm:text-sm font-bold text-slate-700 max-w-[120px] truncate hover:text-emerald-700 transition-colors"
+              <div className="relative hidden sm:block" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                 >
-                  {user.displayName || user.email?.split('@')[0]}
-                </Link>
-                <button 
-                  onClick={logout}
-                  className="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
-                >
-                  Log Out
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
                 </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-4 py-3 border-b border-slate-100 mb-2">
+                      <p className="text-sm font-bold text-slate-900 truncate">{user.displayName || user.email?.split('@')[0]}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                    </div>
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-3 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 transition-colors"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      My Dashboard
+                    </Link>
+                    <Link
+                      to="/dashboard?tab=settings"
+                      className="flex items-center gap-3 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 transition-colors"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Account Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        logout();
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Log Out
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Link to="/auth" className="hidden sm:flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white hover:bg-emerald-600 bg-slate-900 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors shadow-sm whitespace-nowrap">
@@ -501,8 +587,12 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg absolute w-full max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg absolute left-0 right-0 w-full max-h-[calc(100vh-80px)] overflow-y-auto">
           <div className="px-4 pt-4 pb-2">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Language</span>
+              <LanguageToggle />
+            </div>
             <form 
               className="relative text-slate-400 focus-within:text-emerald-600"
               onSubmit={(e) => {

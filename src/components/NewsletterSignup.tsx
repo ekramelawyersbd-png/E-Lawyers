@@ -672,7 +672,7 @@ export function NewsletterSignup({
     <section 
       id="newsletter-signup-section"
       aria-label="Newsletter Signup"
-      className={`bg-slate-100/70 border-t border-slate-200 py-12 md:py-16 px-4 sm:px-6 lg:px-8 ${className}`}
+      className={className}
     >
       {fullWidthContent}
     </section>

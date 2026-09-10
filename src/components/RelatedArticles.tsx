@@ -168,7 +168,7 @@ export function RelatedArticles({
   return (
     <section 
       id="related-articles-section"
-      aria-label="Related Articles"
+      aria-label="Related Insights"
       className="bg-slate-50/80 py-14 md:py-20 border-t border-slate-200"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -181,7 +181,7 @@ export function RelatedArticles({
               <span>Recommended For You</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-              Related Articles
+              Related Insights
             </h2>
             <p className="text-slate-600 text-sm md:text-base mt-1.5 max-w-2xl">
               Relevant legal guides and regulatory analyses in <span className="font-semibold text-slate-800">{currentArticle.category}</span> curated by topic and statutory tags.

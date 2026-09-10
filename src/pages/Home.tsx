@@ -15,6 +15,8 @@ import { NewsletterSignup } from '../components/NewsletterSignup';
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const [isSection2Expanded, setIsSection2Expanded] = useState(false);
+
   const handleIncreaseFont = () => setNewsFontScale(p => Math.min(p + 1, 3));
   const handleDecreaseFont = () => setNewsFontScale(p => Math.max(p - 1, 0));
 
@@ -28,36 +30,42 @@ export function Home() {
       id: 'corporate',
       icon: <Landmark className="w-6 h-6 text-emerald-600" />,
       title: 'Corporate Law',
+      imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Company Registration', 'RJSC Compliance', 'Share Transfer', 'Directors\' Responsibilities', 'Corporate Governance']
     },
     {
       id: 'tax',
       icon: <Calculator className="w-6 h-6 text-emerald-600" />,
       title: 'Income Tax',
+      imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Income Tax Return Filing', 'Tax Calculation Guide', 'Tax Rebate Rules', 'TIN & e-TIN Updates', 'NBR Tax Circulars']
     },
     {
       id: 'vat',
       icon: <FileText className="w-6 h-6 text-emerald-600" />,
       title: 'VAT & Customs',
+      imageUrl: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['VAT Registration', 'VAT Return Filing', 'VAT Rules & Procedures', 'Customs Compliance', 'Import-Export Tax Issues']
     },
     {
       id: 'business',
       icon: <Briefcase className="w-6 h-6 text-emerald-600" />,
       title: 'Business & Startup',
+      imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Business Registration', 'Trade License', 'Partnership Agreements', 'Startup Legal Requirements', 'Business Compliance Checklist']
     },
     {
       id: 'legal_docs',
       icon: <FileSignature className="w-6 h-6 text-emerald-600" />,
       title: 'Legal Documentation',
+      imageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Agreement Drafting', 'Legal Notices', 'Contracts', 'Power of Attorney', 'Deeds & Documents']
     },
     {
       id: 'civil_criminal',
       icon: <Scale className="w-6 h-6 text-emerald-600" />,
       title: 'Civil & Criminal Law',
+      imageUrl: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Property Law', 'Family Law', 'Court Procedures', 'Legal Rights', 'Litigation Process']
     }
   ];
@@ -82,23 +90,37 @@ export function Home() {
   return (
     <div>
       {/* 1. Hero Section */}
-      <section className="w-full relative">
-        <div className="bg-slate-900 py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex flex-col justify-center min-h-[calc(100vh-130px)] text-white shadow-xl">
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 opacity-90 text-[17px]" />
-          
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
+      <section className="w-full relative bg-[#071426] overflow-hidden">
+        {/* Subtle radial glow and modern background pattern */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-[#00A878]/20 rounded-full blur-[120px] mix-blend-screen animate-in fade-in duration-1000" />
+          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-[#00A878]/10 rounded-full blur-[100px] mix-blend-screen" />
+          {/* Abstract Grid/Pattern Overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50" />
+        </div>
+        
+        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Content Area */}
             <div>
-              <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 border border-emerald-500/30">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Latest Legal Updates
+              <span className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md text-emerald-300 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8 border border-white/10 shadow-[0_0_15px_rgba(0,168,120,0.15)]">
+                <span className="w-2 h-2 rounded-full bg-[#00A878] animate-pulse"></span>
+                Trusted Legal & Tax Intelligence
               </span>
-              <h1 className="text-[45px] font-bold tracking-tight mb-6 leading-tight max-w-2xl">
-                Expert Legal, Tax & Corporate Solutions for Bangladesh
+              
+              <h1 className="text-[40px] sm:text-5xl lg:text-[56px] font-extrabold tracking-tight mb-6 leading-[1.15] text-white">
+                Expert Legal, Tax & <span className="text-[#00A878] relative whitespace-nowrap">Corporate Solutions<svg className="absolute -bottom-2 left-0 w-full h-3 text-[#00A878]/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/></svg></span><br className="hidden sm:block" /> for Bangladesh
               </h1>
               
-              <div className="mb-8 max-w-xl">
+              <p className="text-[#A8B5C7] text-lg sm:text-xl mb-10 leading-relaxed max-w-xl font-medium">
+                Navigate regulatory complexities with absolute confidence. Premium consultancy and authoritative insights for modern enterprises.
+              </p>
+              
+              {/* Search Bar */}
+              <div className="mb-10 max-w-xl relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00A878] to-emerald-400 rounded-full blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <form 
-                  className="relative flex items-center bg-white rounded-full p-1 border border-slate-200/20 focus-within:ring-2 focus-within:ring-emerald-500 transition-all shadow-lg"
+                  className="relative flex items-center bg-white/10 backdrop-blur-xl rounded-full p-1.5 border border-white/10 shadow-2xl transition-all"
                   onSubmit={(e) => {
                     e.preventDefault();
                     const form = e.target as HTMLFormElement;
@@ -108,64 +130,80 @@ export function Home() {
                     }
                   }}
                 >
-                  <Search className="w-5 h-5 text-slate-400 ml-4 absolute pointer-events-none" />
+                  <Search className="w-5 h-5 text-[#A8B5C7] ml-5 absolute pointer-events-none" />
                   <input 
                     name="search"
                     type="text" 
-                    placeholder="Search Legal Articles..." 
-                    className="w-full bg-transparent border-none py-3 pl-12 pr-4 text-slate-900 placeholder:text-slate-500 focus:outline-none text-sm md:text-base font-medium"
+                    placeholder="Search legal precedents, tax codes..." 
+                    className="w-full bg-transparent border-none py-3.5 pl-14 pr-4 text-white placeholder:text-[#A8B5C7] focus:outline-none text-base font-medium"
                   />
-                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-full text-sm font-bold transition-colors shadow-md">
+                  <button type="submit" className="bg-gradient-to-r from-[#00A878] to-emerald-500 hover:from-emerald-500 hover:to-[#00A878] text-white px-8 py-3.5 rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(0,168,120,0.4)] shrink-0">
                     Search
                   </button>
                 </form>
               </div>
 
+              {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4">
                 <a 
                   href="https://appointment.accounticca.com" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="bg-white text-slate-900 hover:bg-slate-100 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md"
+                  className="bg-[#00A878] hover:bg-emerald-500 text-white px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,168,120,0.3)] hover:-translate-y-0.5"
                 >
-                  <span>Consult a Lawyer</span>
-                  <ExternalLink className="w-4 h-4 text-emerald-700" />
+                  <span>Book Consultation</span>
+                  <ExternalLink className="w-4 h-4" />
                 </a>
                 <a 
-                  href="https://appointment.accounticca.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="bg-emerald-600 text-white hover:bg-emerald-500 px-6 py-3 rounded-full font-bold transition-colors flex items-center gap-2 shadow-md"
+                  href="/category/corporate" 
+                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5"
                 >
-                  <span>Get Legal Advice</span>
-                  <ExternalLink className="w-4 h-4 text-emerald-200" />
+                  <span>Explore Insights</span>
+                  <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>
 
+            {/* Featured Article Card (Right side) */}
             {featuredArticle && (
-              <div className="hidden lg:block relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <Link to={`/article/${featuredArticle.id}`} className="relative block bg-slate-800 border border-slate-700 p-6 rounded-3xl hover:border-emerald-500/50 transition-all shadow-2xl">
-                  <span className="inline-block bg-amber-400/20 text-amber-300 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md mb-4 border border-amber-400/30">
-                    Featured Article
-                  </span>
-                  <h2 className="text-2xl font-bold text-white mb-3 leading-tight group-hover:text-emerald-400 transition-colors">
+              <div className="relative group hidden lg:block animate-in fade-in zoom-in-95 slide-in-from-right-8 duration-1000 delay-150">
+                <div className="absolute -inset-1 bg-gradient-to-br from-[#00A878] to-emerald-900 rounded-[28px] blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                <Link to={`/article/${featuredArticle.id}`} className="relative flex flex-col bg-[rgba(255,255,255,0.06)] backdrop-blur-2xl border border-white/10 p-8 rounded-[24px] shadow-2xl hover:border-white/20 transition-all duration-500 overflow-hidden hover:-translate-y-2 min-h-[380px]">
+                  
+                  {/* Subtle inner top highlight */}
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="inline-block bg-[#00A878]/20 text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-[#00A878]/30 shadow-sm backdrop-blur-md">
+                      {featuredArticle.category || 'Featured Insight'}
+                    </span>
+                    <span className="text-[#A8B5C7] text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                      <Clock className="w-3.5 h-3.5" />
+                      {calculateReadingTime(featuredArticle.content)} min
+                    </span>
+                  </div>
+                  
+                  <h2 className="text-[26px] font-bold text-white mb-4 leading-tight group-hover:text-emerald-300 transition-colors">
                     {featuredArticle.title}
                   </h2>
-                  <p className="text-slate-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                  
+                  <p className="text-[#A8B5C7] text-base mb-8 line-clamp-3 leading-relaxed">
                     {featuredArticle.excerpt}
                   </p>
-                  <div className="flex items-center justify-between mt-auto">
+                  
+                  <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
                     <div className="flex items-center gap-3">
-                      <img src={featuredArticle.author.avatarUrl} alt={featuredArticle.author.name} className="w-8 h-8 rounded-full border-2 border-slate-700" />
+                      <div className="relative">
+                        <img src={featuredArticle.author.avatarUrl} alt={featuredArticle.author.name} className="w-10 h-10 rounded-full object-cover border-2 border-[#071426] shadow-sm relative z-10" />
+                        <div className="absolute inset-0 rounded-full bg-[#00A878] blur-[4px] opacity-40 z-0"></div>
+                      </div>
                       <div>
-                        <p className="text-xs font-bold text-white">{featuredArticle.author.name}</p>
-                        <p className="text-[10px] text-slate-400">{format(new Date(featuredArticle.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(featuredArticle.content)} min read</p>
+                        <p className="text-sm font-bold text-white">{featuredArticle.author.name}</p>
+                        <p className="text-xs text-[#A8B5C7] font-medium">{featuredArticle.author.role || 'Senior Counsel'}</p>
                       </div>
                     </div>
-                    <span className="text-emerald-400 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Read <ArrowRight className="w-4 h-4" />
+                    <span className="bg-white/10 group-hover:bg-[#00A878] text-white p-3 rounded-full transition-colors duration-300">
+                      <ArrowUpRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </span>
                   </div>
                 </Link>
@@ -177,52 +215,73 @@ export function Home() {
 
       {/* 2. Latest Articles */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Latest Articles</h2>
-            <p className="text-slate-600 text-lg">Tax Updates, Legal Notices, Business Law & Corporate Compliance</p>
-          </div>
-          <Link to="/category/updates" className="hidden sm:flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 transition-colors group">
-            View All Updates <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {recentArticles.map(article => (
-            <Link key={article.id} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden h-full">
-              <div className="aspect-[16/9] w-full overflow-hidden relative">
-                <img 
-                  src={article.imageUrl} 
-                  alt={article.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-white/90 backdrop-blur-sm text-emerald-800 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
-                    {article.category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-tight">
-                  {article.title}
-                </h3>
-                <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed flex-1">
-                  {article.excerpt}
-                </p>
-                <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-auto">
-                  <div className="flex items-center gap-3">
-                    <img src={article.author.avatarUrl} alt={article.author.name} className="w-8 h-8 rounded-full border border-slate-200" />
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{article.author.name}</p>
-                      <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{format(new Date(article.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(article.content)} min read</p>
-                    </div>
-                  </div>
-                  <BookmarkButton id={article.id} title={article.title} url={`/article/${article.id}`} className="text-slate-400 hover:text-emerald-600 transition-colors" />
-                </div>
-              </div>
+        <div className={`relative ${isSection2Expanded ? '' : 'max-h-[300px] overflow-hidden'}`}>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">Latest Articles</h2>
+              <p className="text-slate-600 text-lg">Tax Updates, Legal Notices, Business Law & Corporate Compliance</p>
+            </div>
+            <Link to="/category/updates" className="hidden sm:flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 transition-colors group">
+              View All Updates <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-          ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {recentArticles.map(article => (
+              <Link key={article.id} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden h-full">
+                <div className="aspect-[16/9] w-full overflow-hidden relative">
+                  <img 
+                    src={article.imageUrl} 
+                    alt={article.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-white/90 backdrop-blur-sm text-emerald-800 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                      {article.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-tight">
+                    {article.title}
+                  </h3>
+                  <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed flex-1">
+                    {article.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-auto">
+                    <div className="flex items-center gap-3">
+                      <img src={article.author.avatarUrl} alt={article.author.name} className="w-8 h-8 rounded-full border border-slate-200" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">{article.author.name}</p>
+                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{format(new Date(article.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(article.content)} min read</p>
+                      </div>
+                    </div>
+                    <BookmarkButton id={article.id} title={article.title} url={`/article/${article.id}`} className="text-slate-400 hover:text-emerald-600 transition-colors" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {!isSection2Expanded && (
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent flex items-end justify-center pb-2">
+              <button 
+                onClick={() => setIsSection2Expanded(true)}
+                className="bg-emerald-600 text-white px-6 py-2.5 rounded-full font-bold shadow-md hover:bg-emerald-700 transition-colors"
+              >
+                Read More
+              </button>
+            </div>
+          )}
         </div>
+        {isSection2Expanded && (
+          <div className="mt-8 flex justify-center">
+            <button 
+              onClick={() => setIsSection2Expanded(false)}
+              className="bg-slate-200 text-slate-700 px-6 py-2.5 rounded-full font-bold shadow-sm hover:bg-slate-300 transition-colors"
+            >
+              Show Less
+            </button>
+          </div>
+        )}
       </section>
 
       {/* 3. Categories Section */}
@@ -235,23 +294,35 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mainCategories.map((category) => (
-              <Link key={category.id} to={`/category/${category.id}`} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all group flex flex-col h-full">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                    {category.icon}
+              <Link key={category.id} to={`/category/${category.id}`} className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all group flex flex-col h-full overflow-hidden">
+                {category.imageUrl && (
+                  <div className="w-full h-40 overflow-hidden">
+                    <img 
+                      src={category.imageUrl} 
+                      alt={category.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{category.title}</h3>
-                </div>
-                <ul className="space-y-3 mb-6 flex-1">
-                  {category.contents.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="text-emerald-600 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-4 border-t border-slate-100">
-                  View All <ArrowRight className="w-4 h-4" />
+                )}
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      {category.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{category.title}</h3>
+                  </div>
+                  <ul className="space-y-3 mb-6 flex-1">
+                    {category.contents.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="text-emerald-600 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-4 border-t border-slate-100">
+                    View All <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </Link>
             ))}
@@ -478,16 +549,19 @@ By subscribing, you agree to our Privacy Policy and Terms of Service."
             className={isHighContrast ? '!bg-black !text-yellow-400 !border-yellow-400 hover:!bg-yellow-400 hover:!text-black' : ''}
           />
         </div>
-        <div className="max-w-3xl mx-auto">
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors shadow-sm ${isHighContrast ? 'bg-black border-2 border-yellow-400 text-yellow-400' : 'bg-emerald-100 text-emerald-600'}`}>
+        <div className={`max-w-4xl mx-auto p-8 md:p-12 rounded-[2.5rem] shadow-2xl border relative overflow-hidden ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white/80 backdrop-blur-2xl border-white shadow-emerald-900/5'}`}>
+          {!isHighContrast && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl -z-10 pointer-events-none" />
+          )}
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors shadow-sm relative z-10 ${isHighContrast ? 'bg-black border-2 border-yellow-400 text-yellow-400' : 'bg-emerald-100 text-emerald-600'}`}>
             <MessageSquare className="w-8 h-8" />
           </div>
-          <h2 className={`${['text-2xl md:text-3xl', 'text-3xl md:text-4xl', 'text-4xl md:text-5xl', 'text-5xl md:text-6xl'][newsFontScale]} font-bold mb-4 transition-all ${isHighContrast ? 'text-white' : 'text-slate-900'}`}>Stay Updated with Legal & Tax News</h2>
-          <p className={`${['text-base', 'text-lg', 'text-xl', 'text-2xl'][newsFontScale]} mb-10 transition-all ${isHighContrast ? 'text-yellow-400 font-bold tracking-wide' : 'text-slate-600'}`}>
+          <h2 className={`relative z-10 ${['text-2xl md:text-3xl', 'text-3xl md:text-4xl', 'text-4xl md:text-5xl', 'text-5xl md:text-6xl'][newsFontScale]} font-bold mb-4 transition-all ${isHighContrast ? 'text-white' : 'text-slate-900'}`}>Stay Updated with Legal & Tax News</h2>
+          <p className={`relative z-10 ${['text-base', 'text-lg', 'text-xl', 'text-2xl'][newsFontScale]} mb-10 transition-all ${isHighContrast ? 'text-yellow-400 font-bold tracking-wide' : 'text-slate-600'}`}>
             Subscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox.
           </p>
-          <div className="text-left mt-8 max-w-2xl mx-auto"><NewsletterSignup variant="full-width" /></div>
-          <p className={`text-xs mt-6 transition-colors ${isHighContrast ? 'text-white font-bold' : 'text-slate-500'}`}>By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
+          <div className="text-left mt-8 max-w-2xl mx-auto relative z-10"><NewsletterSignup variant="full-width" /></div>
+          <p className={`relative z-10 text-xs mt-6 transition-colors ${isHighContrast ? 'text-white font-bold' : 'text-slate-500'}`}>By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
           <SectionNote id="newsletter-section" isHighContrast={isHighContrast} />
         </div>
       </section>

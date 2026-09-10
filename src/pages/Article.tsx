@@ -29,10 +29,15 @@ import { RelatedArticles, getRecommendedArticles } from '../components/RelatedAr
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { InteractiveChecklistItem } from '../components/InteractiveChecklistItem';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
+import { SortableTable } from '../components/SortableTable';
+
 export function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { language } = useLanguage();
   const [isSaved, setIsSaved] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
 
@@ -114,6 +119,17 @@ export function Article() {
     [article]
   );
 
+  const localizedContent = useMemo(() => {
+    if (!article) return '';
+    const regex = /(?:\n|^)---\s*\n\s*(?:#+\s*)?(?:বাংলা|in bangla)/i;
+    const parts = article.content.split(regex);
+    if (language === 'en') {
+      return parts[0].trim();
+    } else {
+      return parts.length > 1 ? parts[1].trim() : parts[0].trim();
+    }
+  }, [article, language]);
+
   const markdownComponents = useMemo(() => ({
     h2: ({ node, children, ...props }: any) => {
       const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -164,7 +180,8 @@ export function Article() {
         return <InteractiveChecklistItem articleId={article.id} {...props}>{children}</InteractiveChecklistItem>;
       }
       return <li {...props}>{children}</li>;
-    }
+    },
+    table: ({ node, children, ...props }: any) => <SortableTable {...props}>{children}</SortableTable>
   }), [article.id]);
 
   return (
@@ -195,7 +212,7 @@ export function Article() {
                 </Link>
                 <div className="flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">
                   <Clock className="w-3.5 h-3.5" />
-                  {calculateReadingTime(article.content)} min read
+                  {calculateReadingTime(localizedContent)} min read
                 </div>
               </div>
               
@@ -285,7 +302,7 @@ export function Article() {
             {/* Read Aloud controls */}
             <div className="mb-8 flex items-center justify-between border-b border-slate-100 pb-4">
               <span className="text-sm font-bold text-slate-500">Audio Version</span>
-              <ReadAloudButton content={article.content} title={article.title} />
+              <ReadAloudButton content={localizedContent} title={article.title} />
             </div>
 
             {/* 2-7. Article Content Area (Markdown) */}
@@ -294,7 +311,7 @@ export function Article() {
                 remarkPlugins={[remarkGfm]}
                 components={markdownComponents}
               >
-                {article.content}
+                {localizedContent}
               </Markdown>
             </div>
 
@@ -322,26 +339,6 @@ export function Article() {
               summary={article.excerpt} 
               variant="bottom-bar" 
             />
-
-            {/* Suggested Reading Footer Section */}
-            {relatedArticles.length > 0 && (
-              <div className="bg-emerald-50/50 rounded-3xl p-6 mb-12 border border-emerald-100/50">
-                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-emerald-600" />
-                  Suggested Reading
-                </h4>
-                <ul className="space-y-3">
-                  {relatedArticles.map((rel) => (
-                    <li key={rel.id} className="flex items-start gap-2 group">
-                      <ChevronRight className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0 group-hover:translate-x-1 transition-transform" />
-                      <Link to={`/article/${rel.id}`} className="text-slate-700 hover:text-emerald-700 font-medium transition-colors line-clamp-1">
-                        {rel.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
 
             {/* 8. Author Profile Section */}
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 mb-12 flex flex-col md:flex-row gap-6 items-start">
@@ -416,7 +413,7 @@ export function Article() {
               </div>
 
               {/* Table of Contents */}
-              <TableOfContents content={article.content} />
+              <TableOfContents content={localizedContent} />
 
               {/* Categories */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
@@ -433,11 +430,11 @@ export function Article() {
                 </ul>
               </div>
 
-              {/* Related Articles (Sidebar) */}
+              {/* Related Insights (Sidebar) */}
               {relatedArticles.length > 0 && (
                 <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                   <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-emerald-600" /> Related Articles
+                    <FileText className="w-5 h-5 text-emerald-600" /> Related Insights
                   </h3>
                   <div className="space-y-4">
                     {relatedArticles.slice(0, 3).map(rel => (

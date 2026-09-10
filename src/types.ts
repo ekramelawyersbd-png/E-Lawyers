@@ -36,8 +36,8 @@ export interface Article {
   readTime: number;
   imageUrl: string;
   tags: string[];
-  likes: number;
-  comments: number;
+  likes?: number;
+  comments?: number;
   isExpertOpinion?: boolean;
 }
 
