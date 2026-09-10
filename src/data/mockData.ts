@@ -48,7 +48,1312 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  {
+    id: 'income-tax-act-2023-definitions-amendments-2026',
+    title: 'Key Definitions & Terminology Amendments in Income Tax Act 2023 (Applicable 2026-2027)',
+    metaTitle: 'Income Tax Act 2023 Definition Amendments & Changes Bangladesh',
+    metaDescription: 'Complete guide on key definitions, terminology amendments, and new clauses introduced in the Income Tax Act 2023, applicable from Assessment Year 2026-2027.',
+    excerpt: 'Detailed breakdown of the recent terminology replacements, new definitions, and clause amendments in the Income Tax Act 2023 effective from Assessment Year 2026-2027.',
+    content: `![Income Tax Act 2023 Amendments](https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1200&h=600)
 
+# Key Definitions & Terminology Amendments in Income Tax Act 2023
+## আয়কর আইন ২০২৩-এর গুরুত্বপূর্ণ সংজ্ঞা ও পরিভাষাগত সংশোধনীসমূহ
+
+Source: National Board of Revenue (NBR), Income Tax Act 2023 Amendments
+
+---
+
+## English Version
+
+### Introduction
+
+The National Board of Revenue (NBR) has introduced several critical amendments to the **Income Tax Act 2023**, specifically targeting the definitions and terminology outlined in Section 2. These changes, applicable from the **Assessment Year 2026-2027**, aim to expand the tax net, provide clarity on emerging business structures (such as digital businesses), and separate specific tax components like surcharges.
+
+### Significant Changes to Key Definitions
+
+The following table summarizes the major additions, replacements, and amendments made to the legal definitions within the Act.
+
+| Clause | Subject Matter | Amendment Type | Description of Change |
+| :--- | :--- | :--- | :--- |
+| **Section 2** | **'Loss' Terminology** | Replacement | Replaced the word 'khoti' with 'lokshan' throughout the Act for consistency and clarity. |
+| **Section 2(14)** | **Income Tax** | Replacement | Excluded 'Surcharge' from the scope of 'Income Tax' to establish separate legal statuses for each. |
+| **Section 2(17)** | **Deputy Commissioner of Taxes** | Amendment | Removed 'Tax Recovery Officer' from the definition of Deputy Commissioner of Taxes. |
+| **Section 2(21)** | **Tax** | Replacement | Replaced the definition to explicitly include Surcharge, additional tax, penalty, interest, and fees under the definition of 'Tax'. |
+| **Section 2(22k)** | **Tax Day** | Addition | Added a legal definition for 'Tax Day' as a National Tax Day declared by the government to honor taxpayers. |
+| **Section 2(26b)** | **Assessment** | Replacement | Expanded the definition to include assessment of income, reassessment, additional assessment, and further assessment. |
+| **Section 2(30k)** | **Raw Material** | Addition | Added a new definition identifying raw materials as any substance/material directly used in production or processing. |
+| **Section 2(31)** | **Company** | Replacement | Reorganized the definition to include foreign liaison/branch offices, permanent establishments (PE), and various financial institutions. |
+| **Section 2(40k)** | **Developer** | Addition | Added a definition for individuals or entities engaged in land development, infrastructure construction, or joint development agreements. |
+| **Section 2(51)** | **Inspecting Addl. Commissioner** | Replacement | Updated the definition to include the role of Tax Recovery Officer. |
+| **Section 2(54) & 2(76k)** | **Principal Officer** | Deletion / Addition | Removed the definition of 'Head of Office' and added 'Principal Officer', specifying MDs, CEOs, CFOs, secretaries, or designated individuals. |
+| **Section 2(65k)** | **Private Institute** | Addition | Added a definition covering private universities, medical/engineering colleges, and technical or vocational training institutes. |
+| **Section 2(69) & 2(69k)** | **Person & AOP** | Replacement / Addition | Included 'Artificial Juridical Person' (AJP) under Person. Added a specific definition for Association of Persons (AOP) for joint ventures excluding companies/firms. |
+| **Section 2(77)** | **Capital Asset** | Replacement | Expanded to include personal gold, silver, precious metals, gems, paintings, antiques, and club memberships as capital assets. |
+| **Section 2(80)** | **Export** | Replacement | Expanded to include the supply of raw materials to export-oriented industries under back-to-back LCs or local LCs in foreign currency. |
+| **Section 2(81)** | **Dividend** | Amendment | Clarified that loans/advances by a company are treated as dividends only when given to 'Natural Persons' (Individual); excludes joint venture profit distribution. |
+| **Section 2(86k)** | **Associate Enterprise (AE)** | Addition / Amendment | Changed the threshold for debt-to-asset ratio from 50% to 35% for determining AE status and defined 'Book Value of Total Assets'. |
+| **Section 2(86kh)** | **Surcharge** | Addition | Added a definition for surcharge to include environmental surcharge, tobacco surcharge, and any other surcharges. |
+| **Section 2(92)** | **Permanent Establishment (PE)** | Amendment | Added provisions for non-residents with **100,000+ digital/online customers in Bangladesh** to be treated as having a PE; prioritized DTAA provisions. |
+
+---
+
+## বাংলা সংস্করণ
+
+### আয়কর আইন ২০২৩-এর গুরুত্বপূর্ণ সংজ্ঞা ও পরিভাষাগত সংশোধনীসমূহ
+
+#### ভূমিকা
+জাতীয় রাজস্ব বোর্ড (NBR) **আয়কর আইন ২০২৩**-এর ধারা ২-এ উল্লেখিত বিভিন্ন সংজ্ঞা ও পরিভাষায় গুরুত্বপূর্ণ কিছু সংশোধনী এনেছে। **করবর্ষ ২০২৬-২০২৭** থেকে কার্যকর হতে যাওয়া এই সংশোধনীগুলোর মূল লক্ষ্য হলো করজাল সম্প্রসারণ, ডিজিটাল ব্যবসার মতো নতুন কাঠামোর আইনি স্পষ্টতা প্রদান এবং সারচার্জের মতো বিষয়গুলোকে কর থেকে আলাদা আইনি মর্যাদা দেওয়া।
+
+#### সংজ্ঞায় আনা উল্লেখযোগ্য পরিবর্তনসমূহ
+
+আইনের বিভিন্ন সংজ্ঞায় যেসব নতুন সংযোজন, প্রতিস্থাপন ও সংশোধনী আনা হয়েছে, তার সারসংক্ষেপ নিচে দেওয়া হলো:
+
+| ধারা | বিষয়বস্তু | সংশোধনীর ধরন | পরিবর্তনের বিবরণ |
+| :--- | :--- | :--- | :--- |
+| **ধারা ২** | **'ক্ষতি' শব্দের পরিবর্তন** | প্রতিস্থাপন | আইনের সর্বত্র সামঞ্জস্য বজায় রাখতে 'ক্ষতি' (khoti) শব্দের পরিবর্তে 'লোকসান' (lokshan) শব্দটি প্রতিস্থাপন করা হয়েছে। |
+| **ধারা ২(১৪)** | **আয়কর (Income Tax)** | প্রতিস্থাপন | আয়করের সংজ্ঞা থেকে 'সারচার্জ' (Surcharge)-কে বাদ দেওয়া হয়েছে, যাতে এদের আলাদা আইনি মর্যাদা প্রতিষ্ঠিত হয়। |
+| **ধারা ২(১৭)** | **উপ-করকমিশনার** | সংশোধনী | উপ-করকমিশনারের সংজ্ঞা থেকে 'কর আদায় কর্মকর্তা' (Tax Recovery Officer)-কে বাদ দেওয়া হয়েছে। |
+| **ধারা ২(২১)** | **কর (Tax)** | প্রতিস্থাপন | 'কর'-এর সংজ্ঞায় সারচার্জ, অতিরিক্ত কর, জরিমানা, সুদ এবং ফি-কে স্পষ্টভাবে অন্তর্ভুক্ত করা হয়েছে। |
+| **ধারা ২(২২ক)** | **কর দিবস (Tax Day)** | সংযোজন | করদাতাদের সম্মাননা জানাতে সরকার কর্তৃক ঘোষিত 'জাতীয় কর দিবস'-এর আইনি সংজ্ঞা যুক্ত করা হয়েছে। |
+| **ধারা ২(২৬খ)** | **কর নির্ধারণ (Assessment)** | প্রতিস্থাপন | সংজ্ঞাকে সম্প্রসারিত করে আয়ের কর নির্ধারণ, পুনঃকর নির্ধারণ, অতিরিক্ত কর নির্ধারণ এবং পরবর্তী কর নির্ধারণ অন্তর্ভুক্ত করা হয়েছে। |
+| **ধারা ২(৩০ক)** | **কাঁচামাল (Raw Material)** | সংযোজন | উৎপাদনে বা প্রক্রিয়াকরণে সরাসরি ব্যবহৃত উপাদান বা বস্তু যা চূড়ান্ত পণ্যে রূপান্তরিত হয়, তাকে কাঁচামাল হিসেবে সংজ্ঞায়িত করা হয়েছে। |
+| **ধারা ২(৩১)** | **কোম্পানি (Company)** | প্রতিস্থাপন | বিদেশি লিয়াজোঁ/ব্রাঞ্চ অফিস, স্থায়ী প্রতিষ্ঠান (PE) এবং বিভিন্ন আর্থিক প্রতিষ্ঠানকে অন্তর্ভুক্ত করে কোম্পানির সংজ্ঞা পুনর্গঠন করা হয়েছে। |
+| **ধারা ২(৪০ক)** | **ডেভেলপার (Developer)** | সংযোজন | ভূমি উন্নয়ন, অবকাঠামো নির্মাণ বা যৌথ উন্নয়ন চুক্তির সাথে জড়িত ব্যক্তি বা প্রতিষ্ঠানকে সংজ্ঞায়িত করা হয়েছে। |
+| **ধারা ২(৫১)** | **পরিদর্শী অতিরিক্ত কমিশনার** | প্রতিস্থাপন | কর আদায় কর্মকর্তার (Tax Recovery Officer) দায়িত্ব অন্তর্ভুক্ত করে সংজ্ঞায় পরিবর্তন আনা হয়েছে। |
+| **ধারা ২(৫৪) ও ২(৭৬ক)** | **প্রধান কর্মকর্তা (Principal Officer)** | বিলোপ / সংযোজন | 'অফিস প্রধান' সংজ্ঞাটি বাদ দিয়ে 'প্রধান কর্মকর্তা' যুক্ত করা হয়েছে (এমডি, সিইও, সিএফও, সচিব বা নির্ধারিত ব্যক্তি)। |
+| **ধারা ২(৬৫ক)** | **বেসরকারি প্রতিষ্ঠান** | সংযোজন | বেসরকারি বিশ্ববিদ্যালয়, মেডিকেল/ইঞ্জিনিয়ারিং কলেজ এবং কারিগরি ও ভোকেশনাল ট্রেনিং ইনস্টিটিউটকে অন্তর্ভুক্ত করে সংজ্ঞা দেওয়া হয়েছে। |
+| **ধারা ২(৬৯) ও ২(৬৯ক)** | **ব্যক্তি ও AOP** | প্রতিস্থাপন / সংযোজন | 'ব্যক্তি'-এর অধীনে কৃত্রিম ব্যক্তিসত্তাকে (AJP) যুক্ত করা হয়েছে। কোম্পানি/ফার্ম ব্যতীত যৌথ উদ্যোগের জন্য AOP-এর সুনির্দিষ্ট সংজ্ঞা দেওয়া হয়েছে। |
+| **ধারা ২(৭৭)** | **মূলধনি সম্পদ (Capital Asset)** | প্রতিস্থাপন | ব্যক্তিগত স্বর্ণ, রৌপ্য, মূল্যবান ধাতু, রত্ন, চিত্রকর্ম, এন্টিকস এবং ক্লাবের মেম্বারশিপকে মূলধনি সম্পদ হিসেবে সংজ্ঞায়িত করা হয়েছে। |
+| **ধারা ২(৮০)** | **রপ্তানি (Export)** | প্রতিস্থাপন | ব্যাক-টু-ব্যাক এলসি বা বৈদেশিক মুদ্রায় স্থানীয় এলসি-এর মাধ্যমে রপ্তানিমুখী শিল্পে কাঁচামাল সরবরাহকে রপ্তানির সংজ্ঞায় যুক্ত করা হয়েছে। |
+| **ধারা ২(৮১)** | **লভ্যাংশ (Dividend)** | সংশোধনী | কোম্পানির দেওয়া ঋণ/অগ্রিম কেবল 'স্বাভাবিক ব্যক্তি' (Natural Person)-কে দেওয়া হলেই তা লভ্যাংশ হিসেবে গণ্য হবে বলে স্পষ্ট করা হয়েছে। |
+| **ধারা ২(৮৬ক)** | **সহযোগী উদ্যোগ (AE)** | সংযোজন/সংশোধনী | AE স্ট্যাটাস নির্ধারণে ঋণ ও সম্পদের অনুপাতের (debt-to-asset ratio) সীমা ৫০% থেকে কমিয়ে ৩৫% করা হয়েছে। |
+| **ধারা ২(৮৬খ)** | **সারচার্জ (Surcharge)** | সংযোজন | পরিবেশগত সারচার্জ, তামাক সারচার্জ এবং অন্যান্য সারচার্জ অন্তর্ভুক্ত করতে নতুন সংজ্ঞা যুক্ত করা হয়েছে। |
+| **ধারা ২(৯২)** | **স্থায়ী প্রতিষ্ঠান (PE)** | সংশোধনী | **১ লাখের বেশি ডিজিটাল/অনলাইন গ্রাহক** রয়েছে এমন অনাবাসিক (non-resident) প্রতিষ্ঠানকে PE হিসেবে গণ্য করার বিধান যুক্ত করা হয়েছে; DTAA-কে অগ্রাধিকার দেওয়া হয়েছে। |
+
+### উপসংহার (Conclusion)
+এই সংশোধনীগুলোর মাধ্যমে কর প্রশাসন আরও সুনির্দিষ্ট এবং যুগোপযোগী হবে। বিশেষ করে ডিজিটাল ব্যবসায়ীদের জন্য স্থায়ী প্রতিষ্ঠানের (PE) নতুন সংজ্ঞা এবং মূলধনি সম্পদের সম্প্রসারিত রূপ ভবিষ্যতে কর পরিপালন ও নির্ধারণে গুরুত্বপূর্ণ ভূমিকা পালন করবে।`,
+    author: mockAuthors.a2,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    publishedAt: new Date().toISOString(),
+    readTime: 8,
+    tags: [
+      'Income Tax Act 2023',
+      'Tax Amendments',
+      'Section 2',
+      'Tax Definitions',
+      'Permanent Establishment',
+      'Digital Economy Tax',
+      'Capital Asset',
+      'NBR',
+      'Bangladesh'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1200&h=600',
+    likes: 47,
+    comments: 11
+  },
+  {
+    id: 'individual-tax-rates-return-filing-guidelines-2024',
+    title: 'Individual Income Tax Rates & Return Filing Guidelines (2024-2025)',
+    metaTitle: 'Individual Tax Rates & Return Filing Guidelines in Bangladesh 2024',
+    metaDescription: 'Complete guide on individual income tax rates, tax-free limits, mandatory return filing conditions (Section 166), and eligible investment rebates in Bangladesh for 2024-2025.',
+    excerpt: 'Comprehensive guide covering the 2024-2025 individual income tax rates, tax-free income limits by category, mandatory return filing conditions under Section 166, and investment tax rebate sectors in Bangladesh.',
+    content: `![Individual Tax Rates & Guidelines](https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Individual Income Tax Rates & Return Filing Guidelines in Bangladesh
+## ব্যক্তিখাতে আয়কর হার ও রিটার্ন দাখিলের নিয়মাবলী
+
+Source: National Board of Revenue (NBR), Income Tax Act 2023
+
+---
+
+## English Version
+
+### Introduction
+
+Understanding the individual income tax rates, tax-free limits, and mandatory return filing conditions is crucial for every taxpayer in Bangladesh. The National Board of Revenue (NBR) updates these thresholds periodically to reflect economic conditions. This guide provides a comprehensive overview of the individual tax structure for general taxpayers, women, senior citizens, and specialized groups.
+
+---
+
+### 1. Tax-Free Income Limits
+
+The minimum threshold for taxable income varies based on the category of the individual taxpayer. If an individual's total annual income falls below these limits, they are not obligated to pay income tax, though they may still need to file a return if they meet specific mandatory conditions.
+
+| Taxpayer Category | Tax-Free Income Limit |
+| :--- | :--- |
+| **General Individual (Male)** | **4,00,000 BDT** |
+| **Female Taxpayers & Elderly (Aged 65 and above)** | **4,50,000 BDT** |
+| **Persons with Disabilities & Third Gender** | **5,25,000 BDT** |
+| **Gazetted War-Wounded Freedom Fighters & injured 'July Warriors' (2024 Uprising)** | **5,50,000 BDT** |
+| **Parent/Guardian of a Disabled Person** | **Additional 50,000 BDT** above personal limit |
+
+---
+
+### 2. Income Tax Rates and Brackets
+
+Income exceeding the tax-free limit is taxed at progressive rates. The tax brackets apply sequentially to the remaining income:
+
+| Income Slab | Tax Rate |
+| :--- | :--- |
+| **First** (Tax-Free Limit based on category) | **0%** |
+| **Next 3,00,000 BDT** | **10%** |
+| **Next 4,00,000 BDT** | **15%** |
+| **Next 5,00,000 BDT** | **20%** |
+| **Next 20,00,000 BDT** | **25%** |
+| **Remaining Balance** | **30%** |
+
+---
+
+### 3. The Minimum Tax Rule (The "Cliff" Effect)
+
+While progressive rates apply to income above the tax-free limit, there is a mandatory **Minimum Tax** rule based on your location and circumstances.
+
+- **The Tax-Free Capacity (Bucket System):** Your personalized tax-free limit acts like a bucket. For example, a 65-year-old woman starts with a baseline limit of 4,50,000 BDT. The senior citizen status increases it by 50,000 BDT to 5,00,000 BDT. If she is also the legal guardian of a disabled dependent, she gains another 50,000 BDT, bringing her exact personalized tax-free limit to 5,50,000 BDT.
+- **The Minimum Tax Trigger:** The moment your total income exceeds your personalized tax-free boundary by even a few Taka, you hit the "minimum tax cliff."
+- **Standard Minimum Tax:** Instantly, you owe a mandatory **5,000 BDT** (may vary between 3,000 BDT to 5,000 BDT based on location, typically 5,000 BDT in City Corporation areas).
+- **Investment Rebate Override:** This minimum tax cannot be wiped out by investment rebates. Even if your calculated rebates would normally bring your tax liability to zero, this mandatory payment overrides them.
+- **Exception for First-Time Filers:** If you are filing your return for the very first time, the minimum penalty drops to just **1,000 BDT**.
+
+---
+
+### 4. Mandatory Return Filing Conditions (Section 166)
+
+Even if your income is below the tax-free threshold, you **must file an income tax return** if you meet any of the following conditions under Section 166:
+
+- Own a motor vehicle (excluding 2/3 wheelers)
+- Hold a trade license
+- Are a shareholder director or employee of a company
+- Are a partner in a firm or member of an Association of Persons (AoP)
+- Hold an executive or management position in an organization
+- Are a government employee
+- Are a registered professional (doctor, lawyer, CA, engineer, etc.)
+- Are a candidate for any elective public office (UP, Municipality, National elections, etc.)
+- Hold membership in a registered club
+- Obtained a bank loan exceeding 20 lakh BDT
+- Participate in specific government tenders or registrations
+
+*Income sources to declare include: Salary/Employment, Rent, Agriculture, Business or Profession, Capital Gains, Financial Assets, and Other Sources.*
+
+---
+
+### 5. Investment Tax Credit (Rebate) Categories
+
+Taxpayers can reduce their actual tax liability by claiming investment tax rebates on specific approved sectors. Eligible investments and donations include:
+
+- **Life Insurance Premiums**
+- **Provident Fund Contributions** (Recognized/Act 1925)
+- **Approved Superannuation Funds**
+- **Government Securities** (up to 5 lakh BDT)
+- **Unit Certificates, Mutual Funds, ETFs, and Joint Investment Schemes**
+- **DPS / Monthly Savings Schemes** (up to 1.2 lakh BDT annually)
+- **Listed Stocks / Securities**
+- **Zakat Fund** (via official Bank Transfer)
+- **Approved Charitable Donations** (e.g., ASHIC, BANCAT, BRAC, charitable hospitals, government welfare funds, etc.)
+
+---
+
+## বাংলা সংস্করণ
+
+### ব্যক্তিখাতে আয়কর হার ও রিটার্ন দাখিলের নিয়মাবলী
+
+#### ভূমিকা
+
+বাংলাদেশের প্রত্যেক করদাতার জন্য ব্যক্তিখাতের আয়কর হার, করমুক্ত আয়সীমা এবং বাধ্যতামূলক রিটার্ন দাখিলের শর্তাবলি জানা অত্যন্ত জরুরি। জাতীয় রাজস্ব বোর্ড (NBR) বিভিন্ন ক্যাটাগরির করদাতাদের জন্য আলাদা আলাদা করমুক্ত সীমা নির্ধারণ করে থাকে। 
+
+---
+
+#### ১. করমুক্ত আয়সীমা
+
+করদাতার ধরন অনুযায়ী ন্যূনতম করমুক্ত আয়সীমা ভিন্ন হয়। বার্ষিক আয় এই সীমার নিচে থাকলে আয়কর প্রদান করতে হয় না, তবে সুনির্দিষ্ট কিছু শর্ত মিললে শূন্য রিটার্ন (Zero Return) দাখিল করা বাধ্যতামূলক হতে পারে।
+
+| করদাতার ধরন | করমুক্ত আয়সীমা |
+| :--- | :--- |
+| **সাধারণ ব্যক্তি (পুরুষ)** | **৪,০০,০০০ টাকা** |
+| **নারী করদাতা এবং প্রবীণ নাগরিক (৬৫ বছর বা তদূর্ধ্ব)** | **৪,৫০,০০০ টাকা** |
+| **প্রতিবন্ধী ব্যক্তি এবং তৃতীয় লিঙ্গের করদাতা** | **৫,২৫,০০০ টাকা** |
+| **গেজেটভুক্ত যুদ্ধাহত মুক্তিযোদ্ধা এবং জুলাই গণঅভ্যুত্থানে (২০২৪) আহত ব্যক্তিবর্গ** | **৫,৫০,০০০ টাকা** |
+| **প্রতিবন্ধী ব্যক্তির পিতা/মাতা বা আইনানুগ অভিভাবক** | ব্যক্তিগত সীমার অতিরিক্ত **৫০,০০০ টাকা** |
+
+---
+
+#### ২. আয়করের হার ও ধাপসমূহ (Tax Slabs)
+
+করমুক্ত সীমার অতিরিক্ত আয়ের ওপর ধাপে ধাপে আয়কর নির্ধারিত হয়:
+
+| আয়ের ধাপ | করের হার |
+| :--- | :--- |
+| **প্রথম** (ক্যাটাগরি অনুযায়ী করমুক্ত সীমা পর্যন্ত) | **০%** |
+| **পরবর্তী ৩,০০,০০০ টাকার ওপর** | **১০%** |
+| **পরবর্তী ৪,০০,০০০ টাকার ওপর** | **১৫%** |
+| **পরবর্তী ৫,০০,০০০ টাকার ওপর** | **২০%** |
+| **পরবর্তী ২০,০০,০০০ টাকার ওপর** | **২৫%** |
+| **অবশিষ্ট আয়ের ওপর** | **৩০%** |
+
+---
+
+#### ৩. ন্যূনতম কর বা মিনিমাম ট্যাক্স (Minimum Tax)
+
+করমুক্ত সীমার ওপরের আয়ের জন্য সাধারণ কর হার প্রযোজ্য হলেও, একটি বাধ্যতামূলক **ন্যূনতম কর (Minimum Tax)** বিধান রয়েছে।
+
+- **ব্যক্তিগত করমুক্ত সীমা (Bucket System):** আপনার করমুক্ত সীমা একটি ধারণক্ষমতার মতো কাজ করে। যেমন, ৬৫ বছর বয়সী একজন নারীর বেস লিমিট ৪,৫০,০০০ টাকা। সিনিয়র সিটিজেন হওয়ার কারণে এটি বেড়ে ৫,০০,০০০ টাকা হয়। তিনি যদি কোনো প্রতিবন্ধী ব্যক্তির আইনানুগ অভিভাবক হন, তবে এটি আরও ৫০,০০০ টাকা বেড়ে ৫,৫০,০০০ টাকায় দাঁড়ায়।
+- **ন্যূনতম করের শর্ত:** আপনার মোট আয় এই ব্যক্তিগত করমুক্ত সীমার চেয়ে এক টাকা বেশি হলেও আপনি ন্যূনতম করের আওতায় পড়বেন।
+- **স্ট্যান্ডার্ড ন্যূনতম কর:** আয় সীমা অতিক্রম করলেই আপনাকে সাধারণত বাধ্যতামূলকভাবে **৫,০০০ টাকা** ন্যূনতম কর দিতে হবে (এলাকাভেদে এটি ৩,০০০ থেকে ৫,০০০ টাকা হতে পারে, তবে সিটি কর্পোরেশন এলাকায় সাধারণত ৫,০০০ টাকা)।
+- **রেয়াত বাতিল (Rebate Override):** ন্যূনতম করের ক্ষেত্রে বিনিয়োগ রেয়াত (Investment Rebate) কাজ করে কাজ করে না। অর্থাৎ, বিনিয়োগের কারণে আপনার হিসাবকৃত কর শূন্য বা ৫,০০০ টাকার নিচে নেমে গেলেও আপনাকে বাধ্যতামূলকভাবে এই ন্যূনতম কর পরিশোধ করতেই হবে।
+- **নতুন করদাতাদের জন্য ছাড়:** আপনি যদি প্রথমবারের মতো (First-time filer) রিটার্ন দাখিল করে থাকেন, তবে এই ন্যূনতম করের পরিমাণ কমে মাত্র **১,০০০ টাকা** হবে।
+
+---
+
+#### ৪. বাধ্যতামূলক রিটার্ন দাখিলের শর্তসমূহ (ধারা ১৬৬)
+
+আয়কর আইন ২০২৩-এর ধারা ১৬৬ অনুযায়ী, আপনার আয় করমুক্ত সীমার নিচে হলেও নিচের যেকোনো একটি শর্ত পূরণ করলে রিটার্ন দাখিল করা বাধ্যতামূলক:
+
+- মোটরগাড়ির মালিকানা থাকলে (২/৩ চাকার যান ব্যতীত)
+- ট্রেড লাইসেন্স থাকলে
+- কোনো কোম্পানির শেয়ারহোল্ডার ডিরেক্টর বা কর্মচারী হলে
+- কোনো ফার্মের অংশীদার বা AoP-এর সদস্য হলে
+- কোনো প্রতিষ্ঠানে নির্বাহী বা ব্যবস্থাপনা পদে কর্মরত থাকলে
+- সরকারি চাকরিজীবী হলে
+- পেশাজীবী হিসেবে নিবন্ধিত থাকলে (ডাক্তার, আইনজীবী, চার্টার্ড অ্যাকাউন্ট্যান্ট, ইঞ্জিনিয়ার ইত্যাদি)
+- যেকোনো জনপ্রতিনিধি নির্বাচনে (ইউনিয়ন পরিষদ, পৌরসভা, জাতীয় সংসদ) প্রার্থী হলে
+- কোনো নিবন্ধিত ক্লাবের সদস্যপদ থাকলে
+- ২০ লাখ টাকার বেশি ব্যাংক ঋণ গ্রহণ করলে
+
+---
+
+#### ৫. কর রেয়াতযোগ্য বিনিয়োগ খাত (Investment Tax Rebate)
+
+নির্ধারিত কিছু খাতে বিনিয়োগ বা দান করলে করদাতারা তাদের প্রদেয় আয়করের ওপর রেয়াত (Rebate) বা ছাড় পেতে পারেন। অনুমোদিত খাতগুলো হলো:
+
+- **জীবন বীমার প্রিমিয়াম**
+- **প্রভিডেন্ট ফান্ডে অনুদান**
+- **অনুমোদিত সুপারঅ্যানুয়েশন ফান্ড**
+- **সরকারি সিকিউরিটিজ বা সঞ্চয়পত্র** (সর্বোচ্চ ৫ লাখ টাকা পর্যন্ত)
+- **মিউচুয়াল ফান্ড, ইউনিট সার্টিফিকেট ও ইটিএফ (ETF)**
+- **ডিপিএস (DPS) বা মাসিক সঞ্চয় প্রকল্প** (বার্ষিক সর্বোচ্চ ১.২ লাখ টাকা পর্যন্ত)
+- **পুঁজিবাজারে তালিকাভুক্ত শেয়ার বা সিকিউরিটিজ**
+- **যাকাত ফান্ড** (ব্যাংক ট্রান্সফারের মাধ্যমে)
+- **অনুমোদিত দাতব্য প্রতিষ্ঠানে অনুদান** (যেমন: আশিক, ব্যানকাট, ব্র্যাক, দাতব্য হাসপাতাল, সরকারি কল্যাণ তহবিল ইত্যাদি)
+
+---
+
+### উপসংহার
+
+আয়কর রিটার্ন প্রস্তুত করার সময় সঠিক করমুক্ত সীমা এবং বিনিয়োগ রেয়াত দাবি করা হলে আপনার প্রদেয় করের পরিমাণ উল্লেখযোগ্যভাবে হ্রাস পেতে পারে। এছাড়া, নির্ধারিত সময়ের মধ্যে রিটার্ন দাখিল না করলে জরিমানা ও অন্যান্য আইনি জটিলতার সম্মুখীন হতে হয়।`,
+    author: mockAuthors.a1,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    publishedAt: new Date().toISOString(),
+    readTime: 6,
+    tags: [
+      'Individual Tax',
+      'Tax Rates',
+      'Return Filing',
+      'Section 166',
+      'Tax Exemptions',
+      'Investment Rebate',
+      'NBR',
+      'Bangladesh'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600',
+    likes: 54,
+    comments: 12
+  },
+  {
+    id: 'non-resident-tds-rates-section-119',
+    title: 'Non-Resident TDS Rates Under Section 119 | Bangladesh Withholding Tax Rules 2026',
+    metaTitle: 'Non-Resident TDS Rates Under Section 119 | Bangladesh Withholding Tax Rules 2026',
+    metaDescription: 'Complete guide to non-resident withholding tax (TDS) rates under Section 119 of the Income Tax Act, 2023 and Withholding Tax Rules 2026. Learn tax rates for royalties, technical services, digital marketing, contractors, investments, and exemptions.',
+    excerpt: 'Complete guide to non-resident withholding tax (TDS) rates under Section 119 of the Income Tax Act, 2023 and Withholding Tax Rules 2026 covering royalties, technical services, digital marketing, foreign contractors, investments, and statutory exemptions in Bangladesh.',
+    content: `![Non-Resident TDS Rates Under Section 119](https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Non-Resident Withholding Tax Rules Under Section 119 of Income Tax Act 2023: Complete Guide
+## ধারা ১১৯ অনুযায়ী Non-Resident TDS Rate | বিদেশি পেমেন্টে Withholding Tax Rules 2026
+
+Source: National Board of Revenue (NBR), Income Tax Act 2023, Section 119 & Withholding Tax Rules 2026
+
+---
+
+## English Version
+
+### Introduction: Cross-Border Transactions & Withholding Tax
+
+With the rapid growth of international business, cross-border transactions have become standard practice for Bangladeshi companies. Payments made to foreign companies, organizations, and individuals are subject to specific **Tax Deducted at Source (TDS)** requirements under **Section 119 of the Income Tax Act, 2023** and the **Withholding Tax Rules, 2026**.
+
+Whenever a Bangladeshi resident entity makes payments to a non-resident person or organization, applicable withholding tax must be deducted before remitting the payment abroad through authorized banking channels (Authorized Dealers).
+
+The applicable TDS rate depends on the nature of payment, including:
+- Royalty and intellectual property payments
+- Technical and engineering services
+- Professional and legal advisory
+- Digital marketing, bandwidth, and media broadcasting
+- Foreign contractors and goods supply
+- Equipment and machinery rental
+- Investment returns, interest, capital gains, and dividends
+
+---
+
+### Key Rule for Non-Residents Without Permanent Establishment (PE)
+
+#### 1. Final Tax Liability Rule
+If a non-resident taxpayer **does not have a Permanent Establishment (PE)** in Bangladesh, the TDS deducted under Section 119 is considered their **final tax liability**.
+
+This means:
+- The deducted tax cannot be adjusted against other tax claims or assessments.
+- The non-resident cannot normally claim a refund through regular tax adjustment mechanisms.
+- The withholding tax acts as the final and conclusive settlement of tax obligations in Bangladesh.
+
+#### 2. Double Taxation Avoidance Agreement (DTAA) Priority
+Where Bangladesh has signed a **Double Taxation Avoidance Agreement (DTAA)** with the country of residence of the recipient entity, the provisions of that bilateral treaty **take priority over domestic statutory rates**.
+
+A DTAA may provide:
+- **Reduced withholding tax rates** (e.g., 10% on royalties or technical fees instead of 20%).
+- **Tax exemptions** under specific treaty articles.
+- **Special criteria** for determining permanent establishment and source taxation.
+
+> **Compliance Tip:** Businesses should obtain a Tax Residency Certificate (TRC) and verify applicable treaty benefits before remitting payments abroad.
+
+---
+
+### Non-Resident Withholding Tax Rates Under Section 119
+
+#### 1. Royalties & Intangible Property Payments – 20% TDS
+
+**Applicable Payments:**
+- Royalty fees
+- License fees
+- Intellectual property (IP) rights
+- Use of software licenses, copyrights, trademarks, and patents
+- Use of intangible assets and franchise rights
+
+**TDS Rate:** **20%**
+
+**Explanation:**
+Payments made to foreign entities for using intellectual property, technology rights, software licenses, trademarks, patents, or other intangible assets are subject to a **20% withholding tax**.
+
+**Example:**
+A Bangladeshi enterprise pays a foreign software company $50,000 for enterprise software licensing rights. The payment will attract **20% TDS** ($10,000) prior to remittance, unless reduced under a DTAA.
+
+---
+
+#### 2. Technical Services & Technical Assistance – 10% / 20% TDS
+
+**Applicable Services:**
+- Technical consultancy
+- Engineering support and architectural planning
+- Technical know-how transfer
+- Specialized industrial assistance
+- Technology-related implementation services
+
+**TDS Rate Breakdown:**
+
+| Recipient Type | Applicable TDS Rate |
+| :--- | :--- |
+| **Non-individual corporate entity (Company / LLP / Firm)** | **10%** |
+| **Individual person / Professional consultant** | **20%** |
+
+**Explanation:**
+The withholding rate depends on whether the foreign service provider is an incorporated entity or an individual consultant. Corporate technical providers benefit from a lower 10% rate.
+
+---
+
+#### 3. Professional & Legal Services
+
+##### Professional Service Fees
+
+| Recipient Type | Applicable TDS Rate |
+| :--- | :--- |
+| **Foreign company / Corporate entity** | **10%** |
+| **Individual professional** | **20%** |
+
+**Examples:**
+- Cross-border business consulting
+- Audit and accounting advisory
+- Financial modeling and restructuring advisory
+
+##### Legal Service Fees
+- **TDS Rate:** **20%**
+
+Payments made to foreign law firms, barristers, or international legal counsel are subject to **20% withholding tax**.
+
+---
+
+#### 4. Digital Marketing, Bandwidth & Media Services
+
+International digital services are strictly regulated under distinct withholding rates:
+
+- **Bandwidth Payments (10% TDS):** Applicable for international internet bandwidth, undersea cable capacity, and data connectivity services.
+- **Digital Marketing & Advertisement Creation (10% TDS):** Applicable for digital advertising campaigns, online search marketing, social media ad placements, and multimedia advertisement production.
+- **Advertisement Broadcasting (15% TDS):** Applicable for television advertising, radio broadcasts, and cross-border media broadcasting services.
+- **Satellite, Airtime, Frequency & Channel Rental (20% TDS):** Applicable for satellite transponder capacity rental, broadcasting frequency leases, and satellite channel leasing.
+
+---
+
+#### 5. Cross-Border Contractor & Supply Contracts – 6% TDS
+
+##### Foreign Contractor Services
+Contracts executed by non-resident contractors or subcontractors are subject to **6% TDS**:
+- Manufacturing contracts
+- Processing or conversion contracts
+- Civil works projects
+- Construction and infrastructure contracts
+- Industrial engineering projects
+
+##### Foreign Goods Supply Contracts
+Cross-border supply bills and offshore equipment supplies:
+- **TDS Rate:** **6%**
+
+**Example:**
+A Bangladeshi company contracts a foreign vendor to supply customized industrial machinery parts. The payment requires **6% TDS** deduction.
+
+---
+
+#### 6. Equipment & Machinery Rental – 7.5% TDS
+
+**Applicable Payments:**
+- Heavy industrial equipment rental
+- Specialized machinery leasing
+- Drilling, marine, or aviation equipment charter
+
+**TDS Rate:** **7.5%**
+
+**Example:**
+A local power generation plant leases high-capacity turbine testing equipment from a foreign supplier. The lease payment attracts **7.5% TDS**.
+
+---
+
+#### 7. Investment Returns & Capital Income
+
+- **Interest Payments (10% TDS):** Applicable to foreign loan interest, offshore commercial borrowing (ECB) interest, bank deposit interest, and financial yields.
+- **Capital Gains (15% TDS):** Applicable on the sale of shares in Bangladeshi entities, transfer of capital assets, and investment disposal transactions.
+- **Dividend Payments:**
+
+| Recipient Entity Type | Applicable TDS Rate |
+| :--- | :--- |
+| **Foreign Company, Institutional Fund, or Trust** | **20%** |
+| **Individual Non-Resident Person** | **25%** |
+
+---
+
+#### 8. Other Unspecified Services – 20% TDS
+
+If a payment made to a non-resident does not fall under any specific category mentioned in the withholding schedule:
+- **Standard TDS Rate:** **20%**
+
+This residual clause covers all other cross-border service payments not specifically enumerated under preferential rates.
+
+---
+
+### Statutory Exemptions from Non-Resident TDS
+
+Section 119 withholding tax does not apply to certain approved cross-border payments:
+
+1. **Payments to Foreign Government Authorities:** Payments made directly to foreign sovereign governments, embassies, or state institutions are exempt from Section 119 withholding requirements.
+2. **Subscription Fees to International Professional Bodies:** Membership dues or annual subscription payments made to internationally recognized professional organizations (e.g., IFAC, ACCA, ICAEW, IEEE, CFA Institute) are exempt.
+3. **Branch Office & Liaison Office Expenses:** Approved head office expense allocations and operational transfers of foreign branch or liaison offices may receive exemption according to statutory guidelines.
+4. **Overseas Education Tuition Fees:** Foreign university and school tuition remittances are exempt when verified by Authorized Dealers (ADs) and processed under Bangladesh Bank foreign exchange guidelines.
+
+---
+
+### Summary Table: Non-Resident TDS Rates
+
+| Payment Category | Applicable TDS Rate |
+| :--- | :--- |
+| **Royalty & Intangible Property Rights** | **20%** |
+| **Technical Services (Foreign Corporate Entity)** | **10%** |
+| **Technical Services (Individual Professional)** | **20%** |
+| **Professional Services (Foreign Company)** | **10%** |
+| **Professional Services (Individual)** | **20%** |
+| **Legal Services & International Counsel** | **20%** |
+| **International Bandwidth Payments** | **10%** |
+| **Digital Marketing & Advertisement Creation** | **10%** |
+| **Advertisement Broadcasting** | **15%** |
+| **Satellite / Airtime / Frequency / Channel Rental** | **20%** |
+| **Foreign Contractor (Civil/Engineering/Construction)** | **6%** |
+| **Foreign Goods Supply Contracts** | **6%** |
+| **Equipment & Machinery Rental / Leasing** | **7.5%** |
+| **Interest Income / Foreign Loan Yields** | **10%** |
+| **Capital Gains (Shares & Capital Assets)** | **15%** |
+| **Dividend (Company, Fund, or Trust)** | **20%** |
+| **Dividend (Individual Non-Resident)** | **25%** |
+| **Other Unspecified Cross-Border Services** | **20%** |
+
+---
+
+## বাংলা সংস্করণ
+
+### Income Tax Act 2023-এর Section 119 অনুযায়ী Non-Resident Withholding Tax Rules 2026: সম্পূর্ণ গাইড
+
+#### ভূমিকা
+
+বর্তমান বিশ্বায়িত ব্যবসায়িক পরিবেশে বাংলাদেশের প্রতিষ্ঠানগুলো নিয়মিত বিদেশি কোম্পানি ও ব্যক্তিদের কাছ থেকে বিভিন্ন ধরনের পরামর্শ, প্রযুক্তি ও পণ্য সেবা গ্রহণ করে আন্তর্জাতিক পেমেন্ট বা রেমিট্যান্স পাঠিয়ে থাকে।
+
+এই ধরনের Cross-Border Payment-এর ক্ষেত্রে **Income Tax Act, 2023-এর Section 119** এবং **Withholding Tax Rules, 2026** অনুযায়ী উৎসে কর বা **Tax Deducted at Source (TDS)** কর্তন করা বাধ্যতামূলক।
+
+বিদেশি ব্যক্তি বা প্রতিষ্ঠানের কাছে অর্থ পাঠানোর পূর্বে অনুমোদিত ব্যাংক (Authorized Dealer)-এর মাধ্যমে প্রযোজ্য হারে কর কর্তন করতে হয়।
+
+---
+
+#### Permanent Establishment (PE) না থাকলে বিশেষ নিয়ম
+
+যদি কোনো Non-Resident Taxpayer-এর বাংলাদেশে কোনো **Permanent Establishment (PE)** বা স্থায়ী ব্যবসায়িক ভিত্তি না থাকে, তাহলে Section 119 অনুযায়ী কর্তন করা TDS:
+- তার **Final Tax Liability** হিসেবে গণ্য হবে।
+- অন্য কোনো কর দাবির সাথে সমন্বয় করা যাবে না।
+- সাধারণভাবে অতিরিক্ত কর রিফান্ড বা সমন্বয়ের সুযোগ থাকবে না।
+
+#### DTAA থাকলে চুক্তির নিয়ম প্রাধান্য পাবে
+
+বাংলাদেশ এবং সংশ্লিষ্ট দেশের মধ্যে যদি **Double Taxation Avoidance Agreement (DTAA)** বা দ্বৈত কর পরিহার চুক্তি স্বাক্ষরিত থাকে, তাহলে সেই চুক্তির বিধান অভ্যন্তরীণ আইনের চেয়ে অগ্রাধিকার পাবে।
+
+DTAA-এর মাধ্যমে:
+- **কম TDS Rate** (যেমন: রয়্যালটি বা টেকনিক্যাল ফিতে ২০%-এর বদলে ১০%)
+- **কর অব্যাহতি (Tax Exemption)**
+- **উৎস কর নির্ধারণের বিশেষ শর্ত**
+
+পাওয়া যেতে পারে।
+
+---
+
+#### Non-Resident TDS Rate তালিকা
+
+| Payment Type | প্রযোজ্য TDS Rate |
+| :--- | :--- |
+| **Royalty ও Intangible Property** | **২০%** |
+| **Technical Service (Company)** | **১০%** |
+| **Technical Service (Individual)** | **২০%** |
+| **Professional Service (Company)** | **১০%** |
+| **Professional Service (Individual)** | **২০%** |
+| **Legal Service (আইনি পরামর্শ)** | **২০%** |
+| **Bandwidth Payment** | **১০%** |
+| **Digital Marketing ও বিজ্ঞাপন তৈরি** | **১০%** |
+| **Advertisement Broadcasting** | **১৫%** |
+| **Satellite / Airtime / Channel Rental** | **২০%** |
+| **Foreign Contractor (নির্মাণ ও প্রকৌশল)** | **৬%** |
+| **Foreign Goods Supply** | **৬%** |
+| **Equipment Rental (যন্ত্রপাতি ভাড়া)** | **৭.৫%** |
+| **Interest (ঋণের সুদ)** | **১০%** |
+| **Capital Gain (মূলধনী লাভ)** | **১৫%** |
+| **Dividend (Company/Fund/Trust)** | **২০%** |
+| **Dividend (Individual)** | **২৫%** |
+| **অন্যান্য Service** | **২০%** |
+
+---
+
+#### Non-Resident TDS থেকে অব্যাহতি
+
+Section 119 অনুযায়ী নিম্নোক্ত পেমেন্টে TDS প্রযোজ্য নয়:
+
+১. **Foreign Government Authority Payment:** বিদেশি সরকারি কোনো প্রতিষ্ঠান বা দূতাবাসকে প্রদেয় অর্থ।
+২. **International Professional Organization Subscription:** আন্তর্জাতিকভাবে স্বীকৃত প্রফেশনাল বডি (যেমন: ACCA, ICAEW, IFAC, IEEE)-এর সাবস্ক্রিপশন ফি।
+৩. **Branch ও Liaison Office Expenses:** বিদেশি কোম্পানির স্থানীয় Branch Office বা Liaison Office-এর অনুমোদিত পরিচালন ব্যয়।
+৪. **Overseas Education Tuition Fee:** Authorized Dealer (AD) ব্যাংক দ্বারা যাচাইকৃত এবং Bangladesh Bank-এর বৈদেশিক মুদ্রা নিয়ন্ত্রণ নীতিমালা অনুযায়ী প্রেরিত বিদেশি শিক্ষার ফি।
+
+---
+
+### Conclusion / উপসংহার
+
+Section 119 অনুযায়ী Non-Resident Payment-এর ক্ষেত্রে সঠিক TDS Rate নির্ধারণ করা আন্তর্জাতিক বাণিজ্যের একটি অত্যন্ত সংবেদনশীল বিষয়।
+
+Royalty, Technical Service, Digital Marketing, Contractor Payment, Equipment Rental এবং Investment Income-এর ক্ষেত্রে সুনির্দিষ্ট withholding tax rate নির্ধারণ করা হয়েছে।
+
+সঠিকভাবে TDS কর্তন এবং DTAA সুবিধার সদ্ব্যবহার করলে ব্যবসা প্রতিষ্ঠানগুলো ঝুঁকিহীনভাবে আন্তর্জাতিক লেনদেন পরিচালনা ও কর পরিপালন নিশ্চিত করতে পারে।`,
+    author: mockAuthors.a2,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    publishedAt: new Date().toISOString(),
+    readTime: 8,
+    tags: [
+      'Section 119',
+      'Non-Resident TDS',
+      'Withholding Tax',
+      'Foreign Remittance',
+      'DTAA',
+      'Cross-Border Tax',
+      'Income Tax Act 2023',
+      'NBR',
+      'Bangladesh'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=1200&h=600',
+    likes: 42,
+    comments: 8
+  },
+  {
+    id: 'corporate-service-payment-tds-rates-section-90',
+    title: 'Corporate Service Payment TDS Rates Under Section 90 | Withholding Tax Rules Guide',
+    metaTitle: 'Corporate Service Payment TDS Rates Under Section 90 | Withholding Tax Rules Guide',
+    metaDescription: 'Learn corporate service payment TDS rates under Section 90 and withholding tax rules. Complete guide covering consultancy, technical services, transport, manpower, telecom, honoraria and other service payments.',
+    excerpt: 'Complete guide covering corporate service payment TDS rates under Section 90 including consultancy, technical services, transport, manpower, telecom, honoraria and service payments in Bangladesh.',
+    content: `![Corporate Service Payment TDS Rates Under Section 90](https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Corporate Service Payments Under Section 90 & Withholding Tax Rules: Complete Guide
+## ধারা ৯০ অনুযায়ী Corporate Service Payment ও Withholding Tax Rules: বিস্তারিত গাইড
+
+Source: National Board of Revenue (NBR), Income Tax Act 2023, Section 90 & Withholding Tax Rules
+
+---
+
+## English Version
+
+### Introduction: Understanding Corporate Service TDS Rules
+
+Under **Section 90** of the Income Tax Act and related Withholding Tax Rules, companies and organizations are required to deduct **Tax Deducted at Source (TDS)** when making payments for different corporate services.
+
+The applicable withholding tax rate depends on:
+- Nature of the service
+- Service provider type (individual or non-individual entity)
+- Industry category
+- Payment method and contract terms
+
+Proper classification of corporate service payments is essential for maintaining tax compliance and avoiding penalties, audit disputes, and disallowances under tax assessment.
+
+---
+
+### 1. Advisory & Consultancy Fees – 7.5% / 15% TDS
+
+**Applicable Services:**
+Consultancy and advisory services include:
+- Business consultancy
+- Professional advisory
+- Management consulting
+- Strategic planning services
+- Corporate advisory services
+
+**TDS Rate Breakdown:**
+
+| Service Provider Type | Applicable TDS Rate |
+| :--- | :--- |
+| **Non-individual corporate entity (Company / Firm / LLP)** | **7.5%** |
+| **Individual service provider (Professional consultant)** | **15%** |
+
+**Explanation:**
+When a company pays consultancy fees to another company, partnership, or corporate organization, the payment is subject to **7.5% TDS**. If the consultant is an individual professional, the applicable rate increases to **15%**.
+
+**Example:**
+A company hires a consulting firm for business strategy development and pays consultancy fees. The company must deduct **7.5% TDS** before releasing payment. If an individual management expert is hired directly, **15% TDS** applies.
+
+---
+
+### 2. Technical Services & Know-How Payments – 10% / 15% TDS
+
+**Covered Services:**
+Technical service payments include:
+- Technical assistance
+- Engineering support
+- Software development or technology support
+- Technical expertise
+- Specialized know-how transfer
+
+**TDS Rate Breakdown:**
+
+| Service Provider Type | Applicable TDS Rate |
+| :--- | :--- |
+| **Non-individual corporate entity** | **10%** |
+| **Individual service provider** | **15%** |
+
+**Explanation:**
+Technical services usually involve specialized knowledge, technology, or professional engineering expertise. Payments for such services require withholding tax deduction at source.
+
+**Example:**
+A manufacturing company receives specialized technical support from an engineering company. The invoice payment will attract **10% TDS**.
+
+---
+
+### 3. Logistics, Transport & Rental Services – 2% TDS
+
+**Applicable Services:**
+The following services are subject to **2% TDS**:
+- Transport services
+- Vehicle rental
+- Carrying and freight services
+- General repair and maintenance
+- Ride-sharing platform payments
+- Co-working space rental fees
+
+**Explanation:**
+Transportation and operational support services are classified under general service payments where tax is deducted at **2% of the gross bill amount**.
+
+**Example:**
+A company hires a logistics and transport provider for nationwide product distribution. The total invoice payment will be subject to **2% TDS**.
+
+---
+
+### 4. Catering, Events & Operational Services – 2% TDS
+
+**Covered Services:**
+The following corporate services require **2% TDS**:
+- Catering services
+- Event management
+- Public relations (PR) services
+- Corporate training and workshops
+- Courier services
+- Packing and shifting services
+
+**Explanation:**
+Companies frequently outsource operational activities such as corporate events, annual general meetings (AGM), employee training, and logistics support. These payments require deduction of tax at source at **2%**.
+
+**Example:**
+A corporate enterprise organizes its annual conference through an event management company. The payment requires **2% TDS deduction**.
+
+---
+
+### 5. Manpower Supply & Security Agencies – 1% / 10% TDS
+
+**Applicable Services:**
+Includes:
+- Manpower supply
+- Cleaning services
+- Personal and facility security services
+- Media agency services
+
+**TDS Rate Structure:**
+
+| Calculation Method | Applicable TDS Rate |
+| :--- | :--- |
+| **On total gross bill amount** | **1%** |
+| **On commission amount only (where split billing applies)** | **10%** |
+
+**Explanation:**
+Where payment is treated as a complete consolidated service bill, the applicable deduction is **1%**. However, if only commission income is specified and separated, the rate becomes **10% on commission**.
+
+---
+
+### 6. Equipment Repair & Dockyard Services – 5% TDS
+
+**Applicable Services:**
+Includes:
+- Motor garage services
+- Workshop repair services
+- Private container port services
+- Dockyard and dry-dock services
+
+**TDS Rate:** **5%**
+
+**Explanation:**
+Repair and specialized industrial facility services are subject to a **5% withholding rate** due to their technical and operational nature.
+
+---
+
+### 7. Telecom & Financial Services – 10% TDS
+
+**Covered Services:**
+The following corporate payments require **10% TDS**:
+- Mobile network operator service bills
+- Credit rating agency fees
+
+**Explanation:**
+Telecommunication and financial evaluation services are considered specialized corporate infrastructure services and carry a withholding tax rate of **10%**.
+
+**Example:**
+A company pays monthly mobile communication service charges and corporate SIM bills to a telecom operator. The payment requires **10% TDS**.
+
+---
+
+### 8. Honoraria & Meeting Fees – 20% TDS
+
+**Applicable Payments:**
+Includes:
+- Board meeting fees
+- Committee sitting fees
+- Training fees
+- Honorarium payments
+
+**TDS Rate:** **20%**
+
+**Explanation:**
+Honoraria and similar professional board/training payments are subject to a elevated deduction rate of **20%** under withholding tax provisions.
+
+**Example:**
+A financial institution pays an external expert for conducting a specialized corporate governance workshop. The payment requires **20% TDS deduction**.
+
+---
+
+### Summary Table: Corporate Service Payment TDS Rates
+
+| Service Category | Applicable TDS Rate |
+| :--- | :--- |
+| **Consultancy & Advisory (Corporate Entity)** | **7.5%** |
+| **Consultancy by Individual Professional** | **15%** |
+| **Technical Services (Corporate Entity)** | **10%** |
+| **Technical Services by Individual** | **15%** |
+| **Transport, Vehicle Rental & Logistics** | **2%** |
+| **Catering, Events & Operational Services** | **2%** |
+| **Manpower, Cleaning & Security Agencies (Gross Bill)** | **1%** |
+| **Commission-Based Agency Payment (On Commission)** | **10%** |
+| **Equipment Repair & Dockyard Services** | **5%** |
+| **Telecom & Credit Rating Services** | **10%** |
+| **Honoraria, Meeting & Sitting Fees** | **20%** |
+
+---
+
+## বাংলা সংস্করণ
+
+### ধারা ৯০ অনুযায়ী Corporate Service Payment ও Withholding Tax Rules: বিস্তারিত গাইড
+
+#### ভূমিকা
+
+**Income Tax Act-এর Section 90** এবং সংশ্লিষ্ট **Withholding Tax Rules** অনুযায়ী বিভিন্ন Corporate Service-এর বিপরীতে অর্থ পরিশোধ করার সময় উৎসে কর বা **TDS (Tax Deducted at Source)** কর্তন করতে হয়।
+
+Corporate Service Payment-এর ক্ষেত্রে TDS Rate নির্ভর করে:
+- সেবার ধরন
+- Service Provider ব্যক্তি নাকি প্রতিষ্ঠান (Individual vs Non-individual)
+- Payment-এর প্রকৃতি
+- সংশ্লিষ্ট Tax Category
+
+সঠিক TDS Rate প্রয়োগ করা ব্যবসার Tax Compliance-এর জন্য অত্যন্ত গুরুত্বপূর্ণ। ভুল হারে কর কর্তন করলে জরিমানা ও নিরীক্ষা আপত্তির মুখে পড়তে হতে পারে।
+
+---
+
+#### ১. Advisory ও Consultancy Fee – ৭.৫% / ১৫% TDS
+
+**প্রযোজ্য সেবা:**
+- Business Consultancy
+- Management Advisory
+- Professional Advice
+- Corporate Strategy Consulting
+
+**TDS Rate:**
+
+| Service Provider | প্রযোজ্য TDS |
+| :--- | :--- |
+| **Corporate Entity (কোম্পানি / ফার্ম)** | **৭.৫%** |
+| **Individual Consultant (ব্যক্তিগত পরামর্শক)** | **১৫%** |
+
+**বিস্তারিত:**
+কোনো কোম্পানি যদি অন্য কোনো Consulting Firm থেকে ব্যবসায়িক পরামর্শ গ্রহণ করে, তাহলে বিল পরিশোধের সময় **৭.৫% TDS** কর্তন করতে হবে। আর পরামর্শক যদি স্বতন্ত্র কোনো ব্যক্তি বা প্রফেশনাল হন, তবে TDS হার হবে **১৫%**।
+
+---
+
+#### ২. Technical Service ও Know-How Payment – ১০% / ১৫% TDS
+
+**অন্তর্ভুক্ত সেবা:**
+- Technical Support
+- Engineering Service
+- Technology Assistance ও সফটওয়্যার সাপোর্ট
+- Specialized Knowledge ও Know-how Transfer
+
+**TDS Rate:**
+
+| Provider | Rate |
+| :--- | :--- |
+| **Company / Entity (প্রতিষ্ঠান)** | **১০%** |
+| **Individual (ব্যক্তি)** | **১৫%** |
+
+---
+
+#### ৩. Logistics, Transport ও Rental Service – ২% TDS
+
+**নিম্নোক্ত সেবার ক্ষেত্রে ২% TDS প্রযোজ্য:**
+- Transport Service
+- Vehicle Rental (গাড়ি ভাড়া)
+- Carrying & Freight Service
+- Repair & Maintenance
+- Ride Sharing Platform
+- Co-working Space Rent
+
+**নিয়ম:**
+TDS মোট গ্রস বিলের উপর হিসাব করে **২%** কর্তন করতে হয়।
+
+---
+
+#### ৪. Catering, Event ও Operational Service – ২% TDS
+
+**প্রযোজ্য সেবা:**
+- Catering Service
+- Event Management
+- Public Relations (PR)
+- Training & Workshop
+- Courier Service
+- Packing & Shifting
+
+এসব অপারেশনাল সেবার বিল পরিশোধের সময় **২% TDS** কর্তন করতে হবে।
+
+---
+
+#### ৫. Manpower ও Security Agency – ১% / ১০% TDS
+
+**প্রযোজ্য ক্ষেত্র:**
+- Manpower Supply
+- Cleaning Service
+- Personal & Facility Security
+- Media Agency Service
+
+**TDS হার:**
+- **Total Bill-এর উপর:** **১%**
+- **শুধুমাত্র Commission-এর উপর:** **১০%**
+
+---
+
+#### ৬. Equipment Repair ও Dockyard Service – ৫% TDS
+
+**প্রযোজ্য সেবা:**
+- Motor Garage
+- Workshop Repair
+- Private Container Port
+- Dockyard Service
+
+**TDS Rate:** **৫%**
+
+---
+
+#### ৭. Telecom ও Financial Service – ১০% TDS
+
+**প্রযোজ্য সেবা:**
+- Mobile Network Operator Service (টেলিকম বিল)
+- Credit Rating Agency Fee
+
+**TDS Rate:** **১০%**
+
+**উদাহরণ:**
+কোনো কোম্পানি টেলিকম অপারেটরকে মাসিক মোবাইল সার্ভিস চার্জ বা কর্পোরেট সংযোগের বিল পরিশোধ করলে **১০% TDS** কর্তন করতে হবে।
+
+---
+
+#### ৮. Honoraria ও Meeting Fee – ২০% TDS
+
+**প্রযোজ্য ক্ষেত্র:**
+- Meeting Fee (বোর্ড বা মিটিং ফি)
+- Training Fee
+- Honorarium (সম্মানী ভাতা)
+
+**TDS Rate:** **২০%**
+
+---
+
+#### Corporate Service Payment TDS Rate সংক্ষেপে
+
+| Service Category | প্রযোজ্য TDS Rate |
+| :--- | :--- |
+| **Consultancy Fee (Corporate Entity)** | **৭.৫%** |
+| **Individual Consultancy** | **১৫%** |
+| **Technical Service (Corporate Entity)** | **১০%** |
+| **Individual Technical Service** | **১৫%** |
+| **Transport, Vehicle Rental & Logistics** | **২%** |
+| **Catering & Event Service** | **২%** |
+| **Manpower & Security Agency (Total Bill)** | **১%** |
+| **Commission-Based Agency (Commission Amount)** | **১০%** |
+| **Equipment Repair & Dockyard** | **৫%** |
+| **Telecom & Credit Rating** | **১০%** |
+| **Honorarium & Meeting Fee** | **২০%** |
+
+---
+
+### Conclusion / উপসংহার
+
+Corporate Service Payment-এর ক্ষেত্রে **Section 90** অনুযায়ী সঠিক TDS Rate নির্ধারণ করা অত্যন্ত গুরুত্বপূর্ণ। Consultancy, Technical Service, Logistics, Manpower, Telecom এবং অন্যান্য Corporate Services-এর জন্য আইন অনুযায়ী আলাদা আলাদা withholding tax rate নির্ধারণ করা হয়েছে।
+
+সঠিক Tax Deduction নিশ্চিত করলে প্রতিষ্ঠানগুলো সহজে compliance বজায় রাখতে পারে এবং ভবিষ্যতের নিরীক্ষা সংক্রান্ত ঝুঁকি বহুলাংশে কমাতে পারে।`,
+    author: mockAuthors.a1,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    publishedAt: new Date().toISOString(),
+    readTime: 7,
+    tags: [
+      'Section 90',
+      'Withholding Tax',
+      'TDS Rates',
+      'Corporate Services',
+      'Consultancy Fees',
+      'Technical Services',
+      'Income Tax Act',
+      'Tax Compliance',
+      'NBR',
+      'Bangladesh'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1200&h=600',
+    likes: 38,
+    comments: 9
+  },
+  {
+    id: 'supply-contracts-section-89-withholding-tax-rules',
+    title: 'Supply Contracts Under Section 89 & Withholding Tax Rules: Complete Guide',
+    metaTitle: 'Supply Contracts Under Section 89 & Withholding Tax Rules Bangladesh',
+    metaDescription: 'Complete guide on Tax Deducted at Source (TDS) under Section 89 for supply contracts, manufacturing inputs, industrial raw materials, and withholding tax compliance in Bangladesh.',
+    excerpt: 'A comprehensive guide on Tax Deducted at Source (TDS) under Section 89 for general supply, manufacturing, raw materials, energy, and tobacco contracts in Bangladesh.',
+    content: `![Supply Contracts and Withholding Tax](https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Supply Contracts Under Section 89 & Withholding Tax Rules: Complete Guide
+## ধারা ৮৯ অনুযায়ী Supply Contract ও Withholding Tax Rules: বিস্তারিত গাইড
+
+Source: National Board of Revenue (NBR), Income Tax Act 2023, Section 89 & Withholding Tax Rules
+
+---
+
+## English Version
+
+### Introduction: Understanding Supply Contract TDS Rules
+
+Under **Section 89** of the Income Tax Act and related withholding tax rules, payments made against different types of supply contracts are subject to **Tax Deducted at Source (TDS)**. The applicable TDS rate depends on the nature of goods, industry, and type of contract.
+
+These rules are designed to ensure proper tax collection at the payment stage. Businesses making payments to suppliers, manufacturers, contractors, or service providers must deduct the applicable withholding tax before making payment.
+
+The correct identification of the supply category is important because applying an incorrect TDS rate may create tax compliance issues, penalties, and audit discrepancies.
+
+---
+
+### 1. General Supply & Manufacturing Contracts – 5% TDS
+
+**Applicable Activities:**
+A **5% TDS** rate applies to general supply and manufacturing-related contracts, including:
+- Manufacturing contracts
+- Processing or conversion contracts
+- Civil works contracts
+- Construction contracts
+- Engineering contracts
+
+**Explanation:**
+When a business enters into an agreement for manufacturing products, converting raw materials into finished goods, or completing construction and engineering-related work, the payment made under such contracts generally falls under the **5% withholding category**.
+
+**Example:**
+A company hires another company to manufacture customized machinery parts or complete a construction project. The payment made to the supplier or contractor will require deduction of 5% TDS.
+
+---
+
+### 2. Industrial Raw Materials & Packaging Materials Supply – 3% TDS
+
+**Applicable Products:**
+Supply of raw materials and packaging materials used in industrial production is subject to **3% TDS**.
+
+Examples include:
+- Industrial production raw materials
+- Manufacturing inputs
+- Packaging materials used by factories (cartons, drums, bottles, foils)
+
+**Explanation:**
+Industries often purchase large quantities of materials required for production. Since these supplies directly support manufacturing activities, a reduced TDS rate of **3%** is applicable.
+
+**Example:**
+A food processing company purchases packaging materials such as cartons, bottles, or industrial packaging from a supplier. The payment will attract 3% TDS.
+
+---
+
+### 3. Recycled Goods & Recycling Industry Inputs – 1% TDS
+
+**Applicable Supplies:**
+A **1% TDS** rate applies to:
+- Recycled plastic products
+- Recycled paper products
+- Recycled glass materials
+- Recycled lead products
+- Raw materials supplied to recycling industries
+
+**Explanation:**
+The government provides a lower withholding rate for recycling-related supplies to encourage recycling businesses and promote sustainable industrial activities and green manufacturing.
+
+**Example:**
+A recycling company purchases waste plastic materials for processing into recycled plastic products. The payment will be subject to 1% TDS.
+
+---
+
+### 4. Petroleum & Energy Supply – 1% and 3% TDS
+
+#### A. Oil Supply by Refinery Companies – 1% TDS
+Supply of petroleum products by oil refinery companies is subject to:
+- **TDS Rate:** 1%
+
+**Example:**
+A petroleum distributor purchases refined oil products from an authorized refinery company. The payment requires deduction of 1% withholding tax.
+
+#### B. Extra High Voltage Power Cable Manufacturing – 3% TDS
+Locally manufactured Extra High Voltage (EHV) power cables:
+- Voltage range: **33kV to 500kV**
+- Manufactured using **VCV (Vertical Continuous Vulcanization)** technology
+
+are subject to:
+- **TDS Rate:** 3%
+
+**Explanation:**
+These specialized power transmission cables are treated separately due to their industrial importance, heavy capital requirement, and infrastructure utility.
+
+---
+
+### 5. Tobacco Raw Materials Supply – 10% TDS
+
+**Applicable Industries:**
+Supply of tobacco raw materials to:
+- Cigarette manufacturing industries
+- Bidi manufacturing industries
+- Jarda manufacturing industries
+- Gul manufacturing industries
+
+is subject to:
+- **TDS Rate:** 10%
+
+**Explanation:**
+Due to the specific regulated nature of tobacco-related industries and public health policy, a higher withholding tax rate of 10% is applied.
+
+**Example:**
+A tobacco supplier provides raw tobacco leaves to a cigarette manufacturing company. The payment will require deduction of 10% TDS.
+
+---
+
+### 6. Unlisted Product Supplies – 5% TDS
+
+**Applicable Rule:**
+If a product supply does not fall under any specific category mentioned in the schedule, the standard withholding rate applies:
+- **TDS Rate:** 5%
+
+**Explanation:**
+This category works as a residual, general provision covering goods supplies that are not specifically classified under preferential or elevated rates.
+
+**Example:**
+A company purchases a type of industrial product that is not mentioned in the TDS schedule. The payment will generally attract 5% TDS.
+
+---
+
+### Summary Table: Supply Contract TDS Rates
+
+| Supply Category | Applicable TDS Rate |
+| :--- | :--- |
+| **Manufacturing, processing, civil works, construction & engineering contracts** | **5%** |
+| **Industrial raw materials and packaging materials** | **3%** |
+| **Recycled goods and recycling industry inputs** | **1%** |
+| **Oil supplied by refinery companies** | **1%** |
+| **Extra High Voltage power cables (33kV–500kV, VCV manufactured)** | **3%** |
+| **Tobacco raw materials** | **10%** |
+| **Other unlisted product supplies** | **5%** |
+
+---
+
+## বাংলা সংস্করণ
+
+### ধারা ৮৯ অনুযায়ী Supply Contract ও Withholding Tax (TDS) নিয়ম: বিস্তারিত আলোচনা
+
+#### ভূমিকা
+
+আয়কর আইন অনুযায়ী **Section 89** এবং সংশ্লিষ্ট **Withholding Tax Rules** অনুসারে বিভিন্ন ধরনের Supply Contract বা পণ্য সরবরাহের বিপরীতে অর্থ পরিশোধ করার সময় উৎসে কর বা **Tax Deducted at Source (TDS)** কর্তন করতে হয়।
+
+সরবরাহকৃত পণ্যের ধরন, শিল্পখাত এবং চুক্তির প্রকৃতির উপর ভিত্তি করে TDS-এর হার নির্ধারণ করা হয়।
+
+ব্যবসা প্রতিষ্ঠানগুলোকে সঠিক ক্যাটাগরি নির্বাচন করে নির্ধারিত হারে TDS কর্তন করতে হয়। ভুল হারে TDS কাটলে পরবর্তীতে কর সংক্রান্ত জটিলতা, জরিমানা ও নিরীক্ষা সংক্রান্ত আপত্তি তৈরি হতে পারে।
+
+---
+
+#### ১. General Supply ও Manufacturing Contract – ৫% TDS
+
+**প্রযোজ্য ক্ষেত্র:**
+নিম্নোক্ত কাজের ক্ষেত্রে **৫% TDS** প্রযোজ্য:
+- Manufacturing Contract
+- Processing বা Conversion Contract
+- Civil Works
+- Construction Contract
+- Engineering Contract
+
+**বিস্তারিত:**
+কোনো প্রতিষ্ঠান যদি অন্য কোনো প্রতিষ্ঠানকে পণ্য তৈরি, কাঁচামাল প্রক্রিয়াজাতকরণ, নির্মাণ কাজ বা ইঞ্জিনিয়ারিং কাজের জন্য নিয়োগ করে, তাহলে সেই চুক্তির অর্থ পরিশোধের সময় সাধারণত ৫% TDS কর্তন করতে হয়।
+
+**উদাহরণ:**
+একটি কোম্পানি অন্য একটি প্রতিষ্ঠানের মাধ্যমে বিশেষ ধরনের যন্ত্রাংশ তৈরি করালো। সেই প্রতিষ্ঠানের বিল পরিশোধের সময় ৫% TDS কর্তন করতে হবে।
+
+---
+
+#### ২. Industrial Raw Material ও Packaging Material Supply – ৩% TDS
+
+**প্রযোজ্য পণ্য:**
+শিল্প উৎপাদনে ব্যবহৃত:
+- কাঁচামাল (Raw materials)
+- উৎপাদন উপকরণ (Manufacturing inputs)
+- Packaging Materials (কার্টন, ড্রাম, বোতল, ফয়েল ইত্যাদি)
+
+সরবরাহের ক্ষেত্রে **৩% TDS** প্রযোজ্য।
+
+**বিস্তারিত:**
+কারখানা বা উৎপাদনকারী প্রতিষ্ঠানগুলো তাদের উৎপাদন কার্যক্রম চালানোর জন্য বিভিন্ন ধরনের কাঁচামাল ও প্যাকেজিং সামগ্রী ক্রয় করে। এসব শিল্প সংশ্লিষ্ট সরবরাহের ক্ষেত্রে কম হারে TDS নির্ধারণ করা হয়েছে।
+
+**উদাহরণ:**
+একটি খাদ্য উৎপাদনকারী প্রতিষ্ঠান কার্টন, বোতল বা প্যাকেজিং সামগ্রী ক্রয় করলে সেই পেমেন্টে ৩% TDS প্রযোজ্য হবে।
+
+---
+
+#### ৩. Recycled Goods ও Recycling Industry Inputs – ১% TDS
+
+**প্রযোজ্য পণ্য:**
+নিম্নোক্ত পণ্যের ক্ষেত্রে **১% TDS**:
+- Recycled Plastic
+- Recycled Paper
+- Recycled Glass
+- Recycled Lead
+- Recycling Industry-এর কাঁচামাল
+
+**বিস্তারিত:**
+পুনর্ব্যবহারযোগ্য পণ্য উৎপাদনকারী প্রতিষ্ঠানকে উৎসাহিত করার জন্য এবং পরিবেশবান্ধব উৎপাদনকে বেগবান করতে এসব সরবরাহে তুলনামূলক কম TDS হার রাখা হয়েছে।
+
+**উদাহরণ:**
+একটি Recycling Factory বর্জ্য প্লাস্টিক কিনে পুনরায় ব্যবহারযোগ্য পণ্য তৈরি করলে সেই পেমেন্টে ১% TDS কর্তন করতে হবে।
+
+---
+
+#### ৪. Petroleum ও Energy Supply – ১% এবং ৩% TDS
+
+##### ক) Oil Refinery Company-এর Oil Supply – ১% TDS
+তেল পরিশোধনকারী কোম্পানি থেকে সরবরাহকৃত তেলের ক্ষেত্রে:
+- **TDS হার:** ১%
+
+**উদাহরণ:**
+একজন ডিলার কোনো Oil Refinery Company থেকে পরিশোধিত তেল কিনলে পেমেন্টের সময় ১% TDS কর্তন করতে হবে।
+
+##### খ) Extra High Voltage Power Cable – ৩% TDS
+স্থানীয়ভাবে উৎপাদিত:
+- ৩৩kV থেকে ৫০০kV ক্ষমতার Power Cable
+- VCV Line (Vertical Continuous Vulcanization) প্রযুক্তিতে তৈরি
+
+এর ক্ষেত্রে:
+- **TDS হার:** ৩%
+
+---
+
+#### ৫. Tobacco Raw Materials Supply – ১০% TDS
+
+**প্রযোজ্য শিল্প:**
+নিম্নোক্ত শিল্পে সরবরাহকৃত তামাকের কাঁচামালের ক্ষেত্রে:
+- Cigarette Industry
+- Bidi Industry
+- Jarda Industry
+- Gul Manufacturing Industry
+
+**১০% TDS** কর্তন করতে হবে।
+
+**বিস্তারিত:**
+তামাকজাত পণ্যের উপর বিশেষ কর নিয়ন্ত্রণ এবং জনস্বাস্থ্য সুরক্ষার অংশ হিসেবে এই খাতে তুলনামূলক বেশি TDS হার নির্ধারণ করা হয়েছে।
+
+---
+
+#### ৬. তালিকাভুক্ত নয় এমন Product Supply – ৫% TDS
+
+**নিয়ম:**
+যেসব পণ্য নির্দিষ্ট কোনো TDS ক্যাটাগরিতে উল্লেখ নেই, সেসব পণ্য সরবরাহের ক্ষেত্রে সাধারণ হার প্রযোজ্য হবে:
+- **TDS হার:** ৫%
+
+**উদাহরণ:**
+কোনো প্রতিষ্ঠান এমন কোনো পণ্য ক্রয় করল যা TDS Schedule-এ আলাদাভাবে উল্লেখ নেই, তাহলে সাধারণত ৫% TDS কর্তন করতে হবে।
+
+---
+
+#### Supply Contract TDS Rate সংক্ষেপে
+
+| Supply Category | প্রযোজ্য TDS Rate |
+| :--- | :--- |
+| **Manufacturing, Processing, Civil Works, Construction ও Engineering Contract** | **৫%** |
+| **Industrial Raw Material ও Packaging Material** | **৩%** |
+| **Recycled Goods ও Recycling Industry Materials** | **১%** |
+| **Oil Refinery Company-এর Oil Supply** | **১%** |
+| **Extra High Voltage Power Cable (33kV–500kV, VCV Line)** | **৩%** |
+| **Tobacco Raw Materials** | **১০%** |
+| **অন্যান্য Unlisted Product Supply** | **৫%** |
+
+---
+
+### Conclusion / উপসংহার
+
+Supply Contract-এর ক্ষেত্রে সঠিক TDS হার নির্ধারণ করা ব্যবসার কর compliance-এর একটি গুরুত্বপূর্ণ অংশ। পণ্যের ধরন, ব্যবহার এবং শিল্পখাত অনুযায়ী TDS হার পরিবর্তিত হতে পারে। তাই প্রতিটি Supply Agreement বা Purchase Contract-এর আগে সংশ্লিষ্ট TDS category যাচাই করা জরুরি।`,
+    author: mockAuthors.a2,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    publishedAt: new Date().toISOString(),
+    readTime: 6,
+    tags: ['Section 89', 'Withholding Tax', 'TDS Rates', 'Supply Contracts', 'Income Tax Act', 'Tax Compliance', 'NBR', 'Bangladesh'],
+    imageUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=1200&h=600',
+    likes: 24,
+    comments: 6
+  },
   {
     id: 'rjsc-registration-fees',
     title: 'RJSC Registration Fees in Bangladesh: Complete Guide',
@@ -300,7 +1605,7 @@ RJSC নিবন্ধনের মোট খরচ নির্ভর কর�
     category: 'Corporate Law',
     categoryId: 'corporate',
     publishedAt: new Date().toISOString(),
-    readTime: '8',
+    readTime: 8,
     tags: ['RJSC', 'Company Registration', 'Corporate Law', 'Business Setup', 'Bangladesh'],
     imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=1200&h=600'
   },

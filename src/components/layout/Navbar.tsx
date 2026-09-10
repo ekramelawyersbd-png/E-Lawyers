@@ -21,7 +21,11 @@ import {
   Bookmark,
   Settings,
   LayoutDashboard,
-  LogOut
+  LogOut,
+  Users,
+  Award,
+  MessageSquare,
+  Calendar
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
@@ -33,15 +37,19 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [blogOpen, setBlogOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [communityOpen, setCommunityOpen] = useState(false);
   const [mobileBlogOpen, setMobileBlogOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
+  const [mobileCommunityOpen, setMobileCommunityOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   
   const blogDropdownRef = useRef<HTMLDivElement>(null);
   const resourcesDropdownRef = useRef<HTMLDivElement>(null);
+  const communityDropdownRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const blogTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const communityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -144,6 +152,12 @@ export function Navbar() {
       icon: FileText 
     },
     { 
+      name: 'TDS Reference', 
+      path: '/tds-guide', 
+      description: 'Section 89, 90 & 119 TDS rates & database',
+      icon: BookOpen 
+    },
+    { 
       name: 'Training & CPD', 
       path: '/training', 
       description: 'Webinars, masterclasses & legal workshops',
@@ -157,11 +171,42 @@ export function Navbar() {
     },
   ];
 
+  const communityLinks = [
+    { 
+      name: 'Experts Directory', 
+      path: '/community?tab=experts', 
+      description: 'Verified lawyers, tax practitioners & CAs',
+      icon: Award 
+    },
+    { 
+      name: 'Discussions & Q&A', 
+      path: '/community?tab=discussions', 
+      description: 'Ask questions & discuss BD regulations',
+      icon: MessageSquare 
+    },
+    { 
+      name: 'Events & CPD Workshops', 
+      path: '/training', 
+      description: 'Webinars, masterclasses & legal workshops',
+      icon: Calendar 
+    },
+    { 
+      name: 'Community Hub & Rankings', 
+      path: '/community', 
+      description: 'Overview, networking & monthly top contributors',
+      icon: Users 
+    },
+  ];
+
   const isBlogActive = blogCategories.some(link => location.pathname === link.path) || 
     location.pathname.startsWith('/category/') || 
     location.pathname.startsWith('/article/');
     
   const isResourceActive = resourceLinks.some(link => location.pathname === link.path);
+
+  const isCommunityActive = location.pathname === '/community' || 
+    location.pathname === '/experts' || 
+    location.pathname === '/discussions';
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -171,6 +216,9 @@ export function Navbar() {
       }
       if (resourcesDropdownRef.current && !resourcesDropdownRef.current.contains(event.target as Node)) {
         setResourcesOpen(false);
+      }
+      if (communityDropdownRef.current && !communityDropdownRef.current.contains(event.target as Node)) {
+        setCommunityOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
@@ -184,9 +232,10 @@ export function Navbar() {
   useEffect(() => {
     setBlogOpen(false);
     setResourcesOpen(false);
+    setCommunityOpen(false);
     setIsOpen(false);
     setUserMenuOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   const handleBlogMouseEnter = () => {
     if (blogTimeoutRef.current) clearTimeout(blogTimeoutRef.current);
@@ -207,6 +256,17 @@ export function Navbar() {
   const handleResourcesMouseLeave = () => {
     resourcesTimeoutRef.current = setTimeout(() => {
       setResourcesOpen(false);
+    }, 150);
+  };
+
+  const handleCommunityMouseEnter = () => {
+    if (communityTimeoutRef.current) clearTimeout(communityTimeoutRef.current);
+    setCommunityOpen(true);
+  };
+
+  const handleCommunityMouseLeave = () => {
+    communityTimeoutRef.current = setTimeout(() => {
+      setCommunityOpen(false);
     }, 150);
   };
 
@@ -274,7 +334,7 @@ export function Navbar() {
                 aria-expanded={blogOpen}
                 aria-haspopup="true"
               >
-                <span>Blog</span>
+                <span>Articles</span>
                 <ChevronDown 
                   className={cn(
                     "w-3.5 h-3.5 transition-transform duration-200", 
@@ -292,7 +352,7 @@ export function Navbar() {
                 >
                   <div className="flex items-center justify-between pb-2 mb-2 px-2 border-b border-slate-100">
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                      Blog Categories & Law Topics
+                      Articles & Law Categories
                     </span>
                     <Link 
                       to="/search" 
@@ -439,16 +499,103 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Community */}
-            <Link
-              to="/community"
-              className={cn(
-                "inline-block text-[12px] xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300 ease-out hover:scale-[1.05] hover:-translate-y-[1px] hover:text-emerald-600 py-2 border-b-2",
-                location.pathname === '/community' ? "text-emerald-700 border-emerald-700" : "text-slate-600 border-transparent"
-              )}
+            {/* Dynamic Community Dropdown Menu */}
+            <div 
+              ref={communityDropdownRef} 
+              className="relative inline-block"
+              onMouseEnter={handleCommunityMouseEnter}
+              onMouseLeave={handleCommunityMouseLeave}
             >
-              Community
-            </Link>
+              <button
+                type="button"
+                onClick={() => setCommunityOpen((prev) => !prev)}
+                className={cn(
+                  "inline-flex items-center gap-1 text-[12px] xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300 ease-out hover:scale-[1.05] hover:-translate-y-[1px] hover:text-emerald-600 py-2 border-b-2 focus:outline-none",
+                  isCommunityActive || communityOpen
+                    ? "text-emerald-700 border-emerald-700" 
+                    : "text-slate-600 border-transparent"
+                )}
+                aria-expanded={communityOpen}
+                aria-haspopup="true"
+              >
+                <span>Community</span>
+                <ChevronDown 
+                  className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-200", 
+                    communityOpen ? "rotate-180 text-emerald-700" : "text-slate-400"
+                  )} 
+                />
+              </button>
+
+              {/* Community Dropdown Panel */}
+              {communityOpen && (
+                <div 
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[440px] bg-white rounded-2xl shadow-xl border border-slate-100 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  <div className="flex items-center justify-between pb-2 mb-2 px-2 border-b border-slate-100">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                      Professional Network & Q&A
+                    </span>
+                    <Link 
+                      to="/community" 
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 transition-colors"
+                      onClick={() => setCommunityOpen(false)}
+                    >
+                      Community Hub →
+                    </Link>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {communityLinks.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = 
+                        item.path === '/community'
+                          ? location.pathname === '/community' && !location.search
+                          : item.path.includes('?')
+                          ? location.pathname === '/community' && location.search.includes(item.path.split('?')[1])
+                          : location.pathname === item.path;
+
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.path}
+                          onClick={() => setCommunityOpen(false)}
+                          className={cn(
+                            "flex items-start gap-3 p-2.5 rounded-xl transition-all duration-200 group text-left",
+                            isActive 
+                              ? "bg-emerald-50/80 border border-emerald-200/60" 
+                              : "hover:bg-slate-50 border border-transparent hover:border-slate-100"
+                          )}
+                          role="menuitem"
+                        >
+                          <div className={cn(
+                            "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                            isActive 
+                              ? "bg-emerald-600 text-white shadow-sm" 
+                              : "bg-slate-100 text-slate-600 group-hover:bg-emerald-600 group-hover:text-white"
+                          )}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className={cn(
+                              "text-xs font-bold transition-colors leading-tight",
+                              isActive ? "text-emerald-900" : "text-slate-900 group-hover:text-emerald-700"
+                            )}>
+                              {item.name}
+                            </div>
+                            <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 leading-normal">
+                              {item.description}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Contact */}
             <a
@@ -718,17 +865,48 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Mobile Community */}
-            <Link
-              to="/community"
-              className={cn(
-                "block px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                location.pathname === '/community' ? "text-emerald-700 bg-emerald-50" : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+            {/* Mobile Community Accordion */}
+            <div className="border-b border-slate-100 py-1 my-2">
+              <button
+                type="button"
+                onClick={() => setMobileCommunityOpen(prev => !prev)}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
+                  isCommunityActive ? "text-emerald-700 bg-emerald-50/50" : "text-slate-700 hover:text-emerald-700"
+                )}
+              >
+                <span className="flex items-center gap-2">Community</span>
+                <ChevronDown className={cn("w-5 h-5 transition-transform duration-200", mobileCommunityOpen && "rotate-180")} />
+              </button>
+
+              {mobileCommunityOpen && (
+                <div className="pl-4 pr-2 py-2 space-y-1 bg-slate-50/50 rounded-xl my-1">
+                  {communityLinks.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = 
+                      item.path === '/community'
+                        ? location.pathname === '/community' && !location.search
+                        : item.path.includes('?')
+                        ? location.pathname === '/community' && location.search.includes(item.path.split('?')[1])
+                        : location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold transition-colors",
+                          isActive ? "text-emerald-700 bg-emerald-100/60" : "text-slate-600 hover:text-slate-900"
+                        )}
+                      >
+                        <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-              onClick={() => setIsOpen(false)}
-            >
-              Community
-            </Link>
+            </div>
 
             {/* Mobile Contact */}
             <a

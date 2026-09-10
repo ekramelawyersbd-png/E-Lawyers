@@ -22,6 +22,9 @@ import { VatGuide } from './pages/VatGuide';
 import { Contact } from './pages/Contact';
 import { Auth } from './pages/Auth';
 import { FaqPage } from './pages/FaqPage';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsConditions } from './pages/TermsConditions';
+import { TdsReference } from './pages/TdsReference';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -36,6 +39,8 @@ export default function App() {
             <Route path="category/:id" element={<Category />} />
             <Route path="article/:id" element={<Article />} />
             <Route path="community" element={<Community />} />
+            <Route path="experts" element={<Community initialTab="experts" />} />
+            <Route path="discussions" element={<Community initialTab="discussions" />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="tools" element={<ToolsHub />} />
             <Route path="training" element={<TrainingHub />} />
@@ -47,8 +52,11 @@ export default function App() {
             <Route path="policy-analysis" element={<TaxPolicyAnalysis />} />
             <Route path="team" element={<Team />} />
             <Route path="vat-guide" element={<VatGuide />} />
+            <Route path="tds-guide" element={<TdsReference />} />
             <Route path="contact" element={<Contact />} />
             <Route path="auth" element={<Auth />} />
+            <Route path="privacy" element={<PrivacyPolicy />} />
+            <Route path="terms" element={<TermsConditions />} />
           </Route>
         </Routes>
       </BrowserRouter>
