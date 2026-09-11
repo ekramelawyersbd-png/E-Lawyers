@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X, HelpCircle, Send, Tag, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, HelpCircle, Send, Tag, Sparkles, CheckCircle2, Calendar, ExternalLink } from 'lucide-react';
 import { Question } from '../../data/communityData';
+import { buildAppointmentUrl } from '../../utils/appointmentRedirect';
 
 interface AskQuestionModalProps {
   isOpen: boolean;
@@ -99,6 +100,34 @@ export function AskQuestionModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
+            {/* Confidential Consultation Referral to Appointment Portal */}
+            <div className="p-3.5 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+              <div>
+                <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-700" />
+                  Need confidential 1-on-1 legal advice?
+                </p>
+                <p className="text-[11px] text-slate-600 mt-0.5">
+                  Connect privately with {targetedExpertName || 'a corporate lawyer or tax specialist'}.
+                </p>
+              </div>
+              <a
+                href={buildAppointmentUrl({
+                  lawyer: targetedExpertName,
+                  service: category,
+                  notes: title || content,
+                  name: authorName,
+                  source: 'Ask Question Modal Banner'
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs"
+              >
+                <span>Book Appointment</span>
+                <ExternalLink className="w-3 h-3 text-emerald-200" />
+              </a>
+            </div>
+
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Question Headline *

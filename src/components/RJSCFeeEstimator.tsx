@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Calculator, Building2, CalendarClock, Receipt } from 'lucide-react';
+import { Calculator, Building2, CalendarClock, Receipt, ExternalLink, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LegalTooltip } from './LegalTooltip';
+import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 
 export function RJSCFeeEstimator() {
   const [entityType, setEntityType] = useState<string>('pvt');
@@ -136,17 +137,34 @@ export function RJSCFeeEstimator() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="flex items-center gap-4 bg-white px-5 py-3 rounded-xl border border-emerald-200 shadow-sm w-full sm:w-auto"
+                className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto"
               >
-                <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
-                  <Receipt className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Estimated Fee</div>
-                  <div className="text-2xl font-black text-slate-900">
-                    ৳ {estimatedFee.toLocaleString()}
+                <div className="flex items-center gap-4 bg-white px-5 py-3 rounded-xl border border-emerald-200 shadow-sm w-full sm:w-auto">
+                  <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+                    <Receipt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Estimated Fee</div>
+                    <div className="text-2xl font-black text-slate-900">
+                      ৳ {estimatedFee.toLocaleString()}
+                    </div>
                   </div>
                 </div>
+
+                <a
+                  href={buildAppointmentUrl({
+                    service: 'RJSC Annual Return & Compliance',
+                    notes: `Entity: ${entityType}, Filing Period: ${filingPeriod}, Est. Gov Fee: ৳${estimatedFee}`,
+                    source: 'RJSC Fee Estimator'
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm whitespace-nowrap"
+                >
+                  <Calendar className="w-4 h-4 text-emerald-200" />
+                  <span>Consult Lawyer for Filing</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
+                </a>
               </motion.div>
             ) : (
               <motion.div 

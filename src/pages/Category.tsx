@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { calculateReadingTime } from '../utils/readingTime';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
-import { Filter, Search, Clock } from 'lucide-react';
+import { Filter, Search, Clock, Calendar, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 
 export function Category() {
   const { id } = useParams();
@@ -93,6 +94,33 @@ export function Category() {
           <p className="text-slate-500 text-lg font-bold">No articles found in this category yet.</p>
         </div>
       )}
+      {/* Category Lawyer Consultation Banner */}
+      <div className="mt-14 bg-gradient-to-r from-emerald-900 to-slate-900 rounded-3xl p-8 sm:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-emerald-800/40">
+        <div className="max-w-xl">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-800/60 text-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+            <Calendar className="w-3.5 h-3.5" /> Direct Counsel
+          </span>
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            Need Expert Counsel in {category.name}?
+          </h3>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Schedule a confidential 1-on-1 session with our Supreme Court advocates and senior corporate tax partners.
+          </p>
+        </div>
+        <a
+          href={buildAppointmentUrl({
+            service: category.name,
+            source: `Category Page - ${category.name}`
+          })}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-2xl transition-all shadow-lg hover:shadow-emerald-500/20 whitespace-nowrap text-sm shrink-0"
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Book Consultation</span>
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
     </div>
   );
 }

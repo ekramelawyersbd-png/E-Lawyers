@@ -1,8 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { Calculator, ShieldAlert, CheckCircle2, AlertCircle, ArrowRight, DollarSign } from 'lucide-react';
+import { Calculator, ShieldAlert, CheckCircle2, AlertCircle, ArrowRight, DollarSign, Bookmark, RotateCcw, Calendar, ExternalLink } from 'lucide-react';
+import { TaxScenarioManager } from '../components/tax/TaxScenarioManager';
+import { TaxDeadlineNotification } from '../components/tax/TaxDeadlineNotification';
+import { TaxCategory, TaxLocation, TaxScenario, TaxScenarioInputs } from '../types/taxScenario';
+import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 
-type Category = 'general' | 'female_senior' | 'disabled' | 'freedom_fighter';
-type Location = 'dhaka_ctg' | 'other_cc' | 'non_cc';
+type Category = TaxCategory;
+type Location = TaxLocation;
 
 export function TaxPlanner() {
   const [income, setIncome] = useState<string>('');
@@ -12,6 +16,27 @@ export function TaxPlanner() {
   const [disabledDependents, setDisabledDependents] = useState<number>(0);
   const [location, setLocation] = useState<Location>('dhaka_ctg');
   const [isFirstTimeFiler, setIsFirstTimeFiler] = useState<boolean>(false);
+
+  const handleLoadScenario = (sc: TaxScenario) => {
+    setIncome(sc.inputs.income);
+    setInvestment(sc.inputs.investment);
+    setTds(sc.inputs.tds);
+    setCategory(sc.inputs.category);
+    setDisabledDependents(sc.inputs.disabledDependents);
+    setLocation(sc.inputs.location);
+    setIsFirstTimeFiler(sc.inputs.isFirstTimeFiler);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleResetInputs = () => {
+    setIncome('');
+    setInvestment('');
+    setTds('');
+    setCategory('general');
+    setDisabledDependents(0);
+    setLocation('dhaka_ctg');
+    setIsFirstTimeFiler(false);
+  };
 
   // Compute logic
   const results = useMemo(() => {
@@ -90,10 +115,20 @@ export function TaxPlanner() {
 
   }, [income, investment, tds, category, disabledDependents, location, isFirstTimeFiler]);
 
+  const currentInputs: TaxScenarioInputs = useMemo(() => ({
+    income,
+    investment,
+    tds,
+    category,
+    disabledDependents,
+    location,
+    isFirstTimeFiler
+  }), [income, investment, tds, category, disabledDependents, location, isFirstTimeFiler]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       
-      <div className="text-center max-w-3xl mx-auto mb-12">
+      <div className="text-center max-w-3xl mx-auto mb-8">
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">
           Individual Income <span className="text-emerald-600">Tax Planner</span>
         </h1>
@@ -102,13 +137,35 @@ export function TaxPlanner() {
         </p>
       </div>
 
+      {/* Tax Filing Deadline Notification Component */}
+      <div className="mb-10">
+        <TaxDeadlineNotification
+          currentInputs={currentInputs}
+          currentResults={results}
+          onLoadScenario={handleLoadScenario}
+        />
+      </div>
+
       <div className="grid lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Form */}
         <div className="lg:col-span-7 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/60">
-          <div className="flex items-center gap-3 mb-6">
-            <Calculator className="w-6 h-6 text-emerald-500" />
-            <h2 className="text-2xl font-bold text-slate-900">Tax Inputs</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Calculator className="w-6 h-6 text-emerald-500" />
+              <h2 className="text-2xl font-bold text-slate-900">Tax Inputs</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                id="reset-tax-planner-inputs-btn"
+                onClick={handleResetInputs}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                title="Clear all fields"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Clear
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -280,6 +337,30 @@ export function TaxPlanner() {
             </div>
           </div>
 
+          {/* Lawyer / Tax Practitioner Consultation CTA */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-emerald-800">
+              <Calendar className="w-5 h-5 text-emerald-600" />
+              <h4 className="font-bold text-sm text-slate-900">Need Certified Legal or Tax Review?</h4>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Have our accredited Supreme Court tax advocates and chartered accountants review your deductions, verify minimum tax rules, and file your statutory return.
+            </p>
+            <a
+              href={buildAppointmentUrl({
+                service: 'Individual Tax Planning & Assessment',
+                notes: `Taxable Income: ${results.taxableIncome.toLocaleString()} BDT, Estimated Liability: ${results.finalLiability.toLocaleString()} BDT, Region: ${location}`,
+                source: 'Tax Planner Results'
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm group"
+            >
+              <span>Book Tax Consultation</span>
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+          </div>
+
           {results.taxableIncome > 0 && results.finalLiability === results.minimumTax && (
             <div className="bg-amber-50 rounded-2xl p-5 border border-amber-200 flex gap-4 items-start">
               <ShieldAlert className="w-6 h-6 text-amber-600 shrink-0" />
@@ -293,6 +374,13 @@ export function TaxPlanner() {
           )}
         </div>
       </div>
+
+      {/* Local Storage Scenario Management & Comparator */}
+      <TaxScenarioManager
+        currentInputs={currentInputs}
+        currentResults={results}
+        onLoadScenario={handleLoadScenario}
+      />
     </div>
   );
 }

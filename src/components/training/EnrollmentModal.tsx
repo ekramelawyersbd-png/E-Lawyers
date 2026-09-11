@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2, ExternalLink, Calendar } from 'lucide-react';
+import { redirectToAppointment, buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
 interface EnrollmentModalProps {
   isOpen: boolean;
@@ -46,6 +47,16 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
     } catch (err) {
       console.error('Failed to save enrollment', err);
     }
+
+    // Automatically redirect to centralized appointment portal in a new tab
+    redirectToAppointment({
+      name,
+      email,
+      phone,
+      service: `Training & Legal Career: ${title}`,
+      notes: `Course: ${title} (${price || 'Standard'}). Registrant: ${name}`,
+      source: 'Course Enrollment Form'
+    });
   };
 
   return (
@@ -64,16 +75,35 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
               <div className="mx-auto w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Enrollment Successful!</h3>
-              <p className="text-slate-600 mb-6">
-                Thank you for registering your interest in <strong className="text-slate-900">{title}</strong>. We will contact you soon.
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Enrollment Request Forwarded!</h3>
+              <p className="text-slate-600 mb-6 text-sm">
+                Your details for <strong className="text-slate-900">{title}</strong> were recorded and transferred to our appointment scheduling system.
               </p>
-              <button
-                onClick={onClose}
-                className="w-full py-3 px-4 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-sm"
-              >
-                Close
-              </button>
+              <div className="space-y-3">
+                <a
+                  href={buildAppointmentUrl({
+                    name,
+                    email,
+                    phone,
+                    service: `Training & Legal Career: ${title}`,
+                    notes: `Course: ${title} (${price || 'Standard'}). Registrant: ${name}`,
+                    source: 'Course Enrollment Confirmation'
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-4 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center justify-center gap-2 text-sm"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>Open Appointment Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+                <button
+                  onClick={onClose}
+                  className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors text-sm"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 text-left">

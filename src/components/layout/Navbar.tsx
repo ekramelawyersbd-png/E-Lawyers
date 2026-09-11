@@ -32,6 +32,7 @@ import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { getSavedItems } from '../../utils/readingList';
 import { LanguageToggle } from '../LanguageToggle';
+import { TaxDeadlineNavDropdown } from '../tax/TaxDeadlineNavDropdown';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -632,6 +633,9 @@ export function Navbar() {
                <input name="search" type="text" placeholder="Search..." className="bg-slate-100 border border-transparent rounded-full py-2 pl-9 pr-3 text-xs sm:text-sm w-36 xl:w-52 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:border-emerald-200 text-slate-900 transition-all focus:w-48 xl:focus:w-64 shadow-inner" />
             </form>
             
+            {/* Tax Deadline Notification Alerts */}
+            <TaxDeadlineNavDropdown />
+
             {/* Help / Support Icon */}
             <div className="relative group hidden sm:block">
               <Link

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Calendar, ExternalLink } from 'lucide-react';
 import { NewsletterSignup } from '../NewsletterSignup';
+import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
 export function Footer() {
   return (
@@ -44,10 +45,40 @@ export function Footer() {
           <div>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Quick Links</h3>
             <ul className="space-y-4 text-sm font-medium">
-              <li><Link to="/about" className="hover:text-emerald-400 transition-colors">About E-Lawyers blog</Link></li>
-              <li><Link to="/services/legal" className="hover:text-emerald-400 transition-colors">Legal Services</Link></li>
-              <li><Link to="/services/tax" className="hover:text-emerald-400 transition-colors">Tax Services</Link></li>
-              <li><Link to="/services/corporate" className="hover:text-emerald-400 transition-colors">Corporate Services</Link></li>
+              <li><Link to="/team" className="hover:text-emerald-400 transition-colors">Our Professional Team</Link></li>
+              <li>
+                <a 
+                  href={buildAppointmentUrl({ service: 'Legal Advisory & Litigation', source: 'Footer Legal Services' })} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Legal Services</span>
+                  <ExternalLink className="w-3 h-3 text-slate-500" />
+                </a>
+              </li>
+              <li>
+                <a 
+                  href={buildAppointmentUrl({ service: 'Income Tax & Assessment', source: 'Footer Tax Services' })} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Tax Services</span>
+                  <ExternalLink className="w-3 h-3 text-slate-500" />
+                </a>
+              </li>
+              <li>
+                <a 
+                  href={buildAppointmentUrl({ service: 'Corporate Law & RJSC Compliance', source: 'Footer Corporate Services' })} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Corporate Services</span>
+                  <ExternalLink className="w-3 h-3 text-slate-500" />
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -57,17 +88,27 @@ export function Footer() {
               <li><Link to="/" className="hover:text-emerald-400 transition-colors">Blog Categories</Link></li>
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
               <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
-              <li><a href="https://appointment.accounticca.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">Contact Us</a></li>
+              <li>
+                <a 
+                  href={APPOINTMENT_BASE_URL} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Contact Us</span>
+                  <ExternalLink className="w-3 h-3 text-slate-500" />
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Get in Touch</h3>
             <p className="text-sm text-slate-500 font-medium mb-4">
-              Need immediate legal or tax assistance? Contact our experts today.
+              Need immediate legal or tax assistance? Connect directly with our experts on our appointment platform.
             </p>
             <a 
-              href="https://appointment.accounticca.com" 
+              href={APPOINTMENT_BASE_URL} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"

@@ -1,6 +1,7 @@
 import { teamMembers } from '../data/teamData';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { Linkedin, Facebook, Youtube, MessageCircle, Mail, Phone, Calendar, ExternalLink } from 'lucide-react';
+import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
 
 export function Team() {
   return (
@@ -13,10 +14,10 @@ export function Team() {
           Meet the dedicated legal, tax, and corporate experts at E-Lawyers committed to delivering excellence.
         </p>
         <a
-          href="https://appointment.accounticca.com"
+          href={APPOINTMENT_BASE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all"
+          className="inline-flex items-center gap-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all"
         >
           <Calendar className="w-4 h-4 text-emerald-100" />
           <span>Book Consultation with Legal & Tax Team</span>
@@ -66,17 +67,35 @@ export function Team() {
                   </a>
                 )}
                 {member.whatsapp && (
-                  <a href={member.whatsapp.replace('WhatsApp Chat: ', '')} target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-100 text-slate-600 hover:bg-[#25d366] hover:text-white rounded-full transition-colors" title="WhatsApp">
+                  <a 
+                    href={buildAppointmentUrl({ lawyer: member.name, service: member.position, source: 'Team WhatsApp Inquiry' })} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="p-2 bg-slate-100 text-slate-600 hover:bg-[#25d366] hover:text-white rounded-full transition-colors" 
+                    title={`Request WhatsApp consultation with ${member.name}`}
+                  >
                     <MessageCircle className="w-4 h-4" />
                   </a>
                 )}
                 {member.email && (
-                  <a href={`mailto:${member.email}`} className="p-2 bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white rounded-full transition-colors" title="Email">
+                  <a 
+                    href={buildAppointmentUrl({ lawyer: member.name, service: member.position, source: 'Team Email Inquiry' })} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="p-2 bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white rounded-full transition-colors" 
+                    title={`Send inquiry to ${member.name} via appointment portal`}
+                  >
                     <Mail className="w-4 h-4" />
                   </a>
                 )}
                 {member.phone && (
-                  <a href={`tel:${member.phone.replace(/[^0-9+]/g, '')}`} className="p-2 bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white rounded-full transition-colors" title="Phone">
+                  <a 
+                    href={buildAppointmentUrl({ lawyer: member.name, service: member.position, source: 'Team Phone Inquiry' })} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="p-2 bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white rounded-full transition-colors" 
+                    title={`Book phone slot with ${member.name}`}
+                  >
                     <Phone className="w-4 h-4" />
                   </a>
                 )}
@@ -84,10 +103,10 @@ export function Team() {
 
               <div className="mt-4 pt-3 border-t border-slate-100">
                 <a
-                  href="https://appointment.accounticca.com"
+                  href={buildAppointmentUrl({ lawyer: member.name, service: member.position, source: 'Team Member Card' })}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full text-center py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Calendar className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Book Consultation</span>

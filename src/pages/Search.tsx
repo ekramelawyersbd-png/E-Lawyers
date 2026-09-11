@@ -4,7 +4,8 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Search as SearchIcon, History, X, Clock } from 'lucide-react';
+import { Search as SearchIcon, History, X, Clock, Calendar, ExternalLink } from 'lucide-react';
+import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 
 const RECENT_SEARCHES_KEY = 'elawyers_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
@@ -237,12 +238,28 @@ export function Search() {
           ))}
         </div>
       ) : (
-        <div id="search-no-results" className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div id="search-no-results" className="text-center py-16 px-6 bg-white rounded-3xl border border-slate-200 shadow-sm max-w-2xl mx-auto">
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <SearchIcon className="w-8 h-8 text-slate-400" />
           </div>
-          <p className="text-slate-500 text-lg font-bold mb-2">No articles found</p>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">Try adjusting your search terms or browse our categories to find what you're looking for.</p>
+          <p className="text-slate-900 text-lg font-bold mb-2">No articles found{query ? ` for "${query}"` : ''}</p>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
+            Looking for customized legal advice or tax representation on this topic? Connect directly with our panel of practicing lawyers.
+          </p>
+          <a
+            href={buildAppointmentUrl({
+              service: 'Legal & Tax Consultation',
+              notes: query ? `Search query: ${query}` : undefined,
+              source: 'Search Page - No Results'
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-bold transition-all shadow-sm"
+          >
+            <Calendar className="w-4 h-4 text-emerald-200" />
+            <span>Book Consultation on Appointment Portal</span>
+            <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
+          </a>
         </div>
       )}
     </div>

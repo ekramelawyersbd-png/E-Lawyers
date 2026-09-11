@@ -11,9 +11,12 @@ import {
   Menu,
   X,
   FileSignature,
-  Bookmark
+  Bookmark,
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
 export function QuickAccessDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,6 +143,19 @@ export function QuickAccessDrawer() {
         </div>
         
         <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2">
+          <a
+            href={APPOINTMENT_BASE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center justify-between w-full py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm group"
+          >
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-emerald-200" />
+              <span>Book Legal Consultation</span>
+            </div>
+            <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+          </a>
           <Link
             to="/dashboard?tab=bookmarks"
             id="drawer-bookmarks-link"

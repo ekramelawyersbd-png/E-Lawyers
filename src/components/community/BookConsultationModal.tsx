@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X, Calendar, Clock, CheckCircle2, ShieldCheck, CreditCard } from 'lucide-react';
+import { X, Calendar, Clock, ExternalLink, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Expert } from '../../data/communityData';
+import { redirectToAppointment, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
 interface BookConsultationModalProps {
   expert: Expert | null;
@@ -19,17 +20,32 @@ export function BookConsultationModal({
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
 
   if (!isOpen || !expert) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
-    setTimeout(() => {
-      setIsSuccess(false);
-      onClose();
-    }, 2000);
+    redirectToAppointment({
+      name: clientName,
+      email: clientEmail,
+      phone: clientPhone,
+      date,
+      time: timeSlot,
+      notes: topic,
+      lawyer: expert.name,
+      service: expert.role,
+      source: 'Expert Consultation Modal'
+    });
+    onClose();
+  };
+
+  const handleDirectBooking = () => {
+    redirectToAppointment({
+      lawyer: expert.name,
+      service: expert.role,
+      source: 'Direct Expert Booking'
+    });
+    onClose();
   };
 
   return (
@@ -47,7 +63,7 @@ export function BookConsultationModal({
               className="w-12 h-12 rounded-2xl object-cover border-2 border-emerald-100"
             />
             <div>
-              <h3 className="text-lg font-extrabold text-slate-900">Book Consultation</h3>
+              <h3 className="text-lg font-extrabold text-slate-900">Schedule Consultation</h3>
               <p className="text-xs text-emerald-700 font-semibold">{expert.name} • {expert.role}</p>
             </div>
           </div>
@@ -59,144 +75,136 @@ export function BookConsultationModal({
           </button>
         </div>
 
-        {isSuccess ? (
-          <div className="p-10 text-center flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-8 h-8" />
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
+          <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 text-slate-600">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Standard Advisory:</span>
             </div>
-            <h4 className="text-xl font-bold text-slate-900 mb-2">Appointment Requested!</h4>
-            <p className="text-sm text-slate-600 max-w-xs mb-3">
-              We have dispatched your consultation request to {expert.name}. Our coordinator will contact you via WhatsApp / Phone to confirm your slot.
-            </p>
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" /> Confidential & Encrypted
-            </span>
+            <span className="font-extrabold text-emerald-800 text-sm">{expert.hourlyRate || 'BDT 4,000 / hr'}</span>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
-            <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 flex items-center justify-between text-xs">
-              <span className="text-slate-600 font-medium">Standard Advisory Fee:</span>
-              <span className="font-extrabold text-emerald-800 text-sm">{expert.hourlyRate || 'BDT 4,000 / hr'}</span>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Preferred Date *
-                </label>
-                <div className="relative">
-                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="date"
-                    required
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
-                  />
-                </div>
-              </div>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Appointments with <strong>{expert.name}</strong> are scheduled through our centralized appointment booking portal at <span className="text-emerald-700 font-semibold">appointment.accounticca.com</span>. Any details entered below will be forwarded automatically.
+          </p>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Preferred Time Slot *
-                </label>
-                <div className="relative">
-                  <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <select
-                    value={timeSlot}
-                    onChange={(e) => setTimeSlot(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
-                  >
-                    <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
-                    <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
-                    <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
-                    <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
-                  </select>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Preferred Date
+              </label>
+              <div className="relative">
+                <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Consultation Topic / Legal Brief *
+                Preferred Time Slot
               </label>
-              <textarea
-                required
-                rows={3}
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="Briefly state your requirements (e.g. VAT notice resolution, foreign subsidiary registration, trademark dispute)..."
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Tanvir Ahmed"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Phone / WhatsApp *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
-                  placeholder="+880 1712-345678"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
-                />
+              <div className="relative">
+                <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select
+                  value={timeSlot}
+                  onChange={(e) => setTimeSlot(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                >
+                  <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                  <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                  <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+                  <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+                </select>
               </div>
             </div>
+          </div>
 
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Consultation Topic / Legal Brief
+            </label>
+            <textarea
+              rows={2}
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Briefly state your requirements (e.g. VAT notice resolution, corporate registration, tax advice)..."
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 resize-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Email Address *
+                Full Name
               </label>
               <input
-                type="email"
-                required
-                value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
-                placeholder="tanvir@company.com.bd"
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g. Tanvir Ahmed"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
               />
             </div>
 
-            <div className="pt-3 flex items-center justify-between border-t border-slate-100">
-              <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
-                Pay after confirmation
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-bold transition-colors shadow-sm"
-                >
-                  Confirm Request
-                </button>
-              </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                Phone / WhatsApp
+              </label>
+              <input
+                type="tel"
+                value={clientPhone}
+                onChange={(e) => setClientPhone(e.target.value)}
+                placeholder="+880 1712-345678"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+              />
             </div>
-          </form>
-        )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={clientEmail}
+              onChange={(e) => setClientEmail(e.target.value)}
+              placeholder="tanvir@company.com.bd"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+            />
+          </div>
+
+          <div className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={handleDirectBooking}
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 underline inline-flex items-center gap-1 py-1"
+            >
+              <span>Skip form & book on portal directly</span>
+              <ExternalLink className="w-3 h-3" />
+            </button>
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"
+              >
+                <span>Continue to Portal</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   );

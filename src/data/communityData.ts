@@ -1,3 +1,5 @@
+import { teamMembers, TeamMember } from './teamData';
+
 export interface Expert {
   id: string;
   name: string;
@@ -17,6 +19,12 @@ export interface Expert {
   bio: string;
   hourlyRate?: string;
   isAvailableForConsultation?: boolean;
+  linkedin?: string;
+  facebook?: string;
+  youtube?: string;
+  whatsapp?: string;
+  email?: string;
+  phone?: string;
 }
 
 export interface QuestionAnswer {
@@ -137,128 +145,91 @@ export const EXPERT_CATEGORIES: ExpertCategory[] = [
   }
 ];
 
-export const INITIAL_EXPERTS: Expert[] = [
-  {
-    id: 'exp-1',
-    name: 'Aminul Islam',
-    role: 'Corporate Lawyer',
-    verificationBadge: '✓ Supreme Court Advocate',
-    experience: '12 Years Experience',
-    rating: 4.8,
-    reviewsCount: 94,
-    answersCount: 89,
-    articlesCount: 24,
-    helpfulVotes: 430,
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&auto=format&fit=crop&q=80',
-    category: 'corporate-law',
-    specialization: ['Company Law', 'FDI', 'Corporate Compliance'],
-    credentials: 'LL.M (Commercial Law), Advocate Supreme Court of Bangladesh, Member of Supreme Court Bar Association',
-    bio: 'Specializing in corporate restructuring, RJSC statutory dispute resolution, foreign direct investment compliances, and joint venture contractual arrangements in Dhaka and Chittagong.',
-    hourlyRate: 'BDT 4,500 / hr',
-    isAvailableForConsultation: true
-  },
-  {
-    id: 'exp-2',
-    name: 'Sadia Rahman',
-    role: 'Tax Consultant',
-    verificationBadge: '✓ FCA Certified',
-    experience: '14 Years Experience',
-    rating: 4.9,
-    reviewsCount: 128,
-    answersCount: 152,
-    articlesCount: 38,
-    helpfulVotes: 760,
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1000&auto=format&fit=crop&q=80',
-    category: 'tax-consultants',
-    specialization: ['Income Tax Act 2023', 'Corporate Tax Audit', 'Transfer Pricing'],
-    credentials: 'Fellow Chartered Accountant (FCA), Member of ICAB & Dhaka Taxes Bar Association',
-    bio: 'Advising multinationals, fintech startups, and manufacturing enterprises on strategic tax minimization, withholding tax optimization, and NBR tribunal appeals.',
-    hourlyRate: 'BDT 5,000 / hr',
-    isAvailableForConsultation: true
-  },
-  {
-    id: 'exp-3',
-    name: 'Karim Chowdhury',
-    role: 'VAT Specialist',
-    verificationBadge: '✓ Ex-NBR Consultant',
-    experience: '16 Years Experience',
-    rating: 5.0,
-    reviewsCount: 165,
-    answersCount: 121,
-    articlesCount: 19,
-    helpfulVotes: 610,
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1000&auto=format&fit=crop&q=80',
-    category: 'vat-specialists',
-    specialization: ['VAT Act 2012', 'Mushak 9.1 Returns', 'Customs Tariff Classifications'],
-    credentials: 'FCMA, Former Revenue & VAT Policy Advisor to the National Board of Revenue (NBR)',
-    bio: 'Leading authority on value-added tax compliance in Bangladesh, assisting e-commerce businesses, importers, and exporters in seamless Mushak filing and penalty waiver hearings.',
-    hourlyRate: 'BDT 4,000 / hr',
-    isAvailableForConsultation: true
-  },
-  {
-    id: 'exp-4',
-    name: 'Barrister Mahreen Khan',
-    role: 'Company Registration & IP Attorney',
-    verificationBadge: '✓ Barrister-at-Law (Lincoln’s Inn)',
-    experience: '10 Years Experience',
-    rating: 4.8,
-    reviewsCount: 78,
-    answersCount: 68,
-    articlesCount: 15,
-    helpfulVotes: 340,
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&auto=format&fit=crop&q=80',
-    category: 'company-registration',
-    specialization: ['RJSC Incorporation', 'Trademark & IP', 'Startup Governance'],
-    credentials: 'Called to the Bar of England & Wales (Lincoln’s Inn), Advocate Supreme Court of Bangladesh',
-    bio: 'Guided over 300+ technology and retail startups through RJSC private limited incorporation, foreign ownership equity structures, and trade license protocols.',
-    hourlyRate: 'BDT 3,500 / hr',
-    isAvailableForConsultation: true
-  },
-  {
-    id: 'exp-5',
-    name: 'Tanzir Hossain, FCA',
-    role: 'Tax & Financial Audit Consultant',
-    verificationBadge: '✓ FCA Certified',
-    experience: '11 Years Experience',
-    rating: 4.7,
-    reviewsCount: 62,
-    answersCount: 74,
-    articlesCount: 12,
-    helpfulVotes: 290,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=1000&auto=format&fit=crop&q=80',
-    category: 'tax-consultants',
-    specialization: ['Statutory Audit', 'Corporate Income Tax', 'ERP Compliance'],
-    credentials: 'FCA, BBA (Finance, IBA University of Dhaka), Certified Financial Consultant',
-    bio: 'Advising medium-scale enterprises and tech companies on streamlined bookkeeping, annual return submissions, and navigating cross-border withholding tax.',
-    hourlyRate: 'BDT 3,800 / hr',
-    isAvailableForConsultation: true
-  },
-  {
-    id: 'exp-6',
-    name: 'Advocate Zillur Rahman',
-    role: 'Foreign Investment & Regulatory Attorney',
-    verificationBadge: '✓ BIDA & Supreme Court Practitioner',
-    experience: '15 Years Experience',
-    rating: 4.9,
-    reviewsCount: 105,
-    answersCount: 92,
-    articlesCount: 21,
-    helpfulVotes: 480,
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces',
-    coverImage: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1000&auto=format&fit=crop&q=80',
-    category: 'foreign-investment',
-    specialization: ['BIDA Licensing', 'FE Regulations', 'Work Permit Clearance'],
-    credentials: 'Senior Partner, Foreign Investment & Regulatory Law Chamber, Supreme Court of Bangladesh',
-    bio: 'Trusted counsel for multinational joint-ventures entering Bangladesh, securing work permits, factory establishment clearances, and central bank remittances.',
-    hourlyRate: 'BDT 6,000 / hr',
-    isAvailableForConsultation: true
-  }
+const COVER_IMAGES = [
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1000&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1000&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=1000&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1000&auto=format&fit=crop&q=80',
 ];
+
+function getCategoryForMember(member: TeamMember): string {
+  const combined = `${member.expertise} ${member.position}`.toLowerCase();
+  if (combined.includes('vat')) return 'vat-specialists';
+  if (combined.includes('tax') || combined.includes('acca') || combined.includes('accounting') || combined.includes('financial')) return 'tax-consultants';
+  if (combined.includes('corporate law') || combined.includes('litigation') || member.name.includes('Advocate')) return 'corporate-law';
+  if (combined.includes('foreign') || combined.includes('ceo') || combined.includes('strategy')) return 'foreign-investment';
+  if (combined.includes('company') || combined.includes('registration') || combined.includes('advisory') || combined.includes('consultancy') || combined.includes('compliance')) return 'company-registration';
+  return 'corporate-law';
+}
+
+function getVerificationBadge(member: TeamMember): string {
+  const pos = member.position.toLowerCase();
+  const name = member.name.toLowerCase();
+  const exp = member.expertise.toLowerCase();
+  if (pos.includes('founding')) return '✓ Founding Member';
+  if (pos.includes('ceo')) return '✓ Chief Executive Officer';
+  if (name.includes('advocate') || pos.includes('advocate')) return '✓ Supreme Court Advocate';
+  if (name.includes('acca') || pos.includes('acca')) return '✓ ACCA Qualified';
+  if (name.includes('phd')) return '✓ PhD Legal Scholar';
+  if (pos.includes('partner')) return '✓ Firm Partner';
+  if (pos.includes('senior consultant')) return '✓ Senior Consultant';
+  if (exp.includes('tax') || pos.includes('tax')) return '✓ Income Tax Adviser';
+  if (exp.includes('vat') || pos.includes('vat')) return '✓ VAT Consultant';
+  return '✓ Verified Practitioner';
+}
+
+function getExperience(member: TeamMember, idx: number): string {
+  const pos = member.position.toLowerCase();
+  if (pos.includes('founding') || pos.includes('ceo')) return '15+ Years Experience';
+  if (pos.includes('senior') || pos.includes('partner') || member.name.includes('Advocate') || member.name.includes('PhD')) return '12+ Years Experience';
+  if (pos.includes('consultant') || member.name.includes('ACCA')) return '8+ Years Experience';
+  if (pos.includes('senior executive')) return '6+ Years Experience';
+  return '4+ Years Experience';
+}
+
+export const INITIAL_EXPERTS: Expert[] = teamMembers.map((member, idx) => {
+  const category = getCategoryForMember(member);
+  const verificationBadge = getVerificationBadge(member);
+  const experience = getExperience(member, idx);
+  const specs = member.expertise.split(',').map(s => s.trim()).filter(Boolean);
+  
+  const rating = idx === 0 ? 5.0 : idx < 6 ? 4.9 : 4.8;
+  const answersCount = Math.max(25, 160 - idx * 6);
+  const reviewsCount = Math.max(18, 120 - idx * 5);
+  const articlesCount = Math.max(4, 28 - idx);
+  const helpfulVotes = answersCount * 4 + reviewsCount * 2;
+
+  const pos = member.position.toLowerCase();
+
+  return {
+    id: `team-exp-${idx + 1}`,
+    name: member.name,
+    role: member.position,
+    verificationBadge,
+    experience,
+    rating,
+    reviewsCount,
+    answersCount,
+    articlesCount,
+    helpfulVotes,
+    avatar: member.imgSrc,
+    coverImage: COVER_IMAGES[idx % COVER_IMAGES.length],
+    category,
+    specialization: specs.length > 0 ? specs : ['Corporate Advisory', 'Regulatory Compliance'],
+    credentials: `${member.position} at E-Lawyers | Specializing in ${member.expertise}`,
+    bio: member.bio,
+    hourlyRate: pos.includes('founding') || pos.includes('ceo') ? 'BDT 5,000 / hr' : pos.includes('partner') || pos.includes('senior') ? 'BDT 4,000 / hr' : 'BDT 3,000 / hr',
+    isAvailableForConsultation: true,
+    linkedin: member.linkedin,
+    facebook: member.facebook,
+    youtube: member.youtube,
+    whatsapp: member.whatsapp,
+    email: member.email,
+    phone: member.phone
+  };
+});
 
 export const TRENDING_DISCUSSIONS: TrendingDiscussion[] = [
   {
@@ -293,46 +264,46 @@ export const TRENDING_DISCUSSIONS: TrendingDiscussion[] = [
 export const TOP_CONTRIBUTORS_MONTH: TopContributor[] = [
   {
     rank: 1,
-    name: 'Sadia Rahman',
-    role: 'Tax Consultant',
-    badge: '✓ FCA Certified',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces',
-    helpfulAnswers: 152,
-    reputationPoints: 2480,
+    name: teamMembers[0]?.name || 'Ekramul Islam Khandaker',
+    role: teamMembers[0]?.position || 'Founding Member',
+    badge: '✓ Founding Member',
+    avatar: teamMembers[0]?.imgSrc || '',
+    helpfulAnswers: 184,
+    reputationPoints: 2840,
     tierBadge: '🥇 Diamond Contributor',
     tierColor: 'bg-amber-500/10 text-amber-700 border-amber-300'
   },
   {
     rank: 2,
-    name: 'Karim Chowdhury',
-    role: 'VAT Specialist',
-    badge: '✓ Ex-NBR Consultant',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces',
-    helpfulAnswers: 121,
-    reputationPoints: 2010,
+    name: teamMembers[1]?.name || 'Advocate Anamul Haque',
+    role: teamMembers[1]?.position || 'Founding Member',
+    badge: '✓ Supreme Court Advocate',
+    avatar: teamMembers[1]?.imgSrc || '',
+    helpfulAnswers: 162,
+    reputationPoints: 2420,
     tierBadge: '🥈 Platinum Expert',
     tierColor: 'bg-slate-500/10 text-slate-700 border-slate-300'
   },
   {
     rank: 3,
-    name: 'Aminul Islam',
-    role: 'Corporate Lawyer',
-    badge: '✓ Supreme Court Advocate',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=faces',
-    helpfulAnswers: 98,
-    reputationPoints: 1650,
-    tierBadge: '🥉 Gold Advocate',
+    name: teamMembers[2]?.name || 'Md. Abu Hanif',
+    role: teamMembers[2]?.position || 'CEO',
+    badge: '✓ Executive Director',
+    avatar: teamMembers[2]?.imgSrc || '',
+    helpfulAnswers: 139,
+    reputationPoints: 1980,
+    tierBadge: '🥉 Gold Partner',
     tierColor: 'bg-amber-700/10 text-amber-900 border-amber-400'
   },
   {
     rank: 4,
-    name: 'Tanzir Hossain, FCA',
-    role: 'Chartered Accountant',
-    badge: '✓ FCA Certified',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
-    helpfulAnswers: 74,
-    reputationPoints: 1290,
-    tierBadge: '⭐ Silver Contributor',
+    name: teamMembers[4]?.name || 'Muhammad Abdul Kader ACCA',
+    role: teamMembers[4]?.position || 'Senior Consultant',
+    badge: '✓ ACCA Qualified',
+    avatar: teamMembers[4]?.imgSrc || '',
+    helpfulAnswers: 118,
+    reputationPoints: 1750,
+    tierBadge: '⭐ Master Practitioner',
     tierColor: 'bg-emerald-500/10 text-emerald-700 border-emerald-300'
   }
 ];
