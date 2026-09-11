@@ -140,6 +140,12 @@ export function Navbar() {
       icon: Calculator 
     },
     { 
+      name: 'Individual Tax Planner', 
+      path: '/tax-planner', 
+      description: 'Estimate 2026 tax, rebates & minimum cliff',
+      icon: Calculator 
+    },
+    { 
       name: 'Corporate Tax Planner', 
       path: '/corporate-planner', 
       description: 'Corporate slabs, rebate & planning tool',

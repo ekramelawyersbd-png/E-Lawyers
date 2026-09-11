@@ -25,6 +25,7 @@ import { FaqPage } from './pages/FaqPage';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsConditions } from './pages/TermsConditions';
 import { TdsReference } from './pages/TdsReference';
+import { TaxPlanner } from './pages/TaxPlanner';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="glossary" element={<Glossary />} />
             <Route path="faq" element={<FaqPage />} />
             <Route path="tax-calculator" element={<TaxCalculator />} />
+            <Route path="tax-planner" element={<TaxPlanner />} />
             <Route path="corporate-planner" element={<CorporateTaxPlanner />} />
             <Route path="policy-analysis" element={<TaxPolicyAnalysis />} />
             <Route path="team" element={<Team />} />
