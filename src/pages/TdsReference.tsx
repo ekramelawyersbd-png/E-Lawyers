@@ -1,7 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, BookOpen, Percent, FileText, CheckCircle2, ArrowRightLeft, Globe } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, Filter, BookOpen, Percent, FileText, CheckCircle2, ArrowRightLeft, Globe, Scale, ExternalLink, ChevronRight, Info, Pin, SearchX, RotateCcw, Calculator, Coins, Sparkles } from 'lucide-react';
+import { TdsDetailsDrawer, TdsDrawerItem } from '../components/tds/TdsDetailsDrawer';
+import { QuickCompareToggle } from '../components/tds/QuickCompareToggle';
+import { TdsComparisonTray } from '../components/tds/TdsComparisonTray';
+import { TdsComparatorSearchFilter, SectionType } from '../components/tds/TdsComparatorSearchFilter';
+import { TdsSearchableSelect } from '../components/tds/TdsSearchableSelect';
+import { HighlightText } from '../components/tds/HighlightText';
+import { QuickTdsCalculator } from '../components/tds/QuickTdsCalculator';
 
-type SectionType = 'All' | 'Section 89 (Supply)' | 'Section 90 (Services)' | 'Section 119 (Non-Resident)';
+export type TdsViewMode = 'database' | 'comparator' | 'calculator' | 'treaty';
 
 interface TdsEntry {
   id: string;
@@ -79,19 +86,147 @@ const tdsData: TdsEntry[] = [
   { id: '119-18', category: 'Other Unspecified Services', subCategory: 'General provision for foreign services', section: 'Section 119 (Non-Resident)', rate: '20%' },
 ];
 
+const comparatorSections: SectionType[] = ['All', 'Section 89 (Supply)', 'Section 90 (Services)', 'Section 119 (Non-Resident)'];
+
+function matchesComparatorQuery(item: TdsEntry, query: string): boolean {
+  if (!query || !query.trim()) return true;
+  const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  
+  return tokens.every(token => {
+    // Check if token matches standard section numbers e.g. "89", "90", "119", "sec89", "s89"
+    const cleanedNumber = token.replace(/^s(ec(tion)?)?/, '');
+    if (['89', '90', '119'].includes(cleanedNumber)) {
+      if (item.section.includes(cleanedNumber) || item.id.startsWith(cleanedNumber)) {
+        return true;
+      }
+    }
+
+    return (
+      item.section.toLowerCase().includes(token) ||
+      item.category.toLowerCase().includes(token) ||
+      item.subCategory.toLowerCase().includes(token) ||
+      item.rate.toLowerCase().includes(token) ||
+      item.id.toLowerCase().includes(token)
+    );
+  });
+}
+
 export function TdsReference() {
-  const [viewMode, setViewMode] = useState<'database' | 'comparator' | 'treaty'>('database');
+  const [viewMode, setViewMode] = useState<TdsViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#quick-tds-calculator' || window.location.search.includes('calculator')) {
+        return 'calculator';
+      }
+      if (window.location.hash === '#tds-comparator-section' || window.location.search.includes('comparator')) {
+        return 'comparator';
+      }
+    }
+    return 'comparator';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [treatySearch, setTreatySearch] = useState('');
   const [activeSection, setActiveSection] = useState<SectionType>('All');
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [selectedItemForDetails, setSelectedItemForDetails] = useState<TdsEntry | null>(null);
+
+  // Quick TDS Calculator State
+  const [calcInitialAmount, setCalcInitialAmount] = useState<number>(100000);
+  const [calcInitialRate, setCalcInitialRate] = useState<number>(5);
+  const [calcInitialCategory, setCalcInitialCategory] = useState<string>('');
+
+  const handleLaunchCalculatorWithItem = (item: TdsEntry, amount?: number) => {
+    const numMatch = item.rate.match(/[\d.]+/);
+    const parsedRate = numMatch ? parseFloat(numMatch[0]) : 5;
+    setCalcInitialRate(parsedRate);
+    setCalcInitialCategory(item.id);
+    if (amount) {
+      setCalcInitialAmount(amount);
+    }
+    setViewMode('calculator');
+    const el = document.getElementById('quick-tds-calculator');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Comparator State
   const [compareId1, setCompareId1] = useState<string>('89-1');
   const [compareId2, setCompareId2] = useState<string>('119-2');
+  const [comparatorSearch, setComparatorSearch] = useState('');
+  const [comparatorSectionFilter, setComparatorSectionFilter] = useState<SectionType>('All');
+
+  // Quick-Compare Sticky Tray State
+  const [pinnedItemIds, setPinnedItemIds] = useState<string[]>(['89-1', '90-1']);
+
+  const handleTogglePin = (id: string) => {
+    setPinnedItemIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  const pinnedItems = useMemo(() => {
+    return pinnedItemIds
+      .map(id => tdsData.find(d => d.id === id))
+      .filter((item): item is TdsEntry => Boolean(item));
+  }, [pinnedItemIds]);
+
+  const handleLoadIntoSlots = (id1: string, id2: string) => {
+    setCompareId1(id1);
+    setCompareId2(id2);
+    setViewMode('comparator');
+    const el = document.getElementById('tds-comparator-section');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // Handle URL hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#tds-comparator-section') {
+        setViewMode('comparator');
+      } else if (window.location.hash === '#quick-tds-calculator') {
+        setViewMode('calculator');
+      }
+    };
+    if (window.location.hash === '#tds-comparator-section') {
+      setViewMode('comparator');
+    } else if (window.location.hash === '#quick-tds-calculator') {
+      setViewMode('calculator');
+    }
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const compareItem1 = tdsData.find(item => item.id === compareId1);
   const compareItem2 = tdsData.find(item => item.id === compareId2);
+
+  const filteredComparatorItems = useMemo(() => {
+    return tdsData.filter(item => {
+      const matchesSearch = matchesComparatorQuery(item, comparatorSearch);
+      const matchesSection = comparatorSectionFilter === 'All' || item.section === comparatorSectionFilter;
+      return matchesSearch && matchesSection;
+    });
+  }, [comparatorSearch, comparatorSectionFilter]);
+
+  const comparatorSectionCounts = useMemo(() => {
+    const counts: Record<SectionType, number> = {
+      'All': 0,
+      'Section 89 (Supply)': 0,
+      'Section 90 (Services)': 0,
+      'Section 119 (Non-Resident)': 0,
+    };
+
+    tdsData.forEach(item => {
+      if (matchesComparatorQuery(item, comparatorSearch)) {
+        counts['All']++;
+        if (item.section in counts) {
+          counts[item.section as SectionType]++;
+        }
+      }
+    });
+
+    return counts;
+  }, [comparatorSearch]);
 
   // Extract unique categories for the dropdown, potentially filtered by the active Section
   const availableCategories = useMemo(() => {
@@ -133,7 +268,7 @@ export function TdsReference() {
   const sections: SectionType[] = ['All', 'Section 89 (Supply)', 'Section 90 (Services)', 'Section 119 (Non-Resident)'];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 transition-all ${pinnedItemIds.length > 0 ? 'pb-40 md:pb-48' : ''}`}>
       
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">
@@ -142,17 +277,34 @@ export function TdsReference() {
         <p className="text-lg text-slate-600 leading-relaxed">
           A comprehensive database of Tax Deducted at Source (TDS) rates covering supply contracts, corporate services, and non-resident remittances under the Income Tax Act 2023.
         </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('calculator');
+              const el = document.getElementById('quick-tds-calculator');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            id="hero-quick-calc-cta"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-bold transition-all shadow-2xs group cursor-pointer"
+          >
+            <Calculator className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+            <span>Need to calculate tax deduction on an invoice? Open Quick TDS Calculator</span>
+            <span className="text-emerald-600 font-black">→</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex justify-center mb-8">
-        <div className="inline-flex bg-slate-100 p-1.5 rounded-xl flex-wrap justify-center gap-1">
+        <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl flex-wrap justify-center gap-1.5 shadow-2xs border border-slate-200/60">
           <button
             onClick={() => setViewMode('database')}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            id="tab-btn-database"
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
               viewMode === 'database' 
-                ? 'bg-white text-emerald-700 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-emerald-800 shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -160,21 +312,40 @@ export function TdsReference() {
           </button>
           <button
             onClick={() => setViewMode('comparator')}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            id="tab-btn-comparator"
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
               viewMode === 'comparator' 
-                ? 'bg-white text-emerald-700 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-emerald-800 shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <ArrowRightLeft className="w-4 h-4" />
             Comparator Mode
           </button>
           <button
+            onClick={() => setViewMode('calculator')}
+            id="tab-btn-calculator"
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+              viewMode === 'calculator' 
+                ? 'bg-emerald-600 text-white shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Calculator className="w-4 h-4" />
+            <span>Quick TDS Calculator</span>
+            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+              viewMode === 'calculator' ? 'bg-white/25 text-white' : 'bg-emerald-100 text-emerald-800'
+            }`}>
+              Instant
+            </span>
+          </button>
+          <button
             onClick={() => setViewMode('treaty')}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            id="tab-btn-treaty"
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
               viewMode === 'treaty' 
-                ? 'bg-white text-emerald-700 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-emerald-800 shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Globe className="w-4 h-4" />
@@ -182,6 +353,20 @@ export function TdsReference() {
           </button>
         </div>
       </div>
+
+      {/* Quick Calculator View */}
+      {viewMode === 'calculator' && (
+        <div className="mb-10 animate-fade-in">
+          <QuickTdsCalculator
+            id="quick-tds-calculator"
+            initialAmount={calcInitialAmount}
+            initialRate={calcInitialRate}
+            initialCategory={calcInitialCategory}
+            tdsCategories={tdsData}
+            onSelectCategory={(id) => setCalcInitialCategory(id)}
+          />
+        </div>
+      )}
 
       {viewMode === 'database' && (
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/60 mb-10">
@@ -242,6 +427,7 @@ export function TdsReference() {
                 <th className="py-4 px-6 font-semibold text-sm">Category & Description</th>
                 <th className="py-4 px-6 font-semibold text-sm w-48">Tax Section</th>
                 <th className="py-4 px-6 font-semibold text-sm text-right w-32">TDS Rate</th>
+                <th className="py-4 px-6 font-semibold text-sm text-right w-44">Legal Reference</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -265,11 +451,40 @@ export function TdsReference() {
                         {item.rate}
                       </span>
                     </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <QuickCompareToggle
+                          itemId={item.id}
+                          categoryName={item.category}
+                          isPinned={pinnedItemIds.includes(item.id)}
+                          onToggle={handleTogglePin}
+                          showLabel={false}
+                          className="bg-slate-100 px-2 py-1 rounded-lg border border-slate-200"
+                        />
+                        <button
+                          onClick={() => handleLaunchCalculatorWithItem(item)}
+                          id={`db-calc-${item.id}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl text-xs transition-colors shadow-2xs"
+                          title={`Calculate TDS deduction for ${item.category} (${item.rate})`}
+                        >
+                          <Calculator className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Calc</span>
+                        </button>
+                        <button
+                          onClick={() => setSelectedItemForDetails(item)}
+                          id={`db-expand-details-${item.id}`}
+                          className="expand-details-btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 font-bold rounded-xl text-xs transition-colors shadow-2xs"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Expand Details</span>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="py-12 text-center text-slate-500">
+                  <td colSpan={4} className="py-12 text-center text-slate-500">
                     No matching TDS rates found for "{searchQuery}". Try adjusting your filters.
                   </td>
                 </tr>
@@ -287,108 +502,340 @@ export function TdsReference() {
       </div>
       )}
 
-      {viewMode === 'comparator' && (
-        <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-200/60 mb-10">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Side-by-Side TDS Rate Comparison</h2>
+      {/* Comparator Section */}
+      <section 
+        id="tds-comparator-section" 
+        className={`bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-200/60 mb-10 transition-all ${viewMode === 'comparator' ? 'block' : 'hidden'}`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Side-by-Side TDS Rate Comparison</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Select two TDS categories to contrast statutory rates, or expand full legal details for each item.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold">
+              <Scale className="w-4 h-4 text-emerald-600" />
+              <span>Income Tax Act 2023</span>
+            </span>
+          </div>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-8 relative">
           
-          <div className="grid md:grid-cols-2 gap-8 relative">
-            
-            {/* Visual Divider on Desktop */}
-            <div className="hidden md:block absolute left-1/2 top-12 bottom-0 w-px bg-slate-200 -translate-x-1/2">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-2 text-slate-400 border border-slate-200 rounded-full">
-                <ArrowRightLeft className="w-4 h-4" />
-              </div>
+          {/* Visual Divider on Desktop */}
+          <div className="hidden md:block absolute left-1/2 top-12 bottom-0 w-px bg-slate-200 -translate-x-1/2">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-2 text-slate-400 border border-slate-200 rounded-full shadow-xs">
+              <ArrowRightLeft className="w-4 h-4" />
+            </div>
+          </div>
+
+          {/* Column 1 */}
+          <div className="space-y-6">
+            <div>
+              <TdsSearchableSelect
+                id="compare-slot-1-select"
+                label="Select Item 1"
+                slotName="Slot 1"
+                items={tdsData}
+                selectedId={compareId1}
+                onSelect={(id) => setCompareId1(id)}
+                sections={comparatorSections}
+              />
             </div>
 
-            {/* Column 1 */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Select Item 1</label>
-                <div className="relative">
-                  <select 
-                    value={compareId1}
-                    onChange={(e) => setCompareId1(e.target.value)}
-                    className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none font-medium text-slate-900"
-                  >
-                    {sections.filter(s => s !== 'All').map(section => (
-                      <optgroup key={section} label={section}>
-                        {tdsData.filter(d => d.section === section).map(item => (
-                          <option key={item.id} value={item.id}>
-                            {item.category} - {item.subCategory}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            {compareItem1 && (
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-emerald-800 uppercase bg-emerald-100 rounded-full">
+                      {compareItem1.section}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">Slot 1</span>
                   </div>
-                </div>
-              </div>
-
-              {compareItem1 && (
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                  <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-emerald-800 uppercase bg-emerald-100 rounded-full">
-                    {compareItem1.section}
-                  </span>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{compareItem1.category}</h3>
-                  <p className="text-slate-600 mb-6">{compareItem1.subCategory}</p>
+                  <p className="text-slate-600 mb-6 text-sm">{compareItem1.subCategory}</p>
                   
-                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex justify-between items-center">
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex justify-between items-center mb-6">
                     <span className="text-sm font-medium text-slate-500">Applicable Rate</span>
                     <span className="text-3xl font-black text-emerald-600">{compareItem1.rate}</span>
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Column 2 */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Select Item 2</label>
-                <div className="relative">
-                  <select 
-                    value={compareId2}
-                    onChange={(e) => setCompareId2(e.target.value)}
-                    className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none font-medium text-slate-900"
-                  >
-                    {sections.filter(s => s !== 'All').map(section => (
-                      <optgroup key={section} label={section}>
-                        {tdsData.filter(d => d.section === section).map(item => (
-                          <option key={item.id} value={item.id}>
-                            {item.category} - {item.subCategory}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                {/* Expand Details Button, Calc TDS & Quick-Compare Toggle on compareItem1 */}
+                <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSelectedItemForDetails(compareItem1)}
+                      id={`expand-details-${compareItem1.id}`}
+                      className="expand-details-btn inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xs"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Expand Details</span>
+                    </button>
+                    <button
+                      onClick={() => handleLaunchCalculatorWithItem(compareItem1)}
+                      id="calc-slot-1-btn"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-emerald-100/70 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold rounded-xl text-xs sm:text-sm transition-all"
+                      title="Quick calculate TDS using this rate"
+                    >
+                      <Calculator className="w-4 h-4 text-emerald-700" />
+                      <span>Calc TDS</span>
+                    </button>
                   </div>
+                  <QuickCompareToggle
+                    itemId={compareItem1.id}
+                    categoryName={compareItem1.category}
+                    isPinned={pinnedItemIds.includes(compareItem1.id)}
+                    onToggle={handleTogglePin}
+                    className="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs"
+                  />
                 </div>
               </div>
+            )}
+          </div>
 
-              {compareItem2 && (
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-                  <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-slate-700 uppercase bg-slate-200 rounded-full">
-                    {compareItem2.section}
-                  </span>
+          {/* Column 2 */}
+          <div className="space-y-6">
+            <div>
+              <TdsSearchableSelect
+                id="compare-slot-2-select"
+                label="Select Item 2"
+                slotName="Slot 2"
+                items={tdsData}
+                selectedId={compareId2}
+                onSelect={(id) => setCompareId2(id)}
+                sections={comparatorSections}
+              />
+            </div>
+
+            {compareItem2 && (
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-slate-400"></div>
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-slate-700 uppercase bg-slate-200 rounded-full">
+                      {compareItem2.section}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">Slot 2</span>
+                  </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{compareItem2.category}</h3>
-                  <p className="text-slate-600 mb-6">{compareItem2.subCategory}</p>
+                  <p className="text-slate-600 mb-6 text-sm">{compareItem2.subCategory}</p>
                   
-                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex justify-between items-center">
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex justify-between items-center mb-6">
                     <span className="text-sm font-medium text-slate-500">Applicable Rate</span>
                     <span className="text-3xl font-black text-slate-700">{compareItem2.rate}</span>
                   </div>
                 </div>
-              )}
+
+                {/* Expand Details Button, Calc TDS & Quick-Compare Toggle on compareItem2 */}
+                <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSelectedItemForDetails(compareItem2)}
+                      id={`expand-details-${compareItem2.id}`}
+                      className="expand-details-btn inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xs"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Expand Details</span>
+                    </button>
+                    <button
+                      onClick={() => handleLaunchCalculatorWithItem(compareItem2)}
+                      id="calc-slot-2-btn"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-300 font-bold rounded-xl text-xs sm:text-sm transition-all"
+                      title="Quick calculate TDS using this rate"
+                    >
+                      <Calculator className="w-4 h-4 text-slate-700" />
+                      <span>Calc TDS</span>
+                    </button>
+                  </div>
+                  <QuickCompareToggle
+                    itemId={compareItem2.id}
+                    categoryName={compareItem2.category}
+                    isPinned={pinnedItemIds.includes(compareItem2.id)}
+                    onToggle={handleTogglePin}
+                    className="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* Directory of All TDS Category Items inside Comparator Section */}
+        <div id="tds-comparator-category-items" className="mt-14 pt-10 border-t border-slate-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
+                <Scale className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Section 89 • Section 90 • Section 119</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                All TDS Category Items & Statutory Slabs
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+                Click <strong className="text-emerald-700">"Expand Details"</strong> on any category item to open the slide-out drawer with official legal source text, effective dates, and reference circular numbers.
+              </p>
             </div>
 
+            <div className="flex items-center flex-wrap gap-2">
+              <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl">
+                {filteredComparatorItems.length} Categories Listed
+              </span>
+            </div>
           </div>
+
+          {/* Real-time Search and Section Filters with Keyboard Shortcut and Presets */}
+          <TdsComparatorSearchFilter
+            searchQuery={comparatorSearch}
+            onSearchChange={setComparatorSearch}
+            activeSection={comparatorSectionFilter}
+            onSectionChange={setComparatorSectionFilter}
+            sections={comparatorSections}
+            totalCount={tdsData.length}
+            filteredCount={filteredComparatorItems.length}
+            sectionCounts={comparatorSectionCounts}
+            onReset={() => {
+              setComparatorSearch('');
+              setComparatorSectionFilter('All');
+            }}
+          />
+
+          {/* Category Item Cards Grid or Empty Search State */}
+          {filteredComparatorItems.length === 0 ? (
+            <div className="text-center py-16 px-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3 border border-amber-200/60 shadow-xs">
+                <SearchX className="w-7 h-7" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900 mb-1">
+                No matching TDS categories found
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-5 leading-relaxed">
+                No categories matched your search for &ldquo;<span className="font-bold text-slate-800">{comparatorSearch}</span>&rdquo; {comparatorSectionFilter !== 'All' ? `under ${comparatorSectionFilter}` : ''}. Try clearing filters or searching for keywords like <span className="font-semibold text-emerald-700">&quot;89&quot;</span>, <span className="font-semibold text-emerald-700">&quot;consultancy&quot;</span>, or <span className="font-semibold text-emerald-700">&quot;5%&quot;</span>.
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  id="tds-comparator-empty-reset-btn"
+                  onClick={() => {
+                    setComparatorSearch('');
+                    setComparatorSectionFilter('All');
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Reset Search &amp; Show All Categories</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredComparatorItems.map((item) => {
+                const isPinned = pinnedItemIds.includes(item.id);
+                return (
+                  <div 
+                    key={item.id}
+                    id={`comparator-item-${item.id}`}
+                    className={`p-5 rounded-2xl border transition-all flex flex-col justify-between group ${
+                      isPinned
+                        ? 'bg-emerald-50/50 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
+                        : 'bg-slate-50 hover:bg-white border-slate-200 hover:border-emerald-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2.5">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                          <HighlightText text={item.section} query={comparatorSearch} />
+                        </span>
+                        <span className="font-mono text-xs font-black text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-lg">
+                          <HighlightText text={item.rate} query={comparatorSearch} />
+                        </span>
+                      </div>
+
+                      {/* Quick-Compare Toggle Row */}
+                      <div className="flex items-center justify-between py-1.5 px-2.5 my-2.5 rounded-xl bg-white/90 border border-slate-200/80 shadow-2xs">
+                        <QuickCompareToggle
+                          itemId={item.id}
+                          categoryName={item.category}
+                          isPinned={isPinned}
+                          onToggle={handleTogglePin}
+                        />
+                        {isPinned && (
+                          <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            In Tray
+                          </span>
+                        )}
+                      </div>
+
+                      <h4 className="font-extrabold text-sm text-slate-900 leading-snug group-hover:text-emerald-950 transition-colors">
+                        <HighlightText text={item.category} query={comparatorSearch} />
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-2 flex items-start gap-1.5 leading-relaxed">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <span><HighlightText text={item.subCategory} query={comparatorSearch} /></span>
+                      </p>
+                    </div>
+
+                    <div className="mt-5 pt-3.5 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setSelectedItemForDetails(item)}
+                          id={`expand-details-${item.id}`}
+                          className="expand-details-btn inline-flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors shadow-xs"
+                          title="Expand legal source text, effective dates, and reference circulars"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Details</span>
+                        </button>
+                        <button
+                          onClick={() => handleLaunchCalculatorWithItem(item)}
+                          id={`calc-item-${item.id}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl text-xs transition-colors"
+                          title={`Calculate TDS with ${item.rate}`}
+                        >
+                          <Calculator className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Calc</span>
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            setCompareId1(item.id);
+                            const el = document.getElementById('tds-comparator-section');
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          id={`compare-slot-1-${item.id}`}
+                          className="px-2.5 py-1.5 text-xs font-semibold bg-white hover:bg-slate-200/80 text-slate-700 border border-slate-200 rounded-lg transition-colors"
+                          title="Load this into Slot 1 of side-by-side comparison"
+                        >
+                          Slot 1
+                        </button>
+                        <button
+                          onClick={() => {
+                            setCompareId2(item.id);
+                            const el = document.getElementById('tds-comparator-section');
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          id={`compare-slot-2-${item.id}`}
+                          className="px-2.5 py-1.5 text-xs font-semibold bg-white hover:bg-slate-200/80 text-slate-700 border border-slate-200 rounded-lg transition-colors"
+                          title="Load this into Slot 2 of side-by-side comparison"
+                        >
+                          Slot 2
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
       {viewMode === 'treaty' && (
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/60 mb-10">
@@ -449,6 +896,22 @@ export function TdsReference() {
           </div>
         </div>
       )}
+
+      {/* Slide-out Drawer for TDS Legal Source Text, Effective Dates, and Reference Circular Numbers */}
+      <TdsDetailsDrawer
+        isOpen={!!selectedItemForDetails}
+        onClose={() => setSelectedItemForDetails(null)}
+        item={selectedItemForDetails}
+      />
+
+      {/* Sticky Comparison Tray for Pinned TDS Categories */}
+      <TdsComparisonTray
+        pinnedItems={pinnedItems}
+        onUnpin={handleTogglePin}
+        onClearAll={() => setPinnedItemIds([])}
+        onLoadIntoSlots={handleLoadIntoSlots}
+        onExpandDetails={(item) => setSelectedItemForDetails(item)}
+      />
 
     </div>
   );
