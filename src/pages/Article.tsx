@@ -11,7 +11,6 @@ import remarkGfm from 'remark-gfm';
 import React from 'react';
 import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
-import { Comments } from '../components/Comments';
 import { ChecklistExporter } from '../components/ChecklistExporter';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,6 +33,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { ImageGallery } from '../components/ImageGallery';
+import { CommentSection } from '../components/CommentSection';
+import { BlogSEO } from '../components/BlogSEO';
+import { BlogDisclaimer } from '../components/BlogDisclaimer';
+import { ContactELawyers } from '../components/ContactELawyers';
 
 export function Article() {
   const { id } = useParams();
@@ -188,6 +191,7 @@ export function Article() {
 
   return (
     <>
+      <BlogSEO article={article} />
       <ReadProgress />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <Breadcrumbs 
@@ -342,6 +346,17 @@ export function Article() {
               </>
             )}
 
+            {/* Dynamic Gallery Images */}
+            {article.galleryImages && article.galleryImages.length > 0 && (
+              <div className="my-12">
+                <h3 className="text-2xl font-bold text-slate-900 mb-6">Gallery Images</h3>
+                <ImageGallery 
+                  layout="grid"
+                  images={article.galleryImages}
+                />
+              </div>
+            )}
+
             {/* Tags */}
             <div className="flex items-center gap-3 py-6 border-y border-slate-200 mb-8 flex-wrap">
               <span className="text-sm font-bold text-slate-900">Related Tags:</span>
@@ -376,40 +391,13 @@ export function Article() {
               </div>
             </div>
 
-            {/* 10. Call-to-Action Section (In-content Banner) */}
-            <div className="bg-gradient-to-br from-emerald-800 to-teal-900 rounded-3xl p-8 text-center text-white shadow-xl relative overflow-hidden mb-16 border border-emerald-700">
-              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"1\" fill-rule=\"evenodd\"%3E%3Ccircle cx=\"3\" cy=\"3\" r=\"3\"/>%3Ccircle cx=\"13\" cy=\"13\" r=\"3\"/>%3C/g%3E%3C/svg%3E")' }}></div>
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">Need Professional Legal Assistance?</h3>
-                <p className="text-emerald-100 mb-8 max-w-xl mx-auto">
-                  Our experts are ready to assist you with corporate compliance, tax filing, and legal documentation.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <a 
-                    href="https://appointment.accounticca.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="bg-white text-emerald-900 px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-md inline-flex items-center justify-center gap-2"
-                  >
-                    <span>Consult a Lawyer</span>
-                    <ExternalLink className="w-4 h-4 text-emerald-700" />
-                  </a>
-                  <a 
-                    href="https://appointment.accounticca.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="bg-emerald-700 text-white border border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors inline-flex items-center justify-center gap-2"
-                  >
-                    <span>Request Legal Service</span>
-                    <ExternalLink className="w-4 h-4 text-emerald-200" />
-                  </a>
-                </div>
-              </div>
-            </div>
+            <BlogDisclaimer topic={article.category} />
+            
+            <ContactELawyers />
 
             <ChecklistExporter articleId={article.id} />
             {/* 11. Professional Comments & Peer Discussion Section */}
-            <Comments articleId={article.id} articleTitle={article.title} />
+            <CommentSection articleId={article.id} />
 
           </div>
 
@@ -539,7 +527,7 @@ export function Article() {
       </div>
 
       {/* 9. Related Articles */}
-      <RelatedArticles currentArticle={article} maxItems={4} />
+      <RelatedArticles currentArticle={article} maxItems={3} />
 
       {/* 10. Newsletter Signup */}
       <NewsletterSignup 

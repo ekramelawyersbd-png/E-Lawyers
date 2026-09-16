@@ -35,6 +35,7 @@ export interface Article {
   publishedAt: string;
   readTime: number;
   imageUrl: string;
+  galleryImages?: { url: string; caption?: string }[];
   tags: string[];
   likes?: number;
   comments?: number;
