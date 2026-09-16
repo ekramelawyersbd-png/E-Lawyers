@@ -33,6 +33,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
+import { ImageGallery } from '../components/ImageGallery';
 
 export function Article() {
   const { id } = useParams();
@@ -324,9 +325,21 @@ export function Article() {
               <Section272ComplianceChecklist />
             )}
             {article.id === 'benefits-of-filing-income-tax-return-bangladesh' && (
-              <div className="my-12" id="early-filing-tool">
-                <EarlyFilingIncentive initialPayableTax={50000} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
-              </div>
+              <>
+                <div className="my-12">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Tax Filing Deadline & Incentives</h3>
+                  <ImageGallery 
+                    layout="grid"
+                    images={[
+                      { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/Tax%20sep%2030300.png', caption: 'Tax Return Deadline: September 30' },
+                      { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%20sep%2030.png', caption: 'Early Filing Benefits & Incentives' }
+                    ]} 
+                  />
+                </div>
+                <div className="my-12" id="early-filing-tool">
+                  <EarlyFilingIncentive initialPayableTax={50000} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+              </>
             )}
 
             {/* Tags */}
