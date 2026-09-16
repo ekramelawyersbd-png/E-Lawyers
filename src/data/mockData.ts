@@ -49,6 +49,933 @@ export const categories: { id: string; name: Category; description: string }[] =
 
 export const mockArticles: Article[] = [
   {
+    id: 'benefits-of-filing-income-tax-return-bangladesh',
+    title: 'Benefits of Filing Individual Income Tax Return in Bangladesh | Tax Benefits & PSR Guide',
+    metaTitle: 'Benefits of Filing Individual Income Tax Return in Bangladesh | Tax Benefits & PSR Guide',
+    metaDescription: 'Learn the benefits of filing an individual income tax return in Bangladesh, including tax incentives, investment rebates, PSR access, e-Return benefits, refunds, and penalty avoidance.',
+    excerpt: 'Discover why filing your income tax return in Bangladesh is essential. Explore benefits like investment rebates, PSR access, digital e-Return facilities, refunds, and early filing incentives.',
+    content: `![Benefits of Filing Income Tax Return in Bangladesh](https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Benefits of Filing Individual Income Tax Return in Bangladesh
+## Understanding Tax Incentives, PSR, and Compliance Advantages
+
+Filing an individual income tax return is not only a legal obligation but also provides several financial, business, and personal benefits for taxpayers in Bangladesh. A properly submitted income tax return helps taxpayers claim available tax benefits, access important government and financial services, maintain compliance with the National Board of Revenue (NBR), and manage their financial records efficiently.
+
+With the introduction of the NBR e-Return system, taxpayers can now submit their returns online, receive instant documentation, and maintain their tax history digitally without visiting tax offices.
+
+---
+
+## 1. Financial Benefits of Filing Income Tax Return
+
+### Early Filing Tax Incentive
+
+The Income Tax Act provides incentives for taxpayers who submit their returns within the first quarter of the assessment year.
+
+*   Taxpayers who file their income tax return between **1 July and 30 September** may receive a **5% tax incentive** on net payable tax, subject to a maximum benefit of **BDT 25,000**.
+*   This incentive encourages taxpayers to complete their tax compliance early and reduce their overall tax burden.
+
+---
+
+## 2. Investment Tax Rebate Benefits
+
+One of the major advantages of filing an income tax return is the opportunity to claim investment tax rebates.
+
+Taxpayers can declare eligible investments made during the income year, such as:
+
+*   **DPS (Deposit Pension Scheme)**
+*   **Life insurance premiums**
+*   **Sanchayapatra (Savings Certificates)**
+*   **Mutual funds**
+*   **Provident funds**
+*   **Other approved investment schemes**
+
+Eligible investments allow taxpayers to receive tax credits, which directly reduce their payable income tax. Proper declaration of investments in the income tax return helps taxpayers maximize available tax benefits under applicable laws.
+
+---
+
+## 3. Tax Refund and Adjustment Facility
+
+Many taxpayers pay taxes throughout the year via:
+
+*   **Tax Deducted at Source (TDS)**
+*   **Advance Income Tax (AIT)**
+
+If the total tax paid exceeds the taxpayer’s actual tax liability, the taxpayer may become eligible for:
+
+### Automated Tax Refund (স্বয়ংক্রিয় কর প্রত্যর্পণ)
+The excess tax amount can be refunded according to applicable procedures.
+
+### Adjustment Against Future Tax
+Instead of receiving a refund, taxpayers may adjust excess tax payments against future tax liabilities. This ensures taxpayers do not lose money paid as additional tax.
+
+---
+
+## 4. Proof of Submission of Return (PSR) Benefits
+
+After successfully submitting an income tax return, taxpayers receive an official **Proof of Submission of Return (PSR)**.
+
+*   PSR works as concrete evidence that the taxpayer has fulfilled their income tax filing requirement.
+*   It is a mandatory prerequisite for various financial and government-related activities in Bangladesh.
+
+---
+
+## 5. Access to Important Financial and Government Services
+
+Under Bangladesh tax regulations, submission of an income tax return and possession of PSR are required for several critical services, including:
+
+*   Applying for **bank loans** (home, auto, personal)
+*   Obtaining or renewing **credit cards**
+*   Obtaining or renewing **trade licenses**
+*   Buying, transferring, or registering **real estate properties**
+*   **Vehicle registration-related services** and renewal of motor vehicle fitness certificates
+*   Participating in certain government and business activities (e.g., government tenders, directorships)
+
+Maintaining an updated tax return record helps individuals access these services smoothly without compliance roadblocks.
+
+---
+
+## 6. Benefits of NBR e-Return System
+
+The NBR e-Return platform has modernized income tax filing, making it easier and faster for individual taxpayers.
+
+### Online Return Submission
+Taxpayers can submit their income tax returns entirely online through the NBR portal ([https://etaxnbr.gov.bd](https://etaxnbr.gov.bd)). The online system allows taxpayers to complete filing from the comfort of their home without physically visiting tax offices.
+
+### Instant Tax Documents
+After online submission, taxpayers can instantly generate and download important documents, including:
+*   Acknowledgement Slip
+*   Tax Certificate
+*   TIN Certificate
+*   Payment Challans
+
+These digital documents can be immediately used for financial and official purposes whenever required.
+
+---
+
+## 7. Digital Record Preservation
+
+The e-Return system securely stores taxpayers’ information and previous return records. Benefits of this digital ecosystem include:
+
+*   Easy, immediate access to previous tax returns
+*   Better personal financial record management
+*   Significantly reduced paperwork
+*   Faster future return submission (as many fields auto-populate based on previous data)
+
+Digital preservation helps taxpayers effortlessly maintain a complete, verifiable history of their tax compliance over the years.
+
+---
+
+## 8. Avoiding Legal Penalties and Compliance Risks
+
+Timely submission of an income tax return helps taxpayers avoid severe legal complications. Failure to submit returns within the required statutory deadline may result in:
+
+*   Statutory penalties under applicable provisions (e.g., Section 266)
+*   Additional interest charges for delayed filing (e.g., Section 174)
+*   Compliance-related complexities resulting in blocked services
+*   Possible delays in obtaining critical official approvals or licenses
+
+Regular tax filing ensures taxpayers remain compliant with Bangladesh income tax regulations and avoid unnecessary financial penalties.
+
+---
+
+## 9. Builds Financial Credibility
+
+A consistent income tax filing history significantly improves an individual's financial transparency. A proper, unbroken tax record can help individuals:
+
+*   Demonstrate legitimate and documented income sources
+*   Support large loan or mortgage applications with banking institutions
+*   Maintain professional financial documentation for visas or foreign travel
+*   Establish strong credibility for business partnerships and personal transactions
+
+---
+
+## 10. Conclusion: Why Every Eligible Individual Should File
+
+Income tax return filing is far more than just a legal requirement. It provides financial security, enables access to essential government and banking services, unlocks investment benefits, and fosters better management of personal financial records.
+
+By leveraging the NBR e-Return platform, taxpayers can complete the process conveniently while ensuring full compliance with Bangladesh tax laws. Submitting your return within the prescribed deadline guarantees you enjoy these benefits while building a reliable, secure financial profile for the future.
+
+---
+
+## Frequently Asked Questions (FAQ)
+
+**1. What are the benefits of filing an income tax return in Bangladesh?**
+Filing an income tax return provides tax benefits (like early filing incentives), investment rebates, access to PSR, refund facilities, digital record-keeping, and helps you avoid statutory penalties.
+
+**2. What is PSR in Bangladesh income tax?**
+PSR (Proof of Submission of Return) is an official document issued immediately after submitting an income tax return, serving as mandatory confirmation of your tax filing compliance for accessing over 40 essential services.
+
+**3. Can taxpayers get a tax refund in Bangladesh?**
+Yes. If your Tax Deducted at Source (TDS) or Advance Income Tax (AIT) payments exceed your actual assessed tax liability, you may receive an automated refund or adjust the excess amount against your future tax liabilities.
+
+**4. Can I submit my income tax return online in Bangladesh?**
+Yes. Individual taxpayers can submit their returns entirely online through the NBR e-Return portal at etaxnbr.gov.bd. The platform offers instant acknowledgment and document generation.
+
+**5. What investments qualify for tax rebate in Bangladesh?**
+Eligible investments typically include Deposit Pension Schemes (DPS), life insurance premiums, Sanchayapatra (Savings Certificates), recognized mutual funds, and approved provident funds, subject to the statutory limits and applicable tax rules.
+`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    author: mockAuthors.a1,
+    publishedAt: '2026-09-15T12:00:00.000Z',
+    readTime: 5,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600',
+    tags: [
+      'Income Tax Act 2023',
+      'Tax Benefits',
+      'PSR',
+      'e-Return',
+      'Tax Rebate',
+      'TDS',
+      'Tax Compliance',
+      'NBR Bangladesh'
+    ],
+    likes: 54,
+    comments: 8,
+    isExpertOpinion: true
+  },
+  {
+    id: 'special-surcharge-rules-tobacco-environmental-income-tax-act-2023',
+    title: 'Special Surcharge Rules Under the Income Tax Act, 2023 (Bangladesh): Tobacco Business & Environmental Surcharge Explained',
+    metaTitle: 'Tobacco Business & Environmental Surcharge Rates Bangladesh Income Tax Act 2023',
+    metaDescription: 'Complete guide to Tobacco Business Surcharge (2.5%) and Environmental Surcharge (পরিবেশ সারচার্জ) on multiple motor cars under Bangladesh Income Tax Act 2023 & Finance Act 2026.',
+    excerpt: 'Understand special surcharges under Bangladesh Income Tax Act 2023: 2.5% surcharge on tobacco manufacturing profits for wealth > BDT 4 Crore, and fixed environmental surcharges on multiple cars from BDT 25,000 to BDT 3,50,000 based on engine cc.',
+    content: `![Special Surcharge Rules Tobacco and Environmental Surcharge Bangladesh](https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Special Surcharge Rules Under the Income Tax Act, 2023 (Bangladesh): Tobacco Business & Environmental Surcharge Explained
+## আয়কর আইন ২০২৩ ও অর্থ আইন ২০২৬ এর অধীনে তামাক ব্যবসা ও পরিবেশ সারচার্জের বিস্তারিত বিধান
+
+Source: National Board of Revenue (NBR), Income Tax Act, 2023 & Finance Act, 2026
+
+---
+
+# Introduction
+
+The **Income Tax Act, 2023** (as amended by the **Finance Act, 2026**) introduces specialized categories of surcharge provisions designed to impose targeted additional taxation on specific commercial activities and high-value asset ownership.
+
+Apart from the standard progressive net wealth-based surcharge on regular income tax, certain taxpayers become liable for statutory **special surcharges**, including:
+
+1. **Tobacco Business Surcharge** — levied on high-wealth individuals engaged in tobacco manufacturing.
+2. **Environmental Surcharge (পরিবেশ সারচার্জ)** — levied on owners of multiple motor cars based on engine capacity.
+
+These regulatory fiscal measures aim to discourage activities with adverse public health impacts and mitigate the environmental footprint associated with multi-vehicle ownership.
+
+---
+
+# 1. Tobacco Business Surcharge
+
+## What is Tobacco Business Surcharge?
+
+A special targeted surcharge applies to individual taxpayers who fulfill two simultaneous criteria:
+
+* Possess a **net wealth exceeding BDT 4 Crore**, and
+* Derive taxable income from **manufacturing tobacco or tobacco-related goods**.
+
+The surcharge applies specifically to the net profit generated from tobacco manufacturing operations, such as:
+
+* **Zarda (জর্দা)** manufacturing
+* **Bidi (বিড়ি)** manufacturing
+* **Cigarette (সিগারেট)** manufacturing
+* Other commercial smokeless and processed tobacco products
+
+---
+
+## Rate of Tobacco Business Surcharge
+
+Eligible taxpayers are subject to an:
+
+$$\\mathbf{Additional\\ 2.5\\%\\ Surcharge}$$
+
+> **Statutory Scope:** This 2.5% surcharge is calculated **strictly on the net business income derived from tobacco manufacturing activities**, rather than on the taxpayer’s aggregate total income or overall tax liability.
+
+---
+
+## Example Calculation: Tobacco Business Surcharge
+
+Suppose an individual taxpayer reports the following assessment figures:
+
+* **Disclosed Net Wealth:** BDT 6 Crore *(Exceeds BDT 4 Crore threshold)*
+* **Income from Tobacco Manufacturing:** BDT 2 Crore (BDT 2,00,00,000)
+* **Applicable Tobacco Surcharge Rate:** 2.5%
+
+### Mathematical Calculation:
+
+$$\\text{BDT } 2,00,00,000 \\times 2.5\\% = \\mathbf{\\text{BDT } 5,00,000}$$
+
+Therefore, an additional **BDT 5,00,000 (BDT 5 Lakh)** is payable as tobacco business surcharge, over and above the regular income tax and general wealth surcharge applicable to the taxpayer.
+
+---
+
+## Conditions for Tobacco Business Surcharge Applicability
+
+This special surcharge is triggered **only when both statutory conditions are satisfied concurrently**:
+
+> **Condition 1 (Wealth Threshold):**  
+> The taxpayer’s declared total net wealth must exceed **BDT 4 Crore (BDT 40,000,000)**.
+>
+> **Condition 2 (Source of Income):**  
+> The taxpayer must earn income directly from manufacturing **Zarda, Bidi, Cigarettes, or other tobacco products**.
+
+*If either condition is not met (for example, an individual has tobacco manufacturing income of BDT 50 lakh but their net wealth is BDT 2.5 Crore), the 2.5% tobacco business surcharge does not apply.*
+
+---
+
+# 2. Environmental Surcharge (পরিবেশ সারচার্জ)
+
+## What is Environmental Surcharge?
+
+**Environmental Surcharge (পরিবেশ সারচার্জ)** is a statutory fixed fiscal levy imposed on individual taxpayers who own **multiple motor cars**.
+
+The policy objective of this surcharge is to discourage excessive private vehicle ownership, reduce urban traffic congestion, and internalize the carbon and environmental costs of multi-car ownership in Bangladesh.
+
+> **Key Distinction:** Environmental Surcharge is **completely separate** from the percentage-based wealth surcharge. It is assessed as a fixed monetary sum per additional car.
+
+---
+
+## Who Has to Pay Environmental Surcharge?
+
+An individual taxpayer becomes liable for environmental surcharge when they hold:
+
+$$\\mathbf{More\\ than\\ one\\ motor\\ car\\ in\\ their\\ name}$$
+
+The surcharge is assessed on **each additional motor vehicle beyond the primary car**:
+
+* **Owns 1 Motor Car:** $\\rightarrow$ **No Environmental Surcharge** (Primary personal car is exempt from this charge).
+* **Owns 2 Motor Cars:** $\\rightarrow$ Surcharge applies to the **2nd car**.
+* **Owns 3 Motor Cars:** $\\rightarrow$ Surcharge applies to the **2nd and 3rd cars**.
+* **Owns 4 Motor Cars:** $\\rightarrow$ Surcharge applies to the **2nd, 3rd, and 4th cars**.
+
+---
+
+## Environmental Surcharge Slabs Based on Engine Capacity (CC)
+
+The statutory surcharge amount payable on each additional vehicle is calibrated according to the vehicle’s cubic capacity (cc):
+
+| Engine Capacity (Cubic Capacity / CC) | Environmental Surcharge per Additional Car |
+| :--- | :---: |
+| **Up to 1,500 cc** | **BDT 25,000** |
+| **1,501 cc to 2,000 cc** | **BDT 50,000** |
+| **2,001 cc to 2,500 cc** | **BDT 75,000** |
+| **2,501 cc to 3,000 cc** | **BDT 1,50,000** |
+| **3,001 cc to 3,500 cc** | **BDT 2,00,000** |
+| **Above 3,500 cc** | **BDT 3,50,000** |
+
+*Note: For electric vehicles (EVs), equivalent kilowatt (kW) ratings prescribed by BRTA and NBR guidelines are mapped to the corresponding cc tiers.*
+
+---
+
+## Practical Examples: Environmental Surcharge Calculation
+
+### Example 1: Ownership of Two Motor Cars
+
+A taxpayer owns two motor vehicles:
+* **Car 1 (Primary):** 1,800 cc Sedan $\\rightarrow$ Exempt (Primary car)
+* **Car 2 (Additional):** 2,200 cc SUV $\\rightarrow$ Subject to Environmental Surcharge
+
+**Determination:**
+* Engine capacity of 2nd car: 2,200 cc *(falls in the 2,001 cc – 2,500 cc slab)*
+* **Payable Environmental Surcharge:** **BDT 75,000**
+
+---
+
+### Example 2: Ownership of Four Motor Cars (Three Additional)
+
+A high-net-worth individual owns a fleet of four personal motor cars:
+* **Primary Car:** 2,000 cc Sedan $\\rightarrow$ Exempt
+
+**Additional Three Cars:**
+1. **Additional Car 1:** 1,400 cc Hatchback
+2. **Additional Car 2:** 2,700 cc 4x4 SUV
+3. **Additional Car 3:** 3,600 cc Luxury V6 Saloon
+
+### Step-by-Step Surcharge Schedule:
+
+| Vehicle | Status | Engine Capacity | Applicable Surcharge Slab | Surcharge Amount |
+| :--- | :--- | :---: | :---: | :---: |
+| **Car 1** | Primary Car | 2,000 cc | Exempt | BDT 0 |
+| **Car 2** | Additional Car #1 | 1,400 cc | Up to 1,500 cc | BDT 25,000 |
+| **Car 3** | Additional Car #2 | 2,700 cc | 2,501 cc – 3,000 cc | BDT 1,50,000 |
+| **Car 4** | Additional Car #3 | 3,600 cc | Above 3,500 cc | BDT 3,50,000 |
+| **Total** | | | | **BDT 5,25,000** |
+
+**Total Environmental Surcharge Payable:**
+$$\\text{BDT } 25,000 + \\text{BDT } 1,50,00,000 + \\text{BDT } 3,50,000 = \\mathbf{\\text{BDT } 5,25,000}$$
+
+---
+
+# Wealth Surcharge vs. Environmental Surcharge: Core Differences
+
+Many taxpayers confuse these two surcharges. The following comparison clarifies their distinct legal mechanisms:
+
+| Particulars | Net Wealth-Based Surcharge | Environmental Surcharge (পরিবেশ সারচার্জ) |
+| :--- | :--- | :--- |
+| **Legal Basis** | Disclosed net wealth tier & luxury conditions | Ownership of multiple personal motor cars |
+| **Applicability** | High-net-worth individual taxpayers | Taxpayers owning $>1$ registered motor car |
+| **Calculation Method** | **Percentage (10% to 35%)** of payable regular income tax | **Fixed monetary amount** based on engine displacement (cc) |
+| **Primary Objective** | Progressive fiscal equity and direct wealth redistribution | Environmental protection, carbon containment & traffic reduction |
+| **Income Dependent?** | Yes, applies to assessed payable income tax | No, payable regardless of profit or loss |
+
+---
+
+# Critical Compliance & Filing Guidelines
+
+### 1. Accurate Asset Disclosure on Form IT-10B
+Taxpayers must disclose complete particulars of every vehicle owned on their annual **Statement of Assets, Liabilities and Expenses (Form IT-10B)**:
+* Vehicle registration number and date of registration
+* Precise engine capacity in cubic centimeters (cc) as stated on the BRTA Blue Book / Smart Card
+* Acquisition cost and financing source
+
+### 2. Vehicle-Specific Fixed Charge
+Unlike ordinary income tax, environmental surcharge is not reduced by investment tax rebates, minimum tax rules, or business operating losses. If you own multiple cars, the fixed amount is mandatory.
+
+### 3. Isolated Application of Tobacco Surcharge
+The 2.5% tobacco business surcharge applies exclusively to the profit generated from the tobacco manufacturing head. Other income earned by the taxpayer (such as house property rent, bank interest, or non-tobacco trading) is excluded from this 2.5% levy.
+
+---
+
+# Conclusion
+
+The specialized surcharge rules under the **Income Tax Act, 2023 and Finance Act, 2026** reflect Bangladesh's deliberate policy shift toward using the tax code to address public health priorities and environmental sustainability.
+
+Individuals involved in tobacco manufacturing and those owning multiple private motor vehicles must accurately compute these special surcharges alongside their regular progressive tax obligations to prevent audit scrutiny, late interest, and statutory penalties.
+
+---
+
+### Need Professional Support with Tax Surcharges & Wealth Declarations?
+For tailored advisory on vehicle fleet structuring, Form IT-10B reconciliation, or specialized industrial tax filings, consult our Supreme Court advocates and chartered accountants at **E-Lawyers / Accounticca**.`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    author: mockAuthors.a1,
+    publishedAt: '2026-09-15T12:00:00.000Z',
+    readTime: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200&h=600',
+    tags: [
+      'Income Tax Act 2023',
+      'Special Surcharge',
+      'Environmental Surcharge',
+      'Tobacco Surcharge',
+      'Motor Vehicle Tax',
+      'Finance Act 2026',
+      'Tax Compliance',
+      'NBR Bangladesh'
+    ],
+    likes: 48,
+    comments: 5,
+    isExpertOpinion: true
+  },
+  {
+    id: 'understanding-surcharge-income-tax-act-2023-bangladesh-wealth-rates',
+    title: 'Understanding Surcharge Under the Income Tax Act, 2023 (Bangladesh): Wealth-Based Surcharge Rates Explained',
+    metaTitle: 'Wealth Surcharge Rates Bangladesh Income Tax Act 2023 | Surcharge Guidelines',
+    metaDescription: 'Comprehensive guide to wealth-based surcharge rates under Income Tax Act 2023 & Finance Act 2026 in Bangladesh: slabs up to 35%, luxury asset rules & calculation examples.',
+    excerpt: 'Explore the net wealth surcharge rules under Section 2(86B) of the Income Tax Act 2023 as amended by Finance Act 2026: 0% to 35% slabs, multiple car & 8,000 sq ft property rules, with calculation examples.',
+    content: `![Wealth-Based Surcharge Under Income Tax Act 2023 Bangladesh](https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Understanding Surcharge Under the Income Tax Act, 2023 (Bangladesh): Wealth-Based Surcharge Rates Explained
+## আয়কর আইন ২০২৩ এবং অর্থ আইন ২০২৬ এর অধীনে নিট সম্পদ ভিত্তিক সারচার্জের পূর্ণাঙ্গ নির্দেশিকা
+
+Source: National Board of Revenue (NBR), Income Tax Act, 2023 & Finance Act, 2026
+
+---
+
+# Introduction
+
+The concept of **surcharge (সারচার্জ)** has become an essential pillar of Bangladesh’s direct taxation framework, particularly for high-net-worth individual taxpayers. Under the **Income Tax Act, 2023**, as amended by the **Finance Act, 2026**, surcharge is a legally defined additional charge imposed on certain taxpayers based on specific wealth thresholds and luxury asset ownership criteria.
+
+According to **Section 2(86B)** of the Income Tax Act, 2023, surcharge includes both:
+
+1. **Net Wealth-Based Surcharge** — calculated on the basis of a taxpayer’s total net wealth.
+2. **Environmental Surcharge** — applicable in specified circumstances related to environmental considerations (such as ownership of multiple carbon-emitting motor vehicles).
+
+Among these, the **net wealth-based surcharge** is one of the most critical factors influencing the total annual tax outgo of high-income and asset-rich individuals in Bangladesh.
+
+---
+
+# What is Surcharge?
+
+A **surcharge** is an additional levy payable **over and above the regular income tax liability** of an individual taxpayer.
+
+> **Important Principle:** Surcharge does not replace or reduce normal progressive income tax. Instead, after determining the taxpayer’s regular net payable income tax, the statutory surcharge percentage is applied to that tax liability based on their declared net wealth or qualifying asset holdings.
+
+### The Basic Surcharge Formula:
+
+$$\\mathbf{Surcharge = Payable\\ Income\\ Tax \\times Applicable\\ Surcharge\\ Rate}$$
+
+$$\\mathbf{Total\\ Tax\\ Outflow = Payable\\ Income\\ Tax + Surcharge}$$
+
+### Illustrative Baseline Example:
+
+Suppose an individual taxpayer has the following annual assessment parameters:
+
+* **Payable Regular Income Tax:** BDT 50,00,000
+* **Applicable Net Wealth Surcharge Rate:** 20%
+
+**1. Surcharge Calculation:**
+$$\\text{BDT } 50,00,000 \\times 20\\% = \\mathbf{\\text{BDT } 10,00,000}$$
+
+**2. Total Statutory Tax Liability:**
+$$\\text{Income Tax } (50,00,000) + \\text{Surcharge } (10,00,000) = \\mathbf{\\text{BDT } 60,00,000}$$
+
+---
+
+# Who is Liable to Pay Wealth-Based Surcharge?
+
+The wealth-based surcharge primarily applies to **individual taxpayers** whose aggregate net wealth exceeds statutory thresholds or who trigger specific luxury asset ownership conditions.
+
+The applicable surcharge rate depends on:
+* **Total Net Wealth:** Aggregate value of worldwide assets minus allowable debts and liabilities declared on Form IT-10B.
+* **Ownership of Multiple Motor Vehicles:** Holding more than one motor car registered in the taxpayer’s name.
+* **Ownership of Large Residential Property:** Owning residential real estate exceeding specific square footage limits.
+
+---
+
+# Net Wealth-Based Surcharge Rates for Individual Taxpayers
+
+The progressive surcharge brackets under the Income Tax Act, 2023 (as amended for Assessment Year 2026–2027) are structured as follows:
+
+| Net Wealth of Taxpayer | Applicable Surcharge Rate | Primary Qualifying Trigger |
+| :--- | :---: | :--- |
+| **Up to BDT 4 Crore** | **0% (Nil)** | Standard exemption threshold *(unless luxury conditions apply)* |
+| **Above BDT 4 Crore to BDT 10 Crore** | **10%** | Moderate high-net-worth tier |
+| **Above BDT 10 Crore to BDT 20 Crore** | **20%** | Substantial wealth tier |
+| **Above BDT 20 Crore to BDT 50 Crore** | **30%** | High-wealth bracket |
+| **Above BDT 50 Crore** | **35%** | Ultra-high-net-worth bracket (Maximum Slab) |
+
+---
+
+# Detailed Bracket Analysis & Calculation Examples
+
+## 1. Net Wealth Up to BDT 4 Crore — No Surcharge (0%)
+
+Individuals whose total disclosed net wealth is **BDT 4 Crore (BDT 40,000,000) or below** generally do not have to pay any wealth-based surcharge.
+
+### Example:
+* **Disclosed Net Wealth:** BDT 3.5 Crore (BDT 35,000,000)
+* **Payable Regular Income Tax:** BDT 15,00,000
+* **Applicable Surcharge Rate:** 0%
+* **Additional Surcharge Payable:** **BDT 0**
+* **Total Liability:** **BDT 15,00,000**
+
+---
+
+## 2. Net Wealth Above BDT 4 Crore to BDT 10 Crore — 10% Surcharge
+
+If a taxpayer’s aggregate net wealth exceeds **BDT 4 Crore but does not exceed BDT 10 Crore**, a **10% surcharge** applies to the payable income tax.
+
+### Example:
+* **Disclosed Net Wealth:** BDT 7 Crore
+* **Payable Regular Income Tax:** BDT 40,00,000
+* **Surcharge Amount:**
+  $$\\text{BDT } 40,00,000 \\times 10\\% = \\mathbf{\\text{BDT } 4,00,000}$$
+* **Total Tax Payable:**
+  $$\\text{BDT } 40,00,000 + \\text{BDT } 4,00,000 = \\mathbf{\\text{BDT } 44,00,000}$$
+
+---
+
+# Special Rule: 10% Surcharge Even Below BDT 4 Crore Wealth
+
+A critical compliance rule under the Income Tax Act, 2023 is that a taxpayer **may still be liable for a 10% surcharge even if their total net wealth is BDT 4 Crore or less**, if they meet either of the following luxury asset conditions:
+
+### Condition A: Ownership of More Than One Motor Car
+
+If an individual owns **more than one motor car** registered in their personal name or under their beneficial ownership:
+
+* The taxpayer is automatically brought into the **10% surcharge bracket**, regardless of how modest their total net wealth is.
+* **Example:**
+  * Disclosed Net Wealth: BDT 3 Crore *(below the standard BDT 4 Crore threshold)*
+  * Registered Motor Vehicles: 2 motor cars
+  * Applicable Surcharge: **10% on payable income tax**
+
+### Condition B: Ownership of Residential Property Exceeding 8,000 Square Feet
+
+A mandatory **10% surcharge** applies if the taxpayer owns residential house property having a cumulative built-up or plinth area exceeding:
+
+$$\\mathbf{8,000\\text{ square feet}}$$
+
+* This rule aggregates residential properties owned by the individual.
+* **Example:**
+  * Disclosed Net Wealth: BDT 3.8 Crore *(below BDT 4 Crore)*
+  * Residential Real Estate Area: 10,000 sq. ft. across two apartments or an independent house
+  * Applicable Surcharge: **10% on payable income tax**
+
+---
+
+## 3. Net Wealth Above BDT 10 Crore to BDT 20 Crore — 20% Surcharge
+
+Taxpayers possessing net wealth between **BDT 10 Crore and BDT 20 Crore** are subject to a **20% surcharge** on their payable income tax.
+
+### Example:
+* **Disclosed Net Wealth:** BDT 16 Crore
+* **Payable Regular Income Tax:** BDT 1,00,00,000 (BDT 1 Crore)
+* **Surcharge Amount:**
+  $$\\text{BDT } 1,00,00,000 \\times 20\\% = \\mathbf{\\text{BDT } 20,00,000}$$
+* **Total Statutory Liability:**
+  $$\\text{BDT } 1,00,00,000 + \\text{BDT } 20,00,000 = \\mathbf{\\text{BDT } 1.20\\text{ Crore (BDT 1,20,00,000)}}$$
+
+---
+
+## 4. Net Wealth Above BDT 20 Crore to BDT 50 Crore — 30% Surcharge
+
+High-net-worth individuals with disclosed net wealth exceeding **BDT 20 Crore but up to BDT 50 Crore** must pay a **30% surcharge** on their assessed income tax liability.
+
+### Example:
+* **Disclosed Net Wealth:** BDT 35 Crore
+* **Payable Regular Income Tax:** BDT 5,00,00,000 (BDT 5 Crore)
+* **Surcharge Amount:**
+  $$\\text{BDT } 5,00,00,000 \\times 30\\% = \\mathbf{\\text{BDT } 1,50,00,000 (\\text{BDT } 1.5\\text{ Crore})}$$
+* **Total Tax Payable:**
+  $$\\text{BDT } 5,00,00,000 + \\text{BDT } 1,50,00,000 = \\mathbf{\\text{BDT } 6.50\\text{ Crore (BDT 6,50,00,000)}}$$
+
+---
+
+## 5. Net Wealth Above BDT 50 Crore — 35% Surcharge (Maximum Slab)
+
+The highest tier of the progressive wealth surcharge structure applies to individuals whose net wealth surpasses **BDT 50 Crore**.
+
+Taxpayers in this bracket are required to pay a **35% surcharge** on their total payable income tax.
+
+### Example:
+* **Disclosed Net Wealth:** BDT 75 Crore
+* **Payable Regular Income Tax:** BDT 10,00,00,000 (BDT 10 Crore)
+* **Surcharge Amount:**
+  $$\\text{BDT } 10,00,00,000 \\times 35\\% = \\mathbf{\\text{BDT } 3,50,00,000 (\\text{BDT } 3.5\\text{ Crore})}$$
+* **Total Statutory Liability:**
+  $$\\text{BDT } 10,00,00,000 + \\text{BDT } 3,50,00,000 = \\mathbf{\\text{BDT } 13.50\\text{ Crore (BDT 13,50,00,000)}}$$
+
+---
+
+# Important Points & Strategic Considerations
+
+### 1. Surcharge is Not Based on Income Alone
+A taxpayer might report a high annual taxable income but possess relatively modest accumulated net wealth (for instance, an executive in their early career earning significant salary but having low accumulated assets). Conversely, a retired individual or inheritance recipient may have low current taxable income but substantial accumulated net wealth. The surcharge is triggered primarily by **accumulated net wealth and qualifying luxury assets**, applied to whatever regular income tax is payable.
+
+### 2. Surcharge is Calculated Strictly After Regular Income Tax
+Surcharge is never levied directly as a percentage of total income or as a flat percentage of gross wealth. Instead, it follows this strict four-step sequence:
+
+> **Step 1:** Determine Gross & Taxable Income across all statutory heads  
+> &nbsp;&nbsp;&nbsp;&nbsp;↓  
+> **Step 2:** Calculate Gross Tax & deduct Investment Tax Rebate → Regular Payable Income Tax  
+> &nbsp;&nbsp;&nbsp;&nbsp;↓  
+> **Step 3:** Evaluate Statement of Assets & Liabilities (Form IT-10B) → Applicable Surcharge Rate  
+> &nbsp;&nbsp;&nbsp;&nbsp;↓  
+> **Step 4:** Compute Surcharge = Regular Payable Income Tax × Surcharge Rate
+
+### 3. Thorough Wealth Declaration (Form IT-10B) is Critical
+Under the Income Tax Act, 2023, high-wealth individuals and property owners must file a comprehensive Statement of Assets, Liabilities and Expenses (Form IT-10B). Taxpayers must accurately report:
+* Non-agricultural and agricultural land and commercial/residential buildings
+* All registered motor vehicles (motor cars, jeeps, microbuses)
+* Shares in private and public companies, securities, debentures, and government saving certificates
+* Bank deposits, fixed deposits, cash, and precious metals
+* Outstanding institutional and personal liabilities
+
+> **Caution:** Under-reporting assets or failing to declare second vehicles or large residential properties to avoid the 10% surcharge threshold can result in heavy concealment penalties, asset addition under unexplained wealth provisions, and prosecution under Chapter 24 of the Income Tax Act, 2023.
+
+---
+
+# Summary Surcharge Matrix (Assessment Year 2026–2027)
+
+| Wealth / Asset Condition | Applicable Surcharge | Impact on BDT 10,00,000 Normal Tax |
+| :--- | :---: | :--- |
+| Wealth $\\le$ BDT 4 Crore *(1 Car & Res. Property $\\le$ 8,000 sq. ft.)* | **0%** | Surcharge: BDT 0 $\\rightarrow$ Total: BDT 10,00,000 |
+| Wealth $\\le$ BDT 4 Crore *(Owns >1 Car OR Res. Property > 8,000 sq. ft.)* | **10%** | Surcharge: BDT 1,00,000 $\\rightarrow$ Total: BDT 11,00,000 |
+| Wealth > BDT 4 Crore to BDT 10 Crore | **10%** | Surcharge: BDT 1,00,000 $\\rightarrow$ Total: BDT 11,00,000 |
+| Wealth > BDT 10 Crore to BDT 20 Crore | **20%** | Surcharge: BDT 2,00,000 $\\rightarrow$ Total: BDT 12,00,000 |
+| Wealth > BDT 20 Crore to BDT 50 Crore | **30%** | Surcharge: BDT 3,00,000 $\\rightarrow$ Total: BDT 13,00,000 |
+| Wealth > BDT 50 Crore | **35%** | Surcharge: BDT 3,50,000 $\\rightarrow$ Total: BDT 13,50,000 |
+
+---
+
+# Conclusion
+
+The surcharge provisions under the **Income Tax Act, 2023 (as amended by the Finance Act, 2026)** reinforce a progressive taxation framework in Bangladesh. By imposing additional obligations on high-net-worth individuals and owners of luxury assets, the law ensures that taxpayers with higher economic standing contribute proportionately to national development.
+
+Taxpayers should periodically review their net wealth valuation, asset acquisition documentation, and vehicle registrations with accredited tax professionals to ensure full compliance and precise estimation of their total tax liability for **Assessment Year 2026–2027**.
+
+---
+
+### Need Guidance on Wealth Tax & Surcharge Planning?
+Consult our accredited Supreme Court tax advocates and chartered accountants at **E-Lawyers / Accounticca** for assistance with high-net-worth asset declarations, Form IT-10B reconciliation, and individual tax planning.`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    author: mockAuthors.a1,
+    publishedAt: '2026-09-15T10:00:00.000Z',
+    readTime: 7,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200&h=600',
+    tags: [
+      'Income Tax Act 2023',
+      'Surcharge',
+      'Wealth Tax',
+      'Finance Act 2026',
+      'Section 2(86B)',
+      'High Net Worth Tax',
+      'Bangladesh Tax',
+      'Tax Compliance'
+    ],
+    likes: 62,
+    comments: 8,
+    isExpertOpinion: true
+  },
+  {
+    id: 'medical-allowance-tax-treatment-bangladesh-2026-2027',
+    title: 'Medical Allowance Tax Treatment in Bangladesh Under Income Tax Act, 2023 (Assessment Year 2026–2027)',
+    metaTitle: 'Medical Allowance Tax Treatment Bangladesh Income Tax Act 2023 (AY 2026-2027)',
+    metaDescription: 'Complete analysis of medical allowance (চিকিৎসা ভাতা) tax treatment in Bangladesh for private vs government employees under Income Tax Act, 2023 & Guidelines 2026–2027.',
+    excerpt: 'Understand medical allowance (চিকিৎসা ভাতা) tax treatment in Bangladesh under Income Tax Act 2023 (AY 2026–2027): private sector combined 1/3rd salary exemption under Sixth Schedule vs government tax-exempt rules with calculation examples.',
+    content: `![Medical Allowance Tax Treatment in Bangladesh](https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1200&h=600)
+
+# Medical Allowance Tax Treatment in Bangladesh Under Income Tax Act, 2023 (Assessment Year 2026–2027)
+## আয়কর আইন ২০২৩ এর অধীনে চিকিৎসা ভাতার কর নির্ধারণ ও অব্যাহতি সংক্রান্ত বিধিবিধান
+
+Source: National Board of Revenue (NBR), Income Tax Act, 2023 & Income Tax Guidelines 2026–2027
+
+---
+
+Medical allowance (চিকিৎসা ভাতা) is one of the most common components of an employee’s salary package in Bangladesh. However, many employees are confused about whether medical allowance is taxable, how much exemption they can claim, and whether government and private sector employees receive the same tax benefits.
+
+Under the **Income Tax Act, 2023** and the **Income Tax Guidelines 2026–2027**, the tax treatment of medical allowance depends mainly on the employee’s category. Government and certain public sector employees enjoy specific exemptions, while private sector employees follow the general salary taxation rules.
+
+This article explains the complete tax treatment of medical allowance with comprehensive examples, statutory references, and comparison tables.
+
+---
+
+# 1. Medical Allowance for Private Sector Employees
+
+## Medical Allowance Is Included in Salary Income
+
+For private sector employees, medical allowance is generally considered part of employment income.
+
+According to the salary income rules under the Income Tax Act, 2023, all payments received from employment are combined to calculate total salary receipts. This includes:
+
+* Basic salary
+* Festival bonuses
+* House rent allowance
+* Medical allowance
+* Conveyance allowance
+* Other employment benefits and perquisites
+
+Therefore, a private sector employee cannot separately exclude medical allowance from total gross salary income.
+
+### Example:
+
+Suppose an employee receives the following annual compensation package:
+
+| Salary Component | Annual Amount (BDT) | Tax Status in Gross Receipts |
+| :--- | :---: | :--- |
+| Basic Salary | 6,00,000 | Included |
+| Festival Bonus | 1,00,000 | Included |
+| House Rent Allowance | 2,40,000 | Included |
+| Medical Allowance | 36,000 | Included |
+| **Total Salary Receipts** | **9,76,000** | **Gross Employment Income** |
+
+The medical allowance of BDT 36,000 will be included in total salary receipts.
+
+---
+
+## Consolidated Salary Exemption for Private Employees
+
+Instead of providing separate exemptions for each individual allowance (as was the case under the repealed Income Tax Ordinance 1984), the Income Tax Act, 2023 provides a consolidated, single salary exemption under:
+
+> **Sixth Schedule, Part 1, Clause (27)** of the Income Tax Act, 2023
+
+Under this statutory provision, a private sector employee can claim an exemption equal to:
+
+* **One-third (1/3) of total salary receipts**, or
+* **BDT 5,00,000**
+
+**Whichever amount is lower.**
+
+---
+
+## Step-by-Step Calculation Example (Private Sector Employee)
+
+### Step 1: Calculate Total Salary Receipts
+
+* Basic Salary: BDT 6,00,000
+* Festival Bonus: BDT 1,00,000
+* House Rent Allowance: BDT 2,40,000
+* Medical Allowance: BDT 36,000
+
+$$\\text{Total Salary Receipts} = \\text{BDT } 9,76,000$$
+
+---
+
+### Step 2: Calculate Salary Exemption Limit
+
+* **One-third (1/3) of Total Salary Receipts:**
+  $$\\text{BDT } 9,76,000 \\div 3 = \\text{BDT } 3,25,333$$
+
+* **Maximum Statutory Exemption Cap:**
+  $$= \\text{BDT } 5,00,000$$
+
+* Since the lower of the two amounts applies:
+  $$\\mathbf{Allowed\\ Exemption = BDT\\ 3,25,333}$$
+
+---
+
+### Step 3: Calculate Net Taxable Salary Income
+
+* Total Salary Receipts: BDT 9,76,000
+* *Less:* Sixth Schedule Salary Exemption: BDT 3,25,333
+* **Net Taxable Salary Income: BDT 6,50,667**
+
+This taxable salary income is then added to any other heads of income (such as interest, rental income, or dividends) and subjected to the progressive individual income tax slabs.
+
+---
+
+# 2. Medical Allowance for Government and Public Sector Employees
+
+Government employees and certain public sector employees receive different tax treatment because their salary structures and compensation packages are regulated under specific government gazettes and statutory pay orders.
+
+Examples include employees covered under:
+
+* **Services (Salary and Allowances) Order, 2015**
+* **SRO No. 225-Law/Income Tax-7/2023**
+* Specific public bank, autonomous corporation, and state-owned insurance pay orders
+
+For these eligible employees, medical allowance is treated as a specific, fully exempt benefit.
+
+---
+
+## Medical Allowance Is Fully Tax Exempt for Government Employees
+
+For eligible government and public sector employees:
+
+1. **Medical allowance is not included in taxable income** (100% tax-free).
+2. **House rent allowance** also receives exemption according to the applicable government pay order.
+3. **Important Distinction:** The employee does **not** receive the general 1/3rd salary exemption under Clause (27) of Part 1, Sixth Schedule. The specific statutory exemption replaces the general salary exemption.
+
+---
+
+## Example Calculation: Government Employee
+
+Assume an identical gross salary structure for a government official:
+
+| Salary Component | Annual Amount (BDT) | Tax Treatment Under SRO / Pay Order |
+| :--- | :---: | :--- |
+| Basic Salary | 6,00,000 | Taxable |
+| Festival Bonus | 1,00,000 | Taxable |
+| House Rent Allowance | 2,40,000 | **Fully Exempt** |
+| Medical Allowance | 36,000 | **Fully Exempt** |
+| **Total Gross Receipts** | **9,76,000** | |
+
+---
+
+### Taxable Income Calculation for Government Employee
+
+* Taxable Basic Salary: BDT 6,00,000
+* Taxable Festival Bonus: BDT 1,00,000
+* Total Taxable Salary: **BDT 7,00,000**
+
+The following allowances are completely excluded from the tax net:
+* House Rent Allowance: BDT 2,40,000
+* Medical Allowance: BDT 36,000
+
+$$\\mathbf{Net\\ Taxable\\ Salary\\ Income = BDT\\ 7,00,000}$$
+
+---
+
+# 3. Special Medical Reimbursements That Are Tax Exempt
+
+Apart from regular monthly medical allowances, certain actual medical reimbursements receive separate, distinct statutory tax exemptions under the Income Tax Act, 2023.
+
+These special provisions protect employees facing catastrophic healthcare events from incurring tax burdens on medical aid.
+
+## Major Surgery and Critical Illness Reimbursement
+
+Amounts reimbursed or paid directly by the employer for the treatment of serious medical conditions and life-threatening procedures are exempt from income tax.
+
+Covered procedures typically include:
+
+* **Heart surgery** (bypass, angioplasty, pacemaker installation)
+* **Kidney surgery and dialysis**
+* **Eye surgery** (retinal detachment, corneal transplant)
+* **Liver surgery and transplants**
+* **Brain surgery and neurological interventions**
+* **Artificial organ replacement and orthopedic implants**
+* **Cancer treatment** (chemotherapy, radiation therapy, oncology surgeries)
+
+This critical illness exemption applies to:
+* Permanent and contractual employees
+* Shareholder-directors (where compliant with statutory corporate governance and board approval)
+
+*Note:* Proper documentation, including hospital admission records, surgeon certifications, original payment receipts, and cross-cheque or banking channel reimbursement records, must be maintained for NBR assessment audit.
+
+---
+
+## Employer-Provided Group Health Insurance Benefits
+
+Medical expenses covered or reimbursed through an employer’s formal group health insurance policy are treated separately from taxable remuneration:
+
+* **Hospital bills paid directly by insurance companies** (cashless hospitalization).
+* **Treatment reimbursement** paid under corporate health coverage.
+* **Medical claims settled** through employer-facilitated insurance programs.
+
+Such insurance benefits do not inflate the employee's taxable income, making corporate group health insurance one of the most tax-efficient employee benefits in Bangladesh.
+
+---
+
+# Government vs Private Employee: Comparison Matrix
+
+| Particulars | Government Employee | Private Employee |
+| :--- | :--- | :--- |
+| **Medical Allowance Status** | Fully exempt (if covered by specific pay order / SRO) | Included in gross salary receipts |
+| **House Rent Allowance** | Exempt according to applicable Pay Order | Included in gross salary receipts |
+| **Separate Medical Exemption** | Available specifically by government order | Not available separately |
+| **General 1/3 Salary Exemption** | **Not available** | **Available** (Up to BDT 5,00,000 cap) |
+| **Applicable Legal Authority** | Government Pay Orders & SRO No. 225/2023 | Sixth Schedule, Part 1, Clause (27) |
+
+---
+
+# Final Comparative Tax Impact Example
+
+Comparing both categories on an identical BDT 9,76,000 compensation package:
+
+| Employee Type | Total Salary Receipts | Statutory Exemption | Net Taxable Salary |
+| :--- | :---: | :---: | :---: |
+| **Government Employee** | BDT 9,76,000 | BDT 2,76,000 | **BDT 7,00,000** |
+| **Private Sector Employee** | BDT 9,76,000 | BDT 3,25,333 | **BDT 6,50,667** |
+
+*Key Insight:* In this scenario, the private sector employee actually has a lower taxable salary (BDT 6,50,667 vs BDT 7,00,000) because the consolidated 1/3rd exemption under Clause (27) provides BDT 3,25,333 of total relief, which exceeds the government employee's combined house rent and medical allowance exemption of BDT 2,76,000.
+
+---
+
+# Key Takeaways & Best Practices
+
+1. **Medical allowance is not treated identically for all employees.** Always distinguish between private sector compensation structures and government gazetted pay orders.
+2. **For Private Sector Employees:**
+   * Do not deduct medical allowance separately on your tax return.
+   * Add all allowances to gross salary receipts, then apply the consolidated **1/3rd or BDT 5,00,000 limit** (whichever is lower) under Sixth Schedule, Part 1, Clause (27).
+3. **For Government & Eligible Public Sector Employees:**
+   * Medical allowance is 100% tax-exempt.
+   * Do not double-claim the general 1/3rd salary exemption.
+4. **Special Medical Reimbursements:** Major surgeries, critical illness procedures, and group health insurance claims are treated separately and are protected with specific tax exemptions when backed by formal medical bills.
+5. **Filing Recommendation:** Verify your employment contract, monthly pay slips, and applicable tax schedule before submitting your annual return for Assessment Year 2026–2027.
+
+---
+
+### Need Professional Guidance?
+Have questions about restructuring your company's payroll for optimal tax efficiency or assessing your personal return? Consult our accredited Supreme Court tax advocates and chartered accountants at E-Lawyers / Accounticca.`,
+    categoryId: 'tax',
+    category: 'Income Tax',
+    author: mockAuthors.a1,
+    publishedAt: '2026-09-14T10:00:00.000Z',
+    readTime: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1200&h=600',
+    tags: [
+      'Income Tax Act 2023',
+      'Medical Allowance',
+      'Salary Taxation',
+      'Assessment Year 2026-2027',
+      'Sixth Schedule',
+      'Government vs Private',
+      'Tax Exemption',
+      'NBR Bangladesh'
+    ],
+    likes: 54,
+    comments: 6,
+    isExpertOpinion: true
+  },
+  {
     id: 'income-tax-act-2023-definitions-amendments-2026',
     title: 'Key Definitions & Terminology Amendments in Income Tax Act 2023 (Applicable 2026-2027)',
     metaTitle: 'Income Tax Act 2023 Definition Amendments & Changes Bangladesh',

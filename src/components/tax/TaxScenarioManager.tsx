@@ -12,10 +12,12 @@ import {
   ArrowRight,
   ShieldCheck,
   AlertCircle,
-  Calendar
+  Calendar,
+  Share2
 } from 'lucide-react';
 import { TaxScenario, TaxScenarioInputs, TaxScenarioResults } from '../../types/taxScenario';
 import { TaxScenarioComparison } from './TaxScenarioComparison';
+import { ShareTaxScenarioModal } from './ShareTaxScenarioModal';
 import { computeScenarioDeadlines, getReferenceNow } from '../../utils/taxDeadlineUtils';
 
 const STORAGE_KEY = 'bd_tax_planner_scenarios_v1';
@@ -24,6 +26,7 @@ interface TaxScenarioManagerProps {
   currentInputs: TaxScenarioInputs;
   currentResults: TaxScenarioResults;
   onLoadScenario: (scenario: TaxScenario) => void;
+  onShareScenario?: (scenario: TaxScenario) => void;
 }
 
 const SAMPLE_SCENARIOS: TaxScenario[] = [
@@ -82,7 +85,8 @@ const SAMPLE_SCENARIOS: TaxScenario[] = [
 export function TaxScenarioManager({
   currentInputs,
   currentResults,
-  onLoadScenario
+  onLoadScenario,
+  onShareScenario
 }: TaxScenarioManagerProps) {
   const [scenarios, setScenarios] = useState<TaxScenario[]>([]);
   const [scenarioName, setScenarioName] = useState('');
@@ -92,6 +96,7 @@ export function TaxScenarioManager({
   const [showComparison, setShowComparison] = useState(false);
   const [activeLoadedId, setActiveLoadedId] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [sharingScenario, setSharingScenario] = useState<TaxScenario | null>(null);
 
   // Load from local storage
   useEffect(() => {
@@ -466,13 +471,33 @@ export function TaxScenarioManager({
                       <span className="text-[11px] text-slate-400">Ready to load</span>
                     )}
 
-                    <button
-                      id={`load-scenario-btn-${sc.id}`}
-                      onClick={() => handleLoadScenario(sc)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
-                    >
-                      Load <ArrowRight className="w-3 h-3" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        id={`share-scenario-card-btn-${sc.id}`}
+                        onClick={() => {
+                          if (onShareScenario) {
+                            onShareScenario(sc);
+                          } else {
+                            setSharingScenario(sc);
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 transition-colors shadow-2xs"
+                        title="Share this scenario via deep link or email"
+                      >
+                        <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Share</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        id={`load-scenario-btn-${sc.id}`}
+                        onClick={() => handleLoadScenario(sc)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      >
+                        Load <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -511,6 +536,25 @@ export function TaxScenarioManager({
             handleLoadScenario(sc);
             setShowComparison(false);
           }}
+          onShareScenario={(sc) => {
+            if (onShareScenario) {
+              onShareScenario(sc);
+            } else {
+              setSharingScenario(sc);
+            }
+          }}
+        />
+      )}
+
+      {/* Standalone Share Modal fallback if used independently */}
+      {sharingScenario && (
+        <ShareTaxScenarioModal
+          isOpen={!!sharingScenario}
+          onClose={() => setSharingScenario(null)}
+          scenarioName={sharingScenario.name}
+          notes={sharingScenario.notes}
+          inputs={sharingScenario.inputs}
+          results={sharingScenario.results}
         />
       )}
 

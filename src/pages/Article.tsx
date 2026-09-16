@@ -32,6 +32,7 @@ import { InteractiveChecklistItem } from '../components/InteractiveChecklistItem
 import { useLanguage } from '../contexts/LanguageContext';
 
 import { SortableTable } from '../components/SortableTable';
+import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 
 export function Article() {
   const { id } = useParams();
@@ -321,6 +322,11 @@ export function Article() {
             )}
             {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
               <Section272ComplianceChecklist />
+            )}
+            {article.id === 'benefits-of-filing-income-tax-return-bangladesh' && (
+              <div className="my-12" id="early-filing-tool">
+                <EarlyFilingIncentive initialPayableTax={50000} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              </div>
             )}
 
             {/* Tags */}

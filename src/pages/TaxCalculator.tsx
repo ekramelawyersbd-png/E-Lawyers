@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink } from 'lucide-react';
+import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink, Share2 } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { TaxHistory, SavedCalculation } from '../components/calculator/TaxHistory';
+import { ShareTaxScenarioModal } from '../components/tax/ShareTaxScenarioModal';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { parseTaxCalculatorFromUrl } from '../utils/taxShareUtils';
 
 type TaxpayerCategory = 'general' | 'women_senior' | 'disabled' | 'freedom_fighter';
 type LocationCategory = 'dhaka_ctg' | 'other_city' | 'other';
@@ -21,6 +23,7 @@ export function TaxCalculator() {
   const [calcHistory, setCalcHistory] = useState<SavedCalculation[]>([]);
   const { user } = useAuth();
   const [isCalculating, setIsCalculating] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     setIsCalculating(true);
@@ -30,17 +33,31 @@ export function TaxCalculator() {
 
   useEffect(() => {
     const loadData = async () => {
-      const savedData = localStorage.getItem('taxCalcData');
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData);
-          if (parsed.income !== undefined) setIncome(parsed.income);
-          if (parsed.investments !== undefined) setInvestments(parsed.investments);
-          if (parsed.category) setCategory(parsed.category);
-          if (parsed.location) setLocation(parsed.location);
-          if (parsed.disabledDependents !== undefined) setDisabledDependents(parsed.disabledDependents);
-        } catch (e) {
-          console.error('Failed to parse saved data', e);
+      // Priority 1: Check deep link query parameters
+      const urlParams = parseTaxCalculatorFromUrl(window.location.search);
+      let hasDeepLink = false;
+      if (urlParams) {
+        if (urlParams.income !== undefined) { setIncome(urlParams.income); hasDeepLink = true; }
+        if (urlParams.investments !== undefined) { setInvestments(urlParams.investments); hasDeepLink = true; }
+        if (urlParams.category) { setCategory(urlParams.category as TaxpayerCategory); hasDeepLink = true; }
+        if (urlParams.location) { setLocation(urlParams.location as LocationCategory); hasDeepLink = true; }
+        if (urlParams.disabledDependents !== undefined) { setDisabledDependents(urlParams.disabledDependents); hasDeepLink = true; }
+      }
+
+      // Priority 2: Fall back to local storage if no deep link
+      if (!hasDeepLink) {
+        const savedData = localStorage.getItem('taxCalcData');
+        if (savedData) {
+          try {
+            const parsed = JSON.parse(savedData);
+            if (parsed.income !== undefined) setIncome(parsed.income);
+            if (parsed.investments !== undefined) setInvestments(parsed.investments);
+            if (parsed.category) setCategory(parsed.category);
+            if (parsed.location) setLocation(parsed.location);
+            if (parsed.disabledDependents !== undefined) setDisabledDependents(parsed.disabledDependents);
+          } catch (e) {
+            console.error('Failed to parse saved data', e);
+          }
         }
       }
 
@@ -324,20 +341,34 @@ export function TaxCalculator() {
                 <p className="text-xs text-slate-500 mt-1">Extra Tk 50,000 exemption per dependent.</p>
               </div>
               
-              <button 
-                onClick={handleSave}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition-all bg-emerald-600 hover:bg-emerald-700"
-              >
-                {isSaved ? (
-                  <>
-                    <Check className="w-5 h-5" /> Saved to Local Storage
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" /> Save Calculation
-                  </>
-                )}
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  id="save-tax-calculation-btn"
+                  onClick={handleSave}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition-all bg-emerald-600 hover:bg-emerald-700 shadow-xs"
+                >
+                  {isSaved ? (
+                    <>
+                      <Check className="w-4 h-4" /> Saved
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" /> Save
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  id="share-tax-calculator-btn"
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200/80 border border-emerald-300 transition-all shadow-xs cursor-pointer"
+                  title="Share this tax scenario via deep link or email"
+                >
+                  <Share2 className="w-4 h-4 text-emerald-700" />
+                  <span>Share</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -350,9 +381,20 @@ export function TaxCalculator() {
              </div>
              
              <div className="relative z-10">
-               <h2 className="text-emerald-100 font-bold mb-6 flex items-center gap-2">
-                 Tax Summary 
-               </h2>
+               <div className="flex items-center justify-between mb-6">
+                 <h2 className="text-emerald-100 font-bold flex items-center gap-2">
+                   Tax Summary 
+                 </h2>
+                 <button
+                   type="button"
+                   id="share-tax-calculator-header-btn"
+                   onClick={() => setIsShareModalOpen(true)}
+                   className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs"
+                 >
+                   <Share2 className="w-3.5 h-3.5 text-emerald-300" />
+                   <span>Share Scenario</span>
+                 </button>
+               </div>
                
                <div className="mb-8">
                  <div className="text-emerald-200 text-sm font-bold uppercase tracking-widest mb-1">Estimated Net Tax Payable</div>
@@ -545,6 +587,35 @@ export function TaxCalculator() {
           )}
         </div>
       </div>
+
+      {/* Share Calculation Modal */}
+      {isShareModalOpen && (
+        <ShareTaxScenarioModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          scenarioName={`Tax Assessment (Income: ${parseInt(income || '0', 10).toLocaleString()} BDT)`}
+          notes="Calculated using Accounticca's Bangladesh Individual Income Tax Estimator."
+          inputs={{
+            income: income || '0',
+            investment: investments || '0',
+            tds: '0',
+            category: category === 'women_senior' ? 'female_senior' : category,
+            disabledDependents: parseInt(disabledDependents || '0', 10),
+            location: location === 'other_city' ? 'other_cc' : location === 'other' ? 'non_cc' : 'dhaka_ctg',
+            isFirstTimeFiler: false
+          }}
+          results={{
+            totalLimit: calculation.totalExemption,
+            taxableIncome: calculation.taxableIncome,
+            grossTax: calculation.grossTax,
+            rebate: calculation.eligibleRebate,
+            netTaxBeforeMin: Math.max(0, calculation.grossTax - calculation.eligibleRebate),
+            minimumTax: calculation.minTax,
+            finalLiability: calculation.netTax,
+            netPayable: calculation.netTax
+          }}
+        />
+      )}
     </div>
   );
 }

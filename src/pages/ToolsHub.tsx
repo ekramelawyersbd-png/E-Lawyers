@@ -1,7 +1,9 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight } from 'lucide-react';
+import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
+import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisualizer';
+import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { Gallery } from '../components/Gallery';
 
 export function ToolsHub() {
@@ -56,6 +58,22 @@ export function ToolsHub() {
       icon: <ClipboardCheck className="w-8 h-8" />,
       path: '/dashboard',
       color: 'bg-purple-100 text-purple-700',
+    },
+    {
+      name: 'Wealth Surcharge Visualizer',
+      description: 'Explore progressive net wealth surcharge brackets (0% to 35%) and special luxury triggers.',
+      tooltip: 'Visualize where your net wealth sits among statutory surcharge brackets under Section 2(86B).',
+      icon: <Coins className="w-8 h-8" />,
+      path: '#wealth-surcharge-tool',
+      color: 'bg-teal-100 text-teal-800',
+    },
+    {
+      name: 'Early Filing Incentive',
+      description: 'Calculate your potential 5% tax rebate for filing between July 1 and September 30.',
+      tooltip: 'Estimate your savings from the 5% early filing incentive, up to BDT 25,000.',
+      icon: <Calendar className="w-8 h-8" />,
+      path: '#early-filing-tool',
+      color: 'bg-amber-100 text-amber-800',
     }
   ];
   const visibleTools = tools.filter(t => !hiddenTools.includes(t.name));
@@ -157,44 +175,71 @@ export function ToolsHub() {
         <div className="h-px bg-slate-200 flex-1 ml-4"></div>
       </div>
       
-      <div className="tools-container grid grid-cols-1 md:grid-cols-3 gap-6">
-        {visibleTools.map((tool) => (
-          <Link 
-            key={tool.name}
-            to={tool.path}
-            title={tool.tooltip}
-            className="relative group bg-white rounded-[2rem] border border-slate-200/60 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 hover:border-emerald-200 overflow-hidden flex flex-col items-center text-center gap-5 z-10"
-          >
-            {/* Background glow effect on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
-            <button 
-              onClick={(e) => hideTool(e, tool.name)}
-              className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
-              title="Hide this tool"
+      <div className="tools-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {visibleTools.map((tool) => {
+          const isAnchor = tool.path.startsWith('#');
+          const commonClasses = "relative group bg-white rounded-[2rem] border border-slate-200/60 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 hover:border-emerald-200 overflow-hidden flex flex-col items-center text-center gap-5 z-10 cursor-pointer";
+          const innerContent = (
+            <>
+              {/* Background glow effect on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
+              <button 
+                onClick={(e) => hideTool(e, tool.name)}
+                className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
+                title="Hide this tool"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className={`relative p-5 rounded-[1.5rem] shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-inner ${tool.color}`}>
+                {/* Inner subtle ring */}
+                <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/5" />
+                {tool.icon}
+              </div>
+              
+              <div className="relative z-10 mt-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">
+                  {tool.name}
+                </h3>
+                <p className="text-slate-500 leading-relaxed text-sm group-hover:text-slate-700 transition-colors">
+                  {tool.description}
+                </p>
+              </div>
+              
+              {/* Bottom accent line */}
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-full group-hover:translate-y-0" />
+            </>
+          );
+
+          if (isAnchor) {
+            return (
+              <a
+                key={tool.name}
+                href={tool.path}
+                title={tool.tooltip}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(tool.path.substring(1))?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={commonClasses}
+              >
+                {innerContent}
+              </a>
+            );
+          }
+
+          return (
+            <Link 
+              key={tool.name}
+              to={tool.path}
+              title={tool.tooltip}
+              className={commonClasses}
             >
-              <X className="w-4 h-4" />
-            </button>
-            
-            <div className={`relative p-5 rounded-[1.5rem] shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-inner ${tool.color}`}>
-              {/* Inner subtle ring */}
-              <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/5" />
-              {tool.icon}
-            </div>
-            
-            <div className="relative z-10 mt-2">
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">
-                {tool.name}
-              </h3>
-              <p className="text-slate-500 leading-relaxed text-sm group-hover:text-slate-700 transition-colors">
-                {tool.description}
-              </p>
-            </div>
-            
-            {/* Bottom accent line */}
-            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-full group-hover:translate-y-0" />
-          </Link>
-        ))}
+              {innerContent}
+            </Link>
+          );
+        })}
       </div>
       
       {hiddenTools.length > 0 && (
@@ -232,6 +277,17 @@ export function ToolsHub() {
             }
           ]}
         />
+      </div>
+
+      <div id="wealth-surcharge-tool" className="mt-16 scroll-mt-8">
+        <WealthSurchargeVisualizer 
+          initialPayableTax={500000}
+          showCardWrapper={true}
+        />
+      </div>
+
+      <div id="early-filing-tool" className="mt-16 scroll-mt-8">
+        <EarlyFilingIncentive initialPayableTax={500000} />
       </div>
 
       <div className="mt-16">

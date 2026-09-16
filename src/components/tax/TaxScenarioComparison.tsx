@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowRightLeft, CheckCircle2, ShieldAlert, Sparkles, X, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { ArrowRightLeft, CheckCircle2, ShieldAlert, Sparkles, X, ArrowUpRight, ArrowDownRight, Minus, Share2 } from 'lucide-react';
 import { TaxScenario } from '../../types/taxScenario';
 
 interface TaxScenarioComparisonProps {
   scenarios: TaxScenario[];
   onClose: () => void;
   onLoadScenario: (scenario: TaxScenario) => void;
+  onShareScenario?: (scenario: TaxScenario) => void;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -21,7 +22,7 @@ const LOCATION_LABELS: Record<string, string> = {
   non_cc: 'Non-City Corp.'
 };
 
-export function TaxScenarioComparison({ scenarios, onClose, onLoadScenario }: TaxScenarioComparisonProps) {
+export function TaxScenarioComparison({ scenarios, onClose, onLoadScenario, onShareScenario }: TaxScenarioComparisonProps) {
   if (scenarios.length === 0) {
     return null;
   }
@@ -92,13 +93,26 @@ export function TaxScenarioComparison({ scenarios, onClose, onLoadScenario }: Ta
                             })}
                           </span>
                         </div>
-                        <button
-                          id={`load-scenario-table-btn-${sc.id}`}
-                          onClick={() => onLoadScenario(sc)}
-                          className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shrink-0"
-                        >
-                          Load into Planner
-                        </button>
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <button
+                            id={`load-scenario-table-btn-${sc.id}`}
+                            onClick={() => onLoadScenario(sc)}
+                            className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors text-center"
+                          >
+                            Load
+                          </button>
+                          {onShareScenario && (
+                            <button
+                              id={`share-scenario-table-btn-${sc.id}`}
+                              onClick={() => onShareScenario(sc)}
+                              className="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-lg transition-colors text-center"
+                              title="Share deep link or email"
+                            >
+                              <Share2 className="w-3 h-3 text-emerald-600" />
+                              <span>Share</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </th>
                   ))}

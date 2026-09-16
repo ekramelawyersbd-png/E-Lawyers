@@ -1,14 +1,40 @@
-import React, { useState, useMemo } from 'react';
-import { Calculator, ShieldAlert, CheckCircle2, AlertCircle, ArrowRight, DollarSign, Bookmark, RotateCcw, Calendar, ExternalLink } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { 
+  Calculator, 
+  ShieldAlert, 
+  CheckCircle2, 
+  AlertCircle, 
+  ArrowRight, 
+  DollarSign, 
+  Bookmark, 
+  RotateCcw, 
+  Calendar, 
+  ExternalLink,
+  Share2,
+  Sparkles,
+  Check,
+  X,
+  Coins,
+  CalendarCheck
+} from 'lucide-react';
 import { TaxScenarioManager } from '../components/tax/TaxScenarioManager';
 import { TaxDeadlineNotification } from '../components/tax/TaxDeadlineNotification';
+import { ShareTaxScenarioModal } from '../components/tax/ShareTaxScenarioModal';
+import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisualizer';
+import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { TaxCategory, TaxLocation, TaxScenario, TaxScenarioInputs } from '../types/taxScenario';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
+import { parseTaxScenarioFromUrl } from '../utils/taxShareUtils';
 
 type Category = TaxCategory;
 type Location = TaxLocation;
 
+const STORAGE_KEY = 'bd_tax_planner_scenarios_v1';
+
 export function TaxPlanner() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [income, setIncome] = useState<string>('');
   const [investment, setInvestment] = useState<string>('');
   const [tds, setTds] = useState<string>('');
@@ -16,6 +42,39 @@ export function TaxPlanner() {
   const [disabledDependents, setDisabledDependents] = useState<number>(0);
   const [location, setLocation] = useState<Location>('dhaka_ctg');
   const [isFirstTimeFiler, setIsFirstTimeFiler] = useState<boolean>(false);
+
+  // Sharing & Deep Linking state
+  const [activeScenarioName, setActiveScenarioName] = useState<string>('Custom Tax Plan');
+  const [isSharedFromUrl, setIsSharedFromUrl] = useState<boolean>(false);
+  const [sharedBannerDismissed, setSharedBannerDismissed] = useState<boolean>(false);
+  const [savedToLocalSuccess, setSavedToLocalSuccess] = useState<boolean>(false);
+  
+  // Share modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareModalTarget, setShareModalTarget] = useState<{
+    name?: string;
+    notes?: string;
+    inputs: TaxScenarioInputs;
+  } | null>(null);
+
+  // Hydrate from deep link if present in URL search parameters
+  useEffect(() => {
+    const parsed = parseTaxScenarioFromUrl(searchParams);
+    if (parsed) {
+      setIncome(parsed.inputs.income);
+      setInvestment(parsed.inputs.investment);
+      setTds(parsed.inputs.tds);
+      setCategory(parsed.inputs.category);
+      setDisabledDependents(parsed.inputs.disabledDependents);
+      setLocation(parsed.inputs.location);
+      setIsFirstTimeFiler(parsed.inputs.isFirstTimeFiler);
+      
+      const scenarioTitle = parsed.name || 'Shared Tax Scenario';
+      setActiveScenarioName(scenarioTitle);
+      setIsSharedFromUrl(true);
+      setSharedBannerDismissed(false);
+    }
+  }, [searchParams]);
 
   const handleLoadScenario = (sc: TaxScenario) => {
     setIncome(sc.inputs.income);
@@ -25,6 +84,8 @@ export function TaxPlanner() {
     setDisabledDependents(sc.inputs.disabledDependents);
     setLocation(sc.inputs.location);
     setIsFirstTimeFiler(sc.inputs.isFirstTimeFiler);
+    setActiveScenarioName(sc.name);
+    setIsSharedFromUrl(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -36,6 +97,34 @@ export function TaxPlanner() {
     setDisabledDependents(0);
     setLocation('dhaka_ctg');
     setIsFirstTimeFiler(false);
+    setActiveScenarioName('Custom Tax Plan');
+    setIsSharedFromUrl(false);
+    setSearchParams({}, { replace: true });
+  };
+
+  const handleSaveSharedToLocal = () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      let list: TaxScenario[] = [];
+      if (stored) {
+        list = JSON.parse(stored);
+      }
+      const newScenario: TaxScenario = {
+        id: 'sc-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+        name: activeScenarioName || 'Shared Tax Plan',
+        createdAt: new Date().toISOString(),
+        notes: 'Imported from shared deep link.',
+        inputs: { ...currentInputs },
+        results: { ...results }
+      };
+      const updated = [newScenario, ...list];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new Event('taxScenariosUpdated'));
+      setSavedToLocalSuccess(true);
+      setTimeout(() => setSavedToLocalSuccess(false), 3000);
+    } catch (e) {
+      console.error('Failed to save scenario to localStorage', e);
+    }
   };
 
   // Compute logic
@@ -132,9 +221,34 @@ export function TaxPlanner() {
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">
           Individual Income <span className="text-emerald-600">Tax Planner</span>
         </h1>
-        <p className="text-lg text-slate-600 leading-relaxed">
+        <p className="text-lg text-slate-600 leading-relaxed mb-6">
           Estimate your annual tax liability based on the 2026 guidelines. Input your income, approved investments, and TDS to calculate your net payable tax.
         </p>
+
+        {/* Section Jump Links */}
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="#income-tax-calculator"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold hover:bg-emerald-100 transition-colors shadow-2xs"
+          >
+            <Calculator className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Income Tax Calculator</span>
+          </a>
+          <a
+            href="#wealth-surcharge-section"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-xs font-bold hover:bg-slate-200 transition-colors shadow-2xs"
+          >
+            <Coins className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Wealth Surcharge Visualizer (0% – 35%)</span>
+          </a>
+          <a
+            href="#early-filing-incentive"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-bold hover:bg-amber-100 transition-colors shadow-2xs"
+          >
+            <CalendarCheck className="w-3.5 h-3.5 text-amber-600" />
+            <span>5% Early Filing Incentive</span>
+          </a>
+        </div>
       </div>
 
       {/* Tax Filing Deadline Notification Component */}
@@ -146,7 +260,63 @@ export function TaxPlanner() {
         />
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-8 items-start">
+      {/* Shared Scenario Incoming Deep Link Alert Banner */}
+      {isSharedFromUrl && !sharedBannerDismissed && (
+        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl border border-emerald-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md">
+                  Shared Deep Link Loaded
+                </span>
+                <h3 className="text-sm font-bold text-slate-900">
+                  {activeScenarioName}
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Inputs loaded with annual income of <span className="font-bold text-slate-800">{parseInt(income || '0', 10).toLocaleString()} BDT</span> and net tax payable of <span className="font-bold text-emerald-700">{results.netPayable.toLocaleString()} BDT</span>.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <button
+              id="save-shared-scenario-to-local-btn"
+              onClick={handleSaveSharedToLocal}
+              disabled={savedToLocalSuccess}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
+                savedToLocalSuccess
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              }`}
+            >
+              {savedToLocalSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5" /> Saved to Scenarios!
+                </>
+              ) : (
+                <>
+                  <Bookmark className="w-3.5 h-3.5" /> Save to My Scenarios
+                </>
+              )}
+            </button>
+
+            <button
+              id="dismiss-shared-banner-btn"
+              onClick={() => setSharedBannerDismissed(true)}
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              title="Dismiss banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div id="income-tax-calculator" className="grid lg:grid-cols-12 gap-8 items-start scroll-mt-6">
         
         {/* Left Column: Form */}
         <div className="lg:col-span-7 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/60">
@@ -156,6 +326,22 @@ export function TaxPlanner() {
               <h2 className="text-2xl font-bold text-slate-900">Tax Inputs</h2>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                id="share-active-plan-top-btn"
+                onClick={() => {
+                  setShareModalTarget({
+                    name: activeScenarioName,
+                    inputs: currentInputs
+                  });
+                  setIsShareModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors shadow-2xs"
+                title="Share this tax scenario via deep link or email"
+              >
+                <Share2 className="w-3.5 h-3.5" /> Share Plan
+              </button>
+
               <button
                 type="button"
                 id="reset-tax-planner-inputs-btn"
@@ -335,6 +521,22 @@ export function TaxPlanner() {
                 {Math.abs(results.netPayable).toLocaleString()} <span className="text-lg font-semibold">BDT</span>
               </p>
             </div>
+
+            <button
+              type="button"
+              id="share-active-scenario-results-btn"
+              onClick={() => {
+                setShareModalTarget({
+                  name: activeScenarioName,
+                  inputs: currentInputs
+                });
+                setIsShareModalOpen(true);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-bold transition-all border border-white/10 shadow-xs cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-emerald-300" />
+              <span>Share Scenario Deep Link & Email</span>
+            </button>
           </div>
 
           {/* Lawyer / Tax Practitioner Consultation CTA */}
@@ -375,12 +577,50 @@ export function TaxPlanner() {
         </div>
       </div>
 
+      {/* Progressive Wealth Surcharge Visualizer (0% to 35%) */}
+      <div id="wealth-surcharge-section" className="my-12 scroll-mt-6">
+        <WealthSurchargeVisualizer
+          initialPayableTax={results.finalLiability > 0 ? results.finalLiability : 500000}
+          showCardWrapper={true}
+        />
+      </div>
+
+      {/* 5% Early Filing Incentive */}
+      <div id="early-filing-incentive" className="my-12 scroll-mt-6">
+        <EarlyFilingIncentive
+          initialPayableTax={results.finalLiability > 0 ? results.finalLiability : 500000}
+        />
+      </div>
+
       {/* Local Storage Scenario Management & Comparator */}
       <TaxScenarioManager
         currentInputs={currentInputs}
         currentResults={results}
         onLoadScenario={handleLoadScenario}
+        onShareScenario={(sc) => {
+          setShareModalTarget({
+            name: sc.name,
+            notes: sc.notes,
+            inputs: sc.inputs
+          });
+          setIsShareModalOpen(true);
+        }}
       />
+
+      {/* Share Scenario Modal */}
+      {isShareModalOpen && shareModalTarget && (
+        <ShareTaxScenarioModal
+          isOpen={isShareModalOpen}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setShareModalTarget(null);
+          }}
+          scenarioName={shareModalTarget.name}
+          notes={shareModalTarget.notes}
+          inputs={shareModalTarget.inputs}
+          results={results}
+        />
+      )}
     </div>
   );
 }
