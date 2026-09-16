@@ -26,6 +26,7 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsConditions } from './pages/TermsConditions';
 import { TdsReference } from './pages/TdsReference';
 import { TaxPlanner } from './pages/TaxPlanner';
+import { TaxRefundGuide } from './pages/TaxRefundGuide';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -39,6 +40,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="category/:id" element={<Category />} />
             <Route path="article/:id" element={<Article />} />
+            <Route path="tax-refund-guide" element={<TaxRefundGuide />} />
             <Route path="community" element={<Community />} />
             <Route path="experts" element={<Community initialTab="experts" />} />
             <Route path="discussions" element={<Community initialTab="discussions" />} />

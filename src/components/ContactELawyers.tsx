@@ -1,4 +1,5 @@
 import React from 'react';
+import { Twitter, Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
 
 export function ContactELawyers() {
   return (
@@ -85,7 +86,6 @@ export function ContactELawyers() {
               </a>
             </div>
           </div>
-
         </div>
 
         {/* Social Section */}
@@ -100,19 +100,21 @@ export function ContactELawyers() {
 
           <div className="flex justify-center flex-wrap gap-[15px] my-[30px]">
             {[
-              { name: 'X', url: 'https://x.com/elawyerssbd' },
-              { name: 'Facebook', url: 'https://www.facebook.com/elawyerssbd' },
-              { name: 'LinkedIn', url: 'https://linkedin.com/company/elawyersbd' },
-              { name: 'Instagram', url: 'https://www.instagram.com/elawyerssbd' },
-              { name: 'YouTube', url: 'https://www.youtube.com/@elawyerssbd' },
+              { name: 'X', url: 'https://x.com/elawyerssbd', Icon: Twitter, color: '#000000' },
+              { name: 'Facebook', url: 'https://www.facebook.com/elawyerssbd', Icon: Facebook, color: '#1877F2' },
+              { name: 'LinkedIn', url: 'https://linkedin.com/company/elawyersbd', Icon: Linkedin, color: '#0A66C2' },
+              { name: 'Instagram', url: 'https://www.instagram.com/elawyerssbd', Icon: Instagram, color: '#E1306C' },
+              { name: 'YouTube', url: 'https://www.youtube.com/@elawyerssbd', Icon: Youtube, color: '#FF0000' },
             ].map(social => (
               <a 
                 key={social.name}
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#12345b] text-white px-[25px] py-[12px] rounded-[30px] decoration-none transition-all duration-300 hover:bg-[#b08b35] hover:-translate-y-[3px]"
+                className="flex items-center gap-2 text-white px-[25px] py-[12px] rounded-[30px] decoration-none transition-all duration-300 hover:-translate-y-[3px] shadow-sm hover:shadow-md font-medium"
+                style={{ backgroundColor: social.color }}
               >
+                <social.Icon className="w-5 h-5" />
                 {social.name}
               </a>
             ))}

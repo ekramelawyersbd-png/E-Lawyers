@@ -49,6 +49,444 @@ export const categories: { id: string; name: Category; description: string }[] =
 
 export const mockArticles: Article[] = [
   {
+    id: 'early-filing-tax-incentive-bangladesh',
+    title: 'Early Filing Tax Incentive in Bangladesh: How Timely Tax Return Submission Can Reduce Your Tax Burden',
+    metaTitle: 'Early Filing Tax Incentive Bangladesh',
+    metaDescription: 'Learn how timely income tax return submission in Bangladesh between July 1 and September 30 can reduce your net payable tax burden by up to 5% or BDT 25,000.',
+    excerpt: 'Discover how the Early Filing Tax Incentive in Bangladesh can reduce your net payable tax by up to 5% (max BDT 25,000) when you submit your return between July and September.',
+    content: `Tax compliance is not only a legal responsibility but also an important part of financial planning. To encourage taxpayers to submit their income tax returns on time, Bangladesh's tax system provides incentives for individuals who complete their return filing early within the specified period of the assessment year.
+
+![Early Filing Tax Incentive Cover](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tac%20cover.png)
+
+The Early Filing Tax Incentive rewards taxpayers who submit their income tax returns during the first quarter of the assessment year by providing a reduction in their net payable tax amount.
+
+This initiative encourages timely compliance, reduces last-minute filing pressure, and helps taxpayers manage their financial obligations more effectively.
+
+## What is the Early Filing Tax Incentive?
+
+The Early Filing Tax Incentive is a benefit provided to eligible taxpayers who submit their income tax return within the first quarter of the assessment year.
+
+Taxpayers who file their return between:
+**1 July and 30 September of the assessment year**
+
+can receive a:
+**5% incentive on their net payable tax**
+
+subject to a maximum benefit limit of:
+**BDT 25,000**
+
+This means eligible taxpayers can reduce their final tax payment by applying the incentive amount calculated on their payable tax.
+
+## How Does the Early Filing Incentive Work?
+
+![Early Filing Incentive Calculation](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/Tax%20sep%2030300.png)
+
+The incentive is calculated based on the taxpayer's net payable tax, which is the amount remaining after considering applicable tax credits, rebates, and adjustments.
+
+**Formula:**
+\`Early Filing Incentive = 5% × Net Payable Tax\`
+
+**However:**
+\`Maximum Incentive Allowed = BDT 25,000\`
+
+If the calculated 5% amount exceeds BDT 25,000, the taxpayer will receive only the maximum allowable benefit.
+
+### Example 1: Taxpayer Receiving Full 5% Benefit
+
+**Assume:**
+* Net Payable Tax: BDT 300,000
+* Early Filing Incentive: 5%
+
+**Calculation:**
+\`5% × 300,000 = BDT 15,000\`
+
+![Calculation Example](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tac%202.png)
+
+**Final payable tax:**
+\`BDT 300,000 - BDT 15,000 = BDT 285,000\`
+
+*The taxpayer saves BDT 15,000 by filing early.*
+
+### Example 2: Incentive Limited by Maximum Cap
+
+**Assume:**
+* Net Payable Tax: BDT 800,000
+
+**Calculation:**
+\`5% × 800,000 = BDT 40,000\`
+
+**However, the maximum incentive limit is:**
+\`BDT 25,000\`
+
+**Therefore:**
+\`Final Incentive = BDT 25,000\`
+
+**Final payable tax:**
+\`BDT 800,000 - BDT 25,000 = BDT 775,000\`
+
+![Example 2 Calculation](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%2022.png)
+
+## Why Early Tax Filing is Important
+
+Many taxpayers wait until the last date to submit their returns. However, filing early provides several financial and practical advantages.
+
+### 1. Direct Tax Savings
+The most significant advantage is the reduction in payable tax. By submitting the return within the eligible period, taxpayers can lower their final tax liability through the incentive.
+
+### 2. Better Financial Planning
+Early filing allows taxpayers to understand their exact tax position before the deadline.
+It helps individuals plan:
+* Cash flow requirements
+* Investment decisions
+* Future tax obligations
+* Financial documentation
+
+### 3. Avoid Last-Minute Errors
+Late preparation often increases the risk of:
+* Missing required documents
+* Incorrect income reporting
+* Calculation mistakes
+* Delayed submission
+
+Early filing provides sufficient time to review all information carefully.
+
+### 4. Faster Completion of Tax-Related Services
+A completed tax return is often required for various financial and professional purposes, including:
+* Bank loan applications
+* Business transactions
+* Tax clearance certificates
+* Visa and immigration documentation
+* Investment-related activities
+
+Filing early ensures taxpayers have necessary documents available when required.
+
+## Who Can Benefit From the Early Filing Tax Incentive?
+
+The incentive is designed for eligible taxpayers who:
+* Have taxable income under the applicable tax rules
+* Submit their income tax return within the first quarter
+* Maintain proper income and tax records
+* Calculate their tax liability correctly
+
+Both salaried individuals and business professionals may benefit if they meet the applicable requirements.
+
+## Documents Taxpayers Should Prepare Before Filing
+
+To complete early filing smoothly, taxpayers should keep:
+
+<document-checklist></document-checklist>
+
+
+Proper documentation helps taxpayers claim available benefits accurately.
+
+## Tips to Maximize the Early Filing Benefit
+
+**1. Start Tax Preparation Before July**
+Preparing documents early allows taxpayers to complete filing without delays.
+
+**2. Review Tax Calculations Carefully**
+Ensure income, deductions, rebates, and tax payments are correctly calculated.
+
+**3. Keep Digital Copies of Documents**
+Maintaining electronic records makes future tax filing easier.
+
+**4. Use Online Tax Filing Facilities**
+Digital filing platforms help taxpayers submit returns efficiently and maintain proper records.
+
+## Common Mistakes to Avoid
+
+**Waiting Until the Deadline**
+Delaying filing may result in missing available incentives and creating unnecessary compliance pressure.
+
+**Incorrect Tax Calculation**
+Errors in calculating payable tax may affect the incentive amount.
+
+**Missing Supporting Documents**
+Without proper records, taxpayers may face difficulties claiming available benefits.
+
+## Conclusion
+
+The Early Filing Tax Incentive provides taxpayers with an opportunity to reduce their tax burden while improving their compliance process. By submitting income tax returns between 1 July and 30 September, eligible taxpayers can receive a 5% reduction on their net payable tax, up to a maximum of BDT 25,000.
+
+Early tax filing is not only a compliance requirement—it is also a smart financial practice that helps taxpayers save money, avoid complications, and maintain better control over their financial planning.`,
+    category: 'Income Tax',
+    categoryId: 'personal-tax',
+    author: {
+      id: 'e-lawyers',
+      name: 'E-Lawyers',
+      role: 'Tax Expert',
+      avatarUrl: 'https://ui-avatars.com/api/?name=E+Lawyers&background=047857&color=fff'
+    },
+    publishedAt: new Date().toISOString(),
+    readTime: 5,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200',
+    tags: ['Tax Incentive', 'Early Filing', 'Income Tax Bangladesh', 'Tax Planning', 'NBR']
+  },
+  {
+    id: 'tax-rebate-and-online-tax-refund-process-bangladesh',
+    title: 'Tax Rebate and Online Tax Refund Process in Bangladesh',
+    metaTitle: 'Investment Tax Rebate & Online Refund Process in Bangladesh',
+    metaDescription: 'Complete guide to claiming investment tax rebates and processing online tax refunds (কর প্রত্যর্পণ) through the NBR e-Tax system in Bangladesh.',
+    excerpt: 'Learn how to claim Investment Tax Rebates and process online tax refunds (কর প্রত্যর্পণ) through the NBR e-Tax portal in Bangladesh.',
+    content: `The tax system in Bangladesh provides several benefits to individual taxpayers who make eligible investments during an income year. One of the most important benefits is the **Investment Tax Rebate (Tax Credit)**, which allows taxpayers to reduce their payable income tax by claiming approved investments and contributions.
+
+![Tax Rebate and Online Tax Refund Process](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/6d5d1a22-158e-4726-8073-d6e713adf952.png)
+
+Additionally, if a taxpayer has already paid more tax through **Tax Deducted at Source (TDS)**, **Advance Income Tax (AIT)**, or other prepaid tax mechanisms than their actual tax liability, they may claim the excess amount as a **tax refund (কর প্রত্যর্পণ)** through the online tax return system.
+
+This guide explains the eligible investment categories for tax rebates and the complete online process for claiming tax refunds through the National Board of Revenue (NBR) e-Tax system.
+
+## Part 1: Understanding Investment Tax Rebate in Bangladesh
+
+### What is Investment Tax Rebate?
+
+![Investment Tax Rebate](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/3118bffb-039d-4d1c-824c-77a3fb28bc76.png)
+
+Investment Tax Rebate is a tax benefit provided to individual taxpayers for investing in approved sectors. Instead of paying tax on the full calculated amount, taxpayers can claim a tax credit based on eligible investments declared in their income tax return.
+
+The purpose of this rebate system is to encourage individuals to invest in savings instruments, insurance, retirement schemes, and capital market products while improving long-term financial security.
+
+### Eligible Investment Categories for Tax Rebate
+Individual taxpayers can claim investment tax rebates by declaring investments made during the relevant income year. The major approved investment categories include:
+
+### 1. Life Insurance Premiums
+Premium payments made for approved life insurance policies are eligible for investment tax rebate benefits.
+
+Eligible categories include:
+* Life insurance premiums paid to approved insurance companies in Bangladesh.
+* Contractual deferred annuity premiums.
+* Other approved insurance-related investments under applicable tax regulations.
+
+**Benefits of Life Insurance Investment**
+Life insurance investments provide:
+* Financial protection for family members.
+* Long-term savings benefits.
+* Tax rebate opportunities under income tax laws.
+
+*Taxpayers should maintain premium payment receipts and policy documents as supporting evidence.*
+
+### 2. Deposit Pension Scheme (DPS)
+Contributions made to approved Deposit Pension Schemes (DPS) are eligible for tax rebate claims.
+
+DPS is a popular savings method where individuals deposit a fixed amount monthly for future financial security.
+
+Eligible taxpayers can claim rebate on:
+* Approved monthly DPS contributions.
+* Deposit pension schemes operated by authorized financial institutions.
+
+**Required Documents**
+Taxpayers should preserve:
+* DPS account information.
+* Deposit statements.
+* Payment certificates from the financial institution.
+
+### 3. Government Securities and Savings Certificates
+Investments in government-approved savings instruments are eligible for investment tax rebate.
+
+These include:
+* Sanchayapatra (সঞ্চয়পত্র).
+* Government securities.
+* Unit certificates.
+* Mutual funds.
+* Exchange Traded Funds (ETF).
+* Approved joint investment schemes.
+
+**Why Invest in Government Instruments?**
+Government investment schemes provide:
+* Secure investment opportunities.
+* Regular income benefits.
+* Tax rebate advantages.
+
+*Taxpayers must declare investment details accurately in their tax return.*
+
+### 4. Listed Securities Investment
+Investment in securities listed on approved stock exchanges in Bangladesh may qualify for investment rebate.
+
+Eligible investments include:
+* Shares.
+* Stocks.
+* Listed securities traded through approved stock exchanges.
+
+Investors should maintain:
+* Brokerage statements.
+* BO account records.
+* Purchase documents.
+
+### 5. Provident Fund Contributions
+Contributions to recognized retirement funds are eligible for tax rebate consideration.
+
+Eligible funds include:
+* **Recognized Provident Fund (RPF):** Employee and employer contributions to an approved Recognized Provident Fund may qualify.
+* **General Provident Fund (GPF):** Government employees contributing to a General Provident Fund may also receive tax benefits.
+
+These investments support retirement planning while providing tax advantages.
+
+### 6. Universal Pension and Other Approved Funds
+Recent tax provisions include additional approved investment categories such as:
+* Universal Pension Scheme contributions.
+* Approved Superannuation Funds.
+* Benevolent Funds.
+* Group Insurance premiums.
+* Zakat Funds managed under the Zakat Fund Management Act, 2023.
+
+These schemes encourage taxpayers to build financial security through structured savings.
+
+## Part 2: Understanding Tax Refund in Bangladesh
+
+### What is a Tax Refund?
+
+![Tax Refund](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/7145a580-6784-4b95-b637-c6cdc8980b56.png)
+
+A tax refund occurs when the amount of tax already paid by a taxpayer is higher than the final tax liability calculated in the income tax return.
+
+Excess payment may occur due to:
+* Higher salary TDS deductions.
+* Excess bank interest tax deductions.
+* Advance Income Tax payments.
+* Sanchayapatra source tax deductions.
+* Other prepaid tax payments.
+
+The excess amount becomes refundable tax (কর প্রত্যর্পণ).
+
+### Online Tax Refund Claim Process Through NBR e-Tax
+Individual taxpayers can claim refunds through the NBR online income tax return system.
+
+The complete process is explained below.
+
+### Step 1: Login to NBR e-Tax Portal
+Visit the official NBR e-Tax portal: \`https://etaxnbr.gov.bd\`
+
+After logging in:
+* Select **Regular e-Return**.
+* Start preparing your income tax return.
+* Complete required information including: Personal information, Assessment details, Income details, and Investment rebate information.
+
+### Step 2: Complete Investment Rebate Information
+During return preparation:
+* Enter eligible investment details.
+* Provide applicable investment amounts.
+* Ensure information matches supporting documents.
+
+The system will calculate the applicable rebate based on declared investments.
+
+### Step 3: Go to Tax & Payment Section
+After completing income and rebate information:
+* Navigate to the **Tax & Payment** section.
+* Review your tax calculation.
+* Access payment-related options.
+
+### Step 4: Open e-Return Ledger
+To update tax payment information:
+* Click the **"Update Tax Payment Status"** button.
+* The system will open the **e-Return Ledger** module.
+
+This section allows taxpayers to reconcile previously paid taxes.
+
+### Step 5: Reconcile TDS and Advance Tax Payments
+Taxpayers need to verify their previous tax payments.
+
+**Claim Source Tax**
+Select Claim Source Tax to reconcile:
+* Salary TDS.
+* Bank interest source tax.
+* Sanchayapatra source tax.
+* Other deducted taxes.
+
+**Claim Advance Income Tax (AIT)**
+Select Claim AIT for:
+* Advance tax payments.
+* Other prepaid tax payments.
+
+**Automatic Verification**
+The NBR e-Return system can automatically verify certain records, including:
+* Vehicle/car AIT records.
+* iBAS++ salary TDS information.
+* Online Sanchayapatra records.
+
+### Step 6: Adjust Previous Year Refund (If Applicable)
+If you have an unadjusted refund amount from a previous assessment year:
+* Select **Adjustment of Tax Refund** from the left-side menu.
+* Enter previous return reference information.
+* Save the adjustment.
+
+The remaining refund amount will be considered during current year tax calculation.
+
+### Step 7: Verify Refundable Tax Amount
+After updating all payments:
+* Click **Go to e-Return**.
+* Return to the main calculation page.
+* Review the tax summary.
+
+The system will display:
+* Total tax liability.
+* Total tax paid.
+* Excess payment amount.
+* Refundable tax amount.
+
+### Step 8: Submit Return for Automated Refund
+After completing all information:
+* Review the final return preview.
+* Submit the income tax return online.
+
+For eligible self-assessment returns, including individuals whose income mainly comes from: Salary, Financial assets, or Agriculture.
+
+The system processes the refundable amount through the automated refund mechanism (স্বয়ংক্রিয় কর প্রত্যর্পণ).
+
+Taxpayers may also choose to:
+* Receive the refundable amount.
+* Carry forward the excess amount (জের টানা) for adjustment against future tax liabilities.
+
+## Documents to Maintain for Tax Rebate and Refund Claims
+Taxpayers should keep proper records, including:
+
+**Investment Documents**
+* Insurance premium receipts.
+* DPS statements.
+* Sanchayapatra certificates.
+* Investment certificates.
+* Share market statements.
+* Provident fund statements.
+
+**Tax Payment Documents**
+* TDS certificates.
+* Advance tax payment receipts.
+* Bank tax deduction certificates.
+* Previous return references.
+
+*Proper documentation helps avoid complications during assessment or verification.*
+
+## Common Mistakes to Avoid
+1. **Incorrect Investment Declaration:** Only approved investments should be included in the tax return.
+2. **Missing Supporting Documents:** Always preserve evidence for declared investments.
+3. **Duplicate Tax Claims:** Avoid claiming the same tax payment multiple times.
+4. **Incorrect TDS Matching:** Ensure TDS information matches employer, bank, or government records.
+5. **Not Checking Refund Status:** After submission, taxpayers should monitor refund adjustments or processing status.
+
+## Conclusion
+Investment tax rebate and online tax refund facilities provide significant benefits for individual taxpayers in Bangladesh. By investing in approved financial instruments and accurately declaring tax payments, taxpayers can reduce their tax burden and claim excess tax payments efficiently.
+
+The NBR e-Tax platform has simplified the refund process by enabling online reconciliation of TDS, AIT, and other prepaid taxes. Maintaining proper records and submitting accurate information ensures a smooth tax filing experience.
+
+For taxpayers, understanding eligible investments and following the correct refund procedure is essential for maximizing available tax benefits while remaining compliant with Bangladesh income tax regulations.`,
+    category: 'Income Tax',
+    categoryId: 'personal-tax',
+    author: {
+      id: 'e-lawyers',
+      name: 'E-Lawyers',
+      role: 'Tax Expert',
+      avatarUrl: 'https://ui-avatars.com/api/?name=E+Lawyers&background=047857&color=fff'
+    },
+    publishedAt: new Date().toISOString(),
+    readTime: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1200',
+    galleryImages: [
+      { url: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=800', caption: 'Online e-Tax Filing' },
+      { url: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=800', caption: 'Investment Documents' },
+      { url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=800', caption: 'Financial Planning' }
+    ],
+    tags: ['Tax Rebate', 'Tax Refund', 'NBR e-Tax', 'Investment Allowance', 'Income Tax Bangladesh']
+  },
+  {
     id: 'benefits-of-filing-income-tax-return-bangladesh',
     title: 'Benefits of Filing Individual Income Tax Return in Bangladesh | Tax Benefits & PSR Guide',
     metaTitle: 'Benefits of Filing Individual Income Tax Return in Bangladesh | Tax Benefits & PSR Guide',

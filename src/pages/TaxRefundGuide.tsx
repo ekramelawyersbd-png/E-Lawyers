@@ -8,8 +8,6 @@ import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Faceb
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { DocumentChecklist } from '../components/DocumentChecklist';
 import React from 'react';
 import { ReadProgress } from '../components/ReadProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
@@ -36,38 +34,28 @@ import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
-import { BlogSEO } from '../components/BlogSEO';
+import { Helmet } from 'react-helmet-async';
 import { BlogDisclaimer } from '../components/BlogDisclaimer';
 import { ContactELawyers } from '../components/ContactELawyers';
 
-export function Article() {
-  const { id } = useParams();
+export function TaxRefundGuide() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { language } = useLanguage();
   const [isSaved, setIsSaved] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      setIsSaved(isItemSaved(id));
-      const handleStorageChange = () => setIsSaved(isItemSaved(id));
-      window.addEventListener('bookmarksUpdated', handleStorageChange);
-      return () => window.removeEventListener('bookmarksUpdated', handleStorageChange);
-    }
-  }, [id]);
-
-  const article = mockArticles.find(a => a.id === id);
+  const article = mockArticles.find(a => a.id === 'tax-rebate-and-online-tax-refund-process-bangladesh');
 
   useEffect(() => {
     if (article) {
-      document.title = article.metaTitle || `${article.title} | Accounticca E-Lawyers`;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', article.metaDescription || article.excerpt);
-      }
+      setIsSaved(isItemSaved(article.id));
+      const handleStorageChange = () => setIsSaved(isItemSaved(article.id));
+      window.addEventListener('bookmarksUpdated', handleStorageChange);
+      return () => window.removeEventListener('bookmarksUpdated', handleStorageChange);
     }
   }, [article]);
+
   const popularArticles = mockArticles.slice(0, 4);
   const { isLoaded: isFeaturedLoaded, hasError: hasFeaturedError } = useImageLoader(article?.imageUrl);
 
@@ -86,17 +74,17 @@ export function Article() {
   }
 
   const toggleSave = async () => {
-    if (!id || !article) return;
+    if (!article) return;
     if (isSaved) {
-      await removeBookmark(id, user);
+      await removeBookmark(article.id, user);
       setIsSaved(false);
       setSaveFeedback(null);
     } else {
       await saveBookmark({
-        id,
+        id: article.id,
         title: article.title,
         type: 'article',
-        url: `/article/${id}`,
+        url: `/article/${article.id}`,
         dateSaved: new Date().toISOString(),
         offlineContent: article.content,
         offlineExcerpt: article.excerpt,
@@ -177,9 +165,6 @@ export function Article() {
         return <ImageCarousel images={carouselImages} />;
       }
       
-            if (elementChildren.some((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === "document-checklist")) {
-        return <div className="mb-4">{children}</div>;
-      }
       return <p>{children}</p>;
     },
     img: ({ node, ...props }: any) => <MarkdownImage {...props} />,
@@ -198,9 +183,35 @@ export function Article() {
     table: ({ node, children, ...props }: any) => <SortableTable {...props}>{children}</SortableTable>
   }), [article.id]);
 
+  const pageUrl = `${window.location.origin}/tax-refund-guide`;
+
   return (
     <>
-      <BlogSEO article={article} />
+      <Helmet>
+        <title>{article.metaTitle || `${article.title} | Accounticca E-Lawyers`}</title>
+        <meta name="description" content={article.metaDescription || article.excerpt} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={article.metaTitle || article.title} />
+        <meta property="og:description" content={article.metaDescription || article.excerpt} />
+        <meta property="og:image" content={article.imageUrl} />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={pageUrl} />
+        <meta property="twitter:title" content={article.metaTitle || article.title} />
+        <meta property="twitter:description" content={article.metaDescription || article.excerpt} />
+        <meta property="twitter:image" content={article.imageUrl} />
+
+        {/* Article specific metadata */}
+        <meta property="article:published_time" content={article.publishedAt} />
+        <meta property="article:author" content={article.author.name} />
+        {article.tags?.map(tag => (
+          <meta property="article:tag" content={tag} key={tag} />
+        ))}
+      </Helmet>
       <ReadProgress />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <Breadcrumbs 
@@ -234,6 +245,15 @@ export function Article() {
               <h1 className="text-[25px] leading-[33px] font-bold text-slate-900 mb-6">
                 {article.title}
               </h1>
+              
+              <div className="mb-8 rounded-xl overflow-hidden border border-slate-200">
+                <img 
+                  src="https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/6d5d1a22-158e-4726-8073-d6e713adf952.png" 
+                  alt="Tax Rebate Banner" 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+
               <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
                 {article.excerpt}
               </p>
@@ -298,8 +318,7 @@ export function Article() {
             <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
               <Markdown 
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
-                components={{...markdownComponents, "document-checklist": () => <DocumentChecklist /> } as any}
+                components={markdownComponents}
               >
                 {localizedContent}
               </Markdown>
