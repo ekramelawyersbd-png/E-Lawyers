@@ -151,6 +151,8 @@ Late preparation often increases the risk of:
 Early filing provides sufficient time to review all information carefully.
 
 ### 4. Faster Completion of Tax-Related Services
+
+![Faster Completion of Services](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%20sep%2030.png)
 A completed tax return is often required for various financial and professional purposes, including:
 * Bank loan applications
 * Business transactions
@@ -208,7 +210,9 @@ Without proper records, taxpayers may face difficulties claiming available benef
 
 The Early Filing Tax Incentive provides taxpayers with an opportunity to reduce their tax burden while improving their compliance process. By submitting income tax returns between 1 July and 30 September, eligible taxpayers can receive a 5% reduction on their net payable tax, up to a maximum of BDT 25,000.
 
-Early tax filing is not only a compliance requirement—it is also a smart financial practice that helps taxpayers save money, avoid complications, and maintain better control over their financial planning.`,
+Early tax filing is not only a compliance requirement—it is also a smart financial practice that helps taxpayers save money, avoid complications, and maintain better control over their financial planning.
+
+![Conclusion](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/twa%2022.png)`,
     category: 'Income Tax',
     categoryId: 'personal-tax',
     author: {
