@@ -48,6 +48,244 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+
+  {
+    id: 'required-documents-for-salaried-employees-tax-return-bd',
+    title: 'Required Documents List for Employees (Income from Salary) — FY 2025-26 | AY 2026-27',
+    metaTitle: 'Required Documents for Salaried Employees Tax Return 2025-26 Bangladesh',
+    metaDescription: 'A comprehensive checklist of required documents for salaried employees in Bangladesh to submit their personal income tax return for FY 2025-26 (AY 2026-27).',
+    excerpt: 'For salaried individuals, submitting an accurate Personal Income Tax Return requires proper documentation. Discover the complete list of documents needed for FY 2025-26.',
+    content: `# Personal Income Tax Return Submission
+
+## Required Documents List for Employees (Income from Salary) — FY 2025-26 | AY 2026-27
+
+## Introduction
+
+
+![Introduction Image](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/08f1b082-95ee-49a4-87d6-42463453c849.png)
+
+For salaried individuals, submitting an accurate **Personal Income Tax Return** requires proper documentation of salary income, tax deductions, savings, investments, and other relevant financial information. Employees must collect and maintain necessary documents before preparing their income tax return to ensure smooth submission and compliance with the tax regulations.
+
+For **Financial Year (FY) 2025-26** and **Assessment Year (AY) 2026-27**, employees should prepare the following documents related to their salary income and employment benefits.
+
+---
+
+# Documents Required for Employees (Income from Salary)
+
+## 1. Salary Certificate
+
+A **Salary Certificate** is one of the most important documents required for salaried taxpayers.
+
+This certificate is generally issued by the employer and contains details such as:
+
+* Employee name and designation
+* Employer's name and address
+* Gross annual salary
+* Basic salary
+* House rent allowance (if applicable)
+* Medical allowance
+* Conveyance allowance
+* Bonus and incentives
+* Other benefits and allowances
+* Total taxable income
+* Tax deducted at source (TDS)
+
+### Why is a Salary Certificate Required?
+
+A salary certificate helps the taxpayer and tax authority verify:
+
+* Total employment income
+* Taxable salary amount
+* Employer-provided benefits
+* Tax deduction information
+
+Employees should collect an updated salary certificate from their employer before preparing their tax return.
+
+![Salary Certificate](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/90b0e2d5-0462-418b-ab5f-3dd3b3b40770.png)
+
+---
+
+# 2. Bank Statement
+
+A bank statement is required to verify salary transactions and financial activities.
+
+![Bank Statement](https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/af15f66a-2680-4c40-b0ea-fc0e96997fdd.png)
+
+Employees should provide:
+
+* Salary account bank statement
+* Monthly salary credit records
+* Interest income details (if applicable)
+* Other financial transactions related to income
+
+### Importance of Bank Statement
+
+A bank statement helps maintain transparency by showing:
+
+* Regular salary deposits
+* Additional income sources
+* Savings and investment activities
+* Financial consistency with submitted tax information
+
+Employees should ensure that their bank statement covers the relevant income period.
+
+---
+
+# 3. Provident Fund Information
+
+Employees who contribute to a **Provident Fund (PF)** should submit relevant PF documents.
+
+Required information may include:
+
+* Employee contribution details
+* Employer contribution details
+* PF account statement
+* Annual contribution certificate
+
+### Benefits of Providing PF Information
+
+Provident Fund information helps calculate:
+
+* Eligible investment benefits
+* Tax rebate claims (where applicable)
+* Total employment benefits
+
+Employees should collect updated PF statements from their organization.
+
+---
+
+# 4. TDS Challan and Other Relevant Documents
+
+If tax has been deducted from salary, employees need proper proof of tax deduction.
+
+Required documents include:
+
+* TDS certificate issued by employer
+* Tax deduction details
+* TDS Challan copy (where applicable)
+* Other tax payment documents
+
+### Why TDS Documents Are Important?
+
+TDS documents help taxpayers:
+
+* Claim tax credit
+* Match deducted tax records
+* Avoid discrepancies during return submission
+
+Employees should verify that the deducted tax amount matches the information provided in their income tax return.
+
+---
+
+# Additional Documents Employees Should Keep Ready
+
+Besides salary-related documents, salaried taxpayers may also require:
+
+## Personal Information Documents
+
+* e-TIN Certificate
+* NID Copy
+* Passport-size photograph (if required)
+* Current and permanent address details
+* Previous year's tax return copy
+
+---
+
+## Investment and Tax Benefit Documents
+
+Employees claiming eligible tax benefits should keep:
+
+* Life insurance premium certificate
+* DPS/FDR investment certificate
+* Government savings certificate documents
+* Approved investment records
+* Donation/Zakat evidence (if applicable)
+
+---
+
+## Housing and Asset Information (If Applicable)
+
+Employees who own assets should maintain:
+
+* House/flat ownership documents
+* Land deed
+* Loan documents
+* Vehicle purchase documents
+* Bank loan certificates
+
+---
+
+# Common Mistakes Employees Should Avoid During Tax Return Submission
+
+### 1. Submitting Incorrect Salary Information
+
+Ensure that salary figures match the employer-issued certificate.
+
+### 2. Missing TDS Information
+
+Always verify deducted tax amounts before submitting returns.
+
+### 3. Not Reporting Additional Income
+
+Income from:
+
+* Bank interest
+* Rental property
+* Investments
+* Other sources
+
+should be properly disclosed.
+
+### 4. Not Maintaining Supporting Documents
+
+Keep all supporting documents safely for future reference and compliance requirements.
+
+---
+
+# Benefits of Preparing Documents Before Tax Filing
+
+Preparing documents early helps employees:
+
+✅ Submit accurate tax returns
+✅ Reduce errors during filing
+✅ Claim eligible tax benefits
+✅ Maintain proper financial records
+✅ Avoid unnecessary complications
+
+---
+
+# Submit Your Personal Income Tax Return with E-Lawyers Tax Team
+
+E-Lawyers provides professional assistance for personal income tax return preparation and submission. Our experienced tax team helps individuals organize documents, prepare accurate returns, and complete tax filing procedures efficiently.
+
+## Contact E-Lawyers Tax Team
+
+📧 Email: [info@elawyersbd.com](mailto:info@elawyersbd.com)
+📱 WhatsApp/Viber: +8801313-583838
+
+
+🌐 Website: [www.elawyersbd.com](http://www.elawyersbd.com)
+
+---
+
+## Conclusion
+
+For salaried employees, maintaining proper documentation is essential for accurate **Personal Income Tax Return Submission for FY 2025-26 (AY 2026-27)**. Salary certificates, bank statements, provident fund information, and TDS documents form the foundation of a complete salary income declaration.
+
+By preparing these documents in advance, employees can ensure a smooth and compliant tax filing process.`,
+    category: 'Income Tax',
+    categoryId: 'tax',
+    author: {
+      id: 'e-lawyers',
+      name: 'E-Lawyers',
+      role: 'Tax Expert',
+      avatarUrl: 'https://ui-avatars.com/api/?name=E+Lawyers&background=047857&color=fff'
+    },
+    publishedAt: new Date().toISOString(),
+    readTime: 4,
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=1200',
+    tags: ['Income Tax', 'Salary Tax', 'Tax Return', 'Tax Bangladesh', 'Employees']
+  },
   {
     id: 'early-filing-tax-incentive-bangladesh',
     title: 'Early Filing Tax Incentive in Bangladesh: How Timely Tax Return Submission Can Reduce Your Tax Burden',

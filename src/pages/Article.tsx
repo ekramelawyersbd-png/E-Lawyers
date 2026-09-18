@@ -39,6 +39,7 @@ import { CommentSection } from '../components/CommentSection';
 import { BlogSEO } from '../components/BlogSEO';
 import { BlogDisclaimer } from '../components/BlogDisclaimer';
 import { ContactELawyers } from '../components/ContactELawyers';
+import { RelatedResources } from '../components/RelatedResources';
 
 export function Article() {
   const { id } = useParams();
@@ -145,10 +146,15 @@ export function Article() {
     h2: ({ node, children, ...props }: any) => {
       const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const isFlowchartTarget = article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && id === 'mandatory-hearing-before-imposing-penalty';
+      
+      const isSpecificH2 = id === 'required-documents-list-for-employees-income-from-salary-fy-2025-26-ay-2026-27';
+      const className = isSpecificH2 
+        ? "text-[15px] leading-[25px] scroll-mt-28 font-bold" 
+        : "text-[25px] leading-[33px] scroll-mt-28 font-bold";
 
       return (
         <>
-          <h2 id={id} className="text-[25px] leading-[33px] scroll-mt-28 font-bold" {...props}>{children}</h2>
+          <h2 id={id} className={className} {...props}>{children}</h2>
           {isFlowchartTarget && <PenaltyFlowchart />}
         </>
       );
@@ -376,6 +382,9 @@ export function Article() {
             </div>
 
             <BlogDisclaimer topic={article.category} />
+
+            <RelatedResources currentCategory={article.category} />
+
             
             <ContactELawyers />
 
@@ -401,6 +410,15 @@ export function Article() {
                     className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </form>
+              </div>
+
+              {/* Sidebar Promotional Image */}
+              <div className="rounded-3xl overflow-hidden shadow-sm border border-slate-200">
+                <img 
+                  src="https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/90b0e2d5-0462-418b-ab5f-3dd3b3b40770.png" 
+                  alt="Featured Guide" 
+                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" 
+                />
               </div>
 
               {/* Table of Contents */}
