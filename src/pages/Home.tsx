@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
@@ -99,28 +99,56 @@ export function Home() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50" />
         </div>
         
-        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Content Area */}
-            <div>
-              <span className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md text-emerald-300 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8 border border-white/10 shadow-[0_0_15px_rgba(0,168,120,0.15)]">
-                <span className="w-2 h-2 rounded-full bg-[#00A878] animate-pulse"></span>
-                Trusted Legal & Tax Intelligence
-              </span>
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide mb-5 shadow-sm backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Bangladesh Regulatory &amp; Corporate Intelligence</span>
+              </div>
               
-              <h1 className="text-[40px] sm:text-5xl lg:text-[56px] font-extrabold tracking-tight mb-6 leading-[1.15] text-white">
-                Expert Legal, Tax & <span className="text-[#00A878] relative whitespace-nowrap">Corporate Solutions<svg className="absolute -bottom-2 left-0 w-full h-3 text-[#00A878]/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/></svg></span><br className="hidden sm:block" /> for Bangladesh
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[58px] font-extrabold tracking-tight text-white mb-4 leading-[1.1]">
+                Compliance <span className="text-emerald-400">Hub</span>
               </h1>
               
-              <p className="text-[#A8B5C7] text-lg sm:text-xl mb-10 leading-relaxed max-w-xl font-medium">
-                Navigate regulatory complexities with absolute confidence. Premium consultancy and authoritative insights for modern enterprises.
+              {/* Refined Credibility Line */}
+              <div className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs sm:text-sm text-slate-300 font-medium mb-6 py-2 px-3.5 sm:px-4 rounded-xl bg-white/[0.05] border border-white/10 shadow-sm backdrop-blur-md">
+                <span className="text-slate-400 font-normal">Powered by</span>
+                <a 
+                  href="https://elawyersbd.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-1 font-semibold text-emerald-400 hover:text-emerald-300 underline-offset-4 hover:underline transition-colors"
+                >
+                  <span>E-Lawyers</span>
+                  <ExternalLink className="w-3 h-3 text-emerald-400/80" />
+                </a>
+                <span className="text-slate-500">&amp;</span>
+                <a 
+                  href="https://accounticca.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-1 font-semibold text-emerald-400 hover:text-emerald-300 underline-offset-4 hover:underline transition-colors"
+                >
+                  <span>Accounticca</span>
+                  <ExternalLink className="w-3 h-3 text-emerald-400/80" />
+                </a>
+                <span className="text-slate-500 hidden sm:inline">—</span>
+                <span className="text-slate-200 font-medium">Simplifying Legal &amp; Financial Compliance</span>
+              </div>
+              
+              {/* Value Proposition */}
+              <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl mb-8 font-normal">
+                Authoritative statutory guidance, tax calculators, and actionable regulatory insights. Built for entrepreneurs, CFOs, and practitioners navigating Bangladesh legal and financial compliance.
               </p>
               
               {/* Search Bar */}
-              <div className="mb-10 max-w-xl relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00A878] to-emerald-400 rounded-full blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
+              <div className="mb-5 max-w-xl relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <form 
-                  className="relative flex items-center bg-white/10 backdrop-blur-xl rounded-full p-1.5 border border-white/10 shadow-2xl transition-all"
+                  className="relative flex items-center bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1.5 border border-slate-700/80 shadow-2xl transition-all"
                   onSubmit={(e) => {
                     e.preventDefault();
                     const form = e.target as HTMLFormElement;
@@ -130,85 +158,121 @@ export function Home() {
                     }
                   }}
                 >
-                  <Search className="w-5 h-5 text-[#A8B5C7] ml-5 absolute pointer-events-none" />
+                  <Search className="w-5 h-5 text-slate-400 ml-4 absolute pointer-events-none" />
                   <input 
                     name="search"
                     type="text" 
-                    placeholder="Search legal precedents, tax codes..." 
-                    className="w-full bg-transparent border-none py-3.5 pl-14 pr-4 text-white placeholder:text-[#A8B5C7] focus:outline-none text-base font-medium"
+                    placeholder="Search Income Tax sections, RJSC filings, VAT circulars..." 
+                    className="w-full bg-transparent border-none py-3.5 pl-12 pr-4 text-white placeholder:text-slate-400 focus:outline-none text-sm sm:text-base font-medium"
                   />
-                  <button type="submit" className="bg-gradient-to-r from-[#00A878] to-emerald-500 hover:from-emerald-500 hover:to-[#00A878] text-white px-8 py-3.5 rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(0,168,120,0.4)] shrink-0">
+                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 sm:px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0">
                     Search
                   </button>
                 </form>
               </div>
 
+              {/* Quick Interactive Tool Tags */}
+              <div className="flex flex-wrap items-center gap-2 mb-8 max-w-xl">
+                <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Quick Tools:</span>
+                <Link to="/tax-calculator" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                  Tax Calculator
+                </Link>
+                <Link to="/tds-reference" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                  TDS Guide
+                </Link>
+                <Link to="/corporate-tax-planner" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                  Corporate Tax
+                </Link>
+                <Link to="/vat-guide" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                  VAT Guide
+                </Link>
+              </div>
+              
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4">
                 <a 
                   href="https://appointment.accounticca.com" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="bg-[#00A878] hover:bg-emerald-500 text-white px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,168,120,0.3)] hover:-translate-y-0.5"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:-translate-y-0.5 text-sm sm:text-base"
                 >
                   <span>Book Consultation</span>
                   <ExternalLink className="w-4 h-4" />
                 </a>
-                <a 
-                  href="/category/corporate" 
-                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5"
+                <Link 
+                  to="/category/compliance" 
+                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5 text-sm sm:text-base"
                 >
-                  <span>Explore Insights</span>
+                  <span>Compliance Checklists</span>
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </div>
             </div>
 
-            {/* Featured Article Card (Right side) */}
-            {featuredArticle && (
-              <div className="relative group hidden lg:block animate-in fade-in zoom-in-95 slide-in-from-right-8 duration-1000 delay-150">
-                <div className="absolute -inset-1 bg-gradient-to-br from-[#00A878] to-emerald-900 rounded-[28px] blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-                <Link to={`/article/${featuredArticle.id}`} className="relative flex flex-col bg-[rgba(255,255,255,0.06)] backdrop-blur-2xl border border-white/10 p-8 rounded-[24px] shadow-2xl hover:border-white/20 transition-all duration-500 overflow-hidden hover:-translate-y-2 min-h-[380px]">
-                  
-                  {/* Subtle inner top highlight */}
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="inline-block bg-[#00A878]/20 text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-[#00A878]/30 shadow-sm backdrop-blur-md">
-                      {featuredArticle.category || 'Featured Insight'}
-                    </span>
-                    <span className="text-[#A8B5C7] text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
-                      <Clock className="w-3.5 h-3.5" />
-                      {calculateReadingTime(featuredArticle.content)} min
-                    </span>
-                  </div>
-                  
-                  <h2 className="text-[26px] font-bold text-white mb-4 leading-tight group-hover:text-emerald-300 transition-colors">
-                    {featuredArticle.title}
-                  </h2>
-                  
-                  <p className="text-[#A8B5C7] text-base mb-8 line-clamp-3 leading-relaxed">
-                    {featuredArticle.excerpt}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img src={featuredArticle.author.avatarUrl} alt={featuredArticle.author.name} className="w-10 h-10 rounded-full object-cover border-2 border-[#071426] shadow-sm relative z-10" />
-                        <div className="absolute inset-0 rounded-full bg-[#00A878] blur-[4px] opacity-40 z-0"></div>
+            {/* Right Content Area: SaaS Interactive Card & Pillars */}
+            <div className="lg:col-span-5 space-y-4">
+              {featuredArticle && (
+                <div className="relative group animate-in fade-in zoom-in-95 slide-in-from-right-8 duration-1000 delay-150">
+                  <div className="absolute -inset-1 bg-gradient-to-br from-emerald-500/30 to-slate-800 rounded-[26px] blur-sm opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                  <Link 
+                    to={`/article/${featuredArticle.id}`} 
+                    className="relative flex flex-col bg-slate-900/80 backdrop-blur-2xl border border-slate-700/70 p-7 rounded-[22px] shadow-2xl hover:border-emerald-500/40 transition-all duration-300 overflow-hidden hover:-translate-y-1"
+                  >
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg">
+                        <Sparkles className="w-3 h-3 text-emerald-400" />
+                        <span>{featuredArticle.category || 'Featured Insight'}</span>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-white">{featuredArticle.author.name}</p>
-                        <p className="text-xs text-[#A8B5C7] font-medium">{featuredArticle.author.role || 'Senior Counsel'}</p>
-                      </div>
+                      <span className="text-slate-400 text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        {calculateReadingTime(featuredArticle.content)} min
+                      </span>
                     </div>
-                    <span className="bg-white/10 group-hover:bg-[#00A878] text-white p-3 rounded-full transition-colors duration-300">
-                      <ArrowUpRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    </span>
-                  </div>
-                </Link>
+                    
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug group-hover:text-emerald-300 transition-colors">
+                      {featuredArticle.title}
+                    </h2>
+                    
+                    <p className="text-slate-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                      {featuredArticle.excerpt}
+                    </p>
+                    
+                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-slate-800">
+                      <div className="flex items-center gap-3">
+                        <img 
+                          src={featuredArticle.author.avatarUrl} 
+                          alt={featuredArticle.author.name} 
+                          className="w-9 h-9 rounded-full object-cover border border-slate-700 shadow-sm" 
+                        />
+                        <div>
+                          <p className="text-sm font-bold text-white">{featuredArticle.author.name}</p>
+                          <p className="text-xs text-slate-400">{featuredArticle.author.role || 'Senior Counsel'}</p>
+                        </div>
+                      </div>
+                      <span className="w-9 h-9 rounded-full bg-emerald-600/20 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-all duration-300">
+                        <ArrowUpRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+
+              {/* Three SaaS Compliance Pillar Badges */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Corporate</div>
+                  <div className="text-xs text-slate-300 font-medium">RJSC &amp; Companies</div>
+                </div>
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Tax 2023</div>
+                  <div className="text-xs text-slate-300 font-medium">NBR SROs &amp; Slabs</div>
+                </div>
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">VAT &amp; TDS</div>
+                  <div className="text-xs text-slate-300 font-medium">Withholding Rules</div>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>

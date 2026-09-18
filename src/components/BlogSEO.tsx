@@ -8,7 +8,7 @@ interface BlogSEOProps {
 
 export function BlogSEO({ article }: BlogSEOProps) {
   const url = typeof window !== 'undefined' ? `${window.location.origin}/article/${article.id}` : `https://elawyersbd.com/blog/${article.id}`;
-  const siteName = 'E-Lawyers';
+  const siteName = 'Compliance Hub';
   
   // Default image fallback if not provided
   const imageUrl = article.imageUrl ? (

@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Search, 
   User, 
@@ -53,9 +53,32 @@ export function Navbar() {
   const communityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [savedBookmarkCount, setSavedBookmarkCount] = useState(() => getSavedItems().length);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    if (searchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchOpen]);
+
+  useEffect(() => {
+    setSearchOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -300,10 +323,10 @@ export function Navbar() {
           <div className="flex items-center shrink-0">
             <Link to="/" className="flex items-center gap-3 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-emerald-800/10 p-1 group-hover:scale-105 transition-transform">
-                <img src="/logo.png" alt="E-Lawyers Logo" className="w-full h-full object-contain" />
+                <img src="/logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">E-Lawyers <span className="text-emerald-700">blog</span></h1>
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">Compliance <span className="text-emerald-700">Hub</span></h1>
                 <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-slate-500 font-bold leading-none">Legal • Tax • Tech</p>
               </div>
             </Link>
@@ -617,21 +640,59 @@ export function Navbar() {
           
           {/* Right actions: Search + Auth + Mobile menu toggle */}
           <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
-            <LanguageToggle className="hidden sm:flex" />
-            <form 
-              className="hidden md:block relative text-slate-400 focus-within:text-emerald-600"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const input = form.elements.namedItem('search') as HTMLInputElement;
-                if (input.value.trim()) {
-                  window.location.href = `/search?q=${encodeURIComponent(input.value.trim())}`;
-                }
-              }}
-            >
-               <Search className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-               <input name="search" type="text" placeholder="Search..." className="bg-slate-100 border border-transparent rounded-full py-2 pl-9 pr-3 text-xs sm:text-sm w-36 xl:w-52 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:border-emerald-200 text-slate-900 transition-all focus:w-48 xl:focus:w-64 shadow-inner" />
-            </form>
+            {/* Search Icon / Expandable Search */}
+            <div className="relative flex items-center" ref={searchContainerRef}>
+              {searchOpen ? (
+                <form 
+                  className="relative flex items-center bg-slate-100 border border-emerald-500/50 rounded-full py-1 pl-3 pr-1.5 shadow-sm animate-in fade-in zoom-in-95 duration-150"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) {
+                      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                      setSearchOpen(false);
+                    } else {
+                      navigate('/search');
+                      setSearchOpen(false);
+                    }
+                  }}
+                >
+                  <Search className="h-4 w-4 text-emerald-600 shrink-0 mr-1.5" />
+                  <input 
+                    ref={searchInputRef}
+                    name="search" 
+                    type="text" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search articles..." 
+                    className="bg-transparent border-none text-xs sm:text-sm text-slate-900 focus:outline-none w-36 sm:w-48 placeholder:text-slate-400 font-medium" 
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') setSearchOpen(false);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(false)}
+                    className="p-1 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-200/60 transition-colors"
+                    aria-label="Close search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchOpen(true);
+                    setTimeout(() => searchInputRef.current?.focus(), 50);
+                  }}
+                  className="p-2 rounded-xl transition-colors flex items-center justify-center text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  aria-label="Search articles and guides"
+                  title="Search"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              )}
+            </div>
             
             {/* Tax Deadline Notification Alerts */}
             <TaxDeadlineNavDropdown />

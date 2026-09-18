@@ -50,13 +50,13 @@ export function Auth() {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
         <div className="text-center">
           <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center p-1 bg-emerald-800/10 shadow-sm mb-6 overflow-hidden">
-            <img src="/logo.png" alt="E-Lawyers Logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             {isLogin ? 'Welcome back' : 'Create an account'}
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            {isLogin ? 'Sign in to access your saved calculations' : 'Join E-Lawyers blog today'}
+            {isLogin ? 'Sign in to access your saved calculations' : 'Join Compliance Hub today'}
           </p>
         </div>
 

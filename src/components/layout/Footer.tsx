@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Calendar, ExternalLink } from 'lucide-react';
 import { NewsletterSignup } from '../NewsletterSignup';
+import { LanguageToggle } from '../LanguageToggle';
 import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
 export function Footer() {
@@ -33,9 +34,9 @@ export function Footer() {
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white/10 p-1 group-hover:scale-105 transition-transform">
-                <img src="/footer-logo.png" alt="E-Lawyers Logo" className="w-full h-full object-contain" />
+                <img src="/footer-logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
               </div>
-              <span className="font-bold text-xl text-white">E-Lawyers <span className="text-emerald-500">blog</span></span>
+              <span className="font-bold text-xl text-white">Compliance <span className="text-emerald-500">Hub</span></span>
             </Link>
             <p className="text-sm font-medium text-slate-500 leading-relaxed">
               Your Trusted Platform for Corporate Law, Tax, VAT & Business Compliance Updates in Bangladesh.
@@ -121,7 +122,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               <span className="text-[11px] font-bold text-slate-500">NBR Portal: Connected</span>
@@ -130,9 +131,13 @@ export function Footer() {
               <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               <span className="text-[11px] font-bold text-slate-500">RJSC System: Online</span>
             </div>
+            <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-800 sm:pl-6">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Language:</span>
+              <LanguageToggle variant="dark" />
+            </div>
           </div>
           <div className="flex flex-wrap justify-center gap-6">
-            <span className="text-[11px] uppercase font-bold tracking-widest text-slate-500">© {new Date().getFullYear()} E-Lawyers blog</span>
+            <span className="text-[11px] uppercase font-bold tracking-widest text-slate-500">© {new Date().getFullYear()} Compliance Hub</span>
             <Link to="/privacy" className="text-[11px] uppercase font-bold tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="text-[11px] uppercase font-bold tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
           </div>
