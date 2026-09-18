@@ -186,14 +186,14 @@ export function Article() {
             if (elementChildren.some((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === "document-checklist")) {
         return <div className="mb-4">{children}</div>;
       }
-      return <p>{children}</p>;
+      return <p className="text-[15px] leading-[25px] text-slate-600 mb-6 text-justify">{children}</p>;
     },
     img: ({ node, ...props }: any) => <MarkdownImage {...props} />,
     ul: ({ node, children, ...props }: any) => {
       if (article.id === 'personal-income-tax-return-submission-guide-2025-2026') {
-        return <ul className="list-none pl-0 space-y-3 my-6" {...props}>{children}</ul>;
+        return <ul className="list-none pl-0 space-y-3 my-6 text-[15px] leading-[25px] text-justify" {...props}>{children}</ul>;
       }
-      return <ul {...props}>{children}</ul>;
+      return <ul className="list-disc pl-5 space-y-2 mb-6 text-[15px] leading-[25px] text-justify text-slate-600" {...props}>{children}</ul>;
     },
     li: ({ node, children, ...props }: any) => {
       if (article.id === 'personal-income-tax-return-submission-guide-2025-2026') {
@@ -240,7 +240,7 @@ export function Article() {
               <h1 className="text-[25px] leading-[33px] font-bold text-slate-900 mb-6">
                 {article.title}
               </h1>
-              <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
+              <p className="text-[15px] leading-[25px] text-justify text-slate-600 mb-8">
                 {article.excerpt}
               </p>
               
