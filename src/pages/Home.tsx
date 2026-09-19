@@ -15,13 +15,17 @@ import { NewsletterSignup } from '../components/NewsletterSignup';
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
   const [isHighContrast, setIsHighContrast] = useState(false);
-  const [isSection2Expanded, setIsSection2Expanded] = useState(false);
+  const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
 
   const handleIncreaseFont = () => setNewsFontScale(p => Math.min(p + 1, 3));
   const handleDecreaseFont = () => setNewsFontScale(p => Math.max(p - 1, 0));
 
   const featuredArticle = mockArticles[0] || null;
-  const recentArticles = mockArticles.slice(1, 4);
+  const recentArticles = mockArticles.slice(1, 9);
+  const filteredLatestArticles = latestArticlesCategory === 'all'
+    ? recentArticles
+    : mockArticles.filter(a => a.categoryId === latestArticlesCategory).slice(0, 8);
+  const displayLatestArticles = filteredLatestArticles.length > 0 ? filteredLatestArticles : recentArticles;
   const popularArticles = mockArticles.slice(2, 5); // Just using different slice for mockup
   const legalUpdates = mockArticles.filter(a => a.categoryId === 'updates' || a.categoryId === 'corporate').slice(0, 4);
 
@@ -99,7 +103,7 @@ export function Home() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50" />
         </div>
         
-        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] pt-[19px] pb-[81px] pl-[46px] pr-[49px] max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Content Area */}
             <div className="lg:col-span-7">
@@ -279,73 +283,122 @@ export function Home() {
 
       {/* 2. Latest Articles */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className={`relative ${isSection2Expanded ? '' : 'max-h-[300px] overflow-hidden'}`}>
-          <div className="flex items-end justify-between mb-8">
+        <div className="relative">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Latest Articles</h2>
-              <p className="text-slate-600 text-lg">Tax Updates, Legal Notices, Business Law & Corporate Compliance</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold uppercase tracking-wider mb-2.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Statutory &amp; Regulatory Dispatches</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+                Latest Articles &amp; Precedents
+              </h2>
+              <p className="text-slate-500 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+                Expert legal analysis, NBR tax codes, corporate governance mandates, and procedural checklists for Bangladesh.
+              </p>
             </div>
-            <Link to="/category/updates" className="hidden sm:flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 transition-colors group">
-              View All Updates <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            
+            <Link 
+              to="/search" 
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 px-4 py-2.5 rounded-xl transition-all group shrink-0 self-start md:self-auto"
+            >
+              <span>Explore All Articles</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {recentArticles.map(article => (
-              <Link key={article.id} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden h-full">
-                <div className="aspect-[16/9] w-full overflow-hidden relative">
+
+          {/* Interactive Category Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-8 no-scrollbar">
+            {[
+              { id: 'all', label: 'All Updates' },
+              { id: 'tax', label: 'Income Tax' },
+              { id: 'corporate', label: 'Corporate Law' },
+              { id: 'vat', label: 'VAT & Customs' },
+              { id: 'compliance', label: 'Compliance' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setLatestArticlesCategory(tab.id)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  latestArticlesCategory === tab.id
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 4-Column x 2-Row Articles Grid (4 boxes per line, 2 lines) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {displayLatestArticles.map(article => (
+              <Link 
+                key={article.id} 
+                to={`/article/${article.id}`} 
+                className="group bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden h-full"
+              >
+                <div className="aspect-[16/10] w-full overflow-hidden relative bg-slate-100">
                   <img 
                     src={article.imageUrl} 
                     alt={article.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-white/90 backdrop-blur-sm text-emerald-800 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="bg-slate-900/80 backdrop-blur-md text-emerald-300 border border-white/10 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm">
                       {article.category}
                     </span>
                   </div>
+                  <div className="absolute top-2.5 right-2.5">
+                    <span className="bg-white/90 backdrop-blur-md text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-emerald-600" />
+                      {calculateReadingTime(article.content)} min
+                    </span>
+                  </div>
                 </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-tight">
+                
+                <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                  <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                     {article.title}
                   </h3>
-                  <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed flex-1">
+                  <p className="text-slate-500 text-xs mb-4 line-clamp-2 leading-relaxed flex-1 font-normal">
                     {article.excerpt}
                   </p>
-                  <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-auto">
-                    <div className="flex items-center gap-3">
-                      <img src={article.author.avatarUrl} alt={article.author.name} className="w-8 h-8 rounded-full border border-slate-200" />
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{article.author.name}</p>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{format(new Date(article.publishedAt), 'MMM d, yyyy')} • {calculateReadingTime(article.content)} min read</p>
+                  
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-auto">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <img 
+                        src={article.author.avatarUrl} 
+                        alt={article.author.name} 
+                        className="w-7 h-7 rounded-full border border-slate-200 object-cover shrink-0" 
+                      />
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-900 truncate max-w-[85px] sm:max-w-[100px]">{article.author.name}</p>
+                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
+                          {format(new Date(article.publishedAt), 'MMM d, yyyy')}
+                        </p>
                       </div>
                     </div>
-                    <BookmarkButton id={article.id} title={article.title} url={`/article/${article.id}`} className="text-slate-400 hover:text-emerald-600 transition-colors" />
+                    
+                    <div className="flex items-center gap-1 shrink-0">
+                      <BookmarkButton 
+                        id={article.id} 
+                        title={article.title} 
+                        url={`/article/${article.id}`} 
+                        className="text-slate-400 hover:text-emerald-600 transition-colors p-1" 
+                      />
+                      <span className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-emerald-600 group-hover:text-white text-slate-500 flex items-center justify-center transition-all duration-200">
+                        <ArrowUpRight className="w-3 h-3" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
-          {!isSection2Expanded && (
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent flex items-end justify-center pb-2">
-              <button 
-                onClick={() => setIsSection2Expanded(true)}
-                className="bg-emerald-600 text-white px-6 py-2.5 rounded-full font-bold shadow-md hover:bg-emerald-700 transition-colors"
-              >
-                Read More
-              </button>
-            </div>
-          )}
         </div>
-        {isSection2Expanded && (
-          <div className="mt-8 flex justify-center">
-            <button 
-              onClick={() => setIsSection2Expanded(false)}
-              className="bg-slate-200 text-slate-700 px-6 py-2.5 rounded-full font-bold shadow-sm hover:bg-slate-300 transition-colors"
-            >
-              Show Less
-            </button>
-          </div>
-        )}
       </section>
 
       {/* 3. Categories Section */}

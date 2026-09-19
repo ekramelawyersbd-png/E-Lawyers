@@ -12,6 +12,7 @@ import rehypeRaw from 'rehype-raw';
 import { DocumentChecklist } from '../components/DocumentChecklist';
 import React from 'react';
 import { ReadProgress } from '../components/ReadProgress';
+import { ArticleReadingProgress } from '../components/ArticleReadingProgress';
 import { ReadAloudButton } from '../components/ReadAloudButton';
 import { ChecklistExporter } from '../components/ChecklistExporter';
 import { SocialShareButtons } from '../components/SocialShareButtons';
@@ -138,6 +139,10 @@ export function Article() {
     }
   }, [article, language]);
 
+  const readingTimeMinutes = useMemo(() => calculateReadingTime(localizedContent), [localizedContent]);
+  // Long-form articles typically exceed 300 words or require >= 2 minutes to read thoroughly
+  const isLongForm = readingTimeMinutes >= 2 || localizedContent.length > 500;
+
   const markdownComponents = useMemo(() => ({
     h1: ({ node, children, ...props }: any) => {
       const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -207,7 +212,7 @@ export function Article() {
   return (
     <>
       <BlogSEO article={article} />
-      <ReadProgress />
+      {!isLongForm && <ReadProgress />}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <Breadcrumbs 
           items={[
@@ -300,8 +305,21 @@ export function Article() {
               </div>
             </header>
 
+            {/* Visual Reading Progress Indicator Bar for Long-Form Articles */}
+            {isLongForm && (
+              <ArticleReadingProgress
+                targetContentId="article-content-body"
+                totalMinutes={readingTimeMinutes}
+                articleTitle={article.title}
+                category={article.category}
+                rawContent={localizedContent}
+                isSaved={isSaved}
+                onToggleSave={toggleSave}
+              />
+            )}
+
             {/* 2-7. Article Content Area (Markdown) */}
-            <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
+            <div id="article-content-body" className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
               <Markdown 
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}

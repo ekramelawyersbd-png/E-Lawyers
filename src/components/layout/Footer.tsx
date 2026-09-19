@@ -31,7 +31,7 @@ export function Footer() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="col-span-1 md:col-span-1">
+          <div className="col-span-1 md:col-span-1 text-justify">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white/10 p-1 group-hover:scale-105 transition-transform">
                 <img src="/footer-logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
