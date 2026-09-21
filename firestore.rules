@@ -37,7 +37,8 @@ service cloud.firestore {
       // Any reader can read comments on legal articles
       allow read: if true;
       // Allow creation if articleId, authorName, and text are provided
-      allow create: if isAuthenticated() && request.resource.data.articleId is string
+      allow create: if (isAuthenticated() || request.resource.data.authorName is string)
+                    && request.resource.data.articleId is string
                     && request.resource.data.authorName is string
                     && request.resource.data.text is string;
       // Allow updating helpful/endorsement count, or if author updates their comment
@@ -56,6 +57,19 @@ service cloud.firestore {
                             && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$');
       // Allow unsubscribing/deleting if owner
       allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || resource.data.email == request.auth.token.email);
+    }
+
+    // Client Testimonials & Success Stories Collection
+    match /testimonials/{testimonialId} {
+      // Publicly readable for trust and social proof
+      allow read: if true;
+      // Allow authenticated clients or verified users to submit success stories
+      allow create: if request.resource.data.clientName is string
+                    && request.resource.data.story is string
+                    && request.resource.data.rating is number
+                    && request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+      // Allow updates or deletion
+      allow update, delete: if isAuthenticated();
     }
   }
 }

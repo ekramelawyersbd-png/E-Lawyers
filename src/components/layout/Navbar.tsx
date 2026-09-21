@@ -30,7 +30,7 @@ import {
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
-import { getSavedItems } from '../../utils/readingList';
+import { useBookmarks } from '../../contexts/BookmarkContext';
 import { LanguageToggle } from '../LanguageToggle';
 import { TaxDeadlineNavDropdown } from '../tax/TaxDeadlineNavDropdown';
 
@@ -55,7 +55,7 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [savedBookmarkCount, setSavedBookmarkCount] = useState(() => getSavedItems().length);
+  const { count: savedBookmarkCount } = useBookmarks();
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,16 +87,6 @@ export function Navbar() {
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const updateCount = () => setSavedBookmarkCount(getSavedItems().length);
-    window.addEventListener('bookmarksUpdated', updateCount);
-    window.addEventListener('storage', updateCount);
-    return () => {
-      window.removeEventListener('bookmarksUpdated', updateCount);
-      window.removeEventListener('storage', updateCount);
-    };
   }, []);
 
   const blogCategories = [
@@ -150,6 +140,12 @@ export function Navbar() {
       path: '/tools', 
       description: 'Calculators, compliance checklists & utilities',
       icon: Wrench 
+    },
+    { 
+      name: 'Resource Library (PDFs)', 
+      path: '/tools#resource-library', 
+      description: 'Download NDA, service agreement & tax checklists',
+      icon: ScrollText 
     },
     { 
       name: 'Glossary', 
@@ -714,15 +710,15 @@ export function Navbar() {
             </div>
 
             {/* Bookmarks Icon Button */}
-            {user && (
+            {(user || savedBookmarkCount > 0) && (
               <Link
-                to="/dashboard?tab=bookmarks"
+                to="/dashboard?tab=saved"
                 id="navbar-bookmarks-btn"
-                title="Saved Bookmarks"
-                aria-label="View saved legal bookmarks"
+                title="Saved Articles"
+                aria-label="View saved articles on dashboard"
                 className={cn(
-                  "relative p-2 rounded-xl transition-colors flex items-center justify-center",
-                  location.pathname === '/dashboard' && location.search.includes('tab=bookmarks')
+                  "relative p-2 rounded-xl transition-colors flex items-center justify-center cursor-pointer",
+                  location.pathname === '/dashboard' && (location.search.includes('tab=saved') || location.search.includes('tab=bookmarks'))
                     ? "bg-emerald-100 text-emerald-800"
                     : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
                 )}
@@ -764,6 +760,21 @@ export function Navbar() {
                     >
                       <LayoutDashboard className="w-4 h-4" />
                       My Dashboard
+                    </Link>
+                    <Link
+                      to="/dashboard?tab=saved"
+                      className="flex items-center justify-between px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 transition-colors"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Bookmark className="w-4 h-4 text-emerald-600" />
+                        <span>Saved Articles</span>
+                      </div>
+                      {savedBookmarkCount > 0 && (
+                        <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                          {savedBookmarkCount}
+                        </span>
+                      )}
                     </Link>
                     <Link
                       to="/dashboard?tab=settings"
@@ -915,11 +926,11 @@ export function Navbar() {
 
             {/* Mobile Bookmarks */}
             <Link
-              to="/dashboard?tab=bookmarks"
+              to="/dashboard?tab=saved"
               id="mobile-bookmarks-link"
               className={cn(
                 "flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                location.pathname === '/dashboard' && location.search.includes('tab=bookmarks') 
+                location.pathname === '/dashboard' && (location.search.includes('tab=saved') || location.search.includes('tab=bookmarks'))
                   ? "text-emerald-700 bg-emerald-50" 
                   : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
               )}
@@ -927,7 +938,7 @@ export function Navbar() {
             >
               <div className="flex items-center gap-3">
                 <Bookmark className="w-5 h-5 text-emerald-600" />
-                <span>Bookmarks</span>
+                <span>Saved Articles</span>
               </div>
               {savedBookmarkCount > 0 && (
                 <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">

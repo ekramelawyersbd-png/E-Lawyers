@@ -33,6 +33,11 @@
         "title": "string",
         "url": "string",
         "type": "string",
+        "category": "string",
+        "readTime": "number",
+        "offlineExcerpt": "string",
+        "offlineImageUrl": "string",
+        "authorName": "string",
         "createdAt": "timestamp"
       }
     },
@@ -48,6 +53,7 @@
         "organization": "string",
         "topicTag": "string",
         "statutoryRef": "string",
+        "commentType": "string",
         "text": "string",
         "parentId": "string",
         "helpfulCount": "number",
@@ -71,6 +77,26 @@
         "subscribedAt": "string",
         "userId": "string",
         "updatedAt": "timestamp"
+      }
+    },
+    {
+      "name": "testimonials",
+      "description": "Verified client testimonials, success stories, and reviews for consultancy services",
+      "fields": {
+        "clientName": "string",
+        "clientTitle": "string",
+        "companyName": "string",
+        "companyLogo": "string",
+        "avatarUrl": "string",
+        "serviceCategory": "string",
+        "serviceKey": "string",
+        "rating": "number",
+        "headline": "string",
+        "story": "string",
+        "metrics": "string",
+        "verified": "boolean",
+        "featured": "boolean",
+        "createdAt": "timestamp"
       }
     }
   ],

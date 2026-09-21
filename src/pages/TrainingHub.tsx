@@ -49,10 +49,29 @@ export function TrainingHub() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Training Hub</h1>
-        <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-          Explore our comprehensive training programs designed to enhance your professional skills in taxation, legal compliance, and accounting.
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-4">
+          <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+          <span>E-Lawyers Academy • Learn Today. Build a Better Tomorrow.</span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Professional Training & Academy</h1>
+        <p className="text-slate-600 text-lg max-w-2xl mx-auto mb-6">
+          Practical legal, tax, accounting, RJSC compliance, and corporate skills designed to build real-world expertise for students, lawyers, and business professionals.
         </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/article/professional-training-academy-bangladesh"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
+          >
+            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <span>Read Academy Overview & Curriculum</span>
+          </Link>
+          <a
+            href="tel:+8801335230170"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-sm"
+          >
+            <span>Direct Enrollment Helpline: +88 01335230170</span>
+          </a>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">

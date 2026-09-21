@@ -1,216 +1,1053 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
-import { collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
-import { MessageSquare, ThumbsUp, LogIn, Send, Loader2, User as UserIcon } from 'lucide-react';
-
-interface Comment {
-  id: string;
-  articleId: string;
-  userId: string;
-  authorName: string;
-  authorEmail: string;
-  text: string;
-  helpfulCount: number;
-  createdAt: any;
-}
+import { 
+  subscribeToArticleComments, 
+  postProfessionalComment, 
+  toggleEndorsement,
+  deleteProfessionalComment,
+  CommentItem, 
+  CommentType,
+  ProfessionalRole,
+  PROFESSIONAL_ROLES, 
+  DISCUSSION_TOPIC_TAGS 
+} from '../services/commentService';
+import { 
+  MessageSquare, 
+  ThumbsUp, 
+  LogIn, 
+  Send, 
+  Loader2, 
+  User as UserIcon, 
+  HelpCircle, 
+  Lightbulb, 
+  CheckCircle2, 
+  Scale, 
+  Calculator, 
+  Briefcase, 
+  Award, 
+  CornerDownRight, 
+  Sparkles, 
+  Filter, 
+  Clock, 
+  Share2, 
+  Trash2, 
+  FileText, 
+  RefreshCw,
+  Search,
+  Check,
+  ShieldCheck,
+  ChevronDown
+} from 'lucide-react';
+import { format } from 'date-fns';
 
 interface CommentSectionProps {
   articleId: string;
+  articleTitle?: string;
+  articleCategory?: string;
 }
 
-export function CommentSection({ articleId }: CommentSectionProps) {
+export function CommentSection({ 
+  articleId, 
+  articleTitle, 
+  articleCategory 
+}: CommentSectionProps) {
   const { user, signInWithGoogle } = useAuth();
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [comments, setComments] = useState<CommentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Form State
+  const [commentType, setCommentType] = useState<CommentType>('insight');
+  const [selectedTopic, setSelectedTopic] = useState<string>(() => {
+    if (articleCategory && articleCategory.toLowerCase().includes('vat')) {
+      return 'VAT & SD Compliance';
+    }
+    if (articleCategory && (articleCategory.toLowerCase().includes('company') || articleCategory.toLowerCase().includes('rjsc'))) {
+      return 'Corporate Law & RJSC';
+    }
+    if (articleCategory && articleCategory.toLowerCase().includes('withholding')) {
+      return 'Withholding Tax (TDS)';
+    }
+    return 'Tax Assessment & ITA 2023';
+  });
+  const [statutoryRef, setStatutoryRef] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [authorRole, setAuthorRole] = useState<ProfessionalRole>('chartered_accountant');
+  const [organization, setOrganization] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [isGuestMode, setIsGuestMode] = useState(false);
+
+  // Reply State
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replySubmitting, setReplySubmitting] = useState(false);
+
+  // Filtering & Sorting State
+  const [typeFilter, setTypeFilter] = useState<'all' | 'insight' | 'question'>('all');
+  const [topicFilter, setTopicFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'recent' | 'helpful'>('recent');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Endorsements tracked locally per session
+  const [votedCommentIds, setVotedCommentIds] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(`accounticca_voted_${articleId}`);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [submitSuccessMsg, setSubmitSuccessMsg] = useState('');
+
+  // 1. Subscribe to Firestore comments with fallback
   useEffect(() => {
     if (!articleId) return;
 
-    const q = query(
-      collection(db, 'comments'),
-      where('articleId', '==', articleId)
+    setLoading(true);
+    const unsubscribe = subscribeToArticleComments(
+      articleId,
+      (updatedComments) => {
+        setComments(updatedComments);
+        setLoading(false);
+        setIsRefreshing(false);
+      },
+      (error) => {
+        console.warn('Comment subscription error:', error);
+        setLoading(false);
+        setIsRefreshing(false);
+      }
     );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedComments = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Comment[];
-
-      // Sort client-side to avoid needing a composite index
-      fetchedComments.sort((a, b) => {
-        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now();
-        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : Date.now();
-        return timeB - timeA;
-      });
-
-      setComments(fetchedComments);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching comments:", error);
-      setLoading(false);
-    });
 
     return () => unsubscribe();
   }, [articleId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Handle manual refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 600);
+  };
+
+  // Helper to get role details
+  const getRoleInfo = (roleKey: ProfessionalRole) => {
+    return PROFESSIONAL_ROLES.find(r => r.value === roleKey) || PROFESSIONAL_ROLES[0];
+  };
+
+  // 2. Submit new top-level comment (Insight or Question)
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !newComment.trim()) return;
+    if (!commentText.trim()) return;
+
+    const authorDisplayName = user?.displayName || guestName.trim();
+    if (!user && !authorDisplayName) {
+      alert('Please enter your name or sign in with Google to post.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'comments'), {
+      const selectedRoleInfo = getRoleInfo(authorRole);
+      const email = user?.email || (guestEmail.trim() ? guestEmail.trim() : undefined);
+
+      await postProfessionalComment({
         articleId,
-        userId: user.uid,
-        authorName: user.displayName || 'Anonymous User',
-        authorEmail: user.email || '',
-        text: newComment.trim(),
-        helpfulCount: 0,
-        createdAt: serverTimestamp(),
+        userId: user?.uid,
+        authorName: authorDisplayName,
+        authorEmail: email,
+        role: authorRole,
+        roleLabel: selectedRoleInfo.label,
+        organization: organization.trim() || undefined,
+        statutoryRef: statutoryRef.trim() || undefined,
+        topicTag: selectedTopic,
+        commentType,
+        avatar: user?.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(authorDisplayName)}`,
+        text: commentText.trim(),
+        parentId: null
       });
-      setNewComment('');
-    } catch (error) {
-      console.error("Error adding comment:", error);
-      alert("Failed to post comment. Please try again.");
+
+      setCommentText('');
+      setStatutoryRef('');
+      setSubmitSuccessMsg(
+        commentType === 'question' 
+          ? 'Your legal question has been posted to our professional community!'
+          : 'Your technical insight has been published successfully!'
+      );
+      setTimeout(() => setSubmitSuccessMsg(''), 5000);
+    } catch (err) {
+      console.error('Failed to post comment:', err);
+      alert('Unable to post comment at this moment. Please check your connection.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleEndorse = async (commentId: string) => {
-    if (!user) {
-      alert("Please sign in to endorse comments.");
-      return;
-    }
+  // 3. Submit Reply / Answer
+  const handleReplySubmit = async (parentId: string) => {
+    if (!replyText.trim()) return;
+
+    const authorDisplayName = user?.displayName || guestName.trim() || 'Practitioner';
+    setReplySubmitting(true);
     try {
-      const commentRef = doc(db, 'comments', commentId);
-      await updateDoc(commentRef, {
-        helpfulCount: increment(1)
+      const selectedRoleInfo = getRoleInfo(authorRole);
+      const parentComment = comments.find(c => c.id === parentId);
+      const isAnsweringQuestion = parentComment?.commentType === 'question';
+
+      await postProfessionalComment({
+        articleId,
+        userId: user?.uid,
+        authorName: authorDisplayName,
+        authorEmail: user?.email || undefined,
+        role: authorRole,
+        roleLabel: selectedRoleInfo.label,
+        organization: organization.trim() || undefined,
+        statutoryRef: statutoryRef.trim() || undefined,
+        topicTag: parentComment?.topicTag || selectedTopic,
+        commentType: isAnsweringQuestion ? 'insight' : 'insight',
+        avatar: user?.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(authorDisplayName)}`,
+        text: replyText.trim(),
+        parentId: parentId
       });
-    } catch (error) {
-      console.error("Error endorsing comment:", error);
+
+      setReplyText('');
+      setReplyingToId(null);
+    } catch (err) {
+      console.error('Failed to submit reply:', err);
+      alert('Unable to submit reply. Please try again.');
+    } finally {
+      setReplySubmitting(false);
     }
   };
 
+  // 4. Handle Endorse / Helpful
+  const handleToggleEndorse = async (commentId: string) => {
+    const hasVoted = votedCommentIds.has(commentId);
+    const nextSet = new Set(votedCommentIds);
+    if (hasVoted) {
+      nextSet.delete(commentId);
+    } else {
+      nextSet.add(commentId);
+    }
+    setVotedCommentIds(nextSet);
+
+    try {
+      localStorage.setItem(`accounticca_voted_${articleId}`, JSON.stringify(Array.from(nextSet)));
+      await toggleEndorsement(articleId, commentId, hasVoted);
+    } catch (err) {
+      console.error('Error toggling endorsement:', err);
+    }
+  };
+
+  // 5. Handle Delete
+  const handleDelete = async (commentId: string) => {
+    if (!window.confirm('Are you sure you want to remove this comment?')) return;
+    try {
+      await deleteProfessionalComment(articleId, commentId);
+    } catch (err) {
+      console.error('Failed to delete comment:', err);
+    }
+  };
+
+  // 6. Share / Copy Comment Link
+  const handleShareComment = (commentId: string) => {
+    const url = `${window.location.origin}${window.location.pathname}#comment-${commentId}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setCopiedId(commentId);
+      setTimeout(() => setCopiedId(null), 2500);
+    }
+  };
+
+  // Separate top-level comments and replies
+  const { topLevelComments, repliesMap, countInsights, countQuestions } = useMemo(() => {
+    const topLevel: CommentItem[] = [];
+    const replies: Record<string, CommentItem[]> = {};
+    let insights = 0;
+    let questions = 0;
+
+    comments.forEach(c => {
+      if (c.commentType === 'question') {
+        questions++;
+      } else {
+        insights++;
+      }
+
+      if (c.parentId) {
+        if (!replies[c.parentId]) {
+          replies[c.parentId] = [];
+        }
+        replies[c.parentId].push(c);
+      } else {
+        topLevel.push(c);
+      }
+    });
+
+    // Sort replies chronologically
+    Object.keys(replies).forEach(pId => {
+      replies[pId].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    });
+
+    return {
+      topLevelComments: topLevel,
+      repliesMap: replies,
+      countInsights: insights,
+      countQuestions: questions
+    };
+  }, [comments]);
+
+  // Filter and sort top-level comments
+  const filteredComments = useMemo(() => {
+    return topLevelComments.filter(item => {
+      // Type filter
+      if (typeFilter !== 'all' && (item.commentType || 'insight') !== typeFilter) {
+        return false;
+      }
+      // Topic filter
+      if (topicFilter !== 'all' && item.topicTag !== topicFilter) {
+        return false;
+      }
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesAuthor = item.authorName.toLowerCase().includes(q);
+        const matchesText = item.text.toLowerCase().includes(q);
+        const matchesStatutory = item.statutoryRef?.toLowerCase().includes(q);
+        const matchesTopic = item.topicTag?.toLowerCase().includes(q);
+        if (!matchesAuthor && !matchesText && !matchesStatutory && !matchesTopic) {
+          return false;
+        }
+      }
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'helpful') {
+        return b.helpfulCount - a.helpfulCount;
+      }
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }, [topLevelComments, typeFilter, topicFilter, sortBy, searchQuery]);
+
   return (
-    <div className="mt-16 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-slate-100 rounded-xl">
-          <MessageSquare className="w-6 h-6 text-slate-700" />
-        </div>
+    <section 
+      id="professional-comments-section" 
+      aria-label="Professional Comments and Legal Peer Discussion"
+      className="mt-16 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-sm scroll-mt-28"
+    >
+      {/* Header & Meta */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-slate-100">
         <div>
-          <h3 className="text-2xl font-bold text-slate-900">Professional Discussion</h3>
-          <p className="text-slate-500 text-sm mt-1">Join the conversation with other professionals.</p>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-emerald-50 rounded-2xl border border-emerald-200/80 flex items-center justify-center text-emerald-700 shrink-0">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                  Professional Discussions & Inquiries
+                </h3>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  {comments.length}
+                </span>
+              </div>
+              <p className="text-slate-500 text-sm mt-1">
+                Peer exchange for lawyers, tax accountants, and corporate practitioners in Bangladesh.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            aria-label="Refresh comments"
+            title="Refresh discussions from cloud"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 border border-slate-200 transition-all cursor-pointer disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
+            <span className="hidden sm:inline">Sync</span>
+          </button>
         </div>
       </div>
 
-      {/* Comment Input Section */}
-      <div className="mb-10">
-        {!user ? (
-          <div className="bg-slate-50 rounded-2xl p-6 text-center border border-slate-200">
-            <h4 className="text-lg font-semibold text-slate-900 mb-2">Sign in to join the discussion</h4>
-            <p className="text-slate-500 mb-6 text-sm max-w-md mx-auto">
-              You must be signed in with your Google account to post comments and endorse others' insights.
-            </p>
+      {/* Statutory Guidance Note */}
+      <div className="my-6 bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-xs text-slate-600 flex items-start gap-3">
+        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+        <p className="leading-relaxed">
+          <span className="font-bold text-slate-800">Peer Exchange Forum:</span> Share interpretations of the Income Tax Act 2023, VAT & SD Act 2012, RJSC corporate regulations, and High Court Division case law. Discussions reflect professional viewpoints and do not constitute formal attorney-client or audit counsel.
+        </p>
+      </div>
+
+      {/* Success Notification */}
+      {submitSuccessMsg && (
+        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-2.5 animate-fadeIn">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span>{submitSuccessMsg}</span>
+        </div>
+      )}
+
+      {/* Composer Section */}
+      <div className="mb-12 bg-slate-50/70 border border-slate-200 rounded-2xl p-5 sm:p-7">
+        
+        {/* Toggle between Insight and Question */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="inline-flex p-1 bg-slate-200/80 rounded-xl">
             <button
-              onClick={signInWithGoogle}
-              className="inline-flex items-center gap-2 bg-white border border-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-bold hover:bg-slate-50 transition-colors shadow-sm"
+              type="button"
+              onClick={() => setCommentType('insight')}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                commentType === 'insight'
+                  ? 'bg-white text-emerald-800 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
             >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In with Google</span>
+              <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+              <span>Share Insight / Analysis</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCommentType('question')}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                commentType === 'question'
+                  ? 'bg-white text-indigo-800 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
+              <span>Ask Tax / Legal Question</span>
             </button>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex gap-4">
-            <div className="hidden sm:block shrink-0 mt-1">
-              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center border border-emerald-200">
-                <span className="text-emerald-700 font-bold text-sm">
-                  {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-                </span>
+
+          <div className="text-xs text-slate-500 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <span>
+              {commentType === 'insight' 
+                ? 'Contribute practical audit or litigation experience'
+                : 'Get peer feedback from accredited practitioners'}
+            </span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmitComment} className="space-y-4">
+          
+          {/* Topic Selector & Statutory Reference Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Specific Legal / Tax Topic
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedTopic}
+                  onChange={(e) => setSelectedTopic(e.target.value)}
+                  className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none cursor-pointer pr-9"
+                >
+                  {DISCUSSION_TOPIC_TAGS.map((tag) => (
+                    <option key={tag} value={tag}>
+                      {tag}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
-            <div className="flex-1 relative">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Share your insights or ask a question..."
-                className="w-full min-h-[120px] bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none resize-none"
-                required
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Statutory / Legal Citation <span className="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={statutoryRef}
+                onChange={(e) => setStatutoryRef(e.target.value)}
+                placeholder="e.g. Section 272 ITA 2023 or Mushak 9.1"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
-              <div className="absolute bottom-3 right-3">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !newComment.trim()}
-                  className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+            </div>
+          </div>
+
+          {/* Practitioner Role and Chamber */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Professional Designation
+              </label>
+              <div className="relative">
+                <select
+                  value={authorRole}
+                  onChange={(e) => setAuthorRole(e.target.value as ProfessionalRole)}
+                  className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none cursor-pointer pr-9"
                 >
-                  {isSubmitting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <span>Post</span>
-                      <Send className="w-3.5 h-3.5" />
-                    </>
-                  )}
+                  {PROFESSIONAL_ROLES.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Firm / Chamber / Company <span className="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+                placeholder="e.g. Supreme Court Bar, Farhad & Co."
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+              />
+            </div>
+          </div>
+
+          {/* User Sign-In or Guest Name Row */}
+          {!user && (
+            <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                  <UserIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">
+                    Sign in with Google for automated practitioner verification
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Or contribute directly as a verified guest practitioner.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={signInWithGoogle}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Google Sign In</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsGuestMode(!isGuestMode)}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                >
+                  <span>{isGuestMode ? 'Hide Guest Fields' : 'Continue as Guest'}</span>
                 </button>
               </div>
             </div>
-          </form>
+          )}
+
+          {/* Guest Identity Fields if Not Logged In */}
+          {(!user && isGuestMode) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Full Name / Title <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="e.g. Adv. Mahbubur Rahman"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Email Address <span className="text-slate-400 font-normal">(Private notification)</span>
+                </label>
+                <input
+                  type="email"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="counsel@firm.com"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Main Textarea */}
+          <div className="relative">
+            <textarea
+              required
+              rows={4}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder={
+                commentType === 'insight'
+                  ? 'Detail your statutory analysis, audit consideration, or case law precedent related to this topic...'
+                  : 'State your tax or legal query clearly (e.g., What is the applicable withholding rate on foreign SaaS under Section 119?)...'
+              }
+              className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none resize-y leading-relaxed"
+            />
+          </div>
+
+          {/* Submit Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <div className="flex flex-wrap gap-2 text-[11px] text-slate-500">
+              <span className="font-semibold text-slate-700">Recommended Topics:</span>
+              <button 
+                type="button" 
+                onClick={() => setSelectedTopic('Tax Assessment & ITA 2023')} 
+                className="hover:text-emerald-700 cursor-pointer underline"
+              >
+                ITA 2023
+              </button>
+              <span>•</span>
+              <button 
+                type="button" 
+                onClick={() => setSelectedTopic('Withholding Tax (TDS)')} 
+                className="hover:text-emerald-700 cursor-pointer underline"
+              >
+                TDS & SROs
+              </button>
+              <span>•</span>
+              <button 
+                type="button" 
+                onClick={() => setSelectedTopic('VAT & SD Compliance')} 
+                className="hover:text-emerald-700 cursor-pointer underline"
+              >
+                Mushak 9.1
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !commentText.trim()}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs text-white transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+                commentType === 'insight'
+                  ? 'bg-emerald-700 hover:bg-emerald-800'
+                  : 'bg-indigo-700 hover:bg-indigo-800'
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Publishing...</span>
+                </>
+              ) : (
+                <>
+                  <span>
+                    {commentType === 'insight' ? 'Post Professional Insight' : 'Submit Legal Question'}
+                  </span>
+                  <Send className="w-3.5 h-3.5" />
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Filter and Sorting Toolbar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-100">
+        
+        {/* Type Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <button
+            type="button"
+            onClick={() => setTypeFilter('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              typeFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            All Discussions ({topLevelComments.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setTypeFilter('insight')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              typeFilter === 'insight'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+            }`}
+          >
+            <Lightbulb className="w-3 h-3" />
+            <span>Insights ({countInsights})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setTypeFilter('question')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              typeFilter === 'question'
+                ? 'bg-indigo-700 text-white shadow-xs'
+                : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100'
+            }`}
+          >
+            <HelpCircle className="w-3 h-3" />
+            <span>Questions ({countQuestions})</span>
+          </button>
+        </div>
+
+        {/* Search and Topic Selector */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative flex-1 sm:w-48">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search comments..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div className="relative">
+            <select
+              value={topicFilter}
+              onChange={(e) => setTopicFilter(e.target.value)}
+              className="appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 pr-7 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+            >
+              <option value="all">All Topics</option>
+              {DISCUSSION_TOPIC_TAGS.map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+            <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'recent' | 'helpful')}
+              className="appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 pr-7 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+            >
+              <option value="recent">Most Recent</option>
+              <option value="helpful">Most Endorsed</option>
+            </select>
+            <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Comment List */}
+      <div className="space-y-6">
+        {loading ? (
+          <div className="space-y-4 py-4" aria-busy="true">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 animate-pulse space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-slate-200" />
+                  <div className="space-y-1.5">
+                    <div className="w-36 h-4 bg-slate-200 rounded" />
+                    <div className="w-24 h-3 bg-slate-200/60 rounded" />
+                  </div>
+                </div>
+                <div className="w-3/4 h-3 bg-slate-200 rounded" />
+                <div className="w-full h-12 bg-slate-200/60 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : filteredComments.length === 0 ? (
+          <div className="text-center py-12 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <MessageSquare className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+            <h4 className="font-bold text-slate-800 text-base">No discussions match your filter</h4>
+            <p className="text-slate-500 text-xs mt-1 max-w-md mx-auto">
+              Be the first to share an expert insight or post a legal inquiry on this tax topic.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setTypeFilter('all');
+                setTopicFilter('all');
+                setSearchQuery('');
+              }}
+              className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-700 bg-white border border-emerald-200 hover:bg-emerald-50 transition-colors shadow-2xs cursor-pointer"
+            >
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        ) : (
+          filteredComments.map((comment) => {
+            const replies = repliesMap[comment.id] || [];
+            const isVoted = votedCommentIds.has(comment.id);
+            const isAuthor = user?.uid && comment.userId === user.uid;
+            const roleInfo = getRoleInfo(comment.role);
+            const isQuestion = comment.commentType === 'question';
+
+            return (
+              <article
+                key={comment.id}
+                id={`comment-${comment.id}`}
+                className="group bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs hover:shadow-xs transition-shadow"
+              >
+                {/* Header: Author details & Badges */}
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex items-start gap-3.5">
+                    <img
+                      src={comment.avatar}
+                      alt={comment.authorName}
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-slate-200 object-cover shrink-0 mt-0.5"
+                    />
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h4 className="font-bold text-slate-900 text-sm sm:text-base">
+                          {comment.authorName}
+                        </h4>
+                        {comment.isVerifiedProfessional && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span>Verified Practitioner</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Role & Chamber */}
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                        <span className={`font-semibold ${roleInfo.badgeColor}`}>
+                          {comment.roleLabel || roleInfo.label}
+                        </span>
+                        {comment.organization && (
+                          <>
+                            <span>•</span>
+                            <span className="text-slate-600">{comment.organization}</span>
+                          </>
+                        )}
+                        <span>•</span>
+                        <span className="text-slate-400">
+                          {format(new Date(comment.date), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comment Type Pill (Insight vs Question) */}
+                  <div className="shrink-0">
+                    {isQuestion ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        <span>Question</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Insight</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Topic and Statutory Ref Tags */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {comment.topicTag && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200/70">
+                      <span>{comment.topicTag}</span>
+                    </span>
+                  )}
+                  {comment.statutoryRef && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-amber-50 text-amber-900 border border-amber-200/80">
+                      <FileText className="w-3 h-3 text-amber-700" />
+                      <span>{comment.statutoryRef}</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Body Text */}
+                <div className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap pl-0.5">
+                  {comment.text}
+                </div>
+
+                {/* Actions: Endorse, Reply, Share, Delete */}
+                <div className="flex items-center justify-between gap-4 mt-5 pt-4 border-t border-slate-100 text-xs">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleEndorse(comment.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold transition-all cursor-pointer ${
+                        isVoted
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border-slate-200'
+                      }`}
+                      title={isVoted ? "Endorsement recorded" : "Endorse this professional commentary"}
+                    >
+                      <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-current' : ''}`} />
+                      <span>{comment.helpfulCount || 0}</span>
+                      <span className="hidden sm:inline font-normal">
+                        {isVoted ? 'Endorsed' : 'Endorse'}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setReplyingToId(replyingToId === comment.id ? null : comment.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold transition-colors cursor-pointer"
+                    >
+                      <CornerDownRight className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{isQuestion ? 'Answer Query' : 'Reply'}</span>
+                      {replies.length > 0 && (
+                        <span className="ml-1 text-[11px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">
+                          {replies.length}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleShareComment(comment.id)}
+                      title="Copy link to this discussion"
+                      className="inline-flex items-center gap-1 p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      {copiedId === comment.id ? (
+                        <span className="text-[11px] font-bold text-emerald-600">Copied!</span>
+                      ) : (
+                        <Share2 className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+
+                    {isAuthor && (
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(comment.id)}
+                        title="Delete your comment"
+                        className="inline-flex items-center p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inline Reply Composer */}
+                {replyingToId === comment.id && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50/80 p-4 rounded-xl">
+                    <div className="flex items-center justify-between mb-2 text-xs font-semibold text-slate-600">
+                      <span>Replying to {comment.authorName}</span>
+                      <button
+                        type="button"
+                        onClick={() => setReplyingToId(null)}
+                        className="text-slate-400 hover:text-slate-700 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder={
+                        isQuestion
+                          ? 'Provide statutory reasoning or procedural advice to address this question...'
+                          : 'Add your perspective or clarification to this insight...'
+                      }
+                      className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none resize-none leading-relaxed mb-3"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        disabled={replySubmitting || !replyText.trim()}
+                        onClick={() => handleReplySubmit(comment.id)}
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {replySubmitting ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <>
+                            <span>{isQuestion ? 'Post Answer' : 'Submit Reply'}</span>
+                            <Send className="w-3 h-3" />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Nested Replies */}
+                {replies.length > 0 && (
+                  <div className="mt-5 pt-4 border-t border-slate-100 space-y-3.5 pl-4 sm:pl-6 border-l-2 border-slate-200/80 ml-2">
+                    {replies.map((reply) => {
+                      const isReplyVoted = votedCommentIds.has(reply.id);
+                      const isReplyAuthor = user?.uid && reply.userId === user.uid;
+                      const replyRoleInfo = getRoleInfo(reply.role);
+
+                      return (
+                        <div 
+                          key={reply.id} 
+                          id={`comment-${reply.id}`}
+                          className="bg-slate-50/90 rounded-xl p-4 border border-slate-200/80"
+                        >
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="flex items-center gap-2.5">
+                              <img
+                                src={reply.avatar}
+                                alt={reply.authorName}
+                                className="w-7 h-7 rounded-full border border-slate-200 object-cover shrink-0"
+                              />
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h5 className="font-bold text-slate-900 text-xs">
+                                    {reply.authorName}
+                                  </h5>
+                                  <span className={`text-[10px] font-semibold ${replyRoleInfo.badgeColor}`}>
+                                    {reply.roleLabel || replyRoleInfo.label}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-slate-400">
+                                  {format(new Date(reply.date), 'MMM d, yyyy')}
+                                </span>
+                              </div>
+                            </div>
+
+                            {isQuestion && (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                Answer
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-slate-800 text-xs leading-relaxed whitespace-pre-wrap">
+                            {reply.text}
+                          </p>
+
+                          <div className="flex items-center justify-between gap-3 mt-3 pt-2 border-t border-slate-200/60 text-[11px]">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleEndorse(reply.id)}
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border transition-colors cursor-pointer ${
+                                isReplyVoted
+                                  ? 'bg-emerald-600 text-white border-emerald-600'
+                                  : 'bg-white text-slate-600 hover:text-emerald-700 border-slate-200'
+                              }`}
+                            >
+                              <ThumbsUp className={`w-3 h-3 ${isReplyVoted ? 'fill-current' : ''}`} />
+                              <span>{reply.helpfulCount || 0}</span>
+                            </button>
+
+                            {isReplyAuthor && (
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(reply.id)}
+                                className="text-slate-400 hover:text-rose-600 cursor-pointer"
+                                title="Delete your reply"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+              </article>
+            );
+          })
         )}
       </div>
 
-      {/* Comments List */}
-      <div className="space-y-6">
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        ) : comments.length === 0 ? (
-          <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
-            <MessageSquare className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No comments yet.</p>
-            <p className="text-slate-400 text-sm mt-1">Be the first to share your thoughts on this topic.</p>
-          </div>
-        ) : (
-          comments.map((comment) => (
-            <div key={comment.id} className="flex gap-4">
-              <div className="hidden sm:block shrink-0 mt-1">
-                <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200 text-slate-500">
-                  <UserIcon className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="flex-1 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between gap-4 mb-2">
-                  <div>
-                    <h4 className="font-bold text-slate-900">{comment.authorName}</h4>
-                    <span className="text-xs text-slate-400">
-                      {comment.createdAt?.toDate ? new Date(comment.createdAt.toDate()).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      }) : 'Just now'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleEndorse(comment.id)}
-                    className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-600 transition-colors border border-slate-100 hover:border-emerald-200"
-                    title="Endorse this comment"
-                  >
-                    <ThumbsUp className={`w-3.5 h-3.5 ${comment.helpfulCount > 0 ? 'text-emerald-500' : ''}`} />
-                    <span className="text-xs font-bold">{comment.helpfulCount || 0}</span>
-                  </button>
-                </div>
-                <p className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
-                  {comment.text}
-                </p>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+    </section>
   );
 }

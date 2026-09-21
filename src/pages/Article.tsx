@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
-import { isItemSaved } from '../utils/readingList';
 import { calculateReadingTime } from '../utils/readingTime';
 import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
@@ -17,7 +16,7 @@ import { ReadAloudButton } from '../components/ReadAloudButton';
 import { ChecklistExporter } from '../components/ChecklistExporter';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 import { useAuth } from '../contexts/AuthContext';
-import { saveBookmark, removeBookmark } from '../services/bookmarkService';
+import { useBookmarks } from '../contexts/BookmarkContext';
 
 import { ComplianceChecklist } from '../components/ComplianceChecklist';
 import { ImageCarousel } from '../components/ImageCarousel';
@@ -41,23 +40,17 @@ import { BlogSEO } from '../components/BlogSEO';
 import { BlogDisclaimer } from '../components/BlogDisclaimer';
 import { ContactELawyers } from '../components/ContactELawyers';
 import { RelatedResources } from '../components/RelatedResources';
+import { Testimonials } from '../components/Testimonials';
 
 export function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { language } = useLanguage();
-  const [isSaved, setIsSaved] = useState(false);
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      setIsSaved(isItemSaved(id));
-      const handleStorageChange = () => setIsSaved(isItemSaved(id));
-      window.addEventListener('bookmarksUpdated', handleStorageChange);
-      return () => window.removeEventListener('bookmarksUpdated', handleStorageChange);
-    }
-  }, [id]);
+  const isSaved = id ? isBookmarked(id) : false;
 
   const article = mockArticles.find(a => a.id === id);
 
@@ -89,28 +82,26 @@ export function Article() {
 
   const toggleSave = async () => {
     if (!id || !article) return;
-    if (isSaved) {
-      await removeBookmark(id, user);
-      setIsSaved(false);
-      setSaveFeedback(null);
-    } else {
-      await saveBookmark({
-        id,
-        title: article.title,
-        type: 'article',
-        url: `/article/${id}`,
-        dateSaved: new Date().toISOString(),
-        offlineContent: article.content,
-        offlineExcerpt: article.excerpt,
-        offlineImageUrl: article.imageUrl,
-        category: article.category,
-        categoryId: article.categoryId,
-        readTime: article.readTime,
-        authorName: article.author?.name
-      }, user);
-      setIsSaved(true);
-      setSaveFeedback(user ? 'Saved to your private Saved Items on your Dashboard' : 'Saved locally on this device. Sign in to sync across devices');
+    const willBeSaved = !isSaved;
+    await toggleBookmark({
+      id,
+      title: article.title,
+      type: 'article',
+      url: `/article/${id}`,
+      dateSaved: new Date().toISOString(),
+      offlineContent: article.content,
+      offlineExcerpt: article.excerpt,
+      offlineImageUrl: article.imageUrl,
+      category: article.category,
+      categoryId: article.categoryId,
+      readTime: article.readTime,
+      authorName: article.author?.name
+    });
+    if (willBeSaved) {
+      setSaveFeedback(user ? 'Saved to your private dashboard' : 'Bookmarked locally. Sign in with Google to sync to your dashboard across all devices');
       setTimeout(() => setSaveFeedback(null), 4500);
+    } else {
+      setSaveFeedback(null);
     }
   };
 
@@ -403,12 +394,30 @@ export function Article() {
 
             <RelatedResources currentCategory={article.category} />
 
-            
+            {/* Client Success Stories & Testimonials for Trust & Social Proof */}
+            <Testimonials 
+              serviceCategory={article.category}
+              serviceKey={
+                article.id.includes('automation') ? 'automation' :
+                article.id.includes('hr') ? 'hr' :
+                article.id.includes('sales') ? 'sales' :
+                article.id.includes('outsourced') ? 'outsourced' :
+                article.id.includes('bookkeeping') || article.id.includes('accounting') ? 'bookkeeping' :
+                article.id.includes('startup') ? 'startup' : 'all'
+              }
+              title={`Client Success Stories: ${article.category}`}
+              subtitle="See how our tailored advisory delivered concrete financial and operational results for client organizations."
+            />
+
             <ContactELawyers />
 
             <ChecklistExporter articleId={article.id} />
             {/* 11. Professional Comments & Peer Discussion Section */}
-            <CommentSection articleId={article.id} />
+            <CommentSection 
+              articleId={article.id} 
+              articleTitle={article.title}
+              articleCategory={article.category}
+            />
 
           </div>
 

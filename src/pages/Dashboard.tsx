@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   FileText, 
-  Settings, 
   BookMarked, 
   Bookmark, 
   PenSquare, 
@@ -19,39 +18,44 @@ import {
   RefreshCw,
   Check,
   Lock,
-  User as UserIcon,
-  LogOut
+  LogOut,
+  Copy,
+  Printer,
+  SlidersHorizontal,
+  X
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
-import { getSavedItems, SavedItem, clearSavedItems } from '../utils/readingList';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  saveBookmark, 
-  removeBookmark, 
-  subscribeToUserSavedItems, 
-  syncLocalBookmarksToCloud 
-} from '../services/bookmarkService';
+import { useBookmarks } from '../contexts/BookmarkContext';
+
+type SortOption = 'recent' | 'title' | 'readTime';
 
 export function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const { user, signInWithGoogle, logout } = useAuth();
+  const { 
+    savedItems, 
+    removeBookmark, 
+    clearAllBookmarks, 
+    saveBookmark, 
+    syncCloud, 
+    isSyncing 
+  } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  // Support both 'saved' and 'bookmarks' tab parameter for backwards compatibility
   const [activeTab, setActiveTab] = useState<'saved' | 'articles'>(
     tabParam === 'articles' ? 'articles' : 'saved'
   );
-  const [savedItems, setSavedItems] = useState<SavedItem[]>(() => getSavedItems());
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [confirmClear, setConfirmClear] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccessMsg, setSyncSuccessMsg] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (tabParam === 'articles') {
@@ -66,75 +70,17 @@ export function Dashboard() {
     setSearchParams({ tab });
   };
 
-  // Synchronize saved items:
-  // If user is logged in, attach real-time Firestore listener; otherwise listen to local storage events
-  useEffect(() => {
-    // Initial local read
-    setSavedItems(getSavedItems());
-
-    let unsubscribeFirestore: (() => void) | null = null;
-
-    if (user) {
-      unsubscribeFirestore = subscribeToUserSavedItems(
-        user.uid,
-        (cloudItems) => {
-          // Merge cloud items with local items (cloud takes precedence for persistence)
-          const localItems = getSavedItems();
-          const itemMap = new Map<string, SavedItem>();
-          
-          // Add local items
-          localItems.forEach(item => itemMap.set(item.id, item));
-          // Add/override with cloud items
-          cloudItems.forEach(item => itemMap.set(item.id, item));
-          
-          const merged = Array.from(itemMap.values()).sort(
-            (a, b) => new Date(b.dateSaved).getTime() - new Date(a.dateSaved).getTime()
-          );
-          setSavedItems(merged);
-        },
-        (err) => {
-          console.warn('Firestore subscription fallback to local storage', err);
-          setSavedItems(getSavedItems());
-        }
-      );
-    }
-
-    const handleStorageChange = () => {
-      if (!user) {
-        setSavedItems(getSavedItems());
-      }
-    };
-
-    window.addEventListener('bookmarksUpdated', handleStorageChange);
-    return () => {
-      window.removeEventListener('bookmarksUpdated', handleStorageChange);
-      if (unsubscribeFirestore) {
-        unsubscribeFirestore();
-      }
-    };
-  }, [user]);
-
   const handleRemoveSaved = async (id: string, e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    await removeBookmark(id, user);
-    setSavedItems(prev => prev.filter(i => i.id !== id));
+    await removeBookmark(id);
   };
 
   const handleClearAll = async () => {
-    // Remove all saved items
-    const itemsToDelete = [...savedItems];
-    clearSavedItems();
-    setSavedItems([]);
+    await clearAllBookmarks();
     setConfirmClear(false);
-
-    if (user) {
-      for (const item of itemsToDelete) {
-        await removeBookmark(item.id, user);
-      }
-    }
   };
 
   const handleQuickBookmark = async (articleId: string) => {
@@ -152,27 +98,22 @@ export function Dashboard() {
         categoryId: article.categoryId,
         readTime: article.readTime,
         authorName: article.author?.name
-      }, user);
-      setSavedItems(getSavedItems());
+      });
     }
   };
 
-  const handleSyncToCloud = async () => {
-    if (!user) {
-      await signInWithGoogle();
-      return;
-    }
-    setIsSyncing(true);
-    try {
-      const count = await syncLocalBookmarksToCloud(user);
-      setSyncSuccessMsg(`Successfully synced ${count} item${count === 1 ? '' : 's'} to your cloud library!`);
-      setTimeout(() => setSyncSuccessMsg(null), 4000);
-    } catch {
-      setSyncSuccessMsg('Cloud synchronization completed.');
-      setTimeout(() => setSyncSuccessMsg(null), 3000);
-    } finally {
-      setIsSyncing(false);
-    }
+  const handleCopyLink = (id: string, url: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const fullUrl = `${window.location.origin}${url}`;
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
+  const handlePrintReadingList = () => {
+    window.print();
   };
 
   useEffect(() => {
@@ -218,18 +159,32 @@ export function Dashboard() {
     return Array.from(cats);
   }, [savedItems]);
 
-  // Filtered items
+  // Filter and sort items
   const filteredSavedItems = useMemo(() => {
-    return savedItems.filter(item => {
-      const matchesSearch = !searchFilter.trim() || 
-        item.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        (item.offlineExcerpt && item.offlineExcerpt.toLowerCase().includes(searchFilter.toLowerCase())) ||
-        (item.category && item.category.toLowerCase().includes(searchFilter.toLowerCase()));
+    const filtered = savedItems.filter(item => {
+      const query = searchFilter.trim().toLowerCase();
+      const matchesSearch = !query || 
+        item.title.toLowerCase().includes(query) ||
+        (item.offlineExcerpt && item.offlineExcerpt.toLowerCase().includes(query)) ||
+        (item.category && item.category.toLowerCase().includes(query));
       
       const matchesCat = selectedCategory === 'all' || item.category === selectedCategory;
       return matchesSearch && matchesCat;
     });
-  }, [savedItems, searchFilter, selectedCategory]);
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'recent') {
+        return new Date(b.dateSaved).getTime() - new Date(a.dateSaved).getTime();
+      }
+      if (sortBy === 'title') {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === 'readTime') {
+        return (a.readTime || 5) - (b.readTime || 5);
+      }
+      return 0;
+    });
+  }, [savedItems, searchFilter, selectedCategory, sortBy]);
 
   const recommendedGuides = useMemo(() => {
     return mockArticles.slice(0, 3);
@@ -275,10 +230,10 @@ export function Dashboard() {
                 {user ? (
                   <>
                     <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                    <span>Private Account</span>
+                    <span>Registered Member</span>
                   </>
                 ) : (
-                  <span>Offline Session</span>
+                  <span>Offline Guest</span>
                 )}
               </p>
             </div>
@@ -297,7 +252,7 @@ export function Dashboard() {
             >
               <div className="flex items-center gap-3">
                 <BookMarked className="w-5 h-5 text-emerald-600" />
-                <span>Saved Items</span>
+                <span>Saved Articles</span>
               </div>
               <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                 activeTab === 'saved' ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'
@@ -316,7 +271,7 @@ export function Dashboard() {
               }`}
             >
               <PenSquare className="w-5 h-5" /> 
-              <span>My Articles</span>
+              <span>My Contributions</span>
             </button>
 
             <div className="pt-2">
@@ -324,7 +279,7 @@ export function Dashboard() {
                 <button
                   id="dashboard-logout-btn"
                   onClick={logout}
-                  className="w-full flex items-center gap-3 px-3.5 py-2 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors rounded-xl font-semibold text-xs cursor-pointer"
+                  className="w-full flex items-center gap-3 px-3.5 py-2 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors rounded-xl font-semibold text-xs cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -333,7 +288,7 @@ export function Dashboard() {
                 <button
                   id="dashboard-signin-btn"
                   onClick={signInWithGoogle}
-                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Sign In with Google</span>
@@ -359,10 +314,10 @@ export function Dashboard() {
             <div className="bg-emerald-800 p-2 rounded-xl">
               {notificationPermission === 'granted' ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
             </div>
-            <h3 className="font-bold">Alerts</h3>
+            <h3 className="font-bold">Statutory Alerts</h3>
           </div>
-          <p className="text-emerald-200 text-sm mb-4">
-            Get notified instantly when amendments affect your saved legal categories.
+          <p className="text-emerald-200 text-sm mb-4 leading-relaxed">
+            Get notified instantly when amendments affect your saved legal categories and tax provisions.
           </p>
           
           {notificationPermission !== 'granted' ? (
@@ -399,12 +354,12 @@ export function Dashboard() {
                   {activeTab === 'saved' ? (
                     <>
                       <BookMarked className="w-6 h-6 text-emerald-600" />
-                      <span>Saved Items</span>
+                      <span>Saved Articles & Reference Library</span>
                     </>
                   ) : (
                     <>
                       <FileText className="w-6 h-6 text-emerald-600" />
-                      <span>My Articles</span>
+                      <span>My Contributions</span>
                     </>
                   )}
                 </h1>
@@ -412,23 +367,23 @@ export function Dashboard() {
                 {activeTab === 'saved' && (
                   user ? (
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Private Library</span>
+                      <Cloud className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Cloud Synced to Account</span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
                       <Lock className="w-3 h-3 text-slate-500" />
-                      <span>Local Device Only</span>
+                      <span>Saved on Device</span>
                     </span>
                   )
                 )}
               </div>
 
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-slate-500 mt-1.5 max-w-2xl">
                 {activeTab === 'saved' 
                   ? user 
-                    ? 'Your private, cloud-synchronized repository of statutory guides, tax policies, and legal analyses.'
-                    : 'Statutory guides and legal analyses saved on this device. Sign in to sync across all your devices.'
+                    ? `Your private repository of bookmarked statutory guides, tax analysis, and legal commentary linked to ${user.email}.`
+                    : 'Statutory guides saved in this browser. Sign in to permanently sync your reading list to your account across all devices.'
                   : 'Manage and publish legal insights for the E-Lawyers community.'}
               </p>
             </div>
@@ -441,30 +396,41 @@ export function Dashboard() {
                 <PenSquare className="w-4 h-4" /> New Article
               </button>
             ) : (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
                 {user && (
                   <button
                     id="sync-cloud-bookmarks-btn"
-                    onClick={handleSyncToCloud}
+                    onClick={syncCloud}
                     disabled={isSyncing}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-2 rounded-xl transition-colors cursor-pointer"
-                    title="Sync local bookmarks to cloud"
+                    title="Sync local bookmarks with cloud"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-emerald-600' : ''}`} />
-                    <span>{isSyncing ? 'Syncing...' : 'Sync to Cloud'}</span>
+                    <span>{isSyncing ? 'Syncing...' : 'Sync Cloud'}</span>
+                  </button>
+                )}
+
+                {savedItems.length > 0 && (
+                  <button
+                    onClick={handlePrintReadingList}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                    title="Print or export reading list"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-slate-500" />
+                    <span className="hidden sm:inline">Print List</span>
                   </button>
                 )}
 
                 {savedItems.length > 0 && (
                   confirmClear ? (
-                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl">
-                      <span className="text-xs text-red-700 font-semibold">Clear all saved items?</span>
+                    <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+                      <span className="text-xs text-rose-700 font-semibold">Clear all?</span>
                       <button
                         id="confirm-clear-bookmarks-btn"
                         onClick={handleClearAll}
-                        className="text-xs bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer"
+                        className="text-xs bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer"
                       >
-                        Yes, Clear
+                        Confirm
                       </button>
                       <button
                         onClick={() => setConfirmClear(false)}
@@ -477,7 +443,7 @@ export function Dashboard() {
                     <button
                       id="clear-all-bookmarks-btn"
                       onClick={() => setConfirmClear(true)}
-                      className="text-xs font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-xl transition-colors border border-slate-200 hover:border-red-200 cursor-pointer"
+                      className="text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-xl transition-colors border border-slate-200 hover:border-rose-200 cursor-pointer"
                     >
                       Clear All
                     </button>
@@ -487,25 +453,17 @@ export function Dashboard() {
             )}
           </div>
 
-          {/* Sync Success Message */}
-          {syncSuccessMsg && (
-            <div className="mb-6 flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-2.5 rounded-2xl text-xs font-bold animate-in fade-in">
-              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{syncSuccessMsg}</span>
-            </div>
-          )}
-
           {/* Guest Sign-in Callout if not logged in */}
           {activeTab === 'saved' && !user && (
-            <div id="saved-items-auth-prompt" className="mb-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
+            <div id="saved-items-auth-prompt" className="mb-6 bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5">
                 <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl shrink-0 mt-0.5 sm:mt-0">
-                  <Lock className="w-5 h-5" />
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">Make your Saved Items permanent & private</h4>
-                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                    You are currently saving articles locally on this browser. Sign in with Google to automatically back up your saved guides to your private cloud library and access them across all your devices.
+                  <h4 className="text-sm font-bold text-slate-900">Sign in to save articles permanently across all your devices</h4>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed max-w-xl">
+                    You currently have {savedItems.length} article{savedItems.length === 1 ? '' : 's'} saved on this device. Sign in with Google to automatically backup your personal library to Firestore and access them anytime.
                   </p>
                 </div>
               </div>
@@ -524,41 +482,69 @@ export function Dashboard() {
               <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
                 <FileText className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">No articles yet</h3>
-              <p className="text-slate-500 max-w-sm mb-6 text-sm">You haven't written any articles. Share your expertise with the community.</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">No contributions yet</h3>
+              <p className="text-slate-500 max-w-sm mb-6 text-sm">You haven't authored any legal commentary yet. Share your statutory analyses with our professional community.</p>
               <button className="text-emerald-700 font-bold hover:underline text-sm cursor-pointer">
-                Start writing now
+                Submit an analysis for review &rarr;
               </button>
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Filter and Search Toolbar */}
+              {/* Filter, Search, and Sort Toolbar */}
               {savedItems.length > 0 && (
-                <div id="bookmarks-toolbar" className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      id="bookmarks-search-input"
-                      type="text"
-                      value={searchFilter}
-                      onChange={(e) => setSearchFilter(e.target.value)}
-                      placeholder="Search saved guides, tax policies, or keywords..."
-                      className="w-full pl-9 pr-4 py-2 bg-white text-xs sm:text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                <div id="bookmarks-toolbar" className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        id="bookmarks-search-input"
+                        type="text"
+                        value={searchFilter}
+                        onChange={(e) => setSearchFilter(e.target.value)}
+                        placeholder="Search saved articles by title, keywords, or legal issues..."
+                        className="w-full pl-9 pr-8 py-2 bg-white text-xs sm:text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                      {searchFilter && (
+                        <button
+                          onClick={() => setSearchFilter('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                        <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="hidden sm:inline">Sort:</span>
+                      </div>
+                      <select
+                        id="bookmarks-sort-select"
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as SortOption)}
+                        className="bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                      >
+                        <option value="recent">Recently Saved</option>
+                        <option value="title">Title (A–Z)</option>
+                        <option value="readTime">Reading Time</option>
+                      </select>
+                    </div>
                   </div>
 
+                  {/* Category Pills */}
                   {availableCategories.length > 0 && (
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 pt-1 border-t border-slate-200/60">
                       <button
                         id="cat-filter-all"
                         onClick={() => setSelectedCategory('all')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                           selectedCategory === 'all'
-                            ? 'bg-emerald-600 text-white shadow-xs'
+                            ? 'bg-emerald-700 text-white shadow-xs'
                             : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                         }`}
                       >
-                        All ({savedItems.length})
+                        All Categories ({savedItems.length})
                       </button>
                       {availableCategories.map((cat) => {
                         const count = savedItems.filter(i => i.category === cat).length;
@@ -567,9 +553,9 @@ export function Dashboard() {
                             key={cat}
                             id={`cat-filter-${cat.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                               selectedCategory === cat
-                                ? 'bg-emerald-600 text-white shadow-xs'
+                                ? 'bg-emerald-700 text-white shadow-xs'
                                 : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                             }`}
                           >
@@ -585,13 +571,13 @@ export function Dashboard() {
               {/* Bookmarked items display */}
               {savedItems.length === 0 ? (
                 /* Empty state with recommendations */
-                <div id="bookmarks-empty-state" className="py-10 text-center">
+                <div id="bookmarks-empty-state" className="py-12 text-center">
                   <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
                     <BookMarked className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">No saved items in your library yet</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No saved articles in your library yet</h3>
                   <p className="text-slate-500 max-w-md mx-auto text-sm mb-8 leading-relaxed">
-                    Bookmark articles, statutory provisions, and tax compliance guidelines while researching. Click the bookmark icon on any guide to store it here in your private Saved Items library for future reference.
+                    Bookmark articles, statutory guidelines, and tax compliance reference manuals while reading. Click the bookmark icon on any guide to store it here in your personal dashboard for later reference.
                   </p>
 
                   <div className="border-t border-slate-100 pt-8 max-w-2xl mx-auto text-left">
@@ -621,10 +607,10 @@ export function Dashboard() {
                             <button
                               id={`bookmark-rec-btn-${guide.id}`}
                               onClick={() => handleQuickBookmark(guide.id)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-600 hover:text-white border border-emerald-300 px-3 py-1.5 rounded-xl transition-colors cursor-pointer shadow-xs"
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-700 hover:text-white border border-emerald-300 px-3 py-1.5 rounded-xl transition-colors cursor-pointer shadow-xs"
                             >
                               <Bookmark className="w-3.5 h-3.5" />
-                              <span>Save</span>
+                              <span>Save to Dashboard</span>
                             </button>
                             <Link
                               to={`/article/${guide.id}`}
@@ -645,8 +631,8 @@ export function Dashboard() {
                   <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Search className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-1">No saved items match your search</h3>
-                  <p className="text-sm text-slate-500 mb-4">Try checking for typos or clear your search query.</p>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">No saved articles match your search</h3>
+                  <p className="text-sm text-slate-500 mb-4">Try checking for typos or reset your active filters.</p>
                   <button
                     onClick={() => {
                       setSearchFilter('');
@@ -674,7 +660,7 @@ export function Dashboard() {
                           </span>
                           <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
                             <Clock className="w-3 h-3" />
-                            <span>{item.readTime ? `${item.readTime} min read` : 'Saved Guide'}</span>
+                            <span>{item.readTime ? `${item.readTime} min read` : '5 min read'}</span>
                           </div>
                         </div>
 
@@ -699,16 +685,32 @@ export function Dashboard() {
                         <span className="text-slate-400 text-[11px]">
                           Saved {new Date(item.dateSaved).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </span>
-                        <div className="flex items-center gap-2">
+                        
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            id={`copy-link-btn-${item.id}`}
+                            onClick={(e) => handleCopyLink(item.id, item.url, e)}
+                            className="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                            title="Copy link to article"
+                            aria-label="Copy link to article"
+                          >
+                            {copiedId === item.id ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+
                           <button 
                             id={`remove-bookmark-btn-${item.id}`}
                             onClick={(e) => handleRemoveSaved(item.id, e)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Remove from Saved Items"
-                            aria-label="Remove saved item"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            title="Remove from Saved Articles"
+                            aria-label="Remove saved article"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
+
                           <Link 
                             to={item.url} 
                             className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"

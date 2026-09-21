@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Bookmark, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { saveBookmark, removeBookmark, checkIsBookmarked } from '../services/bookmarkService';
+import { useBookmarks } from '../contexts/BookmarkContext';
 
 export interface BookmarkButtonProps {
   id: string;
   title: string;
-  url: string;
+  url?: string;
   type?: 'article' | 'policy' | 'section';
   category?: string;
+  categoryId?: string;
   readTime?: number;
   offlineExcerpt?: string;
   offlineImageUrl?: string;
@@ -22,69 +23,55 @@ export function BookmarkButton({
   url, 
   type = 'article',
   category,
+  categoryId,
   readTime,
   offlineExcerpt,
   offlineImageUrl,
   showLabel = false,
   className = ''
 }: BookmarkButtonProps) {
-  const [isSaved, setIsSaved] = useState(() => checkIsBookmarked(id));
-  const [justSaved, setJustSaved] = useState(false);
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const { user } = useAuth();
+  const [justSaved, setJustSaved] = useState(false);
 
-  useEffect(() => {
-    setIsSaved(checkIsBookmarked(id));
+  const isSaved = isBookmarked(id);
 
-    const handleStorageChange = () => {
-      setIsSaved(checkIsBookmarked(id));
-    };
-
-    window.addEventListener('bookmarksUpdated', handleStorageChange);
-    return () => window.removeEventListener('bookmarksUpdated', handleStorageChange);
-  }, [id]);
-
-  const toggleSave = async (e: React.MouseEvent) => {
+  const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const nextSaved = !isSaved;
-    setIsSaved(nextSaved);
-
-    if (nextSaved) {
+    const willBeSaved = !isSaved;
+    if (willBeSaved) {
       setJustSaved(true);
       setTimeout(() => setJustSaved(false), 2000);
-
-      await saveBookmark(
-        {
-          id,
-          title,
-          url,
-          type,
-          category,
-          readTime,
-          offlineExcerpt,
-          offlineImageUrl,
-          dateSaved: new Date().toISOString()
-        },
-        user
-      );
-    } else {
-      await removeBookmark(id, user);
     }
+
+    await toggleBookmark({
+      id,
+      title,
+      url: url || `/article/${id}`,
+      type,
+      category,
+      categoryId,
+      readTime,
+      offlineExcerpt,
+      offlineImageUrl,
+      dateSaved: new Date().toISOString()
+    });
   };
 
   const tooltipText = isSaved
     ? user
       ? "Saved to your private Dashboard"
       : "Bookmarked locally (Sign in to sync)"
-    : "Save to Dashboard";
+    : "Save to personal Dashboard";
 
   if (showLabel) {
     return (
       <button
         id={`bookmark-btn-${id}`}
         type="button"
-        onClick={toggleSave}
+        onClick={handleToggle}
         title={tooltipText}
         aria-label={tooltipText}
         aria-pressed={isSaved}
@@ -111,7 +98,7 @@ export function BookmarkButton({
     <button 
       id={`bookmark-btn-${id}`}
       type="button"
-      onClick={toggleSave}
+      onClick={handleToggle}
       title={tooltipText}
       aria-label={tooltipText}
       aria-pressed={isSaved}
@@ -124,3 +111,4 @@ export function BookmarkButton({
     </button>
   );
 }
+

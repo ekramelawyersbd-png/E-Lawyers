@@ -1,10 +1,11 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins } from 'lucide-react';
+import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
 import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisualizer';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { Gallery } from '../components/Gallery';
+import { ResourceLibrary } from '../components/tools/ResourceLibrary';
 
 export function ToolsHub() {
   
@@ -74,6 +75,14 @@ export function ToolsHub() {
       icon: <Calendar className="w-8 h-8" />,
       path: '#early-filing-tool',
       color: 'bg-amber-100 text-amber-800',
+    },
+    {
+      name: 'Resource Library',
+      description: 'Download PDF templates for NDAs, service agreements, and tax return checklists.',
+      tooltip: 'Access official legal and tax document drafts with one-click PDF generation.',
+      icon: <FolderDown className="w-8 h-8" />,
+      path: '#resource-library',
+      color: 'bg-indigo-100 text-indigo-800',
     }
   ];
   const visibleTools = tools.filter(t => !hiddenTools.includes(t.name));
@@ -253,6 +262,11 @@ export function ToolsHub() {
           </button>
         </div>
       )}
+
+      {/* Resource Library Section */}
+      <div className="mt-16">
+        <ResourceLibrary />
+      </div>
 
       <div className="mt-16">
         <Gallery 

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
@@ -11,11 +11,28 @@ import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
+import { Testimonials } from '../components/Testimonials';
 
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
+  const [isLoadingGuides, setIsLoadingGuides] = useState(true);
+
+  useEffect(() => {
+    // Initial loading state to provide visual skeleton feedback on load
+    const timer = setTimeout(() => {
+      setIsLoadingGuides(false);
+    }, 650);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleRefreshGuides = () => {
+    setIsLoadingGuides(true);
+    setTimeout(() => {
+      setIsLoadingGuides(false);
+    }, 600);
+  };
 
   const handleIncreaseFont = () => setNewsFontScale(p => Math.min(p + 1, 3));
   const handleDecreaseFont = () => setNewsFontScale(p => Math.max(p - 1, 0));
@@ -75,11 +92,29 @@ export function Home() {
   ];
 
   const featuredGuides = [
-    { title: 'Complete Guide to Company Registration in Bangladesh', path: '/article/company-reg' },
-    { title: 'Income Tax Return Filing Guide 2026', path: '/article/tax-return-guide' },
-    { title: 'VAT Compliance Guide for Businesses', path: '/vat-guide' },
-    { title: 'RJSC Annual Return Filing Guide', path: '/article/rjsc-guide' },
-    { title: 'Legal Checklist for Entrepreneurs', path: '/article/startup-legal-checklist' }
+    { title: 'Outsourced Business Support: Extended Business Team for Smarter Growth', path: '/article/outsourced-business-support-accounticca', category: 'Business & Startup', readTime: '6 min read' },
+    { title: 'Sales & Marketing Consultancy: Build a Strong Market Presence', path: '/article/sales-marketing-consultancy-accounticca', category: 'Business & Startup', readTime: '6 min read' },
+    { title: 'HR & Organizational Consultancy: Build Strong Teams & Scalable Orgs', path: '/article/hr-organizational-consultancy-accounticca', category: 'Business & Startup', readTime: '5 min read' },
+    { title: 'Business Automation Consultancy: Make Your Business Smarter With Tech', path: '/article/business-automation-consultancy-accounticca', category: 'Accounting Software', readTime: '6 min read' },
+    { title: 'Business Process Optimization: Improve Efficiency Through Better Systems', path: '/article/business-process-optimization-accounticca', category: 'Business & Startup', readTime: '6 min read' },
+    { title: 'Bookkeeping Services: Keep Financial Records Organized & Audit-Ready', path: '/article/bookkeeping-services-accounticca', category: 'Accounting & Finance', readTime: '5 min read' },
+    { title: 'Accounting & Financial Consultancy: Better Financial Control & Decisions', path: '/article/accounting-financial-consultancy', category: 'Accounting & Finance', readTime: '6 min read' },
+    { title: 'Business Planning & Strategy Consultancy: Create a Clear Growth Roadmap', path: '/article/business-planning-strategy-consultancy', category: 'Business & Startup', readTime: '6 min read' },
+    { title: 'Business Startup Consultancy: Turn Business Ideas Into Reality', path: '/article/business-startup-consultancy', category: 'Business & Startup', readTime: '6 min read' },
+    { title: 'Corporate Law Services in Bangladesh (Company Formation & Advisory)', path: '/article/corporate-law-services-bangladesh', category: 'Corporate Law', readTime: '6 min read' },
+    { title: 'Tax & VAT Services in Bangladesh (Corporate & Individual)', path: '/article/tax-vat-services-bangladesh', category: 'Tax & VAT Law', readTime: '6 min read' },
+    { title: 'RJSC & Compliance Services in Bangladesh', path: '/article/rjsc-compliance-services-bangladesh', category: 'RJSC & Corporate', readTime: '5 min read' },
+    { title: 'Intellectual Property Services in Bangladesh (Trademark, Patent & Copyright)', path: '/article/intellectual-property-services-bangladesh', category: 'Intellectual Property', readTime: '5 min read' },
+    { title: 'Litigation & Arbitration Services in Bangladesh', path: '/article/litigation-arbitration-services-bangladesh', category: 'Litigation & ADR', readTime: '5 min read' },
+    { title: 'Accounting & Finance Solutions for Businesses', path: '/article/accounting-finance-solutions', category: 'Accounting & Finance', readTime: '6 min read' },
+    { title: 'Business Consultancy Services in Bangladesh', path: '/article/business-consultancy-services-bangladesh', category: 'Business & Startup', readTime: '5 min read' },
+    { title: 'Professional Training & Academy (Tax, VAT, RJSC & Legal)', path: '/article/professional-training-academy-bangladesh', category: 'Academy & Training', readTime: '6 min read' },
+    { title: 'Legal Consultancy Services in Bangladesh', path: '/article/legal-consultancy-services-bangladesh', category: 'Corporate Law', readTime: '5 min read' },
+    { title: 'Complete Guide to Company Registration in Bangladesh', path: '/article/company-reg', category: 'Corporate Law', readTime: '8 min read' },
+    { title: 'Income Tax Return Filing Guide 2026', path: '/article/tax-return-guide', category: 'Tax Assessment', readTime: '10 min read' },
+    { title: 'VAT Compliance Guide for Businesses', path: '/vat-guide', category: 'Indirect Tax', readTime: '7 min read' },
+    { title: 'RJSC Annual Return Filing Guide', path: '/article/rjsc-guide', category: 'RJSC Compliance', readTime: '6 min read' },
+    { title: 'Legal Checklist for Entrepreneurs', path: '/article/startup-legal-checklist', category: 'Business & Startup', readTime: '5 min read' }
   ];
 
   const freeResources = [
@@ -452,23 +487,94 @@ export function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Featured Guides */}
-          <div className="lg:col-span-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-              <BookOpen className="w-8 h-8 text-emerald-600" /> Featured Guides
-            </h2>
-            <div className="space-y-4">
-              {featuredGuides.map((guide, idx) => (
-                <Link key={idx} to={guide.path} className="group flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-colors">
-                      <span className="font-bold">0{idx + 1}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">{guide.title}</h3>
-                  </div>
-                  <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors" />
-                </Link>
-              ))}
+          <div 
+            id="featured-guides-container" 
+            className="lg:col-span-8"
+            aria-live="polite"
+          >
+            <div className="flex items-center justify-between gap-4 mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <BookOpen className="w-8 h-8 text-emerald-600" /> Featured Guides
+              </h2>
+              <button
+                id="refresh-guides-btn"
+                type="button"
+                onClick={handleRefreshGuides}
+                disabled={isLoadingGuides}
+                title="Reload guides to inspect loading skeleton state"
+                aria-label="Refresh featured guides"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200/90 hover:border-emerald-300 transition-all cursor-pointer shadow-2xs disabled:opacity-60"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoadingGuides ? 'animate-spin text-emerald-600' : ''}`} />
+                <span className="hidden sm:inline">{isLoadingGuides ? 'Loading...' : 'Refresh'}</span>
+              </button>
             </div>
+
+            {isLoadingGuides ? (
+              <div 
+                id="featured-guides-skeleton-list"
+                aria-busy="true" 
+                aria-label="Loading featured legal guides"
+                className="space-y-4"
+              >
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs animate-pulse"
+                  >
+                    <div className="flex items-center gap-4 w-full pr-4 min-w-0">
+                      {/* Placeholder Index Badge */}
+                      <div className="w-10 h-10 rounded-xl bg-slate-200/70 shrink-0" />
+
+                      {/* Placeholder Title & Category Lines */}
+                      <div className="space-y-2.5 flex-1 min-w-0">
+                        <div 
+                          className="h-4.5 bg-slate-200/80 rounded-md"
+                          style={{ width: `${64 + (i % 3) * 14}%` }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <div className="h-3 bg-slate-200/60 rounded-md w-28" />
+                          <div className="w-1 h-1 rounded-full bg-slate-300" />
+                          <div className="h-3 bg-slate-100 rounded-md w-14" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Placeholder Action Icon */}
+                    <div className="w-5 h-5 rounded-md bg-slate-100 shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {featuredGuides.map((guide, idx) => (
+                  <Link 
+                    key={idx} 
+                    to={guide.path} 
+                    className="group flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all"
+                  >
+                    <div className="flex items-center gap-4 min-w-0 pr-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-colors">
+                        <span className="font-bold">0{idx + 1}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">
+                          {guide.title}
+                        </h3>
+                        {guide.category && (
+                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 font-medium">
+                            <span className="text-emerald-700 font-semibold">{guide.category}</span>
+                            <span>•</span>
+                            <span>{guide.readTime}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Latest Legal Updates */}
@@ -618,6 +724,14 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* Verified Client Success Stories & Testimonials */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Testimonials 
+          title="Client Success Stories & Enterprise Testimonials"
+          subtitle="Real results achieved by businesses, fast-growing startups, and established enterprises partnering with Accounticca."
+        />
+      </div>
 
       {/* Frequently Asked Legal & Tax Queries */}
       <FAQ />

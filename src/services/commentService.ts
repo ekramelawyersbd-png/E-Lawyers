@@ -120,12 +120,19 @@ export const PROFESSIONAL_ROLES: ProfessionalRoleInfo[] = [
 
 export const DISCUSSION_TOPIC_TAGS = [
   'Statutory Interpretation',
-  'Practical Audit & Filing',
+  'Tax Assessment & ITA 2023',
+  'Withholding Tax (TDS)',
+  'VAT & SD Compliance',
+  'Corporate Law & RJSC',
+  'NBR SRO & Circulars',
   'High Court Precedent',
-  'NBR SRO Clarification',
+  'Practical Audit & Filing',
   'Penalty & Dispute Defense',
-  'General Discussion'
+  'Tax Exemption & Rebates',
+  'General Legal Inquiry'
 ];
+
+export type CommentType = 'insight' | 'question';
 
 export interface CommentItem {
   id: string;
@@ -138,6 +145,7 @@ export interface CommentItem {
   organization?: string;
   statutoryRef?: string;
   topicTag?: string;
+  commentType?: CommentType;
   avatar: string;
   text: string;
   date: string;
@@ -152,6 +160,7 @@ const DEFAULT_SEED_DISCUSSIONS: Record<string, CommentItem[]> = {
     {
       id: 'seed-comment-1',
       articleId: 'default',
+      commentType: 'insight',
       authorName: 'Adv. Barrister Tanjim Al-Islam',
       role: 'barrister',
       roleLabel: 'Barrister-at-Law & Advocate, Supreme Court of Bangladesh',
@@ -166,14 +175,49 @@ const DEFAULT_SEED_DISCUSSIONS: Record<string, CommentItem[]> = {
       isVerifiedProfessional: true
     },
     {
+      id: 'seed-comment-q1',
+      articleId: 'default',
+      commentType: 'question',
+      authorName: 'Shahriar Ahmed, ACMA',
+      role: 'cost_management_accountant',
+      roleLabel: 'Cost & Management Accountant (ACMA)',
+      organization: 'FinTech Logistics Ltd.',
+      statutoryRef: 'Section 119 & Section 166, ITA 2023',
+      topicTag: 'Withholding Tax (TDS)',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=faces',
+      text: 'For cross-border SaaS software subscriptions (AWS/Google Cloud) paid via corporate credit card without a physical Permanent Establishment in Bangladesh, what is the current applicable withholding rate under the new Finance Act? Does the bank automatically deduct 20% TDS or must we file a separate Mushak 6.3 / 6.6 certificate?',
+      date: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
+      helpfulCount: 9,
+      parentId: null,
+      isVerifiedProfessional: true
+    },
+    {
+      id: 'seed-comment-a1',
+      articleId: 'default',
+      commentType: 'insight',
+      authorName: 'Mohammad Farhad Hossain, FCA',
+      role: 'chartered_accountant',
+      roleLabel: 'Chartered Accountant (FCA - ICAB)',
+      organization: 'Farhad & Co., Chartered Accountants',
+      statutoryRef: 'Section 119(1) & NBR SRO 186/2023',
+      topicTag: 'Withholding Tax (TDS)',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
+      text: 'Under Section 119 read with the Sixth Schedule, authorized dealer (AD) banks in Bangladesh deduct 20% TDS plus 15% VAT on royalty/technical service remittance abroad unless a Double Tax Avoidance Agreement (DTAA) residency certificate is validated by the NBR Taxes Zone. Ensure you collect the Form 16C withholding challan from your bank for annual tax assessment audit trails.',
+      date: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
+      helpfulCount: 16,
+      parentId: 'seed-comment-q1',
+      isVerifiedProfessional: true
+    },
+    {
       id: 'seed-comment-2',
       articleId: 'default',
+      commentType: 'insight',
       authorName: 'Mohammad Farhad Hossain, FCA',
       role: 'chartered_accountant',
       roleLabel: 'Chartered Accountant (FCA - ICAB)',
       organization: 'Farhad & Co., Chartered Accountants',
       statutoryRef: 'VAT & SD Act 2012, Third Schedule',
-      topicTag: 'Practical Audit & Filing',
+      topicTag: 'VAT & SD Compliance',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
       text: 'When preparing the tax reconciliation statement (Mushak 9.1 vs audited financial statements), auditors often observe variance due to timing differences in export LC realizations. Ensuring documented proof of bill of lading (BL) and PRC (Proceeds Realization Certificate) eliminates 90% of DCT scrutiny during assessment proceedings.',
       date: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
@@ -184,12 +228,13 @@ const DEFAULT_SEED_DISCUSSIONS: Record<string, CommentItem[]> = {
     {
       id: 'seed-comment-3',
       articleId: 'default',
+      commentType: 'insight',
       authorName: 'Nasrin Sultana, ITP',
       role: 'tax_practitioner',
       roleLabel: 'Income Tax Practitioner (ITP) & VAT Consultant',
       organization: 'Dhaka Taxes Bar Association',
       statutoryRef: 'NBR SRO No. 182-Ain/2023',
-      topicTag: 'NBR SRO Clarification',
+      topicTag: 'NBR SRO & Circulars',
       avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces',
       text: 'Note that the revised SRO provides an extension window for submission of withholding tax returns under Section 177. If clients faced e-TIN verification portal timeouts during month-end, keep the server timestamp log saved as evidence.',
       date: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
@@ -269,6 +314,7 @@ export function subscribeToArticleComments(
           organization: data.organization || '',
           statutoryRef: data.statutoryRef || '',
           topicTag: data.topicTag || 'Statutory Interpretation',
+          commentType: data.commentType || 'insight',
           avatar: data.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.authorName || 'Counsel')}`,
           text: data.text || '',
           date: data.createdAt?.toDate?.() ? data.createdAt.toDate().toISOString() : data.date || new Date().toISOString(),
@@ -339,6 +385,7 @@ export async function postProfessionalComment(
       organization: newCommentData.organization || '',
       statutoryRef: newCommentData.statutoryRef || '',
       topicTag: newCommentData.topicTag || 'Statutory Interpretation',
+      commentType: newCommentData.commentType || 'insight',
       avatar: newCommentData.avatar,
       text: newCommentData.text,
       parentId: newCommentData.parentId || null,
@@ -357,6 +404,31 @@ export async function postProfessionalComment(
 
   window.dispatchEvent(new CustomEvent('articleCommentsUpdated', { detail: { articleId: newCommentData.articleId } }));
   return commentItem;
+}
+
+/**
+ * Delete a comment from local cache and Firestore
+ */
+export async function deleteProfessionalComment(
+  articleId: string,
+  commentId: string
+): Promise<void> {
+  // Update local cache
+  const local = getLocalCachedComments(articleId);
+  const filtered = local.filter(c => c.id !== commentId && c.parentId !== commentId);
+  setLocalCachedComments(articleId, filtered);
+
+  // Update in Firestore
+  const commentsCol = 'comments';
+  try {
+    const { deleteDoc } = await import('firebase/firestore');
+    const docRef = doc(db, commentsCol, commentId);
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.warn('Could not delete comment from Firestore:', error);
+  }
+
+  window.dispatchEvent(new CustomEvent('articleCommentsUpdated', { detail: { articleId } }));
 }
 
 /**

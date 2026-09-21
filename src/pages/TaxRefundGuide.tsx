@@ -400,7 +400,11 @@ export function TaxRefundGuide() {
 
             <ChecklistExporter articleId={article.id} />
             {/* 11. Professional Comments & Peer Discussion Section */}
-            <CommentSection articleId={article.id} />
+            <CommentSection 
+              articleId={article.id} 
+              articleTitle={article.title}
+              articleCategory={article.category}
+            />
 
           </div>
 
