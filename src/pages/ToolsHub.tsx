@@ -6,6 +6,7 @@ import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisu
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { Gallery } from '../components/Gallery';
 import { ResourceLibrary } from '../components/tools/ResourceLibrary';
+import { ServiceSEO } from '../components/SEO';
 
 export function ToolsHub() {
   
@@ -91,6 +92,17 @@ export function ToolsHub() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <ServiceSEO
+        title="Business & Tax Compliance Tools | Accounticca & E-Lawyers"
+        description="Access interactive tools for income tax calculation, RJSC fee estimation, wealth surcharge visualizers, and downloadable legal agreements."
+        serviceType="Compliance & Financial Advisory Tools"
+        canonicalUrl="/tools"
+        keywords={['Tax Calculator Bangladesh', 'RJSC Fee Estimator', 'Wealth Surcharge', 'Compliance Calendar', 'Legal Templates Bangladesh']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Tools Hub', url: '/tools' }
+        ]}
+      />
       <div className="mb-10 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Tools Hub</h1>
         <p className="text-slate-600 text-lg max-w-2xl mx-auto">

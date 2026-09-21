@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ServiceSEO } from '../components/SEO';
 
 type CompanyCategory = 
   | 'public_10' 
@@ -133,6 +134,18 @@ export function CorporateTaxPlanner() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <ServiceSEO
+        title="Corporate Tax Planner 2026-27 | Assessment Year Strategy | Compliance Hub"
+        description="Analyze financial projections and implement strategic deductions to optimize corporate income tax liability for listed and private companies in Bangladesh."
+        serviceType="Corporate Tax Optimization & Financial Planning"
+        canonicalUrl="/corporate-planner"
+        keywords={['Corporate Tax Planning Bangladesh', 'Income Tax Act 2023 Corporate Rates', 'Listed Company Tax Slabs', 'Cashless Transaction Tax Benefits']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Tools Hub', url: '/tools' },
+          { name: 'Corporate Tax Planner', url: '/corporate-planner' }
+        ]}
+      />
       <Breadcrumbs items={[{ label: 'Tools' }, { label: 'Corporate Tax Planner 2026' }]} />
       
       <div className="mb-10">

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
@@ -11,13 +11,14 @@ import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
-import { Testimonials } from '../components/Testimonials';
+import { SEO } from '../components/SEO';
 
 export function Home() {
   const [newsFontScale, setNewsFontScale] = useState(1);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
   const [isLoadingGuides, setIsLoadingGuides] = useState(true);
+  const [heroArticleIndex, setHeroArticleIndex] = useState(0);
 
   useEffect(() => {
     // Initial loading state to provide visual skeleton feedback on load
@@ -36,6 +37,12 @@ export function Home() {
 
   const handleIncreaseFont = () => setNewsFontScale(p => Math.min(p + 1, 3));
   const handleDecreaseFont = () => setNewsFontScale(p => Math.max(p - 1, 0));
+
+  // Sort all articles by published date descending and extract top 3 for hero switcher
+  const heroRecentArticles = [...mockArticles]
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 3);
+  const currentHeroArticle = heroRecentArticles[heroArticleIndex] || heroRecentArticles[0] || mockArticles[0] || null;
 
   const featuredArticle = mockArticles[0] || null;
   const recentArticles = mockArticles.slice(1, 9);
@@ -88,6 +95,22 @@ export function Home() {
       title: 'Civil & Criminal Law',
       imageUrl: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=600&h=400',
       contents: ['Property Law', 'Family Law', 'Court Procedures', 'Legal Rights', 'Litigation Process']
+    },
+    {
+      id: 'resources',
+      icon: <Wrench className="w-6 h-6 text-emerald-600" />,
+      title: 'Resources & Tools',
+      imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=600&h=400',
+      path: '/tools',
+      contents: ['Tax & VAT Calculators', 'Resource Library & Forms', 'Statutory Compliance Checklists', 'Glossary & Guides', 'CPD Masterclasses']
+    },
+    {
+      id: 'community',
+      icon: <Users className="w-6 h-6 text-emerald-600" />,
+      title: 'Community & Network',
+      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600&h=400',
+      path: '/community',
+      contents: ['Verified Experts Directory', 'Legal Q&A & Discussions', 'Upcoming Seminars & CPD', 'Monthly Top Contributors', 'Expert Consultations']
     }
   ];
 
@@ -128,6 +151,21 @@ export function Home() {
 
   return (
     <div>
+      <SEO
+        title="Compliance Hub | Legal, Tax, VAT, Accounting & Business Technology Platform"
+        description="Empowering Bangladeshi businesses, startups, and foreign investors with integrated legal governance, NBR tax advisory, RJSC compliance, and fractional CFO leadership."
+        canonicalUrl="/"
+        keywords={[
+          'Compliance Hub Bangladesh',
+          'Legal Advisory Dhaka',
+          'Tax Consulting Bangladesh',
+          'VAT Advisory',
+          'RJSC Company Registration',
+          'Fractional CFO Services',
+          'Accounticca',
+          'E-Lawyers'
+        ]}
+      />
       {/* 1. Hero Section */}
       <section className="w-full relative bg-[#071426] overflow-hidden">
         {/* Subtle radial glow and modern background pattern */}
@@ -248,51 +286,126 @@ export function Home() {
               </div>
             </div>
 
-            {/* Right Content Area: SaaS Interactive Card & Pillars */}
+            {/* Right Content Area: Top 3 Recent Articles Switcher & Pillars */}
             <div className="lg:col-span-5 space-y-4">
-              {featuredArticle && (
+              {currentHeroArticle && (
                 <div className="relative group animate-in fade-in zoom-in-95 slide-in-from-right-8 duration-1000 delay-150">
                   <div className="absolute -inset-1 bg-gradient-to-br from-emerald-500/30 to-slate-800 rounded-[26px] blur-sm opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <Link 
-                    to={`/article/${featuredArticle.id}`} 
-                    className="relative flex flex-col bg-slate-900/80 backdrop-blur-2xl border border-slate-700/70 p-7 rounded-[22px] shadow-2xl hover:border-emerald-500/40 transition-all duration-300 overflow-hidden hover:-translate-y-1"
-                  >
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg">
-                        <Sparkles className="w-3 h-3 text-emerald-400" />
-                        <span>{featuredArticle.category || 'Featured Insight'}</span>
+                  <div className="relative flex flex-col bg-slate-900/85 backdrop-blur-2xl border border-slate-700/70 p-6 sm:p-7 rounded-[22px] shadow-2xl overflow-hidden">
+                    
+                    {/* Header: Recent Insights Tabs (1 to 3) & Navigation */}
+                    <div className="flex items-center justify-between gap-2 mb-5">
+                      <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                        {heroRecentArticles.map((article, idx) => (
+                          <button
+                            key={article.id}
+                            type="button"
+                            onClick={() => setHeroArticleIndex(idx)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              heroArticleIndex === idx
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                            title={`View recent article ${idx + 1}`}
+                          >
+                            <span>Recent 0{idx + 1}</span>
+                          </button>
+                        ))}
                       </div>
-                      <span className="text-slate-400 text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        {calculateReadingTime(featuredArticle.content)} min
-                      </span>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setHeroArticleIndex((prev) => (prev > 0 ? prev - 1 : heroRecentArticles.length - 1))}
+                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5"
+                          title="Previous recent article"
+                          aria-label="Previous article"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHeroArticleIndex((prev) => (prev < heroRecentArticles.length - 1 ? prev + 1 : 0))}
+                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5"
+                          title="Next recent article"
+                          aria-label="Next article"
+                        >
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    
-                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug group-hover:text-emerald-300 transition-colors">
-                      {featuredArticle.title}
-                    </h2>
-                    
-                    <p className="text-slate-400 text-sm mb-6 line-clamp-3 leading-relaxed">
-                      {featuredArticle.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-slate-800">
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={featuredArticle.author.avatarUrl} 
-                          alt={featuredArticle.author.name} 
-                          className="w-9 h-9 rounded-full object-cover border border-slate-700 shadow-sm" 
-                        />
-                        <div>
-                          <p className="text-sm font-bold text-white">{featuredArticle.author.name}</p>
-                          <p className="text-xs text-slate-400">{featuredArticle.author.role || 'Senior Counsel'}</p>
+
+                    <Link 
+                      to={`/article/${currentHeroArticle.id}`} 
+                      className="group/link flex flex-col flex-1"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg">
+                          <Sparkles className="w-3 h-3 text-emerald-400" />
+                          <span>{currentHeroArticle.category || 'Recent Insight'}</span>
                         </div>
+                        <span className="text-slate-400 text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          {calculateReadingTime(currentHeroArticle.content)} min
+                        </span>
                       </div>
-                      <span className="w-9 h-9 rounded-full bg-emerald-600/20 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-all duration-300">
-                        <ArrowUpRight className="w-4 h-4" />
-                      </span>
+                      
+                      <h2 className="text-lg sm:text-xl font-bold text-white mb-2.5 leading-snug group-hover/link:text-emerald-300 transition-colors line-clamp-2">
+                        {currentHeroArticle.title}
+                      </h2>
+                      
+                      <p className="text-slate-400 text-xs sm:text-sm mb-5 line-clamp-2 leading-relaxed">
+                        {currentHeroArticle.excerpt}
+                      </p>
+                      
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={currentHeroArticle.author.avatarUrl} 
+                            alt={currentHeroArticle.author.name} 
+                            className="w-8 h-8 rounded-full object-cover border border-slate-700 shadow-sm" 
+                          />
+                          <div>
+                            <p className="text-xs font-bold text-white">{currentHeroArticle.author.name}</p>
+                            <p className="text-[10px] text-slate-400">
+                              {currentHeroArticle.publishedAt ? format(new Date(currentHeroArticle.publishedAt), 'MMM d, yyyy') : 'Recent Update'}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="w-8 h-8 rounded-full bg-emerald-600/20 text-emerald-400 group-hover/link:bg-emerald-600 group-hover/link:text-white flex items-center justify-center transition-all duration-300">
+                          <ArrowUpRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </Link>
+
+                    {/* Compact Mini-List for the other 2 recent articles */}
+                    <div className="mt-4 pt-3.5 border-t border-slate-800/80 space-y-1.5">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        Top 3 Recent Updates:
+                      </div>
+                      {heroRecentArticles.map((article, idx) => (
+                        <button
+                          key={article.id}
+                          type="button"
+                          onClick={() => setHeroArticleIndex(idx)}
+                          className={`w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                            heroArticleIndex === idx 
+                              ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-300' 
+                              : 'hover:bg-white/5 text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          <span className="truncate pr-2 font-medium">
+                            <span className="text-emerald-500 font-bold mr-1.5">0{idx + 1}.</span>
+                            {article.title}
+                          </span>
+                          <span className="text-[10px] text-slate-500 shrink-0">
+                            {format(new Date(article.publishedAt), 'MMM d')}
+                          </span>
+                        </button>
+                      ))}
                     </div>
-                  </Link>
+
+                  </div>
                 </div>
               )}
 
@@ -444,36 +557,43 @@ export function Home() {
             <p className="text-lg text-slate-600">Explore comprehensive guides, laws, and compliance procedures categorized by practice area.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {mainCategories.map((category) => (
-              <Link key={category.id} to={`/category/${category.id}`} className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all group flex flex-col h-full overflow-hidden">
+              <Link 
+                key={category.id} 
+                to={category.path || `/category/${category.id}`} 
+                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-emerald-300 transition-all group flex flex-col h-full overflow-hidden hover:-translate-y-0.5"
+              >
                 {category.imageUrl && (
-                  <div className="w-full h-40 overflow-hidden">
+                  <div className="w-full h-36 overflow-hidden relative">
                     <img 
                       src={category.imageUrl} 
                       alt={category.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       referrerPolicy="no-referrer"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
                   </div>
                 )}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                       {category.icon}
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{category.title}</h3>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
+                      {category.title}
+                    </h3>
                   </div>
-                  <ul className="space-y-3 mb-6 flex-1">
+                  <ul className="space-y-2 mb-5 flex-1">
                     {category.contents.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                      <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                        <span>{item}</span>
+                        <span className="line-clamp-1">{item}</span>
                       </li>
                     ))}
                   </ul>
-                  <div className="text-emerald-600 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-4 border-t border-slate-100">
-                    View All <ArrowRight className="w-4 h-4" />
+                  <div className="text-emerald-600 font-bold text-xs sm:text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-3 border-t border-slate-100">
+                    Explore Hub <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
               </Link>
@@ -547,7 +667,7 @@ export function Home() {
               </div>
             ) : (
               <div className="space-y-4">
-                {featuredGuides.map((guide, idx) => (
+                {featuredGuides.slice(0, 10).map((guide, idx) => (
                   <Link 
                     key={idx} 
                     to={guide.path} 
@@ -555,7 +675,7 @@ export function Home() {
                   >
                     <div className="flex items-center gap-4 min-w-0 pr-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-colors">
-                        <span className="font-bold">0{idx + 1}</span>
+                        <span className="font-bold">{String(idx + 1).padStart(2, '0')}</span>
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-lg font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">
@@ -724,14 +844,6 @@ export function Home() {
           </div>
         </div>
       </section>
-
-      {/* Verified Client Success Stories & Testimonials */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Testimonials 
-          title="Client Success Stories & Enterprise Testimonials"
-          subtitle="Real results achieved by businesses, fast-growing startups, and established enterprises partnering with Accounticca."
-        />
-      </div>
 
       {/* Frequently Asked Legal & Tax Queries */}
       <FAQ />

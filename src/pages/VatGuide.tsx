@@ -3,10 +3,23 @@ import { Breadcrumbs } from '../components/Breadcrumbs';
 import { FileText, Calendar, CheckCircle2, AlertTriangle, Scale, PoundSterling } from 'lucide-react';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { ReadProgress } from '../components/ReadProgress';
+import { ServiceSEO } from '../components/SEO';
 
 export function VatGuide() {
   return (
     <>
+      <ServiceSEO
+        title="VAT Registration & Monthly Compliance Guide | E-Lawyers & Accounticca"
+        description="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions in Bangladesh."
+        serviceType="Corporate VAT Compliance & Regulatory Advisory"
+        canonicalUrl="/vat-guide"
+        keywords={['VAT Registration Bangladesh', 'Mushak 9.1', 'VAT Compliance', 'VDS Rules', 'Input Tax Credit Bangladesh']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Tax Updates', url: '/category/tax' },
+          { name: 'VAT Registration & Compliance', url: '/vat-guide' }
+        ]}
+      />
       <ReadProgress />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">

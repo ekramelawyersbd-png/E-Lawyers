@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { parseTaxCalculatorFromUrl } from '../utils/taxShareUtils';
+import { ServiceSEO } from '../components/SEO';
 
 type TaxpayerCategory = 'general' | 'women_senior' | 'disabled' | 'freedom_fighter';
 type LocationCategory = 'dhaka_ctg' | 'other_city' | 'other';
@@ -249,6 +250,18 @@ export function TaxCalculator() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <ServiceSEO
+        title="Income Tax Calculator 2026-27 | Bangladesh Assessment Year Calculator"
+        description="Estimate personal and commercial income tax liability, investment tax rebates, and municipal minimum tax under Bangladesh Finance Act 2026."
+        serviceType="Tax Computation & Advisory"
+        canonicalUrl="/tax-calculator"
+        keywords={['Income Tax Calculator Bangladesh', 'Finance Act 2026 Tax Slabs', 'Tax Rebate Calculator', 'TIN Tax Assessment 2026-27']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Tools Hub', url: '/tools' },
+          { name: 'Tax Calculator 2026-27', url: '/tax-calculator' }
+        ]}
+      />
       <Breadcrumbs items={[{ label: 'Tools' }, { label: 'Income Tax Calculator 2026-27' }]} />
       
       <div className="mb-10">

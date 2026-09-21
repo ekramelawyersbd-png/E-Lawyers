@@ -40,7 +40,8 @@ import { BlogSEO } from '../components/BlogSEO';
 import { BlogDisclaimer } from '../components/BlogDisclaimer';
 import { ContactELawyers } from '../components/ContactELawyers';
 import { RelatedResources } from '../components/RelatedResources';
-import { Testimonials } from '../components/Testimonials';
+import { EcosystemSocialKit } from '../components/EcosystemSocialKit';
+import { BlogCover } from '../components/BlogCover';
 
 export function Article() {
   const { id } = useParams();
@@ -215,7 +216,7 @@ export function Article() {
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Main Content Area */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 leading-[25px]">
             
             {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
               <LegalAlertBanner />
@@ -296,6 +297,9 @@ export function Article() {
               </div>
             </header>
 
+            {/* Featured Article Cover Photo with Category Theming, Dynamic Fallback, and Lightbox Zoom */}
+            <BlogCover article={article} />
+
             {/* Visual Reading Progress Indicator Bar for Long-Form Articles */}
             {isLongForm && (
               <ArticleReadingProgress
@@ -373,6 +377,9 @@ export function Article() {
               variant="bottom-bar" 
             />
 
+            {/* Strategic Partnership Media & Publishing Toolkit */}
+            <EcosystemSocialKit articleId={article.id} />
+
             {/* 8. Author Profile Section */}
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 mb-12 flex flex-col md:flex-row gap-6 items-start">
               <img src={article.author.avatarUrl} alt={article.author.name} className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-sm shrink-0" />
@@ -393,21 +400,6 @@ export function Article() {
             <BlogDisclaimer topic={article.category} />
 
             <RelatedResources currentCategory={article.category} />
-
-            {/* Client Success Stories & Testimonials for Trust & Social Proof */}
-            <Testimonials 
-              serviceCategory={article.category}
-              serviceKey={
-                article.id.includes('automation') ? 'automation' :
-                article.id.includes('hr') ? 'hr' :
-                article.id.includes('sales') ? 'sales' :
-                article.id.includes('outsourced') ? 'outsourced' :
-                article.id.includes('bookkeeping') || article.id.includes('accounting') ? 'bookkeeping' :
-                article.id.includes('startup') ? 'startup' : 'all'
-              }
-              title={`Client Success Stories: ${article.category}`}
-              subtitle="See how our tailored advisory delivered concrete financial and operational results for client organizations."
-            />
 
             <ContactELawyers />
 

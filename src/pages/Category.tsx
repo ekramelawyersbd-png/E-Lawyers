@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Filter, Search, Clock, Calendar, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
+import { SEO } from '../components/SEO';
 
 export function Category() {
   const { id } = useParams();
@@ -19,6 +20,16 @@ export function Category() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <SEO
+        title={`${category.name} — Regulatory, Legal & Compliance Guides | Compliance Hub`}
+        description={category.description}
+        canonicalUrl={`/category/${category.id}`}
+        keywords={[category.name, 'Regulatory Guides Bangladesh', 'Legal Compliance', 'Accounticca', 'E-Lawyers']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: category.name, url: `/category/${category.id}` }
+        ]}
+      />
       <Breadcrumbs 
         items={[
           { label: 'Categories' },

@@ -1,4 +1,5 @@
 import { Article, Author, Category } from '../types';
+import { strategicPartnershipArticle } from './strategicPartnershipArticle';
 
 import { teamMembers } from './teamData';
 
@@ -48,6 +49,7 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  strategicPartnershipArticle,
   {
     id: 'outsourced-business-support-accounticca',
     title: 'Outsourced Business Support: Your Extended Business Team for Smarter Growth',
