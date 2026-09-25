@@ -6,10 +6,32 @@ import { ReadProgress } from '../components/ReadProgress';
 import { ServiceSEO } from '../components/SEO';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
+import { RelatedArticles } from '../components/RelatedArticles';
+import { CommentSection } from '../components/CommentSection';
+import { Article } from '../types';
 
 const VAT_GUIDE_TEXT = `
 Value-Added Tax (VAT) is an indirect tax on the consumption of goods and services. Businesses must register for VAT once they cross turnover thresholds and charge VAT on sales and reclaim VAT on purchases. This guide explains how to register, account for VAT, and remain compliant with filings and payments. Output VAT is the VAT charged to customers on sales of goods and services. Input VAT is the VAT claimed back on purchases and expenses for your business. Monitor registration thresholds, register online, charge VAT on supplies, issue valid VAT invoices, submit regular VAT returns, and keep accurate records for statutory compliance.
 `;
+
+const vatGuideArticle: Article = {
+  id: 'vat-guide',
+  title: 'VAT Registration & Monthly Compliance Guide',
+  excerpt: 'Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions in Bangladesh.',
+  content: VAT_GUIDE_TEXT,
+  category: 'VAT & Customs',
+  categoryId: 'tax',
+  publishedAt: '2026-08-15',
+  author: {
+    id: 'ekramul-hoque',
+    name: 'Ekramul Hoque',
+    role: 'Tax & VAT Specialist',
+    avatarUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400',
+  },
+  imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000',
+  tags: ['VAT', 'Mushak 9.1', 'Tax Compliance', 'BIN Registration', 'VDS Rules'],
+  readTime: 5,
+};
 
 export function VatGuide() {
   return (
@@ -216,66 +238,80 @@ export function VatGuide() {
             summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
             variant="bottom-bar" 
           />
+
+          {/* Professional Comments & Peer Discussion Section */}
+          <div id="professional-comments-section" className="mt-12 scroll-mt-24">
+            <CommentSection 
+              articleId="vat-guide" 
+              articleTitle="VAT Registration & Monthly Compliance Guide"
+              articleCategory="VAT & Customs"
+            />
+          </div>
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-4 space-y-8">
-          {/* Quick Share Widget */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <Share2 className="w-4 h-4 text-emerald-600" />
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Share Guide</h3>
+        <div className="lg:col-span-4">
+          <div className="sticky top-28 space-y-8">
+            {/* Quick Share Widget */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Share2 className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Share Guide</h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                Share this VAT guide with your finance team, partners, and colleagues.
+              </p>
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                <SocialShareButtons 
+                  url="/vat-guide"
+                  title="VAT Registration & Monthly Compliance Guide | Bangladesh"
+                  summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
+                  variant="sidebar-card" 
+                  className="w-full"
+                />
+              </div>
             </div>
-            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Share this VAT guide with your finance team, partners, and colleagues.
-            </p>
-            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-              <SocialShareButtons 
-                url="/vat-guide"
-                title="VAT Registration & Monthly Compliance Guide | Bangladesh"
-                summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
-                variant="sidebar-card" 
-                className="w-full"
-              />
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2">
-              <Calendar className="text-emerald-600 w-5 h-5" />
-              Timeline Summary
-            </h3>
-            <div className="space-y-4 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-emerald-200 before:to-transparent">
-              <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">Initial</div>
-                <div className="font-bold text-slate-900 text-sm">Register within 30 days</div>
-                <div className="text-slate-500 text-xs mt-1">Apply as soon as threshold is met.</div>
-              </div>
-              <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">First Return</div>
-                <div className="font-bold text-slate-900 text-sm">Deadline assigned</div>
-                <div className="text-slate-500 text-xs mt-1">Based on registration date.</div>
-              </div>
-              <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">Ongoing</div>
-                <div className="font-bold text-slate-900 text-sm">File by deadline</div>
-                <div className="text-slate-500 text-xs mt-1">Each period (e.g. 1 month after quarter-end).</div>
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+              <h3 className="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2">
+                <Calendar className="text-emerald-600 w-5 h-5" />
+                Timeline Summary
+              </h3>
+              <div className="space-y-4 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-emerald-200 before:to-transparent">
+                <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
+                  <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">Initial</div>
+                  <div className="font-bold text-slate-900 text-sm">Register within 30 days</div>
+                  <div className="text-slate-500 text-xs mt-1">Apply as soon as threshold is met.</div>
+                </div>
+                <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
+                  <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">First Return</div>
+                  <div className="font-bold text-slate-900 text-sm">Deadline assigned</div>
+                  <div className="text-slate-500 text-xs mt-1">Based on registration date.</div>
+                </div>
+                <div className="relative z-10 p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
+                  <div className="text-emerald-700 font-bold text-xs uppercase tracking-widest mb-1">Ongoing</div>
+                  <div className="font-bold text-slate-900 text-sm">File by deadline</div>
+                  <div className="text-slate-500 text-xs mt-1">Each period (e.g. 1 month after quarter-end).</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-slate-900 rounded-3xl p-8 text-white text-center">
-            <h3 className="font-bold text-xl mb-4">Need VAT Assistance?</h3>
-            <p className="text-slate-300 text-sm mb-6 leading-relaxed">
-              Our experts can help you handle VAT registration, compliance, and strategic advisory.
-            </p>
-            <Link to="/corporate-planner" className="inline-block bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold px-6 py-3 rounded-xl transition-colors w-full">
-              Get Expert Support
-            </Link>
+            <div className="bg-slate-900 rounded-3xl p-8 text-white text-center">
+              <h3 className="font-bold text-xl mb-4">Need VAT Assistance?</h3>
+              <p className="text-slate-300 text-sm mb-6 leading-relaxed">
+                Our experts can help you handle VAT registration, compliance, and strategic advisory.
+              </p>
+              <Link to="/corporate-planner" className="inline-block bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold px-6 py-3 rounded-xl transition-colors w-full">
+                Get Expert Support
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    {/* Related Articles Section */}
+    <RelatedArticles currentArticle={vatGuideArticle} maxItems={3} />
     </>
   );
 }

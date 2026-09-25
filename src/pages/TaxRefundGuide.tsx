@@ -434,23 +434,26 @@ export function TaxRefundGuide() {
               </div>
             </div>
 
+            {/* 9. Professional Comments & Peer Discussion Section */}
+            <div id="professional-comments-section" className="mb-12 scroll-mt-24">
+              <CommentSection 
+                articleId={article.id} 
+                articleTitle={article.title}
+                articleCategory={article.category}
+              />
+            </div>
+
             <BlogDisclaimer topic={article.category} />
             
             <ContactELawyers />
 
             <ChecklistExporter articleId={article.id} />
-            {/* 11. Professional Comments & Peer Discussion Section */}
-            <CommentSection 
-              articleId={article.id} 
-              articleTitle={article.title}
-              articleCategory={article.category}
-            />
 
           </div>
 
           {/* 12. Sidebar Content (Desktop) */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-28 space-y-8">
+          <div className="lg:col-span-4 relative">
+            <div className="sticky top-24 max-h-[calc(100vh-6.5rem)] overflow-y-auto space-y-8 pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
               
               {/* Search Box */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">

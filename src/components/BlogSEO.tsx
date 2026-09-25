@@ -6,9 +6,10 @@ export interface BlogSEOProps {
   article: Article;
   canonicalUrl?: string;
   siteName?: string;
+  customSchema?: Record<string, any> | Array<Record<string, any>>;
 }
 
-export function BlogSEO({ article, canonicalUrl, siteName }: BlogSEOProps) {
+export function BlogSEO({ article, canonicalUrl, siteName, customSchema }: BlogSEOProps) {
   const legalServiceSchema = {
     '@context': 'https://schema.org',
     '@type': 'LegalService',
@@ -25,12 +26,16 @@ export function BlogSEO({ article, canonicalUrl, siteName }: BlogSEOProps) {
     }
   };
 
+  const schemasToInject = customSchema 
+    ? (Array.isArray(customSchema) ? [legalServiceSchema, ...customSchema] : [legalServiceSchema, customSchema])
+    : legalServiceSchema;
+
   return (
     <ArticleSEO
       article={article}
       canonicalUrl={canonicalUrl}
       siteName={siteName}
-      customSchema={legalServiceSchema}
+      customSchema={schemasToInject}
     />
   );
 }

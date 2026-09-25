@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Article } from '../types';
 import { mockArticles } from '../data/mockData';
-import { Clock, ChevronRight, Tag, ArrowUpRight, Sparkles, BookOpen, Calendar, User } from 'lucide-react';
+import { Clock, ChevronRight, Tag, ArrowUpRight, BookOpen, Calendar, User, Sparkles, Layers } from 'lucide-react';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
 import { BookmarkButton } from './BookmarkButton';
@@ -11,6 +11,7 @@ interface RelatedArticlesProps {
   currentArticle: Article;
   articles?: Article[];
   maxItems?: number;
+  className?: string;
 }
 
 export interface RecommendedArticleItem {
@@ -21,16 +22,18 @@ export interface RecommendedArticleItem {
 }
 
 /**
- * Recommends 3-4 relevant articles from the same category using
- * tag-based similarity scoring, with graceful fallback.
+ * Recommends relevant articles dynamically based on the current article's category
+ * and tag similarity, with intelligent fallback.
  */
 export function getRecommendedArticles(
   currentArticle: Article,
   allArticles: Article[] = mockArticles,
-  limit: number = 4
+  limit: number = 3
 ): RecommendedArticleItem[] {
   if (!currentArticle) return [];
 
+  const currentCategory = (currentArticle.category || '').toLowerCase().trim();
+  const currentCategoryId = (currentArticle.categoryId || '').toLowerCase().trim();
   const currentTags = (currentArticle.tags || []).map(t => t.toLowerCase().trim());
 
   const getOverlapInfo = (candidate: Article) => {
@@ -64,10 +67,21 @@ export function getRecommendedArticles(
     return { score, matches: Array.from(new Set(matches)) };
   };
 
-  // 1. Primary pool: other articles from the EXACT same category
-  const sameCategoryPool = allArticles.filter(
-    a => a.id !== currentArticle.id && a.categoryId === currentArticle.categoryId
-  );
+  // 1. Primary pool: articles from the EXACT same category (matching categoryId or category name)
+  const sameCategoryPool = allArticles.filter(a => {
+    if (a.id === currentArticle.id) return false;
+    const candCat = (a.category || '').toLowerCase().trim();
+    const candCatId = (a.categoryId || '').toLowerCase().trim();
+
+    return (
+      (currentCategoryId && candCatId === currentCategoryId) ||
+      (currentCategory && candCat === currentCategory) ||
+      (currentCategory.includes('tax') && candCat.includes('tax')) ||
+      (currentCategory.includes('vat') && candCat.includes('vat')) ||
+      (currentCategory.includes('corporate') && candCat.includes('corporate')) ||
+      (currentCategory.includes('business') && candCat.includes('business'))
+    );
+  });
 
   const scoredSameCategory: RecommendedArticleItem[] = sameCategoryPool.map(article => {
     const { score, matches } = getOverlapInfo(article);
@@ -94,8 +108,7 @@ export function getRecommendedArticles(
 
   const recommendations: RecommendedArticleItem[] = [...scoredSameCategory];
 
-  // 2. If the same category has fewer than the required limit (e.g. 3-4 items),
-  // supplement with top tag-matched articles from other categories
+  // 2. If the same category has fewer than the requested limit, backfill with top tag-matched articles
   if (recommendations.length < limit) {
     const existingIds = new Set([currentArticle.id, ...recommendations.map(r => r.article.id)]);
     const otherPool = allArticles.filter(a => !existingIds.has(a.id));
@@ -149,12 +162,28 @@ export function getRecommendedArticles(
 export function RelatedArticles({
   currentArticle,
   articles = mockArticles,
-  maxItems = 4
+  maxItems = 3,
+  className = '',
 }: RelatedArticlesProps) {
   const recommendedItems = useMemo(
     () => getRecommendedArticles(currentArticle, articles, maxItems),
     [currentArticle, articles, maxItems]
   );
+
+  // Extract unique topics / tags from the current article and related articles in this category
+  const similarTopics = useMemo(() => {
+    const topicSet = new Set<string>();
+    if (currentArticle.tags) {
+      currentArticle.tags.forEach(t => topicSet.add(t));
+    }
+    recommendedItems.forEach(({ article, matchingTags }) => {
+      matchingTags.forEach(t => topicSet.add(t));
+      if (article.tags) {
+        article.tags.slice(0, 3).forEach(t => topicSet.add(t));
+      }
+    });
+    return Array.from(topicSet).slice(0, 7);
+  }, [currentArticle, recommendedItems]);
 
   if (recommendedItems.length === 0) {
     return null;
@@ -163,67 +192,98 @@ export function RelatedArticles({
   const gridColsClass =
     recommendedItems.length === 3
       ? 'grid-cols-1 md:grid-cols-3'
+      : recommendedItems.length === 2
+      ? 'grid-cols-1 md:grid-cols-2'
       : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
+  const categoryUrl = currentArticle.categoryId 
+    ? `/category/${currentArticle.categoryId}` 
+    : '/category/corporate';
 
   return (
     <section 
       id="related-articles-section"
-      aria-label="Related Insights"
-      className="bg-slate-50/80 py-14 md:py-20 border-t border-slate-200"
+      aria-labelledby="related-articles-heading"
+      className={`bg-slate-50/90 py-14 md:py-20 border-t border-slate-200 ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-semibold uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Recommended For You</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/90 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2.5">
+              <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Related Articles &bull; {currentArticle.category}</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-              Related Insights
+            <h2 
+              id="related-articles-heading"
+              className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5"
+            >
+              <span>Related Articles</span>
             </h2>
-            <p className="text-slate-600 text-sm md:text-base mt-1.5 max-w-2xl">
-              Relevant legal guides and regulatory analyses in <span className="font-semibold text-slate-800">{currentArticle.category}</span> curated by topic and statutory tags.
+            <p className="text-slate-600 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+              Explore similar topics and authoritative guides in <span className="font-semibold text-slate-900">{currentArticle.category}</span> to navigate Bangladesh statutory compliance and business law.
             </p>
           </div>
 
           <Link
             id="related-articles-view-category-btn"
-            to={`/category/${currentArticle.categoryId}`}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-800 transition-colors group shrink-0"
+            to={categoryUrl}
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-800 bg-white border border-emerald-200 px-4 py-2.5 rounded-xl shadow-2xs hover:shadow-xs transition-all group shrink-0"
           >
             <span>All {currentArticle.category} Articles</span>
             <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        {/* Articles Cards Grid */}
-        <div className={`grid ${gridColsClass} gap-6`}>
+        {/* Similar Topics / Tags Bar */}
+        {similarTopics.length > 0 && (
+          <div className="mb-8 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5 mr-1">
+              <Tag className="w-3.5 h-3.5 text-slate-400" />
+              <span>Similar Topics:</span>
+            </span>
+            {similarTopics.map(topic => (
+              <Link
+                key={topic}
+                to={`/search?q=${encodeURIComponent(topic)}`}
+                className="text-xs font-medium bg-white text-slate-700 hover:text-emerald-700 hover:border-emerald-300 border border-slate-200 px-3 py-1 rounded-lg transition-colors shadow-2xs hover:bg-emerald-50/50"
+              >
+                #{topic}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Dynamic Articles Cards Grid */}
+        <div className={`grid ${gridColsClass} gap-6 sm:gap-8`}>
           {recommendedItems.map(({ article, matchingTags }, idx) => {
             const readingTime = calculateReadingTime(article.content);
             const displayTag = matchingTags.length > 0 ? matchingTags[0] : (article.tags && article.tags[0]);
+            const formattedDate = article.publishedAt 
+              ? format(new Date(article.publishedAt), 'MMM d, yyyy') 
+              : 'Recent';
 
             return (
               <article
                 key={article.id}
                 id={`related-article-card-${idx}`}
-                className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all duration-300 flex flex-col overflow-hidden h-full"
+                className="group bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200 flex flex-col overflow-hidden h-full"
               >
-                {/* Image Container */}
+                {/* Image Container with Link */}
                 <div className="aspect-[16/10] w-full overflow-hidden relative bg-slate-100">
                   <Link to={`/article/${article.id}`} tabIndex={-1} aria-hidden="true">
                     <img
                       src={article.imageUrl}
                       alt={article.title}
                       loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>
 
                   {/* Category Pill Overlay */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 pointer-events-none">
-                    <span className="bg-slate-900/80 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase shadow-sm">
+                    <span className="bg-slate-900/85 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase shadow-xs">
                       {article.category}
                     </span>
                   </div>
@@ -234,24 +294,36 @@ export function RelatedArticles({
                       id={article.id}
                       title={article.title}
                       url={`/article/${article.id}`}
-                      className="p-1.5 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white text-slate-700 shadow-sm"
+                      className="p-1.5 bg-white/90 backdrop-blur-xs rounded-lg hover:bg-white text-slate-700 shadow-xs"
                     />
                   </div>
                 </div>
 
                 {/* Card Body */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                   <div>
-                    {/* Tag Indicator */}
-                    {displayTag && (
-                      <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 mb-2">
-                        <Tag className="w-3 h-3 text-emerald-600 shrink-0" />
-                        <span className="truncate">#{displayTag}</span>
-                      </div>
-                    )}
+                    {/* Topic / Matching Tag Indicator */}
+                    <div className="flex items-center justify-between gap-2 mb-2.5">
+                      {displayTag ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          <Tag className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span className="truncate">#{displayTag}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                          <Layers className="w-3 h-3 text-slate-400" />
+                          <span>Similar Topic</span>
+                        </span>
+                      )}
+
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 shrink-0">
+                        <Clock className="w-3 h-3" />
+                        <span>{readingTime} min</span>
+                      </span>
+                    </div>
 
                     {/* Article Title */}
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug mb-2.5">
                       <Link 
                         id={`related-article-link-${idx}`}
                         to={`/article/${article.id}`}
@@ -268,8 +340,8 @@ export function RelatedArticles({
                   </div>
 
                   {/* Metadata Footer */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-                    <div className="flex items-center gap-1.5 truncate pr-2">
+                  <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 truncate pr-2">
                       {article.author?.avatarUrl ? (
                         <img 
                           src={article.author.avatarUrl} 
@@ -279,22 +351,17 @@ export function RelatedArticles({
                       ) : (
                         <User className="w-3.5 h-3.5 text-slate-400" />
                       )}
-                      <span className="truncate">{article.author?.name || 'Legal Team'}</span>
+                      <span className="truncate">{article.author?.name || 'Legal Analyst'}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-400" />
-                        {readingTime} min
-                      </span>
-                      <Link
-                        to={`/article/${article.id}`}
-                        aria-label={`Read ${article.title}`}
-                        className="p-1 rounded-md text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 transition-colors"
-                      >
-                        <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </Link>
-                    </div>
+                    <Link
+                      to={`/article/${article.id}`}
+                      aria-label={`Read ${article.title}`}
+                      className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:text-emerald-800 transition-colors group/link shrink-0"
+                    >
+                      <span>Read</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                    </Link>
                   </div>
                 </div>
               </article>

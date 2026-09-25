@@ -36,7 +36,8 @@ import {
   Search,
   Check,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -103,6 +104,8 @@ export function CommentSection({
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [submitSuccessMsg, setSubmitSuccessMsg] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // 1. Subscribe to Firestore comments with fallback
   useEffect(() => {
@@ -142,11 +145,12 @@ export function CommentSection({
   // 2. Submit new top-level comment (Insight or Question)
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!commentText.trim()) return;
 
     const authorDisplayName = user?.displayName || guestName.trim();
     if (!user && !authorDisplayName) {
-      alert('Please enter your name or sign in with Google to post.');
+      setErrorMessage('Please enter your Name / Title (e.g. Adv. Kamal or Farhad, FCA) or sign in with Google to post.');
       return;
     }
 
@@ -173,15 +177,16 @@ export function CommentSection({
 
       setCommentText('');
       setStatutoryRef('');
+      setErrorMessage('');
       setSubmitSuccessMsg(
         commentType === 'question' 
-          ? 'Your legal question has been posted to our professional community!'
+          ? 'Your legal & tax question has been posted to our professional community!'
           : 'Your technical insight has been published successfully!'
       );
       setTimeout(() => setSubmitSuccessMsg(''), 5000);
     } catch (err) {
       console.error('Failed to post comment:', err);
-      alert('Unable to post comment at this moment. Please check your connection.');
+      setErrorMessage('Unable to post discussion at this moment. Please check your network connection.');
     } finally {
       setIsSubmitting(false);
     }
@@ -190,6 +195,7 @@ export function CommentSection({
   // 3. Submit Reply / Answer
   const handleReplySubmit = async (parentId: string) => {
     if (!replyText.trim()) return;
+    setErrorMessage('');
 
     const authorDisplayName = user?.displayName || guestName.trim() || 'Practitioner';
     setReplySubmitting(true);
@@ -218,7 +224,7 @@ export function CommentSection({
       setReplyingToId(null);
     } catch (err) {
       console.error('Failed to submit reply:', err);
-      alert('Unable to submit reply. Please try again.');
+      setErrorMessage('Unable to submit reply. Please try again.');
     } finally {
       setReplySubmitting(false);
     }
@@ -245,11 +251,12 @@ export function CommentSection({
 
   // 5. Handle Delete
   const handleDelete = async (commentId: string) => {
-    if (!window.confirm('Are you sure you want to remove this comment?')) return;
     try {
       await deleteProfessionalComment(articleId, commentId);
+      setConfirmDeleteId(null);
     } catch (err) {
       console.error('Failed to delete comment:', err);
+      setErrorMessage('Failed to delete comment. Please try again.');
     }
   };
 
@@ -391,6 +398,76 @@ export function CommentSection({
         </div>
       )}
 
+      {/* Error Notification */}
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center justify-between gap-2.5 animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMessage('')}
+            className="text-xs font-bold text-rose-700 hover:text-rose-900 bg-rose-100 hover:bg-rose-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Discussion Starters for Accountants & Tax Experts */}
+      <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-emerald-50/80 via-slate-50 to-teal-50/60 border border-emerald-200/90 rounded-2xl">
+        <div className="flex items-center gap-2 mb-2.5">
+          <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-950">
+            Discussion Starters &bull; Tap to Populate Topic
+          </h4>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[
+            {
+              label: '💼 Section 272 Compounding Penalties',
+              topic: 'Tax Assessment & ITA 2023',
+              type: 'insight' as const,
+              text: 'Regarding Section 272 ITA 2023: Before the Taxes Appellate Tribunal, establishing lack of willful concealment and proving bona fide timing difference in accounts is essential to challenge arbitrary penalty orders.'
+            },
+            {
+              label: '📊 Mushak 9.1 VAT Reconciliation',
+              topic: 'VAT & SD Compliance',
+              type: 'insight' as const,
+              text: 'Reconciling monthly Mushak 9.1 returns with audited financial statements: Ensure debit notes, credit notes, and bank realization certificates (PRC) are cross-referenced to withstand commissionerate audit.'
+            },
+            {
+              label: '❓ Query: Cross-Border Cloud & SaaS TDS',
+              topic: 'Withholding Tax (TDS)',
+              type: 'question' as const,
+              text: 'What is the applicable withholding tax (TDS) and VAT rate when remitting payments for overseas SaaS/cloud subscriptions without a local PE in Bangladesh? Does the AD bank issue Form 16C automatically?'
+            },
+            {
+              label: '⚖️ RJSC Annual Filing & Form XII',
+              topic: 'Corporate Law & RJSC',
+              type: 'insight' as const,
+              text: 'For private and public limited companies: Timely filing of Form XII, Schedule X, and audited accounts with RJSC within 30 days of the AGM prevents costly registrar condonation petitions before the High Court.'
+            }
+          ].map((starter, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => {
+                setSelectedTopic(starter.topic);
+                setCommentType(starter.type);
+                if (!commentText.trim()) {
+                  setCommentText(starter.text);
+                }
+              }}
+              className="text-xs font-medium px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 text-slate-800 hover:text-emerald-800 hover:bg-emerald-50 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            >
+              {starter.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Composer Section */}
       <div className="mb-12 bg-slate-50/70 border border-slate-200 rounded-2xl p-5 sm:p-7">
         
@@ -507,70 +584,73 @@ export function CommentSection({
             </div>
           </div>
 
-          {/* User Sign-In or Guest Name Row */}
-          {!user && (
-            <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                  <UserIcon className="w-4 h-4" />
+          {/* User Sign-In or Practitioner Identity Fields */}
+          {!user ? (
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                    <UserIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-900">Contributor Credentials</h5>
+                    <p className="text-[11px] text-slate-500">Enter your name and designation, or sign in with Google for auto-verification</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800">
-                    Sign in with Google for automated practitioner verification
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    Or contribute directly as a verified guest practitioner.
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
                 >
                   <LogIn className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Google Sign In</span>
+                  <span>Sign In with Google</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIsGuestMode(!isGuestMode)}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-                >
-                  <span>{isGuestMode ? 'Hide Guest Fields' : 'Continue as Guest'}</span>
-                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Your Name &amp; Title <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="e.g. Farhad Hossain, FCA or Adv. Kamal"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Email Address <span className="text-slate-400 font-normal">(Private notification)</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="partner@auditfirm.com"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                  />
+                </div>
               </div>
             </div>
-          )}
-
-          {/* Guest Identity Fields if Not Logged In */}
-          {(!user && isGuestMode) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Full Name / Title <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  placeholder="e.g. Adv. Mahbubur Rahman"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none"
+          ) : (
+            <div className="flex items-center justify-between p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName || 'User')}`} 
+                  alt={user.displayName || 'User'} 
+                  className="w-8 h-8 rounded-full border border-emerald-300 object-cover" 
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email Address <span className="text-slate-400 font-normal">(Private notification)</span>
-                </label>
-                <input
-                  type="email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  placeholder="counsel@firm.com"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+                <div>
+                  <p className="font-bold text-slate-900">{user.displayName}</p>
+                  <p className="text-[11px] text-emerald-800 font-medium flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Verified Professional Account ({user.email})</span>
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -908,14 +988,34 @@ export function CommentSection({
                     </button>
 
                     {isAuthor && (
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(comment.id)}
-                        title="Delete your comment"
-                        className="inline-flex items-center p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      confirmDeleteId === comment.id ? (
+                        <div className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 rounded-lg p-1 text-xs">
+                          <span className="text-rose-700 text-[11px] font-bold px-1">Delete?</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(comment.id)}
+                            className="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer"
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeleteId(comment.id)}
+                          title="Delete your comment"
+                          className="inline-flex items-center p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )
                     )}
                   </div>
                 </div>

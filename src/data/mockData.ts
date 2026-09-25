@@ -1,5 +1,6 @@
 import { Article, Author, Category } from '../types';
 import { strategicPartnershipArticle } from './strategicPartnershipArticle';
+import { investmentTaxRebateArticle } from './investmentTaxRebateArticle';
 
 import { teamMembers } from './teamData';
 
@@ -49,6 +50,7 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  investmentTaxRebateArticle,
   strategicPartnershipArticle,
   {
     id: 'outsourced-business-support-accounticca',

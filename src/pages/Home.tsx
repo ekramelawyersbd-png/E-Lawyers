@@ -163,6 +163,7 @@ export function Home() {
   ];
 
   const featuredGuides = [
+    { title: 'Investment Tax Rebate in Bangladesh 2026–2027: Eligible Investments, Limits & Calculation', path: '/article/investment-tax-rebate-bangladesh-2026-2027', category: 'Income Tax', readTime: '12 min read' },
     { title: 'Outsourced Business Support: Extended Business Team for Smarter Growth', path: '/article/outsourced-business-support-accounticca', category: 'Business & Startup', readTime: '6 min read' },
     { title: 'Sales & Marketing Consultancy: Build a Strong Market Presence', path: '/article/sales-marketing-consultancy-accounticca', category: 'Business & Startup', readTime: '6 min read' },
     { title: 'HR & Organizational Consultancy: Build Strong Teams & Scalable Orgs', path: '/article/hr-organizational-consultancy-accounticca', category: 'Business & Startup', readTime: '5 min read' },

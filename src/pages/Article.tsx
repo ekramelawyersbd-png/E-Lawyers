@@ -34,6 +34,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
+import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRebateCalculator';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
 import { BlogSEO } from '../components/BlogSEO';
@@ -202,9 +203,46 @@ export function Article() {
     table: ({ node, children, ...props }: any) => <SortableTable {...props}>{children}</SortableTable>
   }), [article.id]);
 
+  const articleCustomSchema = useMemo(() => {
+    if (article.id === 'investment-tax-rebate-bangladesh-2026-2027') {
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: 'Investment Tax Rebate in Bangladesh 2026–2027: Eligible Investments, Limits & Calculation',
+        description: 'A detailed guide to investment tax rebate in Bangladesh for Assessment Year 2026–2027, including eligible investments, donations, conditions and calculation.',
+        author: {
+          '@type': 'Organization',
+          name: 'E-Lawyers & Accounticca',
+          url: 'https://accounticca.com/'
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'E-Lawyers & Accounticca',
+          url: 'https://accounticca.com/'
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': 'https://accounticca.com/investment-tax-rebate-bangladesh-2026-2027'
+        },
+        keywords: [
+          'Investment Tax Rebate Bangladesh 2026–2027',
+          'Bangladesh Tax Rebate',
+          'Section 78 Income Tax Act 2023',
+          'DPS Tax Rebate',
+          'Income Tax Bangladesh'
+        ]
+      };
+    }
+    return undefined;
+  }, [article.id]);
+
   return (
     <>
-      <BlogSEO article={article} />
+      <BlogSEO 
+        article={article} 
+        canonicalUrl={article.id === 'investment-tax-rebate-bangladesh-2026-2027' ? '/investment-tax-rebate-bangladesh-2026-2027' : undefined}
+        customSchema={articleCustomSchema} 
+      />
       {!isLongForm && <ReadProgress />}
 
       {/* Floating Left Social Share Rail for Desktop */}
@@ -223,13 +261,10 @@ export function Article() {
           ]} 
         />
 
-        <div 
-          className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12"
-          style={{ borderColor: '#125cc6' }}
-        >
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Main Content Area */}
-          <div className="lg:col-span-8 leading-[25px]" style={{ width: '769.263px', height: '12638.5px' }}>
+          <div className="lg:col-span-8 leading-[25px] w-full min-w-0">
             
             {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
               <LegalAlertBanner />
@@ -389,6 +424,12 @@ export function Article() {
               </>
             )}
 
+            {article.id === 'investment-tax-rebate-bangladesh-2026-2027' && (
+              <div className="my-12 scroll-mt-24" id="investment-tax-rebate-tool">
+                <InvestmentTaxRebateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              </div>
+            )}
+
             {/* Dynamic Gallery Images */}
             {article.galleryImages && article.galleryImages.length > 0 && (
               <div className="my-12">
@@ -438,6 +479,15 @@ export function Article() {
               </div>
             </div>
 
+            {/* 9. Professional Comments & Peer Discussion Section */}
+            <div id="professional-comments-section" className="mb-12 scroll-mt-24">
+              <CommentSection 
+                articleId={article.id} 
+                articleTitle={article.title}
+                articleCategory={article.category}
+              />
+            </div>
+
             <BlogDisclaimer topic={article.category} />
 
             <RelatedResources currentCategory={article.category} />
@@ -445,18 +495,12 @@ export function Article() {
             <ContactELawyers />
 
             <ChecklistExporter articleId={article.id} />
-            {/* 11. Professional Comments & Peer Discussion Section */}
-            <CommentSection 
-              articleId={article.id} 
-              articleTitle={article.title}
-              articleCategory={article.category}
-            />
 
           </div>
 
           {/* 12. Sidebar Content (Desktop) */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-28 space-y-8">
+          <div className="lg:col-span-4 relative">
+            <div className="sticky top-24 max-h-[calc(100vh-6.5rem)] overflow-y-auto space-y-8 pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
               
               {/* Search Box */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
