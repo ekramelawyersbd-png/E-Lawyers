@@ -226,7 +226,7 @@ Outsourced Business Support, Fractional Accounting Bangladesh, Executive Reporti
     },
     publishedAt: new Date().toISOString(),
     readTime: 6,
-    imageUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=1200',
+    imageUrl: 'https://i.ibb.co/NnG8px23/Outsourced-Business-Support.png',
     tags: [
       'Outsourced Business Support',
       'Fractional Accounting Bangladesh',
@@ -552,7 +552,7 @@ HR Consultancy Bangladesh, Organizational Development, Job Description Developme
     },
     publishedAt: new Date().toISOString(),
     readTime: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200',
+    imageUrl: 'https://i.ibb.co/yJhGXpp/HR-Organizational-Consultancy.png',
     tags: [
       'HR Consultancy Bangladesh',
       'Organizational Development',
@@ -921,7 +921,7 @@ Business Process Optimization, Operational Efficiency, SOP Development Banglades
     },
     publishedAt: new Date().toISOString(),
     readTime: 6,
-    imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=1200',
+    imageUrl: 'https://i.ibb.co/wFX7Mrj2/Business-Process-Optimization.png',
     tags: [
       'Business Process Optimization',
       'Operational Efficiency',

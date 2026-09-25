@@ -488,8 +488,8 @@ export function TaxCalculator() {
                 <div className="px-6 py-3 bg-slate-50 border-y border-slate-200 font-bold text-sm text-slate-700">
                   Tax Slabs
                 </div>
-                <div className="p-0">
-                  <table className="w-full text-sm text-left">
+                <div className="p-0 overflow-x-auto">
+                  <table className="w-full text-sm text-left min-w-[340px]">
                     <thead className="bg-white text-slate-500 border-b border-slate-100">
                       <tr>
                         <th className="px-6 py-3 font-medium">Slab</th>

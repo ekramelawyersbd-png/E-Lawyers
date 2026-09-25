@@ -17,7 +17,10 @@ export function Footer() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Statutory & Tax Intelligence</span>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-2">
+              <h3 
+                className="text-xl md:text-2xl font-bold text-white tracking-tight mb-2"
+                style={{ fontSize: '21px' }}
+              >
                 Stay Ahead of Bangladesh Law & Tax Updates
               </h3>
               <p className="text-slate-400 text-xs md:text-sm leading-relaxed max-w-xl">
@@ -30,7 +33,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12" style={{ textAlign: 'center' }}>
           <div className="col-span-1 md:col-span-1 text-justify">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white/10 p-1 group-hover:scale-105 transition-transform">
@@ -43,7 +46,7 @@ export function Footer() {
             </p>
           </div>
           
-          <div>
+          <div style={{ textAlign: 'left', fontSize: '12px' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Quick Links</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li><Link to="/team" className="hover:text-emerald-400 transition-colors">Our Professional Team</Link></li>
@@ -83,9 +86,22 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div style={{ textAlign: 'left', lineHeight: '33px', fontSize: '14px', fontStyle: 'normal', fontWeight: 'normal', width: '240.6px', height: '173.988px' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Resources</h3>
-            <ul className="space-y-4 text-sm font-medium">
+            <ul 
+              className="space-y-4 text-sm font-medium"
+              style={{
+                width: '226.6px',
+                height: '137px',
+                marginLeft: '0px',
+                marginRight: '0px',
+                paddingLeft: '0px',
+                paddingTop: '0px',
+                paddingBottom: '0px',
+                borderRadius: '0px',
+                borderWidth: '0px'
+              }}
+            >
               <li><Link to="/" className="hover:text-emerald-400 transition-colors">Blog Categories</Link></li>
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
               <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
@@ -103,7 +119,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div style={{ textAlign: 'justify' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Get in Touch</h3>
             <p className="text-sm text-slate-500 font-medium mb-4">
               Need immediate legal or tax assistance? Connect directly with our experts on our appointment platform.
@@ -121,7 +137,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div 
+          className="border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6"
+          style={{ paddingTop: '30px', marginTop: '0px' }}
+        >
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>

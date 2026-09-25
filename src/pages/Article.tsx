@@ -42,6 +42,7 @@ import { ContactELawyers } from '../components/ContactELawyers';
 import { RelatedResources } from '../components/RelatedResources';
 import { EcosystemSocialKit } from '../components/EcosystemSocialKit';
 import { BlogCover } from '../components/BlogCover';
+import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
 
 export function Article() {
   const { id } = useParams();
@@ -205,6 +206,15 @@ export function Article() {
     <>
       <BlogSEO article={article} />
       {!isLongForm && <ReadProgress />}
+
+      {/* Floating Left Social Share Rail for Desktop */}
+      <SocialShareButtons 
+        url={`/article/${article.id}`}
+        title={article.title} 
+        summary={article.excerpt} 
+        variant="floating-rail" 
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <Breadcrumbs 
           items={[
@@ -213,10 +223,13 @@ export function Article() {
           ]} 
         />
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div 
+          className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12"
+          style={{ borderColor: '#125cc6' }}
+        >
           
           {/* Main Content Area */}
-          <div className="lg:col-span-8 leading-[25px]">
+          <div className="lg:col-span-8 leading-[25px]" style={{ width: '769.263px', height: '12638.5px' }}>
             
             {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
               <LegalAlertBanner />
@@ -224,19 +237,22 @@ export function Article() {
 
             {/* 1. Article Header Section */}
             <header className="mb-10">
-              <div className="flex items-center gap-3 mb-6 flex-wrap">
-                <Link to={`/category/${article.categoryId}`} className="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
+                <Link to={`/category/${article.categoryId}`} className="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md hover:bg-emerald-200 transition-colors">
                   {article.category}
                 </Link>
-                <div className="flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">
-                  <Clock className="w-3.5 h-3.5" />
-                  {calculateReadingTime(localizedContent)} min read
-                </div>
+                <EstimatedReadingTime content={localizedContent} variant="badge" />
               </div>
               
-              <h1 className="text-[25px] leading-[33px] font-bold text-slate-900 mb-6">
+              <h1 className="text-[25px] leading-[33px] font-bold text-slate-900 mb-4">
                 {article.title}
               </h1>
+
+              {/* Estimated Reading Time Display near the Article Title */}
+              <div className="mb-6">
+                <EstimatedReadingTime content={localizedContent} variant="sub-header" />
+              </div>
+
               <p className="text-[15px] leading-[25px] text-justify text-slate-600 mb-8">
                 {article.excerpt}
               </p>
@@ -248,6 +264,8 @@ export function Article() {
                     <p className="font-bold text-slate-900">{article.author.name}</p>
                     <div className="flex items-center gap-3 text-sm text-slate-500">
                       <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
+                      <span>&bull;</span>
+                      <EstimatedReadingTime content={localizedContent} variant="inline" />
                       <span>&bull;</span>
                       <a href="#professional-comments-section" className="flex items-center gap-1 text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
                         <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -290,6 +308,7 @@ export function Article() {
               {/* Top Social Sharing Bar (LinkedIn, Facebook, WhatsApp, Copy Link) */}
               <div className="pt-6">
                 <SocialShareButtons 
+                  url={`/article/${article.id}`}
                   title={article.title} 
                   summary={article.excerpt} 
                   variant="top-bar" 
@@ -335,13 +354,34 @@ export function Article() {
               <>
                 <div className="my-12">
                   <h3 className="text-2xl font-bold text-slate-900 mb-6">Tax Filing Deadline & Incentives</h3>
-                  <ImageGallery 
-                    layout="grid"
-                    images={[
-                      { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/Tax%20sep%2030300.png', caption: 'Tax Return Deadline: September 30' },
-                      { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%20sep%2030.png', caption: 'Early Filing Benefits & Incentives' }
-                    ]} 
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+                    <div>
+                      <ImageGallery 
+                        layout="grid"
+                        className="!my-0 grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
+                        images={[
+                          { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/Tax%20sep%2030300.png', caption: 'Tax Return Deadline: September 30' }
+                        ]} 
+                      />
+                    </div>
+                    <div className="space-y-6">
+                      <ImageGallery 
+                        layout="grid"
+                        className="!my-0 grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
+                        images={[
+                          { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%20sep%2030.png', caption: 'Early Filing Benefits & Incentives' }
+                        ]} 
+                      />
+                      {/* Copy of the second picture placed below it */}
+                      <ImageGallery 
+                        layout="grid"
+                        className="!my-0 grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
+                        images={[
+                          { url: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/tax%20sep%2030.png', caption: 'Early Filing Benefits & Incentives (Copy)' }
+                        ]} 
+                      />
+                    </div>
+                  </div>
                 </div>
                 <div className="my-12" id="early-filing-tool">
                   <EarlyFilingIncentive initialPayableTax={50000} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
@@ -372,6 +412,7 @@ export function Article() {
 
             {/* Bottom Social Media Sharing & Networking Bar */}
             <SocialShareButtons 
+              url={`/article/${article.id}`}
               title={article.title} 
               summary={article.excerpt} 
               variant="bottom-bar" 
@@ -513,12 +554,13 @@ export function Article() {
                 <p className="text-xs text-slate-500 mb-4 leading-relaxed">
                   Share this statutory analysis with your professional network and colleagues.
                 </p>
-                <div className="bg-slate-50 p-2 rounded-2xl border border-slate-100 flex items-center justify-center">
+                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
                   <SocialShareButtons 
+                    url={`/article/${article.id}`}
                     title={article.title} 
                     summary={article.excerpt} 
-                    variant="compact" 
-                    className="justify-center w-full"
+                    variant="sidebar-card" 
+                    className="w-full"
                   />
                 </div>
               </div>

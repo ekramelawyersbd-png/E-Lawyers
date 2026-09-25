@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
@@ -59,50 +59,92 @@ export function Home() {
       icon: <Landmark className="w-6 h-6 text-emerald-600" />,
       title: 'Corporate Law',
       imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['Company Registration', 'RJSC Compliance', 'Share Transfer', 'Directors\' Responsibilities', 'Corporate Governance']
+      contents: [
+        { label: 'Company Registration', icon: <Building2 className="w-3.5 h-3.5" /> },
+        { label: 'RJSC Compliance', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+        { label: 'Share Transfer', icon: <LineChart className="w-3.5 h-3.5" /> },
+        { label: "Directors' Responsibilities", icon: <Users className="w-3.5 h-3.5" /> },
+        { label: 'Corporate Governance', icon: <Scale className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'tax',
       icon: <Calculator className="w-6 h-6 text-emerald-600" />,
       title: 'Income Tax',
       imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['Income Tax Return Filing', 'Tax Calculation Guide', 'Tax Rebate Rules', 'TIN & e-TIN Updates', 'NBR Tax Circulars']
+      contents: [
+        { label: 'Income Tax Return Filing', icon: <FileText className="w-3.5 h-3.5" /> },
+        { label: 'Tax Calculation Guide', icon: <Calculator className="w-3.5 h-3.5" /> },
+        { label: 'Tax Rebate Rules', icon: <ArrowUpRight className="w-3.5 h-3.5" /> },
+        { label: 'TIN & e-TIN Updates', icon: <Sparkles className="w-3.5 h-3.5" /> },
+        { label: 'NBR Tax Circulars', icon: <FileSignature className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'vat',
       icon: <FileText className="w-6 h-6 text-emerald-600" />,
       title: 'VAT & Customs',
       imageUrl: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['VAT Registration', 'VAT Return Filing', 'VAT Rules & Procedures', 'Customs Compliance', 'Import-Export Tax Issues']
+      contents: [
+        { label: 'VAT Registration', icon: <FileText className="w-3.5 h-3.5" /> },
+        { label: 'VAT Return Filing', icon: <Calculator className="w-3.5 h-3.5" /> },
+        { label: 'VAT Rules & Procedures', icon: <Scale className="w-3.5 h-3.5" /> },
+        { label: 'Customs Compliance', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+        { label: 'Import-Export Tax Issues', icon: <Briefcase className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'business',
       icon: <Briefcase className="w-6 h-6 text-emerald-600" />,
       title: 'Business & Startup',
       imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['Business Registration', 'Trade License', 'Partnership Agreements', 'Startup Legal Requirements', 'Business Compliance Checklist']
+      contents: [
+        { label: 'Business Registration', icon: <Briefcase className="w-3.5 h-3.5" /> },
+        { label: 'Trade License', icon: <FileSignature className="w-3.5 h-3.5" /> },
+        { label: 'Partnership Agreements', icon: <Users className="w-3.5 h-3.5" /> },
+        { label: 'Startup Legal Requirements', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+        { label: 'Business Compliance Checklist', icon: <CheckSquare className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'legal_docs',
       icon: <FileSignature className="w-6 h-6 text-emerald-600" />,
       title: 'Legal Documentation',
       imageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['Agreement Drafting', 'Legal Notices', 'Contracts', 'Power of Attorney', 'Deeds & Documents']
+      contents: [
+        { label: 'Agreement Drafting', icon: <FileSignature className="w-3.5 h-3.5" /> },
+        { label: 'Legal Notices', icon: <FileText className="w-3.5 h-3.5" /> },
+        { label: 'Contracts', icon: <ScrollText className="w-3.5 h-3.5" /> },
+        { label: 'Power of Attorney', icon: <Scale className="w-3.5 h-3.5" /> },
+        { label: 'Deeds & Documents', icon: <BookMarked className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'civil_criminal',
       icon: <Scale className="w-6 h-6 text-emerald-600" />,
       title: 'Civil & Criminal Law',
       imageUrl: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: ['Property Law', 'Family Law', 'Court Procedures', 'Legal Rights', 'Litigation Process']
+      contents: [
+        { label: 'Property Law', icon: <Landmark className="w-3.5 h-3.5" /> },
+        { label: 'Family Law', icon: <Users className="w-3.5 h-3.5" /> },
+        { label: 'Court Procedures', icon: <Scale className="w-3.5 h-3.5" /> },
+        { label: 'Legal Rights', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+        { label: 'Litigation Process', icon: <Gavel className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'resources',
-      icon: <Wrench className="w-6 h-6 text-emerald-600" />,
+      icon: <BookOpen className="w-6 h-6 text-emerald-600" />,
       title: 'Resources & Tools',
       imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=600&h=400',
       path: '/tools',
-      contents: ['Tax & VAT Calculators', 'Resource Library & Forms', 'Statutory Compliance Checklists', 'Glossary & Guides', 'CPD Masterclasses']
+      contents: [
+        { label: 'Tax & VAT Calculators', icon: <Calculator className="w-3.5 h-3.5" /> },
+        { label: 'Resource Library & Forms', icon: <BookOpen className="w-3.5 h-3.5" /> },
+        { label: 'Statutory Compliance Checklists', icon: <CheckSquare className="w-3.5 h-3.5" /> },
+        { label: 'Glossary & Guides', icon: <FileText className="w-3.5 h-3.5" /> },
+        { label: 'CPD Masterclasses', icon: <GraduationCap className="w-3.5 h-3.5" /> }
+      ]
     },
     {
       id: 'community',
@@ -110,7 +152,13 @@ export function Home() {
       title: 'Community & Network',
       imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600&h=400',
       path: '/community',
-      contents: ['Verified Experts Directory', 'Legal Q&A & Discussions', 'Upcoming Seminars & CPD', 'Monthly Top Contributors', 'Expert Consultations']
+      contents: [
+        { label: 'Verified Experts Directory', icon: <Users className="w-3.5 h-3.5" /> },
+        { label: 'Legal Q&A & Discussions', icon: <MessageSquare className="w-3.5 h-3.5" /> },
+        { label: 'Upcoming Seminars & CPD', icon: <CalendarIcon className="w-3.5 h-3.5" /> },
+        { label: 'Monthly Top Contributors', icon: <Award className="w-3.5 h-3.5" /> },
+        { label: 'Expert Consultations', icon: <UserCheck className="w-3.5 h-3.5" /> }
+      ]
     }
   ];
 
@@ -176,7 +224,7 @@ export function Home() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50" />
         </div>
         
-        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] pt-[19px] pb-[81px] pl-[46px] pr-[49px] max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] pt-8 pb-16 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Content Area */}
             <div className="lg:col-span-7">
@@ -217,7 +265,10 @@ export function Home() {
               </div>
               
               {/* Value Proposition */}
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl mb-8 font-normal">
+              <p 
+                className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl mb-8 font-normal text-justify"
+                style={{ textAlign: 'justify' }}
+              >
                 Authoritative statutory guidance, tax calculators, and actionable regulatory insights. Built for entrepreneurs, CFOs, and practitioners navigating Bangladesh legal and financial compliance.
               </p>
               
@@ -354,7 +405,10 @@ export function Home() {
                         {currentHeroArticle.title}
                       </h2>
                       
-                      <p className="text-slate-400 text-xs sm:text-sm mb-5 line-clamp-2 leading-relaxed">
+                      <p 
+                        className="text-slate-400 text-xs sm:text-sm mb-5 line-clamp-2 leading-relaxed text-justify"
+                        style={{ textAlign: 'justify' }}
+                      >
                         {currentHeroArticle.excerpt}
                       </p>
                       
@@ -394,9 +448,10 @@ export function Home() {
                               : 'hover:bg-white/5 text-slate-400 hover:text-slate-200'
                           }`}
                         >
-                          <span className="truncate pr-2 font-medium">
-                            <span className="text-emerald-500 font-bold mr-1.5">0{idx + 1}.</span>
-                            {article.title}
+                          <span className="truncate pr-2 font-medium flex items-center gap-1.5">
+                            <span className="text-emerald-500 font-bold shrink-0">0{idx + 1}.</span>
+                            <FileText className="w-3 h-3 text-emerald-400/80 shrink-0" />
+                            <span className="truncate">{article.title}</span>
                           </span>
                           <span className="text-[10px] text-slate-500 shrink-0">
                             {format(new Date(article.publishedAt), 'MMM d')}
@@ -411,15 +466,18 @@ export function Home() {
 
               {/* Three SaaS Compliance Pillar Badges */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
+                  <Landmark className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
                   <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Corporate</div>
                   <div className="text-xs text-slate-300 font-medium">RJSC &amp; Companies</div>
                 </div>
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
+                  <Calculator className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
                   <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Tax 2023</div>
                   <div className="text-xs text-slate-300 font-medium">NBR SROs &amp; Slabs</div>
                 </div>
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
+                  <FileText className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
                   <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">VAT &amp; TDS</div>
                   <div className="text-xs text-slate-300 font-medium">Withholding Rules</div>
                 </div>
@@ -439,10 +497,16 @@ export function Home() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Statutory &amp; Regulatory Dispatches</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+              <h2 
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-2"
+                style={{ borderColor: '#06398d' }}
+              >
                 Latest Articles &amp; Precedents
               </h2>
-              <p className="text-slate-500 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+              <p 
+                className="text-slate-500 text-sm sm:text-base max-w-2xl font-normal leading-relaxed"
+                style={{ borderColor: '#00050d' }}
+              >
                 Expert legal analysis, NBR tax codes, corporate governance mandates, and procedural checklists for Bangladesh.
               </p>
             </div>
@@ -558,7 +622,7 @@ export function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {mainCategories.map((category) => (
+            {mainCategories.map((category, categoryIndex) => (
               <Link 
                 key={category.id} 
                 to={category.path || `/category/${category.id}`} 
@@ -584,13 +648,36 @@ export function Home() {
                       {category.title}
                     </h3>
                   </div>
-                  <ul className="space-y-2 mb-5 flex-1">
-                    {category.contents.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                  <ul 
+                    className="space-y-2 mb-5 flex-1"
+                    style={categoryIndex === 0 ? { fontSize: '14px', lineHeight: '20px', color: '#071173' } : undefined}
+                  >
+                    {category.contents.map((item, idx) => {
+                      const label = typeof item === 'string' ? item : item.label;
+                      const icon = typeof item === 'string' ? (
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                        <span className="line-clamp-1">{item}</span>
-                      </li>
-                    ))}
+                      ) : (
+                        item.icon
+                      );
+                      return (
+                        <li 
+                          key={idx} 
+                          className={`flex items-center gap-2 transition-colors ${
+                            categoryIndex === 0 ? "text-[inherit]" : "text-xs sm:text-sm text-slate-600 group-hover:text-slate-800"
+                          }`}
+                        >
+                          <span className="shrink-0 text-emerald-600/90 group-hover:text-emerald-600 transition-colors">
+                            {icon}
+                          </span>
+                          <span 
+                            className="line-clamp-1 font-medium"
+                            style={categoryIndex === 0 ? { fontSize: '14px', lineHeight: '20px' } : undefined}
+                          >
+                            {label}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <div className="text-emerald-600 font-bold text-xs sm:text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-3 border-t border-slate-100">
                     Explore Hub <ArrowRight className="w-4 h-4" />

@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { FileText, Calendar, CheckCircle2, AlertTriangle, Scale, PoundSterling } from 'lucide-react';
+import { FileText, Calendar, CheckCircle2, AlertTriangle, Scale, PoundSterling, Share2, Clock } from 'lucide-react';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { ReadProgress } from '../components/ReadProgress';
 import { ServiceSEO } from '../components/SEO';
+import { SocialShareButtons } from '../components/SocialShareButtons';
+import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
+
+const VAT_GUIDE_TEXT = `
+Value-Added Tax (VAT) is an indirect tax on the consumption of goods and services. Businesses must register for VAT once they cross turnover thresholds and charge VAT on sales and reclaim VAT on purchases. This guide explains how to register, account for VAT, and remain compliant with filings and payments. Output VAT is the VAT charged to customers on sales of goods and services. Input VAT is the VAT claimed back on purchases and expenses for your business. Monitor registration thresholds, register online, charge VAT on supplies, issue valid VAT invoices, submit regular VAT returns, and keep accurate records for statutory compliance.
+`;
 
 export function VatGuide() {
   return (
@@ -21,6 +27,15 @@ export function VatGuide() {
         ]}
       />
       <ReadProgress />
+
+      {/* Floating Left Social Share Rail for Desktop */}
+      <SocialShareButtons 
+        url="/vat-guide"
+        title="VAT Registration & Monthly Compliance Guide | Bangladesh"
+        summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
+        variant="floating-rail" 
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
         <Breadcrumbs items={[
@@ -31,16 +46,17 @@ export function VatGuide() {
       </div>
 
       {/* Hero Section */}
-      <section className="bg-emerald-900 rounded-3xl p-8 md:p-16 mb-12 relative overflow-hidden text-white border border-emerald-800 shadow-md">
+      <section className="bg-emerald-900 rounded-3xl p-8 md:p-16 mb-8 relative overflow-hidden text-white border border-emerald-800 shadow-md">
         <div className="absolute inset-0 z-0 bg-gradient-to-r from-emerald-900 via-emerald-800/90 to-emerald-900/40" />
         <div className="relative z-10 max-w-3xl">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-6 flex-wrap">
             <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-900 bg-emerald-100 px-3 py-1.5 rounded-md">
               Comprehensive Guide
             </span>
             <span className="text-emerald-100/80 text-sm font-medium">Updated: Aug 2026</span>
+            <EstimatedReadingTime content={VAT_GUIDE_TEXT} variant="hero" />
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-4">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               VAT Registration & Compliance
             </h1>
@@ -51,11 +67,29 @@ export function VatGuide() {
               className="p-3 rounded-full bg-emerald-800/50 hover:bg-emerald-700/80 text-emerald-100 hover:text-white border border-emerald-700/50 transition-colors shrink-0 sm:mt-2 self-start" 
             />
           </div>
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-800/50 border border-emerald-700/60 text-xs text-emerald-100">
+              <Clock className="w-3.5 h-3.5 text-emerald-300" />
+              <span className="font-semibold">Estimated Reading Time:</span>
+              <span className="font-bold text-white bg-emerald-900/80 px-2 py-0.5 rounded">~5 min read</span>
+              <span className="text-emerald-300/80 hidden sm:inline">• 1,120 words</span>
+            </div>
+          </div>
           <p className="text-lg md:text-xl text-emerald-50/90 leading-relaxed max-w-2xl">
             Learn when to register for VAT, how to comply with VAT rules, filing obligations, and avoid common pitfalls in VAT compliance.
           </p>
         </div>
       </section>
+
+      {/* Top Social Sharing Bar */}
+      <div className="mb-10">
+        <SocialShareButtons 
+          url="/vat-guide"
+          title="VAT Registration & Monthly Compliance Guide | Bangladesh"
+          summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
+          variant="top-bar" 
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Main Content */}
@@ -174,10 +208,38 @@ export function VatGuide() {
               </li>
             </ul>
           </section>
+
+          {/* Bottom Social Media Sharing & Networking Card */}
+          <SocialShareButtons 
+            url="/vat-guide"
+            title="VAT Registration & Monthly Compliance Guide | Bangladesh"
+            summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
+            variant="bottom-bar" 
+          />
         </div>
 
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-8">
+          {/* Quick Share Widget */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <Share2 className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Share Guide</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+              Share this VAT guide with your finance team, partners, and colleagues.
+            </p>
+            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+              <SocialShareButtons 
+                url="/vat-guide"
+                title="VAT Registration & Monthly Compliance Guide | Bangladesh"
+                summary="Comprehensive guide to Value Added Tax (VAT) registration (BIN), monthly Mushak return filings, input tax credits, and VDS deductions."
+                variant="sidebar-card" 
+                className="w-full"
+              />
+            </div>
+          </div>
+
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
             <h3 className="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2">
               <Calendar className="text-emerald-600 w-5 h-5" />

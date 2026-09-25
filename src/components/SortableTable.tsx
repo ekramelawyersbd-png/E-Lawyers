@@ -63,8 +63,9 @@ export function SortableTable({ children, ...props }: any) {
   };
 
   return (
-    <div className="not-prose overflow-x-auto my-10 rounded-xl border border-slate-200 shadow-xl overflow-hidden">
-      <table className="w-full text-left border-collapse min-w-[600px]" {...props}>
+    <div className="not-prose my-10 rounded-xl border border-slate-200 shadow-md overflow-hidden bg-white">
+      <div className="overflow-x-auto w-full">
+        <table className="w-full text-left border-collapse min-w-[550px]" {...props}>
         <thead className="bg-emerald-800 text-white border-b-4 border-emerald-900">
           <tr>
             {thElements.map((th: any, index) => (
@@ -102,6 +103,7 @@ export function SortableTable({ children, ...props }: any) {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

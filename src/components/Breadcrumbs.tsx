@@ -12,13 +12,20 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="flex items-center text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 print:hidden">
+    <nav 
+      className="flex items-center text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 print:hidden"
+      style={{ color: '#130606' }}
+    >
       <Link to="/" className="flex items-center hover:text-emerald-700 transition-colors">
         <Home className="w-4 h-4" />
       </Link>
       
       {items.map((item, index) => (
-        <div key={index} className="flex items-center">
+        <div 
+          key={index} 
+          className="flex items-center"
+          style={index === 0 ? { borderColor: '#e90e0e' } : undefined}
+        >
           <ChevronRight className="w-4 h-4 mx-2 text-slate-400 shrink-0" />
           {item.path ? (
             <Link 
@@ -28,7 +35,10 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               {item.label}
             </Link>
           ) : (
-            <span className="text-slate-900 font-bold">
+            <span 
+              className="text-slate-900 font-bold"
+              style={index === 1 ? { color: '#0a3491' } : undefined}
+            >
               {item.label}
             </span>
           )}
