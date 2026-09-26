@@ -1,6 +1,7 @@
 import { Article, Author, Category } from '../types';
 import { strategicPartnershipArticle } from './strategicPartnershipArticle';
 import { investmentTaxRebateArticle } from './investmentTaxRebateArticle';
+import { totalIncomeCalculationArticle } from './totalIncomeCalculationArticle';
 
 import { teamMembers } from './teamData';
 
@@ -50,6 +51,7 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  totalIncomeCalculationArticle,
   investmentTaxRebateArticle,
   strategicPartnershipArticle,
   {

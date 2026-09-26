@@ -35,6 +35,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRebateCalculator';
+import { TotalIncomeCalculator } from '../components/tax/TotalIncomeCalculator';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
 import { BlogSEO } from '../components/BlogSEO';
@@ -204,6 +205,85 @@ export function Article() {
   }), [article.id]);
 
   const articleCustomSchema = useMemo(() => {
+    if (article.id === 'total-income-calculation-bangladesh-2026-2027') {
+      return [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: 'How to Calculate Total Income in Bangladesh for 2026–2027',
+          description: 'Complete guide to calculating Total Income (মোট আয়) in Bangladesh for Assessment Year 2026–2027, including the major income heads and investment tax rebate calculation.',
+          author: {
+            '@type': 'Person',
+            name: 'Advocate Ekramul Hoque',
+            url: 'https://elawyersbd.com/'
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'E-Lawyers & Accounticca',
+            url: 'https://elawyersbd.com/'
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': 'https://elawyersbd.com/total-income-calculation-bangladesh-2026-2027/'
+          },
+          image: 'https://elawyersbd.com/wp-content/uploads/2026/09/total-income-calculation-bangladesh-2026-2027.jpg',
+          keywords: [
+            'Total Income Calculation Bangladesh 2026–2027',
+            'Total Income Bangladesh',
+            'মোট আয় নির্ণয়',
+            'Income Tax Bangladesh 2026–2027',
+            'Bangladesh Income Tax Guide',
+            'IT-11GA 2023',
+            'Income Tax Return Bangladesh',
+            'Taxable Income Bangladesh',
+            'Salary Income Tax Bangladesh',
+            'Business Income Tax Bangladesh',
+            'Rent Income Tax Bangladesh',
+            'Investment Tax Rebate Bangladesh',
+            'Section 78 Income Tax Act 2023',
+            'Bangladesh Tax Return 2026–27'
+          ]
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'What is Total Income in Bangladesh?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Total Income is the aggregate of income computed under the applicable heads of income after applying the deductions, exemptions and computation rules prescribed by the Income Tax Act, 2023.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'What are the main income heads in Bangladesh?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The major income categories include employment, rent, agriculture, business or profession, capital gains, financial assets, other sources, applicable partnership or AOP income, applicable spouse or minor-child income, and taxable foreign income.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'Is Total Income the same as the income used for investment tax rebate?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Not necessarily. The investment tax rebate calculation has specific statutory rules regarding which income is included or excluded from the 3% qualifying-income calculation.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'How is investment tax rebate calculated for 2026–2027?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'For Assessment Year 2026–2027, the investment tax rebate is subject to the lowest of 3% of qualifying total income, 10% of qualifying investment and expenditure, and Tk. 7,50,000.'
+              }
+            }
+          ]
+        }
+      ];
+    }
     if (article.id === 'investment-tax-rebate-bangladesh-2026-2027') {
       return {
         '@context': 'https://schema.org',
@@ -236,11 +316,21 @@ export function Article() {
     return undefined;
   }, [article.id]);
 
+  const canonicalUrl = useMemo(() => {
+    if (article.id === 'total-income-calculation-bangladesh-2026-2027') {
+      return 'https://elawyersbd.com/total-income-calculation-bangladesh-2026-2027/';
+    }
+    if (article.id === 'investment-tax-rebate-bangladesh-2026-2027') {
+      return '/investment-tax-rebate-bangladesh-2026-2027';
+    }
+    return undefined;
+  }, [article.id]);
+
   return (
     <>
       <BlogSEO 
         article={article} 
-        canonicalUrl={article.id === 'investment-tax-rebate-bangladesh-2026-2027' ? '/investment-tax-rebate-bangladesh-2026-2027' : undefined}
+        canonicalUrl={canonicalUrl}
         customSchema={articleCustomSchema} 
       />
       {!isLongForm && <ReadProgress />}
@@ -427,6 +517,12 @@ export function Article() {
             {article.id === 'investment-tax-rebate-bangladesh-2026-2027' && (
               <div className="my-12 scroll-mt-24" id="investment-tax-rebate-tool">
                 <InvestmentTaxRebateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              </div>
+            )}
+
+            {article.id === 'total-income-calculation-bangladesh-2026-2027' && (
+              <div className="my-12 scroll-mt-24" id="total-income-calculator-tool">
+                <TotalIncomeCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
               </div>
             )}
 

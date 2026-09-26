@@ -505,8 +505,12 @@ export function Contact() {
               <div>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-sm">
-                      E
+                    <div className="w-10 h-10 rounded-xl bg-slate-900 border border-teal-500/30 p-1 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                      <img 
+                        src="/elawyers-emblem.png" 
+                        alt="E-LAWYERS" 
+                        className="w-full h-full object-contain" 
+                      />
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-slate-900">E-LAWYERS</h3>
@@ -614,22 +618,13 @@ export function Contact() {
               {/* Official Brand Header */}
               <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
                 <div className="flex items-center gap-3.5">
-                  {/* Official Emblem Picture */}
+                  {/* Official Emblem */}
                   <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-teal-900 p-0.5 shadow-md shadow-emerald-950/60 shrink-0">
                     <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
                       <div className="absolute inset-0 bg-emerald-500/15" />
-                      <svg className="w-full h-full text-emerald-400 relative z-10" viewBox="0 0 36 36" fill="none">
-                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeDasharray="3 3" />
-                        <path d="M18 6L8 27H13L15.5 21.5H20.5L23 27H28L18 6Z" fill="url(#acc-grad-icon)" />
-                        <path d="M16.8 19L18 15L19.2 19H16.8Z" fill="#042f2e" />
-                        <path d="M24 10L29 6M29 6H24M29 6V11" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <defs>
-                          <linearGradient id="acc-grad-icon" x1="8" y1="6" x2="28" y2="27" gradientUnits="userSpaceOnUse">
-                            <stop stopColor="#34d399" />
-                            <stop offset="1" stopColor="#059669" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
+                      <div className="relative z-10 w-full h-full flex items-center justify-center text-emerald-400 font-black text-xl tracking-tight">
+                        A
+                      </div>
                     </div>
                   </div>
 
@@ -656,21 +651,17 @@ export function Contact() {
                 </div>
               </div>
 
-              {/* Official Social Links with Real Brand Logos */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 relative z-10">
+              {/* Official Social Links */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative z-10">
                 {/* LinkedIn */}
                 <a
                   href="https://linkedin.com/company/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#0A66C2]/20 hover:-translate-y-1 relative"
+                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all group text-slate-200 hover:text-white"
                 >
-                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Linkedin className="w-4.5 h-4.5 text-[#0A66C2] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/company</span>
+                  <Linkedin className="w-4 h-4 text-[#0A66C2] group-hover:text-white shrink-0 transition-colors" />
+                  <span className="text-xs font-bold">LinkedIn</span>
                 </a>
 
                 {/* Facebook */}
@@ -678,14 +669,10 @@ export function Contact() {
                   href="https://facebook.com/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#1877F2]/20 hover:-translate-y-1 relative"
+                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all group text-slate-200 hover:text-white"
                 >
-                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Facebook className="w-4.5 h-4.5 text-[#1877F2] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">Facebook</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/accounticca</span>
+                  <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white shrink-0 transition-colors" />
+                  <span className="text-xs font-bold">Facebook</span>
                 </a>
 
                 {/* X */}
@@ -693,16 +680,12 @@ export function Contact() {
                   href="https://x.com/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-white/10 hover:-translate-y-1 relative"
+                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all group text-slate-200 hover:text-white"
                 >
-                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <svg className="w-4.5 h-4.5 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">X</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-mono mt-0.5">@accounticca</span>
+                  <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-white fill-current shrink-0 transition-colors" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  <span className="text-xs font-bold">X</span>
                 </a>
 
                 {/* YouTube */}
@@ -710,14 +693,10 @@ export function Contact() {
                   href="https://youtube.com/@accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#FF0000]/20 hover:-translate-y-1 relative"
+                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all group text-slate-200 hover:text-white"
                 >
-                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Youtube className="w-4.5 h-4.5 text-[#FF0000] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">YouTube</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-red-100 font-mono mt-0.5">@accounticca</span>
+                  <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white shrink-0 transition-colors" />
+                  <span className="text-xs font-bold">YouTube</span>
                 </a>
               </div>
             </div>
@@ -730,25 +709,15 @@ export function Contact() {
               {/* Official Brand Header */}
               <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
                 <div className="flex items-center gap-3.5">
-                  {/* Official Emblem Picture */}
+                  {/* Official Emblem Picture with authentic E-LAWYERS logo mark */}
                   <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-cyan-600 to-slate-900 p-0.5 shadow-md shadow-teal-950/60 shrink-0">
-                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
+                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-1.5 relative overflow-hidden">
                       <div className="absolute inset-0 bg-teal-500/15" />
-                      <svg className="w-full h-full text-teal-300 relative z-10" viewBox="0 0 36 36" fill="none">
-                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeDasharray="3 3" />
-                        <path d="M18 8V26" stroke="url(#elaw-grad-icon)" strokeWidth="1.8" strokeLinecap="round" />
-                        <path d="M10 13H26" stroke="url(#elaw-grad-icon)" strokeWidth="1.8" strokeLinecap="round" />
-                        <path d="M10 13L7 19C7 20.8 12.5 20.8 12.5 19L10 13Z" fill="url(#elaw-grad-icon)" fillOpacity="0.25" stroke="#2dd4bf" strokeWidth="1.2" />
-                        <path d="M26 13L23 19C23 20.8 28.5 20.8 28.5 19L26 13Z" fill="url(#elaw-grad-icon)" fillOpacity="0.25" stroke="#2dd4bf" strokeWidth="1.2" />
-                        <path d="M14 28H22" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" />
-                        <circle cx="18" cy="8" r="2" fill="#5eead4" />
-                        <defs>
-                          <linearGradient id="elaw-grad-icon" x1="10" y1="8" x2="26" y2="28" gradientUnits="userSpaceOnUse">
-                            <stop stopColor="#5eead4" />
-                            <stop offset="1" stopColor="#0d9488" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
+                      <img 
+                        src="/elawyers-emblem.png" 
+                        alt="E-LAWYERS Official Emblem" 
+                        className="w-full h-full object-contain relative z-10 drop-shadow-xs" 
+                      />
                     </div>
                   </div>
 
@@ -773,6 +742,15 @@ export function Contact() {
                     @elawyerssbd
                   </span>
                 </div>
+              </div>
+
+              {/* Official Brand Wordmark Banner (from BLUE.png) */}
+              <div className="p-3 rounded-2xl bg-slate-950/70 border border-teal-500/25 flex items-center justify-center relative z-10 shadow-inner">
+                <img 
+                  src="/BLUE.png" 
+                  alt="E-LAWYERS Barristers & Advocates" 
+                  className="h-8 sm:h-9 w-auto max-w-full object-contain drop-shadow-md"
+                />
               </div>
 
               {/* Official Social Links with Real Brand Logos */}

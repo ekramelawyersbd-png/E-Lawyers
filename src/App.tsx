@@ -78,6 +78,7 @@ export default function App() {
                 <Route path="rjsc-compliance-services-bangladesh" element={<Navigate to="/article/rjsc-compliance-services-bangladesh" replace />} />
                 <Route path="blog/accounting-finance-solutions" element={<Navigate to="/article/accounting-finance-solutions" replace />} />
                 <Route path="investment-tax-rebate-bangladesh-2026-2027" element={<Navigate to="/article/investment-tax-rebate-bangladesh-2026-2027" replace />} />
+                <Route path="total-income-calculation-bangladesh-2026-2027" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
               </Route>
             </Routes>
             <BookmarkNotificationToast />

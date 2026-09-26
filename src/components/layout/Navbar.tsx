@@ -33,6 +33,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBookmarks } from '../../contexts/BookmarkContext';
 import { LanguageToggle } from '../LanguageToggle';
 import { TaxDeadlineNavDropdown } from '../tax/TaxDeadlineNavDropdown';
+import { GlobalSearchAutocomplete } from '../search/GlobalSearchAutocomplete';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -673,58 +674,27 @@ export function Navbar() {
           
           {/* Right actions: Search + Auth + Mobile menu toggle */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* Search Icon / Expandable Search */}
-            <div className="relative flex items-center" ref={searchContainerRef}>
+            {/* Search Icon / Expandable Search with Autocomplete */}
+            <div className="relative flex items-center">
               {searchOpen ? (
-                <form 
-                  className="relative flex items-center bg-slate-100/90 border border-emerald-500 rounded-full py-1 pl-3.5 pr-2 shadow-sm animate-in fade-in zoom-in-95 duration-150"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (searchQuery.trim()) {
-                      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-                      setSearchOpen(false);
-                    } else {
-                      navigate('/search');
-                      setSearchOpen(false);
-                    }
-                  }}
-                >
-                  <Search className="h-4 w-4 text-emerald-600 shrink-0 mr-2" />
-                  <input 
-                    ref={searchInputRef}
-                    name="search" 
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search articles, tax..." 
-                    className="bg-transparent border-none text-xs sm:text-sm text-slate-900 focus:outline-none w-36 sm:w-52 placeholder:text-slate-400 font-medium" 
-                    onKeyDown={(e) => {
-                      if (e.key === 'Escape') setSearchOpen(false);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSearchOpen(false)}
-                    className="p-1 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-200/60 transition-colors cursor-pointer"
-                    aria-label="Close search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </form>
+                <GlobalSearchAutocomplete
+                  isOpen={searchOpen}
+                  onClose={() => setSearchOpen(false)}
+                  variant="navbar-desktop"
+                  placeholder="Search articles, tax tools, SROs..."
+                  autoFocus={true}
+                />
               ) : (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchOpen(true);
-                    setTimeout(() => searchInputRef.current?.focus(), 50);
-                  }}
-                  className="h-9 px-2.5 sm:px-3 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-600 hover:text-emerald-800 transition-all flex items-center gap-2 group cursor-pointer"
-                  aria-label="Search articles and guides"
-                  title="Search (Press ⌘K)"
+                  onClick={() => setSearchOpen(true)}
+                  className="h-9 px-2.5 sm:px-3 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-600 hover:text-emerald-800 transition-all flex items-center gap-2 group cursor-pointer shadow-2xs"
+                  aria-label="Search articles and tax tools"
+                  title="Search articles & tax tools (Press ⌘K)"
                 >
                   <Search className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
                   <span className="hidden md:inline-block text-xs font-semibold text-slate-500 group-hover:text-slate-800">
-                    Search...
+                    Search tools &amp; articles...
                   </span>
                   <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">
                     ⌘K
@@ -862,24 +832,19 @@ export function Navbar() {
       {isOpen && (
         <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg absolute left-0 right-0 w-full max-h-[calc(100vh-80px)] overflow-y-auto">
           <div className="px-4 pt-4 pb-2">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Language</span>
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Language</span>
               <LanguageToggle />
             </div>
-            <form 
-              className="relative text-slate-400 focus-within:text-emerald-600"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const input = form.elements.namedItem('search') as HTMLInputElement;
-                if (input.value.trim()) {
-                  window.location.href = `/search?q=${encodeURIComponent(input.value.trim())}`;
-                }
-              }}
-            >
-               <Search className="h-5 w-5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-               <input name="search" type="text" placeholder="Search articles..." className="bg-slate-100 border-none rounded-xl py-3 pl-11 pr-4 text-base w-full focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900" />
-            </form>
+            <div className="mb-3">
+              <GlobalSearchAutocomplete
+                isOpen={true}
+                onClose={() => setIsOpen(false)}
+                variant="navbar-mobile"
+                placeholder="Search articles & tax tools..."
+                autoFocus={false}
+              />
+            </div>
           </div>
           <div className="px-4 pt-2 pb-6 space-y-1">
             {/* Mobile Home */}

@@ -1,20 +1,25 @@
 import { BookmarkButton } from '../components/BookmarkButton';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Search as SearchIcon, History, X, Clock, Calendar, ExternalLink } from 'lucide-react';
+import { Search as SearchIcon, History, X, Clock, Calendar, ExternalLink, Calculator, ArrowRight, Sparkles, BookOpen, FileText } from 'lucide-react';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
+import { searchableTaxTools, SearchableTool } from '../data/searchableTools';
 
 const RECENT_SEARCHES_KEY = 'elawyers_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
 
 export function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.get('q') || '';
   const [inputValue, setInputValue] = useState(query);
   const [results, setResults] = useState(mockArticles);
+  const [matchingTools, setMatchingTools] = useState<SearchableTool[]>([]);
+  const [showInputSuggestions, setShowInputSuggestions] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
@@ -35,10 +40,23 @@ export function Search() {
     setInputValue(query);
   }, [query]);
 
+  // Click outside listener for suggestions
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+        setShowInputSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     if (query) {
       const lowerQuery = query.toLowerCase();
+      const tokens = lowerQuery.split(/\s+/).filter(Boolean);
+
       const filtered = mockArticles.filter(article => 
         article.title.toLowerCase().includes(lowerQuery) || 
         article.excerpt.toLowerCase().includes(lowerQuery) ||
@@ -46,6 +64,20 @@ export function Search() {
         article.category.toLowerCase().includes(lowerQuery)
       );
       setResults(filtered);
+
+      const toolsFiltered = searchableTaxTools.filter(tool => {
+        const nameLower = tool.name.toLowerCase();
+        const shortLower = tool.shortName.toLowerCase();
+        const descLower = tool.description.toLowerCase();
+        const catLower = tool.category.toLowerCase();
+        return nameLower.includes(lowerQuery) ||
+               shortLower.includes(lowerQuery) ||
+               descLower.includes(lowerQuery) ||
+               catLower.includes(lowerQuery) ||
+               tool.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+               tokens.some(t => nameLower.includes(t) || tool.tags.some(tag => tag.includes(t)));
+      });
+      setMatchingTools(toolsFiltered);
 
       const trimmed = query.trim();
       if (trimmed) {
@@ -61,8 +93,34 @@ export function Search() {
       }
     } else {
       setResults(mockArticles);
+      setMatchingTools(searchableTaxTools.filter(t => t.featured));
     }
   }, [query]);
+
+  // Suggestions for autocomplete while typing
+  const liveSuggestions = React.useMemo(() => {
+    const trimmed = inputValue.trim().toLowerCase();
+    if (!trimmed) return { tools: [], articles: [] };
+    const tokens = trimmed.split(/\s+/).filter(Boolean);
+
+    const tools = searchableTaxTools
+      .filter(t => {
+        const name = t.name.toLowerCase();
+        const tags = t.tags.join(' ').toLowerCase();
+        return name.includes(trimmed) || tokens.every(tok => name.includes(tok) || tags.includes(tok));
+      })
+      .slice(0, 3);
+
+    const articles = mockArticles
+      .filter(a => {
+        const title = a.title.toLowerCase();
+        const tags = (a.tags || []).join(' ').toLowerCase();
+        return title.includes(trimmed) || tokens.every(tok => title.includes(tok) || tags.includes(tok));
+      })
+      .slice(0, 4);
+
+    return { tools, articles };
+  }, [inputValue]);
 
   const handleSelectRecent = (term: string) => {
     setInputValue(term);
@@ -96,10 +154,12 @@ export function Search() {
       <div className="mb-12">
         <h1 id="search-page-title" className="text-3xl font-bold text-slate-900 mb-6">Search Results</h1>
         <form 
+          ref={formRef}
           id="search-page-form"
           className="relative max-w-2xl"
           onSubmit={(e) => {
             e.preventDefault();
+            setShowInputSuggestions(false);
             const trimmed = inputValue.trim();
             if (trimmed) {
               setSearchParams({ q: trimmed });
@@ -114,7 +174,11 @@ export function Search() {
             name="search"
             type="text" 
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onFocus={() => setShowInputSuggestions(true)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setShowInputSuggestions(true);
+            }}
             placeholder="Search for articles, VAT, tax rules..."
             className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm text-slate-900"
           />
@@ -125,12 +189,94 @@ export function Search() {
               onClick={() => {
                 setInputValue('');
                 setSearchParams({});
+                setShowInputSuggestions(false);
               }}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
               aria-label="Clear search input"
             >
               <X className="w-4 h-4" />
             </button>
+          )}
+
+          {/* Real-time Autocomplete Dropdown attached to search input */}
+          {showInputSuggestions && (liveSuggestions.tools.length > 0 || liveSuggestions.articles.length > 0) && (
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl z-50 overflow-hidden divide-y divide-slate-100 animate-in fade-in zoom-in-95 duration-100">
+              <div className="px-4 py-2 bg-slate-50 flex items-center justify-between text-[11px] font-bold text-slate-500">
+                <span className="flex items-center gap-1.5 uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-emerald-600" />
+                  Suggestions as you type
+                </span>
+                <span>Press Enter to search</span>
+              </div>
+
+              {liveSuggestions.tools.length > 0 && (
+                <div className="p-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 px-2 py-1 block">
+                    Tax Tools &amp; Calculators
+                  </span>
+                  {liveSuggestions.tools.map(tool => (
+                    <button
+                      key={tool.id}
+                      type="button"
+                      onClick={() => {
+                        setShowInputSuggestions(false);
+                        navigate(tool.path);
+                      }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-emerald-50/80 flex items-center justify-between group transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                          <Calculator className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
+                            {tool.name}
+                          </div>
+                          <span className="text-[10px] text-slate-400">
+                            {tool.category}
+                          </span>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {liveSuggestions.articles.length > 0 && (
+                <div className="p-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 px-2 py-1 block">
+                    Articles &amp; Guides
+                  </span>
+                  {liveSuggestions.articles.map(article => (
+                    <button
+                      key={article.id}
+                      type="button"
+                      onClick={() => {
+                        setShowInputSuggestions(false);
+                        navigate(`/article/${article.id}`);
+                      }}
+                      className="w-full text-left p-2 rounded-xl hover:bg-blue-50/80 flex items-center justify-between group transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                        <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center shrink-0">
+                          <FileText className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 group-hover:text-blue-900 truncate">
+                            {article.title}
+                          </div>
+                          <span className="text-[10px] text-slate-400">
+                            {article.category}
+                          </span>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </form>
 
@@ -187,9 +333,66 @@ export function Search() {
         )}
       </div>
 
+      {/* Matching Tax & Compliance Tools */}
+      {matchingTools.length > 0 && (
+        <div id="matching-tax-tools-section" className="mb-10 p-6 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/60 rounded-3xl border border-emerald-200/80 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                <Calculator className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-900 leading-tight">
+                  {query ? 'Matching Tax & Compliance Tools' : 'Featured Tax Tools'}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Interactive calculators, statutory planners &amp; guides
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+              {matchingTools.length} Tool{matchingTools.length > 1 ? 's' : ''} Found
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {matchingTools.map(tool => (
+              <Link
+                key={tool.id}
+                to={tool.path}
+                className="p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                      {tool.category}
+                    </span>
+                    {tool.badge && (
+                      <span className="text-[10px] font-extrabold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                        {tool.badge}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    {tool.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                    {tool.description}
+                  </p>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
+                  <span>Open Tool</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 flex items-center justify-between">
         <h2 id="search-results-heading" className="text-lg font-bold text-slate-800">
-          {query ? `Showing results for "${query}"` : 'All Articles'}
+          {query ? `Showing articles for "${query}"` : 'All Articles'}
         </h2>
         <span id="search-results-count" className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
           {results.length} found
