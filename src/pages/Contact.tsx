@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Mail, 
   Phone, 
@@ -17,9 +18,21 @@ import {
   Globe, 
   Briefcase,
   Share2,
-  FileText
+  FileText,
+  Home,
+  ChevronRight,
+  Sparkles,
+  Linkedin,
+  Facebook,
+  Instagram,
+  Youtube,
+  ArrowUpRight
 } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ContactFaq } from '../components/ContactFaq';
+import { OfficeLocationMap } from '../components/OfficeLocationMap';
+import { FloatingLiveChat } from '../components/FloatingLiveChat';
+import { ContactTestimonialsCarousel } from '../components/ContactTestimonialsCarousel';
 import { redirectToAppointment, APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
 
 export function Contact() {
@@ -68,98 +81,104 @@ export function Contact() {
 
   return (
     <div className="min-h-screen bg-slate-50/60 pb-20">
-      {/* Top Breadcrumb Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Contact Us' }]} />
-      </div>
+      {/* 1. Full-Screen Edge-to-Edge Hero Section (Matching Community Hero) */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/40">
+        {/* Subtle decorative mesh background and ambient orbs */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.25),rgba(255,255,255,0))] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-12 lg:p-16 border border-slate-800 shadow-2xl">
-          {/* Subtle Ambient Glows */}
-          <div className="absolute top-0 right-0 -mt-16 -mr-16 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 -mb-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Top Breadcrumb Navigation */}
+        <div className="max-w-7xl mx-auto mb-8 relative z-10">
+          <nav className="flex items-center text-xs sm:text-sm font-medium text-emerald-300/80 overflow-x-auto whitespace-nowrap">
+            <Link to="/" className="flex items-center text-emerald-300 hover:text-white transition-colors">
+              <Home className="w-3.5 h-3.5 mr-1" />
+              <span>Home</span>
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-500 shrink-0" />
+            <span className="text-white font-semibold">Contact Us</span>
+          </nav>
+        </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-            {/* Header Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs sm:text-sm font-bold tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Integrated Advisory Ecosystem</span>
-            </div>
+        <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
+          {/* Eyebrow Header Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-semibold mb-2 backdrop-blur-md">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span>Integrated Advisory Ecosystem</span>
+          </div>
 
-            {/* Hero Main Heading & Dual Identity */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.2] space-y-2">
-              <span className="block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-300/90">
-                Contact Us
+          {/* Hero Main Heading & Dual Identity */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.2] space-y-2">
+            <span className="block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-300/90">
+              Contact Us
+            </span>
+            <span className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1">
+              <span className="bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 bg-clip-text text-transparent drop-shadow-sm tracking-tight font-black">
+                ACCOUNTICCA
               </span>
-              <span className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1">
-                <span className="bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 bg-clip-text text-transparent drop-shadow-sm tracking-tight">
-                  ACCOUNTICCA
-                </span>
-                <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 font-light text-base sm:text-xl shadow-inner select-none">
-                  ×
-                </span>
-                <span className="bg-gradient-to-r from-teal-300 via-cyan-300 to-emerald-200 bg-clip-text text-transparent drop-shadow-sm tracking-tight">
-                  E-LAWYERS
-                </span>
+              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 font-light text-base sm:text-xl shadow-inner select-none">
+                ×
               </span>
-            </h1>
+              <span className="bg-gradient-to-r from-teal-300 via-cyan-300 to-emerald-200 bg-clip-text text-transparent drop-shadow-sm tracking-tight font-black">
+                E-LAWYERS
+              </span>
+            </span>
+          </h1>
 
-            {/* Core Taglines */}
-            <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
-                Complete Business Support. One Ecosystem.
-              </h2>
-              <p className="text-base sm:text-lg italic font-medium text-emerald-300/90">
-                Where Business Strategy Meets Legal Excellence.
-              </p>
-            </div>
-
-            {/* Value Proposition Description */}
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl mx-auto font-normal">
-              Whether you require corporate legal counsel, tax &amp; VAT optimization, statutory audit, or end-to-end business consultancy, our integrated team provides unified, cross-disciplinary advisory under one roof.
+          {/* Core Taglines */}
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
+              Complete Business Support. One Ecosystem.
+            </h2>
+            <p className="text-base sm:text-lg italic font-medium text-emerald-300/90">
+              Where Business Strategy Meets Legal Excellence.
             </p>
+          </div>
 
-            {/* Hero Quick Action Buttons */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href={APPOINTMENT_BASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/30 transition-all duration-200 group"
-              >
-                <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
-                <span>Book an Appointment</span>
-                <ArrowRight className="w-4 h-4 text-emerald-200 group-hover:translate-x-1 transition-transform" />
-              </a>
+          {/* Value Proposition Description */}
+          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto font-normal">
+            Whether you require corporate legal counsel, tax &amp; VAT optimization, statutory audit, or end-to-end business consultancy, our integrated team provides unified, cross-disciplinary advisory under one roof.
+          </p>
 
-              <a
-                href={`tel:${rawTelNumber}`}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700/80 font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-md transition-all duration-200 group"
-              >
-                <Phone className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
-                <span>Call Our Direct Desk</span>
-                <span className="text-xs text-emerald-400 font-mono font-medium hidden md:inline">
-                  ({primaryPhone})
-                </span>
-              </a>
-            </div>
+          {/* Hero Quick Action Buttons */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href={APPOINTMENT_BASE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/30 transition-all duration-200 group"
+            >
+              <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+              <span>Book an Appointment</span>
+              <ArrowRight className="w-4 h-4 text-emerald-200 group-hover:translate-x-1 transition-transform" />
+            </a>
 
-            {/* Trust Badges */}
-            <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-slate-400 font-semibold">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Dual-Firm Chartered Advisory
+            <a
+              href={`tel:${rawTelNumber}`}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700/80 font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-md transition-all duration-200 group"
+            >
+              <Phone className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
+              <span>Call Our Direct Desk</span>
+              <span className="text-xs text-emerald-400 font-mono font-medium hidden md:inline">
+                ({primaryPhone})
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Direct Senior Partner Oversight
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Guaranteed 24-Hour Inquiry Turnaround
-              </span>
-            </div>
+            </a>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="pt-8 border-t border-emerald-900/40 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-300 font-semibold">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              Dual-Firm Chartered Advisory
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              Direct Senior Partner Oversight
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              Guaranteed 24-Hour Inquiry Turnaround
+            </span>
           </div>
         </div>
       </section>
@@ -364,6 +383,11 @@ export function Contact() {
             </a>
           </div>
         </div>
+      </section>
+
+      {/* Interactive Head Office Map & Navigation Hub */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <OfficeLocationMap primaryPhone={primaryPhone} rawTelNumber={rawTelNumber} />
       </section>
 
       {/* Explore Our Ecosystem Portals */}
@@ -583,127 +607,260 @@ export function Contact() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Accounticca Social Hub */}
-            <div className="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <h3 className="text-base font-bold text-white tracking-wide">
-                    ACCOUNTICCA
-                  </h3>
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-800/90 via-slate-800/60 to-slate-900/90 border border-emerald-500/30 shadow-xl space-y-5 relative overflow-hidden group">
+              {/* Subtle ambient corner glow */}
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-300" />
+
+              {/* Official Brand Header */}
+              <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
+                <div className="flex items-center gap-3.5">
+                  {/* Official Emblem Picture */}
+                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-teal-900 p-0.5 shadow-md shadow-emerald-950/60 shrink-0">
+                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-emerald-500/15" />
+                      <svg className="w-full h-full text-emerald-400 relative z-10" viewBox="0 0 36 36" fill="none">
+                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeDasharray="3 3" />
+                        <path d="M18 6L8 27H13L15.5 21.5H20.5L23 27H28L18 6Z" fill="url(#acc-grad-icon)" />
+                        <path d="M16.8 19L18 15L19.2 19H16.8Z" fill="#042f2e" />
+                        <path d="M24 10L29 6M29 6H24M29 6V11" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                          <linearGradient id="acc-grad-icon" x1="8" y1="6" x2="28" y2="27" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="#34d399" />
+                            <stop offset="1" stopColor="#059669" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-black text-white tracking-wide">
+                        ACCOUNTICCA
+                      </h3>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Verified
+                      </span>
+                    </div>
+                    <p className="text-xs text-emerald-300/80 font-medium">
+                      Chartered &amp; Financial Practice
+                    </p>
+                  </div>
                 </div>
-                <span className="text-xs font-mono text-emerald-400">@accounticca</span>
+
+                <div className="text-right hidden sm:block">
+                  <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                    @accounticca
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {/* Official Social Links with Real Brand Logos */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 relative z-10">
+                {/* LinkedIn */}
                 <a
                   href="https://linkedin.com/company/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#0A66C2]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Linkedin className="w-4.5 h-4.5 text-[#0A66C2] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100">/company</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/company</span>
                 </a>
 
+                {/* Facebook */}
                 <a
                   href="https://facebook.com/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#1877F2]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Facebook className="w-4.5 h-4.5 text-[#1877F2] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">Facebook</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100">/accounticca</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/accounticca</span>
                 </a>
 
+                {/* X */}
                 <a
                   href="https://x.com/accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-white/10 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <svg className="w-4.5 h-4.5 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">X</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-slate-300">@accounticca</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-mono mt-0.5">@accounticca</span>
                 </a>
 
+                {/* YouTube */}
                 <a
                   href="https://youtube.com/@accounticca"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#FF0000]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3.5 h-3.5 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-9 h-9 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Youtube className="w-4.5 h-4.5 text-[#FF0000] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">YouTube</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-red-100">@accounticca</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-red-100 font-mono mt-0.5">@accounticca</span>
                 </a>
               </div>
             </div>
 
             {/* E-Lawyers Social Hub */}
-            <div className="p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-3 h-3 rounded-full bg-teal-400" />
-                  <h3 className="text-base font-bold text-white tracking-wide">
-                    E-LAWYERS
-                  </h3>
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-800/90 via-slate-800/60 to-slate-900/90 border border-teal-500/30 shadow-xl space-y-5 relative overflow-hidden group">
+              {/* Subtle ambient corner glow */}
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-teal-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-teal-500/20 transition-all duration-300" />
+
+              {/* Official Brand Header */}
+              <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
+                <div className="flex items-center gap-3.5">
+                  {/* Official Emblem Picture */}
+                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-cyan-600 to-slate-900 p-0.5 shadow-md shadow-teal-950/60 shrink-0">
+                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-teal-500/15" />
+                      <svg className="w-full h-full text-teal-300 relative z-10" viewBox="0 0 36 36" fill="none">
+                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeDasharray="3 3" />
+                        <path d="M18 8V26" stroke="url(#elaw-grad-icon)" strokeWidth="1.8" strokeLinecap="round" />
+                        <path d="M10 13H26" stroke="url(#elaw-grad-icon)" strokeWidth="1.8" strokeLinecap="round" />
+                        <path d="M10 13L7 19C7 20.8 12.5 20.8 12.5 19L10 13Z" fill="url(#elaw-grad-icon)" fillOpacity="0.25" stroke="#2dd4bf" strokeWidth="1.2" />
+                        <path d="M26 13L23 19C23 20.8 28.5 20.8 28.5 19L26 13Z" fill="url(#elaw-grad-icon)" fillOpacity="0.25" stroke="#2dd4bf" strokeWidth="1.2" />
+                        <path d="M14 28H22" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" />
+                        <circle cx="18" cy="8" r="2" fill="#5eead4" />
+                        <defs>
+                          <linearGradient id="elaw-grad-icon" x1="10" y1="8" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="#5eead4" />
+                            <stop offset="1" stopColor="#0d9488" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-black text-white tracking-wide">
+                        E-LAWYERS
+                      </h3>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 border border-teal-400/40 text-teal-300">
+                        <CheckCircle2 className="w-3 h-3 text-teal-400" />
+                        Verified
+                      </span>
+                    </div>
+                    <p className="text-xs text-teal-300/80 font-medium">
+                      Corporate Law &amp; Litigation Chambers
+                    </p>
+                  </div>
                 </div>
-                <span className="text-xs font-mono text-teal-300">@elawyerssbd</span>
+
+                <div className="text-right hidden sm:block">
+                  <span className="text-xs font-mono text-teal-300 font-bold bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-500/30">
+                    @elawyerssbd
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {/* Official Social Links with Real Brand Logos */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 relative z-10">
+                {/* LinkedIn */}
                 <a
                   href="https://linkedin.com/company/elawyersbd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#0A66C2]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Linkedin className="w-4 h-4 text-[#0A66C2] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100">/company</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/company</span>
                 </a>
 
+                {/* Facebook */}
                 <a
                   href="https://facebook.com/elawyersbd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#1877F2]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">Facebook</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100">/elawyersbd</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/elawyersbd</span>
                 </a>
 
+                {/* X */}
                 <a
                   href="https://x.com/elawyerssbd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-white/10 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <svg className="w-4 h-4 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">X</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-slate-300">@elawyerssbd</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-slate-300 font-mono mt-0.5">@elawyerssbd</span>
                 </a>
 
+                {/* Instagram */}
                 <a
                   href="https://instagram.com/elawyerssbd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#E1306C] border border-slate-700/80 hover:border-[#E1306C] transition-all duration-200 group text-center"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#E1306C] border border-slate-700/80 hover:border-[#E1306C] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#E1306C]/20 hover:-translate-y-1 relative"
                 >
+                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Instagram className="w-4 h-4 text-[#E1306C] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">Instagram</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-pink-100">@elawyerssbd</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-pink-100 font-mono mt-0.5">@elawyerssbd</span>
                 </a>
 
+                {/* YouTube */}
                 <a
                   href="https://youtube.com/@elawyerssbd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center col-span-2 sm:col-span-1"
+                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#FF0000]/20 hover:-translate-y-1 col-span-2 sm:col-span-1 relative"
                 >
+                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
+                    <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white transition-colors" />
+                  </div>
                   <span className="text-xs font-bold text-slate-200 group-hover:text-white">YouTube</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-red-100">@elawyerssbd</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-red-100 font-mono mt-0.5">@elawyerssbd</span>
                 </a>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Verified Client Testimonials & Institutional Trust Badges Carousel */}
+      <ContactTestimonialsCarousel />
 
       {/* Main Dual Columns: Inquiry Form & Practice Capabilities */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -931,6 +1088,9 @@ export function Contact() {
         </div>
       </section>
 
+      {/* Interactive Service FAQ Accordion Section */}
+      <ContactFaq />
+
       {/* Closing Value Prompt (Action Step: Friction-Reducing Closing CTA instead of repetition) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border border-emerald-900/60 p-8 sm:p-12 text-center text-white shadow-xl">
@@ -969,6 +1129,9 @@ export function Contact() {
           </div>
         </div>
       </section>
+
+      {/* Floating Real-Time Business Support Live Chat Widget */}
+      <FloatingLiveChat />
     </div>
   );
 }

@@ -1,142 +1,393 @@
-import React from 'react';
-import { Twitter, Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Globe, 
+  ArrowRight, 
+  ExternalLink, 
+  Copy, 
+  Check, 
+  Building2,
+  Sparkles
+} from 'lucide-react';
+import { APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
 
 export function ContactELawyers() {
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+
+  const googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=BTI+Centara+Grand+144+Green+Road+Panthapath+Dhaka+1205';
+
+  const handleCopyPhone = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText('+8801335230170');
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2000);
+    }
+  };
+
+  const handleCopyEmail = (emailText: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(emailText);
+      setCopiedEmail(emailText);
+      setTimeout(() => setCopiedEmail(null), 2000);
+    }
+  };
+
   return (
-    <section className="py-[40px] sm:py-[70px] px-[15px] sm:px-[20px] bg-gradient-to-br from-[#f8fafc] to-[#ffffff] font-sans text-[#333] my-12 rounded-3xl border border-slate-200">
-      <div className="max-w-[1100px] mx-auto">
+    <section className="py-10 sm:py-14 px-4 sm:px-8 bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950 text-white my-12 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+      {/* Background Ambience Elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
+
+      <div className="max-w-6xl mx-auto relative z-10 space-y-12">
         
-        {/* Header */}
-        <div className="text-center mb-[45px]">
-          <h2 className="text-[28px] sm:text-[38px] font-bold text-[#12345b] mb-[15px]">
-            Contact <span className="text-[#b08b35]">E-Lawyers</span>
+        {/* ========================================================================= */}
+        {/* HEADER: Contact Us / ACCOUNTICCA × E-LAWYERS                              */}
+        {/* ========================================================================= */}
+        <div className="text-center max-w-3xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-widest">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Contact Us</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+            ACCOUNTICCA <span className="text-emerald-400 font-light">×</span> E-LAWYERS
           </h2>
-          <p className="max-w-[750px] mx-auto text-[17px] leading-[1.8] text-[#555]">
-            Get professional legal assistance and expert consultation from our experienced
-            legal team. We are committed to providing reliable, accessible, and convenient
-            legal solutions.
-          </p>
-        </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[25px]">
-          
-          {/* Card 1 */}
-          <div className="bg-white p-[30px_25px] rounded-[18px] shadow-[0_10px_35px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-[#eee] transition-all duration-300 hover:-translate-y-2 flex gap-5 items-start">
-            <div className="w-[55px] h-[55px] shrink-0 flex items-center justify-center bg-[#12345b] text-white rounded-full text-[25px]">
-              📍
-            </div>
-            <div>
-              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Office Address</h4>
-              <p className="text-[15px] leading-[1.7] text-[#555]">
-                G-5, BTI Centara Grand,<br />
-                144-144/1 Green Road,<br />
-                Panthapath, Dhaka-1205
-              </p>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white p-[30px_25px] rounded-[18px] shadow-[0_10px_35px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-[#eee] transition-all duration-300 hover:-translate-y-2 flex gap-5 items-start">
-            <div className="w-[55px] h-[55px] shrink-0 flex items-center justify-center bg-[#12345b] text-white rounded-full text-[25px]">
-              ☎
-            </div>
-            <div>
-              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Direct Phone</h4>
-              <p className="text-[15px] leading-[1.7] text-[#555]">
-                <a href="tel:+8801335230170" className="text-[#b08b35] font-bold hover:underline">
-                  +880 1335-230170
-                </a>
-                <span className="block text-xs text-slate-500 font-medium mt-0.5">
-                  (Hunting lines 70 through 81)
-                </span>
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-white p-[30px_25px] rounded-[18px] shadow-[0_10px_35px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-[#eee] transition-all duration-300 hover:-translate-y-2 flex gap-5 items-start">
-            <div className="w-[55px] h-[55px] shrink-0 flex items-center justify-center bg-[#12345b] text-white rounded-full text-[25px]">
-              ✉
-            </div>
-            <div>
-              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Email</h4>
-              <p className="text-[15px] leading-[1.7] text-[#555]">
-                <a href="mailto:info@elawyersbd.com" className="text-[#b08b35] font-semibold hover:underline">
-                  info@elawyersbd.com
-                </a>
-              </p>
-            </div>
-          </div>
-
-          {/* Card 4 */}
-          <div className="bg-white p-[30px_25px] rounded-[18px] shadow-[0_10px_35px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-[#eee] transition-all duration-300 hover:-translate-y-2 flex gap-5 items-start">
-            <div className="w-[55px] h-[55px] shrink-0 flex items-center justify-center bg-[#12345b] text-white rounded-full text-[25px]">
-              ⚖
-            </div>
-            <div className="flex flex-col h-full">
-              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Book Appointment</h4>
-              <p className="text-[15px] leading-[1.7] text-[#555] mb-[15px] flex-grow">
-                Schedule a consultation with our legal experts.
-              </p>
-              <a 
-                href="https://appointment.accounticca.com/" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-auto bg-[#12345b] text-white px-[28px] py-[10px] rounded-[30px] font-medium hover:bg-[#b08b35] transition-colors duration-300 self-start text-sm"
-              >
-                Book Now
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Social Section */}
-        <div className="text-center mt-[70px]">
-          <h2 className="text-[28px] sm:text-[38px] font-bold text-[#12345b] mb-[15px]">
-            Follow E-Lawyers
-          </h2>
-          <p className="max-w-[750px] mx-auto text-[17px] leading-[1.8] text-[#555]">
-            Stay updated with legal insights, expert advice, service updates, and important
-            announcements through our official social media channels.
-          </p>
-
-          <div className="flex justify-center flex-wrap gap-[15px] my-[30px]">
-            {[
-              { name: 'X', url: 'https://x.com/elawyerssbd', Icon: Twitter, color: '#000000' },
-              { name: 'Facebook', url: 'https://facebook.com/elawyersbd', Icon: Facebook, color: '#1877F2' },
-              { name: 'LinkedIn', url: 'https://linkedin.com/company/elawyersbd', Icon: Linkedin, color: '#0A66C2' },
-              { name: 'Instagram', url: 'https://instagram.com/elawyerssbd', Icon: Instagram, color: '#E1306C' },
-              { name: 'YouTube', url: 'https://youtube.com/@elawyerssbd', Icon: Youtube, color: '#FF0000' },
-            ].map(social => (
-              <a 
-                key={social.name}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-white px-[25px] py-[12px] rounded-[30px] decoration-none transition-all duration-300 hover:-translate-y-[3px] shadow-sm hover:shadow-md font-medium"
-                style={{ backgroundColor: social.color }}
-              >
-                <social.Icon className="w-5 h-5" />
-                {social.name}
-              </a>
-            ))}
-          </div>
-
-          {/* CTA Box */}
-          <div className="mt-[45px] p-[30px_20px] sm:p-[40px] rounded-[20px] bg-[#12345b] text-white text-center">
-            <h3 className="text-[28px] font-bold mb-[10px]">Need Legal Support?</h3>
-            <p className="mb-[25px] text-[#e2e8f0]">
-              Connect with E-Lawyers today and get trusted legal guidance from professionals.
+          <div className="space-y-2">
+            <h3 className="text-lg sm:text-2xl font-extrabold text-emerald-300">
+              Complete Business Support. One Ecosystem.
+            </h3>
+            <p className="text-sm sm:text-base font-bold text-slate-200">
+              Where Business Strategy Meets Legal Excellence.
             </p>
-            <a 
-              href="https://appointment.accounticca.com/" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-[#b08b35] text-white px-[35px] py-[14px] rounded-[30px] font-semibold hover:bg-[#9a782a] transition-colors"
-            >
-              Schedule Consultation
-            </a>
+          </div>
+
+          <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal">
+            Whether you need legal advisory, tax &amp; VAT support, accounting, audit, corporate compliance, business consultancy, or professional assistance, our integrated team is ready to help.
+          </p>
+
+          <p className="text-sm sm:text-base font-bold text-emerald-400 pt-1">
+            Talk to Us. Let’s Build Your Business with Confidence.
+          </p>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 1. OUR OFFICES & CONTACT INFORMATION                                      */}
+        {/* ========================================================================= */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              <Building2 className="w-4 h-4" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Our Offices &amp; Contact Information
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Card 1: Visit Our Office */}
+            <div className="bg-slate-800/80 hover:bg-slate-800 rounded-2xl p-6 border border-slate-700/80 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group shadow-lg">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>Visit Our Office</span>
+                </h4>
+
+                <div className="text-xs sm:text-sm text-slate-300 space-y-1 leading-relaxed">
+                  <strong className="text-emerald-300 block text-sm">ACCOUNTICCA × E-LAWYERS</strong>
+                  <p>G-5, BTI Centara Grand</p>
+                  <p>144–144/1 Green Road, Panthapath</p>
+                  <p>Dhaka–1205, Bangladesh</p>
+                </div>
+              </div>
+
+              <div className="pt-5 mt-4 border-t border-slate-700/70">
+                <a
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 group-hover:translate-x-1 transition-all"
+                >
+                  <span>Get Directions</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2: Call Us */}
+            <div className="bg-slate-800/80 hover:bg-slate-800 rounded-2xl p-6 border border-slate-700/80 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group shadow-lg">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-300 mb-4 group-hover:scale-110 transition-transform">
+                  <Phone className="w-6 h-6" />
+                </div>
+                
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>Call Us</span>
+                </h4>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between bg-slate-900/90 p-2.5 rounded-xl border border-slate-700/80">
+                    <a
+                      href="tel:+8801335230170"
+                      className="text-sm font-black text-emerald-300 hover:text-emerald-200 font-mono"
+                    >
+                      +88 01335-230170–81
+                    </a>
+                    <button
+                      onClick={handleCopyPhone}
+                      title="Copy telephone number"
+                      className="p-1 text-slate-400 hover:text-white transition-colors"
+                    >
+                      {copiedPhone ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Available for business enquiries, professional consultations, and service-related assistance.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-5 mt-4 border-t border-slate-700/70">
+                <a
+                  href="tel:+8801335230170"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-300 hover:text-teal-200 group-hover:translate-x-1 transition-all"
+                >
+                  <span>Call Now</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3: Email Us */}
+            <div className="bg-slate-800/80 hover:bg-slate-800 rounded-2xl p-6 border border-slate-700/80 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group shadow-lg">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-300 mb-4 group-hover:scale-110 transition-transform">
+                  <Mail className="w-6 h-6" />
+                </div>
+                
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>Email Us</span>
+                </h4>
+
+                <div className="space-y-2 text-xs">
+                  {/* Accounticca Email */}
+                  <div className="flex items-center justify-between bg-slate-900/90 p-2 rounded-xl border border-slate-700/80">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">ACCOUNTICCA</span>
+                      <a href="mailto:info@accounticca.com" className="font-semibold text-emerald-300 hover:underline">
+                        info@accounticca.com
+                      </a>
+                    </div>
+                    <button
+                      onClick={() => handleCopyEmail('info@accounticca.com')}
+                      className="p-1 text-slate-400 hover:text-white"
+                      title="Copy email"
+                    >
+                      {copiedEmail === 'info@accounticca.com' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+
+                  {/* E-Lawyers Email */}
+                  <div className="flex items-center justify-between bg-slate-900/90 p-2 rounded-xl border border-slate-700/80">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">E-LAWYERS</span>
+                      <a href="mailto:info@elawyersbd.com" className="font-semibold text-teal-300 hover:underline">
+                        info@elawyersbd.com
+                      </a>
+                    </div>
+                    <button
+                      onClick={() => handleCopyEmail('info@elawyersbd.com')}
+                      className="p-1 text-slate-400 hover:text-white"
+                      title="Copy email"
+                    >
+                      {copiedEmail === 'info@elawyersbd.com' ? <Check className="w-3.5 h-3.5 text-teal-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 pt-1 leading-snug">
+                    For service enquiries, document submissions, corporate support, and general communication.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-5 mt-4 border-t border-slate-700/70">
+                <a
+                  href="mailto:info@accounticca.com?cc=info@elawyersbd.com&subject=General%20Service%20Enquiry"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-blue-200 group-hover:translate-x-1 transition-all"
+                >
+                  <span>Send an Email</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 2. EXPLORE OUR ECOSYSTEM                                                  */}
+        {/* ========================================================================= */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              <Globe className="w-4 h-4" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Explore Our Ecosystem
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Accounticca Hub */}
+            <div className="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/90 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-base shadow-sm">
+                    A
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-black text-white">ACCOUNTICCA</h4>
+                    <span className="text-xs text-emerald-300 font-bold uppercase tracking-wider">
+                      Business &amp; Financial Practice
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                  Verified Portal
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm font-semibold text-emerald-200 bg-slate-900/90 p-3 rounded-xl border border-slate-700/80">
+                Accounting • Tax • Audit • Finance • Business Consultancy
+              </p>
+
+              <div className="space-y-2 pt-1">
+                <a
+                  href="https://accounticca.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700/80 transition-colors group"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-emerald-300 flex items-center gap-2">
+                    🌐 accounticca.com
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-300" />
+                </a>
+
+                <a
+                  href={APPOINTMENT_BASE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700/80 transition-colors group"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-emerald-300 flex items-center gap-2">
+                    📅 appointment.accounticca.com
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-300" />
+                </a>
+
+                <a
+                  href="https://blog.accounticca.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700/80 transition-colors group"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-emerald-300 flex items-center gap-2">
+                    📰 blog.accounticca.com
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-300" />
+                </a>
+              </div>
+            </div>
+
+            {/* E-Lawyers Hub */}
+            <div className="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/90 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-800 text-white flex items-center justify-center font-black text-base shadow-sm">
+                    E
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-black text-white">E-LAWYERS</h4>
+                    <span className="text-xs text-teal-300 font-bold uppercase tracking-wider">
+                      Legal &amp; Compliance Practice
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-teal-400 bg-teal-950/80 px-2.5 py-1 rounded-full border border-teal-500/30">
+                  Legal Chambers
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm font-semibold text-teal-200 bg-slate-900/90 p-3 rounded-xl border border-slate-700/80">
+                Legal • Tax &amp; VAT • Corporate • Compliance • Business Consultancy
+              </p>
+
+              <div className="space-y-2 pt-1">
+                <a
+                  href="https://elawyersbd.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700/80 transition-colors group"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-teal-300 flex items-center gap-2">
+                    🌐 elawyersbd.com
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-300" />
+                </a>
+
+                <a
+                  href={APPOINTMENT_BASE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700/80 transition-colors group"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-teal-300 flex items-center gap-2">
+                    📅 appointment.accounticca.com (Shared)
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-300" />
+                </a>
+
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400">
+                  <span className="text-xs sm:text-sm text-slate-300 flex items-center gap-2">
+                    ⚖️ High Court &amp; RJSC Chambers
+                  </span>
+                  <span className="text-[11px] text-slate-500">Dhaka Jurisdiction</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* BOTTOM ECOSYSTEM SUMMARY BADGE                                            */}
+        {/* ========================================================================= */}
+        <div className="pt-8 border-t border-slate-800 text-center space-y-3">
+          <h4 className="text-lg font-black text-white">ACCOUNTICCA × E-LAWYERS</h4>
+          <p className="text-xs sm:text-sm font-bold text-emerald-400">
+            Complete Business Support. One Ecosystem.
+          </p>
+          <p className="text-xs text-slate-400 font-medium">
+            Accounting | Tax | Audit | Legal | VAT | Corporate | Compliance | Business Consultancy
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-300 pt-2 font-mono">
+            <span>📍 Dhaka, Bangladesh</span>
+            <span>•</span>
+            <a href="tel:+8801335230170" className="hover:text-emerald-300">📞 +88 01335-230170–81</a>
+            <span>•</span>
+            <span className="text-slate-300">
+              ✉️ <a href="mailto:info@accounticca.com" className="hover:text-emerald-300">info@accounticca.com</a> | <a href="mailto:info@elawyersbd.com" className="hover:text-teal-300">info@elawyersbd.com</a>
+            </span>
           </div>
         </div>
 

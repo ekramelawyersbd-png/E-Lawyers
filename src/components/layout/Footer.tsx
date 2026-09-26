@@ -1,5 +1,15 @@
 import { Link } from 'react-router-dom';
-import { Calendar, ExternalLink } from 'lucide-react';
+import { 
+  Calendar, 
+  ExternalLink, 
+  Share2, 
+  CheckCircle2, 
+  Linkedin, 
+  Facebook, 
+  Instagram, 
+  Youtube, 
+  ArrowUpRight 
+} from 'lucide-react';
 import { NewsletterSignup } from '../NewsletterSignup';
 import { LanguageToggle } from '../LanguageToggle';
 import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
@@ -131,6 +141,215 @@ export function Footer() {
               <span>Book a Consultation</span>
               <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
             </a>
+          </div>
+        </div>
+
+        {/* Verified Ecosystem Media & Social Hubs (ACCOUNTICCA × E-LAWYERS) */}
+        <div className="border-t border-slate-800/90 mt-12 pt-10 pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Verified Ecosystem Media Handles</span>
+              </div>
+              <h4 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                Follow ACCOUNTICCA × E-LAWYERS Across Official Channels
+              </h4>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Official Verified Handles
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Accounticca Footer Social Hub */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-800 p-0.5 shadow-sm">
+                    <div className="w-full h-full rounded-[10px] bg-slate-900 flex items-center justify-center text-emerald-400 font-black text-sm">
+                      A
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h5 className="text-sm font-bold text-white tracking-wide">ACCOUNTICCA</h5>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">Verified</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Business &amp; Financial Advisory</p>
+                  </div>
+                </div>
+                <span className="text-xs font-mono text-emerald-400 font-bold hidden sm:inline">@accounticca</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {/* LinkedIn */}
+                <a
+                  href="https://linkedin.com/company/accounticca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Linkedin className="w-4 h-4 text-[#0A66C2] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono">/company</span>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href="https://facebook.com/accounticca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">Facebook</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono">/accounticca</span>
+                </a>
+
+                {/* X */}
+                <a
+                  href="https://x.com/accounticca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
+                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">X</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-slate-300 font-mono">@accounticca</span>
+                </a>
+
+                {/* YouTube */}
+                <a
+                  href="https://youtube.com/@accounticca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">YouTube</span>
+                  <span className="text-[9px] text-slate-400 group-hover:text-red-100 font-mono">@accounticca</span>
+                </a>
+              </div>
+            </div>
+
+            {/* E-Lawyers Footer Social Hub */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-slate-800/70 border border-slate-700/80 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-slate-900 p-0.5 shadow-sm">
+                    <div className="w-full h-full rounded-[10px] bg-slate-900 flex items-center justify-center text-teal-300 font-black text-sm">
+                      E
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h5 className="text-sm font-bold text-white tracking-wide">E-LAWYERS</h5>
+                      <span className="text-[10px] font-bold text-teal-400 bg-teal-950/80 px-2 py-0.5 rounded border border-teal-500/30">Verified</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Legal &amp; Compliance Chambers</p>
+                  </div>
+                </div>
+                <span className="text-xs font-mono text-teal-300 font-bold hidden sm:inline">@elawyerssbd</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {/* LinkedIn */}
+                <a
+                  href="https://linkedin.com/company/elawyersbd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-2.5 h-2.5 absolute top-1 right-1 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-6 h-6 rounded-md bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
+                  <span className="text-[8px] text-slate-400 group-hover:text-blue-100 font-mono">/company</span>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href="https://facebook.com/elawyersbd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-2.5 h-2.5 absolute top-1 right-1 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-6 h-6 rounded-md bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Facebook className="w-3.5 h-3.5 text-[#1877F2] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-200 group-hover:text-white">Facebook</span>
+                  <span className="text-[8px] text-slate-400 group-hover:text-blue-100 font-mono">/elawyersbd</span>
+                </a>
+
+                {/* X */}
+                <a
+                  href="https://x.com/elawyerssbd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-2.5 h-2.5 absolute top-1 right-1 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-6 h-6 rounded-md bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-200 group-hover:text-white">X</span>
+                  <span className="text-[8px] text-slate-400 group-hover:text-slate-300 font-mono">@elawyerssbd</span>
+                </a>
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com/elawyerssbd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#E1306C] border border-slate-700/80 hover:border-[#E1306C] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 relative"
+                >
+                  <ArrowUpRight className="w-2.5 h-2.5 absolute top-1 right-1 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-6 h-6 rounded-md bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Instagram className="w-3.5 h-3.5 text-[#E1306C] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-200 group-hover:text-white">Instagram</span>
+                  <span className="text-[8px] text-slate-400 group-hover:text-pink-100 font-mono">@elawyerssbd</span>
+                </a>
+
+                {/* YouTube */}
+                <a
+                  href="https://youtube.com/@elawyerssbd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-lg hover:-translate-y-0.5 col-span-2 sm:col-span-1 relative"
+                >
+                  <ArrowUpRight className="w-2.5 h-2.5 absolute top-1 right-1 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100" />
+                  <div className="w-6 h-6 rounded-md bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1 transition-colors">
+                    <Youtube className="w-3.5 h-3.5 text-[#FF0000] group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-200 group-hover:text-white">YouTube</span>
+                  <span className="text-[8px] text-slate-400 group-hover:text-red-100 font-mono">@elawyerssbd</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
