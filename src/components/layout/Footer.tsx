@@ -106,15 +106,12 @@ export function Footer() {
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
               <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
               <li>
-                <a 
-                  href={APPOINTMENT_BASE_URL} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <Link 
+                  to="/contact" 
                   className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
                 >
                   <span>Contact Us</span>
-                  <ExternalLink className="w-3 h-3 text-slate-500" />
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

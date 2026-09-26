@@ -42,11 +42,14 @@ export function ContactELawyers() {
               ☎
             </div>
             <div>
-              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Phone</h4>
+              <h4 className="text-[20px] font-bold text-[#12345b] mb-[8px]">Direct Phone</h4>
               <p className="text-[15px] leading-[1.7] text-[#555]">
-                <a href="tel:+8801335230170" className="text-[#b08b35] font-semibold hover:underline">
-                  +88 01335 230170-81
+                <a href="tel:+8801335230170" className="text-[#b08b35] font-bold hover:underline">
+                  +880 1335-230170
                 </a>
+                <span className="block text-xs text-slate-500 font-medium mt-0.5">
+                  (Hunting lines 70 through 81)
+                </span>
               </p>
             </div>
           </div>
@@ -101,10 +104,10 @@ export function ContactELawyers() {
           <div className="flex justify-center flex-wrap gap-[15px] my-[30px]">
             {[
               { name: 'X', url: 'https://x.com/elawyerssbd', Icon: Twitter, color: '#000000' },
-              { name: 'Facebook', url: 'https://www.facebook.com/elawyerssbd', Icon: Facebook, color: '#1877F2' },
+              { name: 'Facebook', url: 'https://facebook.com/elawyersbd', Icon: Facebook, color: '#1877F2' },
               { name: 'LinkedIn', url: 'https://linkedin.com/company/elawyersbd', Icon: Linkedin, color: '#0A66C2' },
-              { name: 'Instagram', url: 'https://www.instagram.com/elawyerssbd', Icon: Instagram, color: '#E1306C' },
-              { name: 'YouTube', url: 'https://www.youtube.com/@elawyerssbd', Icon: Youtube, color: '#FF0000' },
+              { name: 'Instagram', url: 'https://instagram.com/elawyerssbd', Icon: Instagram, color: '#E1306C' },
+              { name: 'YouTube', url: 'https://youtube.com/@elawyerssbd', Icon: Youtube, color: '#FF0000' },
             ].map(social => (
               <a 
                 key={social.name}

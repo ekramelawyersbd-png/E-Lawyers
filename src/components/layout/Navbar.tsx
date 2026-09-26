@@ -658,14 +658,17 @@ export function Navbar() {
             </div>
 
             {/* Contact */}
-            <a
-              href="https://appointment.accounticca.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs xl:text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 tracking-wide transition-all duration-200 whitespace-nowrap"
+            <Link
+              to="/contact"
+              className={cn(
+                "inline-flex items-center px-3.5 py-1.5 rounded-full text-xs xl:text-[13px] tracking-wide transition-all duration-200 whitespace-nowrap",
+                location.pathname === '/contact'
+                  ? "bg-white text-emerald-800 shadow-2xs font-extrabold"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold"
+              )}
             >
               Contact
-            </a>
+            </Link>
           </nav>
           
           {/* Right actions: Search + Auth + Mobile menu toggle */}
@@ -1032,15 +1035,18 @@ export function Navbar() {
             </div>
 
             {/* Mobile Contact */}
-            <a
-              href="https://appointment.accounticca.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2.5 rounded-xl text-base font-bold transition-colors text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+            <Link
+              to="/contact"
+              className={cn(
+                "block px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
+                location.pathname === '/contact'
+                  ? "text-emerald-700 bg-emerald-50 font-extrabold"
+                  : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+              )}
               onClick={() => setIsOpen(false)}
             >
               Contact
-            </a>
+            </Link>
 
             {user ? (
               <div className="mt-4 pt-4 border-t border-slate-100">

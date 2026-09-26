@@ -181,7 +181,7 @@ Through the **Accounticca × E-Lawyers Strategic Partnership**, you no longer ha
 ### Ready to Accelerate Your Business?
 * 🌐 **Consult Our Joint Advisory Team:** [appointment.accounticca.com](https://appointment.accounticca.com)
 * 📧 **Direct Ecosystem Inquiry:** [info@accounticca.com](mailto:info@accounticca.com) | [info@elawyersbd.com](mailto:info@elawyersbd.com)
-* 📞 **Corporate Hotline:** **+88 01335230170-81**
+* 📞 **Corporate Hotline:** [+880 1335-230170](tel:+8801335230170) *(Hunting lines 70–81)*
 * 📍 **Offices:** Dhaka, Bangladesh
 `
 };
