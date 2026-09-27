@@ -25,6 +25,18 @@ export const searchableTaxTools: SearchableTool[] = [
     featured: true
   },
   {
+    id: 'tax-return-checklist',
+    name: '10 Heads Income Return Checklist',
+    shortName: 'Income Return Checklist',
+    category: 'Tax Planner',
+    description: 'Interactive checklist to tick off all 10 statutory income heads under IT-11GA, tracking progress toward Total Income & Section 78 rebate limits.',
+    path: '/article/total-income-calculation-bangladesh-2026-2027#tax-return-checklist-tool',
+    iconName: 'ShieldCheck',
+    badge: 'Interactive Tracker',
+    tags: ['tax checklist', 'return checklist', 'total income checklist', '10 heads', 'it-11ga', 'income heads', 'income tax act 2023'],
+    featured: true
+  },
+  {
     id: 'tax-calculator',
     name: 'Tax Calculator 2026-27',
     shortName: 'Tax Calculator',

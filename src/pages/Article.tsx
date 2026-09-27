@@ -36,6 +36,8 @@ import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRebateCalculator';
 import { TotalIncomeCalculator } from '../components/tax/TotalIncomeCalculator';
+import { TaxReturnChecklist } from '../components/tax/TaxReturnChecklist';
+import { TaxSummaryDashboard } from '../components/tax/TaxSummaryDashboard';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
 import { BlogSEO } from '../components/BlogSEO';
@@ -521,9 +523,17 @@ export function Article() {
             )}
 
             {article.id === 'total-income-calculation-bangladesh-2026-2027' && (
-              <div className="my-12 scroll-mt-24" id="total-income-calculator-tool">
-                <TotalIncomeCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
-              </div>
+              <>
+                <div className="my-12 scroll-mt-24" id="tax-summary-dashboard-tool">
+                  <TaxSummaryDashboard className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="tax-return-checklist-tool">
+                  <TaxReturnChecklist className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="total-income-calculator-tool">
+                  <TotalIncomeCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+              </>
             )}
 
             {/* Dynamic Gallery Images */}
