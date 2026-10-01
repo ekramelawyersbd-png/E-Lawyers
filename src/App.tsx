@@ -31,6 +31,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { BookmarkProvider } from './contexts/BookmarkContext';
 import { BookmarkNotificationToast } from './components/BookmarkNotificationToast';
+import { ScrollManager } from './components/layout/ScrollManager';
+import { NotFound } from './pages/NotFound';
 
 export default function App() {
   return (
@@ -38,6 +40,7 @@ export default function App() {
       <AuthProvider>
         <BookmarkProvider>
           <BrowserRouter>
+            <ScrollManager />
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
@@ -56,14 +59,20 @@ export default function App() {
                 <Route path="tax-calculator" element={<TaxCalculator />} />
                 <Route path="tax-planner" element={<TaxPlanner />} />
                 <Route path="corporate-planner" element={<CorporateTaxPlanner />} />
+                <Route path="corporate-tax-planner" element={<Navigate to="/corporate-planner" replace />} />
                 <Route path="policy-analysis" element={<TaxPolicyAnalysis />} />
                 <Route path="team" element={<Team />} />
                 <Route path="vat-guide" element={<VatGuide />} />
                 <Route path="tds-guide" element={<TdsReference />} />
+                <Route path="tds-reference" element={<Navigate to="/tds-guide" replace />} />
                 <Route path="contact" element={<Contact />} />
                 <Route path="auth" element={<Auth />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsConditions />} />
+                <Route path="company-reg" element={<Navigate to="/article/company-reg" replace />} />
+                <Route path="tax-return-guide" element={<Navigate to="/article/tax-return-guide" replace />} />
+                <Route path="rjsc-guide" element={<Navigate to="/article/rjsc-guide" replace />} />
+                <Route path="startup-legal-checklist" element={<Navigate to="/article/startup-legal-checklist" replace />} />
                 <Route path="outsourced-business-support-accounticca" element={<Navigate to="/article/outsourced-business-support-accounticca" replace />} />
                 <Route path="sales-marketing-consultancy-accounticca" element={<Navigate to="/article/sales-marketing-consultancy-accounticca" replace />} />
                 <Route path="hr-organizational-consultancy-accounticca" element={<Navigate to="/article/hr-organizational-consultancy-accounticca" replace />} />
@@ -79,6 +88,7 @@ export default function App() {
                 <Route path="blog/accounting-finance-solutions" element={<Navigate to="/article/accounting-finance-solutions" replace />} />
                 <Route path="investment-tax-rebate-bangladesh-2026-2027" element={<Navigate to="/article/investment-tax-rebate-bangladesh-2026-2027" replace />} />
                 <Route path="total-income-calculation-bangladesh-2026-2027" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
             <BookmarkNotificationToast />

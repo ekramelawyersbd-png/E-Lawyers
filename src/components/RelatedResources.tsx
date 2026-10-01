@@ -19,13 +19,13 @@ const allResources: Resource[] = [
   {
     title: 'TDS Reference Guide',
     description: 'Find applicable Tax Deducted at Source (TDS) rates for various sectors.',
-    path: '/tds-reference',
+    path: '/tds-guide',
     icon: FileText
   },
   {
     title: 'Corporate Tax Planner',
     description: 'Optimize corporate tax calculations and view applicable rates for companies.',
-    path: '/corporate-tax-planner',
+    path: '/corporate-planner',
     icon: Briefcase
   },
   {
@@ -39,7 +39,7 @@ const allResources: Resource[] = [
 export function RelatedResources({ currentCategory }: { currentCategory?: string }) {
   // We can filter dynamically based on category or article topic, but for now we'll show the top 2-3 tools.
   const displayedResources = currentCategory === 'Corporate Law' 
-    ? allResources.filter(r => ['/corporate-tax-planner', '/tds-reference'].includes(r.path))
+    ? allResources.filter(r => ['/corporate-planner', '/tds-guide'].includes(r.path))
     : allResources.slice(0, 3); // Default resources
 
   return (

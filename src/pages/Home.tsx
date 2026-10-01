@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
 import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel } from 'lucide-react';
@@ -12,8 +12,10 @@ import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { SEO } from '../components/SEO';
+import { DailyUpdatesSection } from '../components/DailyUpdatesSection';
 
 export function Home() {
+  const navigate = useNavigate();
   const [newsFontScale, setNewsFontScale] = useState(1);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
@@ -283,7 +285,7 @@ export function Home() {
                     const form = e.target as HTMLFormElement;
                     const input = form.elements.namedItem('search') as HTMLInputElement;
                     if (input.value.trim()) {
-                      window.location.href = `/search?q=${encodeURIComponent(input.value.trim())}`;
+                      navigate(`/search?q=${encodeURIComponent(input.value.trim())}`);
                     }
                   }}
                 >
@@ -487,6 +489,9 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* Daily Updates - Live Regulatory & Tax Dispatches via Google Search Grounding */}
+      <DailyUpdatesSection />
 
       {/* 2. Latest Articles */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -700,22 +705,33 @@ export function Home() {
             className="lg:col-span-8"
             aria-live="polite"
           >
-            <div className="flex items-center justify-between gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-emerald-600" /> Featured Guides
+            <div className="mb-8">
+              <div className="flex items-center justify-between gap-4 mb-2.5">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Quick Access Advisory &amp; Services</span>
+                </div>
+                <button
+                  id="refresh-guides-btn"
+                  type="button"
+                  onClick={handleRefreshGuides}
+                  disabled={isLoadingGuides}
+                  title="Reload guides to inspect loading skeleton state"
+                  aria-label="Refresh featured guides"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200/90 hover:border-emerald-300 transition-all cursor-pointer shadow-2xs disabled:opacity-60"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoadingGuides ? 'animate-spin text-emerald-600' : ''}`} />
+                  <span className="hidden sm:inline">{isLoadingGuides ? 'Loading...' : 'Refresh'}</span>
+                </button>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+                <BookOpen className="w-7 h-7 text-emerald-600 shrink-0" />
+                <span>Featured Practice Guides &amp; Professional Services</span>
               </h2>
-              <button
-                id="refresh-guides-btn"
-                type="button"
-                onClick={handleRefreshGuides}
-                disabled={isLoadingGuides}
-                title="Reload guides to inspect loading skeleton state"
-                aria-label="Refresh featured guides"
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200/90 hover:border-emerald-300 transition-all cursor-pointer shadow-2xs disabled:opacity-60"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoadingGuides ? 'animate-spin text-emerald-600' : ''}`} />
-                <span className="hidden sm:inline">{isLoadingGuides ? 'Loading...' : 'Refresh'}</span>
-              </button>
+              <p className="text-slate-600 text-sm sm:text-base mt-2 leading-relaxed">
+                Direct access to actionable compliance roadmaps, statutory tax planning guidelines, and corporate advisory services designed for Bangladesh enterprises.
+              </p>
             </div>
 
             {isLoadingGuides ? (
@@ -725,7 +741,7 @@ export function Home() {
                 aria-label="Loading featured legal guides"
                 className="space-y-4"
               >
-                {[0, 1, 2, 3, 4].map((i) => (
+                {[0, 1, 2, 3, 4, 5].map((i) => (
                   <div 
                     key={i} 
                     className="flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs animate-pulse"
@@ -755,7 +771,7 @@ export function Home() {
               </div>
             ) : (
               <div className="space-y-4">
-                {featuredGuides.slice(0, 10).map((guide, idx) => (
+                {featuredGuides.slice(0, 6).map((guide, idx) => (
                   <Link 
                     key={idx} 
                     to={guide.path} 
@@ -850,8 +866,7 @@ export function Home() {
               <div className="space-y-6">
                 {popularArticles.slice(0, 2).map((article, idx) => (
                   <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <div className="flex items-center gap-4 mb-4">
-                      <img src={article.author.avatarUrl} alt={article.author.name} className="w-12 h-12 rounded-full object-cover border-2 border-emerald-100" />
+                    <div className="mb-4">
                       <div>
                         <h4 className="font-bold text-slate-900">{article.author.name}</h4>
                         <p className="text-xs text-emerald-700 font-medium uppercase tracking-wider">{article.author.role || 'Corporate Lawyer'}</p>

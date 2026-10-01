@@ -276,7 +276,7 @@ export function ToolsHub() {
       )}
 
       {/* Resource Library Section */}
-      <div className="mt-16">
+      <div id="resource-library" className="mt-16 scroll-mt-24">
         <ResourceLibrary />
       </div>
 

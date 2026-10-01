@@ -709,15 +709,13 @@ export function Contact() {
               {/* Official Brand Header */}
               <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
                 <div className="flex items-center gap-3.5">
-                  {/* Official Emblem Picture with authentic E-LAWYERS logo mark */}
+                  {/* Official Emblem */}
                   <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-cyan-600 to-slate-900 p-0.5 shadow-md shadow-teal-950/60 shrink-0">
-                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-1.5 relative overflow-hidden">
+                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
                       <div className="absolute inset-0 bg-teal-500/15" />
-                      <img 
-                        src="/elawyers-emblem.png" 
-                        alt="E-LAWYERS Official Emblem" 
-                        className="w-full h-full object-contain relative z-10 drop-shadow-xs" 
-                      />
+                      <div className="relative z-10 w-full h-full flex items-center justify-center text-teal-400 font-black text-xl tracking-tight">
+                        E
+                      </div>
                     </div>
                   </div>
 
@@ -742,15 +740,6 @@ export function Contact() {
                     @elawyerssbd
                   </span>
                 </div>
-              </div>
-
-              {/* Official Brand Wordmark Banner (from BLUE.png) */}
-              <div className="p-3 rounded-2xl bg-slate-950/70 border border-teal-500/25 flex items-center justify-center relative z-10 shadow-inner">
-                <img 
-                  src="/BLUE.png" 
-                  alt="E-LAWYERS Barristers & Advocates" 
-                  className="h-8 sm:h-9 w-auto max-w-full object-contain drop-shadow-md"
-                />
               </div>
 
               {/* Official Social Links with Real Brand Logos */}

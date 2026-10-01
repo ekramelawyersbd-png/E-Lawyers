@@ -52,7 +52,6 @@ export function Search() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     if (query) {
       const lowerQuery = query.toLowerCase();
       const tokens = lowerQuery.split(/\s+/).filter(Boolean);

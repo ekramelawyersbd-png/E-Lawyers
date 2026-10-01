@@ -86,7 +86,6 @@ export function TaxPlanner() {
     setIsFirstTimeFiler(sc.inputs.isFirstTimeFiler);
     setActiveScenarioName(sc.name);
     setIsSharedFromUrl(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleResetInputs = () => {

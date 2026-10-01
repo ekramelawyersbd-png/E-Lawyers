@@ -49,10 +49,7 @@ export function ContactELawyers() {
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
               <span>ACCOUNTICCA</span>
               <span className="text-emerald-400 font-light">×</span>
-              <span className="inline-flex items-center gap-1.5">
-                <img src="/elawyers-emblem.png" alt="E-LAWYERS" className="w-5 h-5 object-contain inline-block" />
-                <span>E-LAWYERS</span>
-              </span>
+              <span>E-LAWYERS</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-0.5">
               Accounting • Tax • VAT • Audit • Corporate &amp; Legal Compliance

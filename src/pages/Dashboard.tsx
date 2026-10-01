@@ -67,7 +67,7 @@ export function Dashboard() {
 
   const switchTab = (tab: 'saved' | 'articles') => {
     setActiveTab(tab);
-    setSearchParams({ tab });
+    setSearchParams({ tab }, { preventScrollReset: true });
   };
 
   const handleRemoveSaved = async (id: string, e?: React.MouseEvent) => {

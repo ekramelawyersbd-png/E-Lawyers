@@ -230,7 +230,7 @@ Outsourced Business Support, Fractional Accounting Bangladesh, Executive Reporti
     },
     publishedAt: new Date().toISOString(),
     readTime: 6,
-    imageUrl: 'https://i.ibb.co/NnG8px23/Outsourced-Business-Support.png',
+    imageUrl: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200',
     tags: [
       'Outsourced Business Support',
       'Fractional Accounting Bangladesh',
