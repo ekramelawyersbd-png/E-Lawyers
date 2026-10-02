@@ -126,18 +126,25 @@ export function GlobalSearchAutocomplete({
 
   // Click outside listener
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        onClose();
+        if (variant === 'navbar-mobile') {
+          // On mobile drawer, clicking outside search only unfocuses the search input
+          setIsFocused(false);
+        } else {
+          onClose();
+        }
       }
     }
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, variant]);
 
   // Reset active index when query changes
   useEffect(() => {

@@ -25,7 +25,10 @@ import {
   Users,
   Award,
   MessageSquare,
-  Calendar
+  Calendar,
+  Home,
+  Check,
+  Languages
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
@@ -281,6 +284,15 @@ export function Navbar() {
     setIsOpen(false);
     setUserMenuOpen(false);
   }, [location.pathname, location.search]);
+
+  // Auto-expand the active section in mobile menu when opened
+  useEffect(() => {
+    if (isOpen) {
+      if (isBlogActive) setMobileBlogOpen(true);
+      if (isResourceActive) setMobileResourcesOpen(true);
+      if (isCommunityActive) setMobileCommunityOpen(true);
+    }
+  }, [isOpen, isBlogActive, isResourceActive, isCommunityActive]);
 
   const handleBlogMouseEnter = () => {
     if (blogTimeoutRef.current) clearTimeout(blogTimeoutRef.current);
@@ -830,65 +842,130 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white shadow-lg absolute left-0 right-0 w-full max-h-[calc(100vh-80px)] overflow-y-auto">
-          <div className="px-4 pt-4 pb-2">
+        <div className="lg:hidden border-t border-slate-200/90 bg-white shadow-2xl absolute left-0 right-0 w-full max-h-[calc(100vh-72px)] overflow-y-auto overscroll-contain z-50">
+          {/* div:nth-of-type(1) - Mobile Search & Language Tools */}
+          <div className="px-4 pt-4 pb-3 border-b border-slate-100 bg-slate-50/70">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Language</span>
+              <span className="text-xs font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <Languages className="w-4 h-4 text-emerald-600" />
+                Language
+              </span>
               <LanguageToggle />
             </div>
-            <div className="mb-3">
+            <div>
               <GlobalSearchAutocomplete
                 isOpen={true}
-                onClose={() => setIsOpen(false)}
+                onClose={() => {
+                  // Keep drawer open when search input loses focus
+                }}
                 variant="navbar-mobile"
                 placeholder="Search articles & tax tools..."
                 autoFocus={false}
               />
             </div>
           </div>
-          <div className="px-4 pt-2 pb-6 space-y-1">
+
+          {/* div:nth-of-type(2) - Mobile Navigation Options */}
+          <div 
+            style={{
+              paddingTop: '8px',
+              paddingLeft: '80px',
+              paddingRight: '28px',
+              paddingBottom: '11px',
+              width: '358px',
+              height: '296px'
+            }}
+            className="space-y-1 overflow-y-auto"
+          >
             {/* Mobile Home */}
             <Link
               to="/"
               className={cn(
-                "block px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                location.pathname === '/' ? "text-emerald-700 bg-emerald-50" : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+                "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[35px]",
+                location.pathname === '/' 
+                  ? "text-emerald-950 bg-emerald-50/90 border border-emerald-300 font-extrabold shadow-2xs" 
+                  : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80 active:bg-slate-100"
               )}
               onClick={() => setIsOpen(false)}
             >
-              Home
+              <div className="flex items-center gap-2">
+                <Home className={cn("w-4 h-4", location.pathname === '/' ? "text-emerald-600" : "text-slate-500")} />
+                <span>Home</span>
+              </div>
+              {location.pathname === '/' && (
+                <span className="inline-flex items-center gap-1 text-[9px] font-extrabold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.2 rounded-full">
+                  <Check className="w-2.5 h-2.5 text-emerald-700" />
+                  Active
+                </span>
+              )}
             </Link>
 
             {/* Mobile Blog Accordion */}
-            <div className="border-y border-slate-100 py-1 my-2">
+            <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-2xs">
               <button
                 type="button"
                 onClick={() => setMobileBlogOpen(prev => !prev)}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                  isBlogActive ? "text-emerald-700 bg-emerald-50/50" : "text-slate-700 hover:text-emerald-700"
+                  "w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-all min-h-[35px] cursor-pointer",
+                  isBlogActive 
+                    ? "text-emerald-950 bg-emerald-50/80 font-extrabold" 
+                    : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80"
                 )}
+                aria-expanded={mobileBlogOpen}
               >
-                <span className="flex items-center gap-2">Blog Categories</span>
-                <ChevronDown className={cn("w-5 h-5 transition-transform duration-200", mobileBlogOpen && "rotate-180")} />
+                <div className="flex items-center gap-2">
+                  <BookOpen className={cn("w-4 h-4", isBlogActive ? "text-emerald-600" : "text-slate-500")} />
+                  <span>Articles &amp; Law</span>
+                  {isBlogActive && (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", mobileBlogOpen ? "rotate-180 text-emerald-700" : "text-slate-400")} />
               </button>
 
               {mobileBlogOpen && (
-                <div className="pl-4 pr-2 py-2 space-y-1 bg-slate-50/50 rounded-xl my-1">
+                <div className="p-1.5 space-y-1 bg-slate-50/70 border-t border-slate-100">
+                  <Link
+                    to="/search"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/60 mb-0.5"
+                  >
+                    <span>Browse All Articles &amp; Law Categories</span>
+                    <span>→</span>
+                  </Link>
+
                   {blogCategories.map((item) => {
                     const Icon = item.icon;
+                    const isSelected = location.pathname === item.path;
                     return (
                       <Link
                         key={item.name}
                         to={item.path}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold transition-colors",
-                          location.pathname === item.path ? "text-emerald-700 bg-emerald-100/60" : "text-slate-600 hover:text-slate-900"
+                          "flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[30px]",
+                          isSelected 
+                            ? "text-emerald-950 bg-white border border-emerald-300 font-black shadow-xs" 
+                            : "text-slate-700 hover:text-slate-900 hover:bg-white/70 active:bg-white"
                         )}
                       >
-                        <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>{item.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className={cn(
+                            "w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                            isSelected ? "bg-emerald-600 text-white shadow-xs" : "bg-white text-slate-500 border border-slate-200/80"
+                          )}>
+                            <Icon className="w-3 h-3" />
+                          </div>
+                          <span className="truncate">{item.name}</span>
+                        </div>
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-0.5 text-[8px] font-extrabold bg-emerald-600 text-white px-1.5 py-0.2 rounded-full shrink-0">
+                            <Check className="w-2 h-2" />
+                            Selected
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
@@ -897,35 +974,64 @@ export function Navbar() {
             </div>
 
             {/* Mobile Resources Accordion */}
-            <div className="border-b border-slate-100 py-1 my-2">
+            <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-2xs">
               <button
                 type="button"
                 onClick={() => setMobileResourcesOpen(prev => !prev)}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                  isResourceActive ? "text-emerald-700 bg-emerald-50/50" : "text-slate-700 hover:text-emerald-700"
+                  "w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-all min-h-[35px] cursor-pointer",
+                  isResourceActive 
+                    ? "text-emerald-950 bg-emerald-50/80 font-extrabold" 
+                    : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80"
                 )}
+                aria-expanded={mobileResourcesOpen}
               >
-                <span className="flex items-center gap-2">Resources & Tools</span>
-                <ChevronDown className={cn("w-5 h-5 transition-transform duration-200", mobileResourcesOpen && "rotate-180")} />
+                <div className="flex items-center gap-2">
+                  <Wrench className={cn("w-4 h-4", isResourceActive ? "text-emerald-600" : "text-slate-500")} />
+                  <span>Resources &amp; Tools</span>
+                  {isResourceActive && (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", mobileResourcesOpen ? "rotate-180 text-emerald-700" : "text-slate-400")} />
               </button>
 
               {mobileResourcesOpen && (
-                <div className="pl-4 pr-2 py-2 space-y-1 bg-slate-50/50 rounded-xl my-1">
+                <div className="p-1.5 space-y-1 bg-slate-50/70 border-t border-slate-100">
                   {resourceLinks.map((item) => {
                     const Icon = item.icon;
+                    const isSelected = item.path.includes('#')
+                      ? location.pathname === item.path.split('#')[0] && location.hash === '#' + item.path.split('#')[1]
+                      : location.pathname === item.path;
                     return (
                       <Link
                         key={item.name}
                         to={item.path}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold transition-colors",
-                          location.pathname === item.path ? "text-emerald-700 bg-emerald-100/60" : "text-slate-600 hover:text-slate-900"
+                          "flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[30px]",
+                          isSelected 
+                            ? "text-emerald-950 bg-white border border-emerald-300 font-black shadow-xs" 
+                            : "text-slate-700 hover:text-slate-900 hover:bg-white/70 active:bg-white"
                         )}
                       >
-                        <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>{item.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className={cn(
+                            "w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                            isSelected ? "bg-emerald-600 text-white shadow-xs" : "bg-white text-slate-500 border border-slate-200/80"
+                          )}>
+                            <Icon className="w-3 h-3" />
+                          </div>
+                          <span className="truncate">{item.name}</span>
+                        </div>
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-0.5 text-[8px] font-extrabold bg-emerald-600 text-white px-1.5 py-0.2 rounded-full shrink-0">
+                            <Check className="w-2 h-2" />
+                            Selected
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
@@ -938,60 +1044,93 @@ export function Navbar() {
               to="/dashboard?tab=saved"
               id="mobile-bookmarks-link"
               className={cn(
-                "flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
+                "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[35px]",
                 location.pathname === '/dashboard' && (location.search.includes('tab=saved') || location.search.includes('tab=bookmarks'))
-                  ? "text-emerald-700 bg-emerald-50" 
-                  : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+                  ? "text-emerald-950 bg-emerald-50/90 border border-emerald-300 font-extrabold shadow-2xs" 
+                  : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80 active:bg-slate-100"
               )}
               onClick={() => setIsOpen(false)}
             >
-              <div className="flex items-center gap-3">
-                <Bookmark className="w-5 h-5 text-emerald-600" />
+              <div className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4 text-emerald-600" />
                 <span>Saved Articles</span>
               </div>
-              {savedBookmarkCount > 0 && (
-                <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  {savedBookmarkCount}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5">
+                {savedBookmarkCount > 0 && (
+                  <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-2xs">
+                    {savedBookmarkCount}
+                  </span>
+                )}
+                {location.pathname === '/dashboard' && (location.search.includes('tab=saved') || location.search.includes('tab=bookmarks')) && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-extrabold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.2 rounded-full">
+                    <Check className="w-2.5 h-2.5 text-emerald-700" />
+                    Active
+                  </span>
+                )}
+              </div>
             </Link>
 
             {/* Mobile Community Accordion */}
-            <div className="border-b border-slate-100 py-1 my-2">
+            <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-2xs">
               <button
                 type="button"
                 onClick={() => setMobileCommunityOpen(prev => !prev)}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
-                  isCommunityActive ? "text-emerald-700 bg-emerald-50/50" : "text-slate-700 hover:text-emerald-700"
+                  "w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-all min-h-[35px] cursor-pointer",
+                  isCommunityActive 
+                    ? "text-emerald-950 bg-emerald-50/80 font-extrabold" 
+                    : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80"
                 )}
+                aria-expanded={mobileCommunityOpen}
               >
-                <span className="flex items-center gap-2">Community</span>
-                <ChevronDown className={cn("w-5 h-5 transition-transform duration-200", mobileCommunityOpen && "rotate-180")} />
+                <div className="flex items-center gap-2">
+                  <Users className={cn("w-4 h-4", isCommunityActive ? "text-emerald-600" : "text-slate-500")} />
+                  <span>Community</span>
+                  {isCommunityActive && (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", mobileCommunityOpen ? "rotate-180 text-emerald-700" : "text-slate-400")} />
               </button>
 
               {mobileCommunityOpen && (
-                <div className="pl-4 pr-2 py-2 space-y-1 bg-slate-50/50 rounded-xl my-1">
+                <div className="p-1.5 space-y-1 bg-slate-50/70 border-t border-slate-100">
                   {communityLinks.map((item) => {
                     const Icon = item.icon;
-                    const isActive = 
-                      item.path === '/community'
-                        ? location.pathname === '/community' && !location.search
-                        : item.path.includes('?')
-                        ? location.pathname === '/community' && location.search.includes(item.path.split('?')[1])
-                        : location.pathname === item.path;
+                    const isSelected = item.path === '/community'
+                      ? location.pathname === '/community' && !location.search
+                      : item.path.includes('?')
+                      ? location.pathname === '/community' && location.search.includes(item.path.split('?')[1])
+                      : location.pathname === item.path;
                     return (
                       <Link
                         key={item.name}
                         to={item.path}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold transition-colors",
-                          isActive ? "text-emerald-700 bg-emerald-100/60" : "text-slate-600 hover:text-slate-900"
+                          "flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[30px]",
+                          isSelected 
+                            ? "text-emerald-950 bg-white border border-emerald-300 font-black shadow-xs" 
+                            : "text-slate-700 hover:text-slate-900 hover:bg-white/70 active:bg-white"
                         )}
                       >
-                        <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>{item.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className={cn(
+                            "w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                            isSelected ? "bg-emerald-600 text-white shadow-xs" : "bg-white text-slate-500 border border-slate-200/80"
+                          )}>
+                            <Icon className="w-3 h-3" />
+                          </div>
+                          <span className="truncate">{item.name}</span>
+                        </div>
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-0.5 text-[8px] font-extrabold bg-emerald-600 text-white px-1.5 py-0.2 rounded-full shrink-0">
+                            <Check className="w-2 h-2" />
+                            Selected
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
@@ -1003,38 +1142,72 @@ export function Navbar() {
             <Link
               to="/contact"
               className={cn(
-                "block px-4 py-2.5 rounded-xl text-base font-bold transition-colors",
+                "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[35px]",
                 location.pathname === '/contact'
-                  ? "text-emerald-700 bg-emerald-50 font-extrabold"
-                  : "text-slate-700 hover:text-emerald-700 hover:bg-slate-50"
+                  ? "text-emerald-950 bg-emerald-50/90 border border-emerald-300 font-extrabold shadow-2xs" 
+                  : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80 active:bg-slate-100"
               )}
               onClick={() => setIsOpen(false)}
             >
-              Contact
+              <div className="flex items-center gap-2">
+                <MessageSquare className={cn("w-4 h-4", location.pathname === '/contact' ? "text-emerald-600" : "text-slate-500")} />
+                <span>Contact</span>
+              </div>
+              {location.pathname === '/contact' && (
+                <span className="inline-flex items-center gap-1 text-[9px] font-extrabold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.2 rounded-full">
+                  <Check className="w-2.5 h-2.5 text-emerald-700" />
+                  Active
+                </span>
+              )}
             </Link>
 
             {user ? (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <div className="px-4 py-2 text-sm font-bold text-slate-500">
-                  Signed in as {user.displayName || user.email}
+              <div className="mt-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/90 space-y-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden ring-1 ring-emerald-300">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-slate-900 truncate">
+                      {user.displayName || user.email?.split('@')[0]}
+                    </p>
+                    <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-xl text-base font-bold text-rose-600 hover:bg-rose-50 transition-colors"
-                >
-                  Log Out
-                </button>
+                <div className="grid grid-cols-2 gap-1.5 pt-1.5 border-t border-slate-200/80">
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-white border border-slate-200 text-[11px] font-bold text-slate-700 hover:text-emerald-700 shadow-2xs min-h-[30px]"
+                  >
+                    <LayoutDashboard className="w-3 h-3 text-emerald-600" />
+                    <span>Dashboard</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-rose-50 border border-rose-200 text-[11px] font-bold text-rose-700 hover:bg-rose-100 min-h-[30px] cursor-pointer"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <Link
                 to="/auth"
-                className="block px-4 py-3 mt-4 rounded-xl text-base font-bold text-white bg-slate-900 text-center"
+                className="flex items-center justify-center gap-1.5 w-full py-2.5 mt-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-emerald-700 transition-all shadow-sm min-h-[36px]"
                 onClick={() => setIsOpen(false)}
               >
-                Sign In
+                <User className="w-3.5 h-3.5" />
+                <span>Sign In / Create Account</span>
               </Link>
             )}
           </div>

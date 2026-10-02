@@ -9,29 +9,39 @@ export function LanguageToggle({ className, variant = 'light' }: { className?: s
 
   return (
     <div className={cn(
-      "flex items-center gap-1 p-1 rounded-full",
-      isDark ? "bg-slate-800/90 border border-slate-700" : "bg-slate-100",
+      "inline-flex items-center gap-1 p-1 rounded-xl border transition-all shadow-2xs",
+      isDark ? "bg-slate-800/95 border-slate-700" : "bg-white border-slate-200/90",
       className
     )}>
       <button
-        onClick={() => setLanguage('en')}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setLanguage('en');
+        }}
         className={cn(
-          "px-2.5 py-1 text-xs font-bold rounded-full transition-colors",
+          "px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all min-h-[34px] min-w-[42px] cursor-pointer flex items-center justify-center select-none",
           language === 'en'
-            ? isDark ? "bg-emerald-600 text-white shadow-sm" : "bg-white text-emerald-700 shadow-sm"
-            : isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-700"
+            ? "bg-emerald-600 text-white shadow-xs scale-100"
+            : isDark ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
         )}
+        aria-pressed={language === 'en'}
       >
         EN
       </button>
       <button
-        onClick={() => setLanguage('bn')}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setLanguage('bn');
+        }}
         className={cn(
-          "px-2.5 py-1 text-xs font-bold rounded-full transition-colors",
+          "px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all min-h-[34px] min-w-[42px] cursor-pointer flex items-center justify-center select-none",
           language === 'bn'
-            ? isDark ? "bg-emerald-600 text-white shadow-sm" : "bg-white text-emerald-700 shadow-sm"
-            : isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-700"
+            ? "bg-emerald-600 text-white shadow-xs scale-100"
+            : isDark ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
         )}
+        aria-pressed={language === 'bn'}
       >
         বাং
       </button>
