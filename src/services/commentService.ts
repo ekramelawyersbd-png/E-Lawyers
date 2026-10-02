@@ -242,6 +242,59 @@ const DEFAULT_SEED_DISCUSSIONS: Record<string, CommentItem[]> = {
       parentId: 'seed-comment-1',
       isVerifiedProfessional: true
     }
+  ],
+  'facebook-post-1718531953613967': [
+    {
+      id: 'fb-comment-1',
+      articleId: 'facebook-post-1718531953613967',
+      commentType: 'insight',
+      authorName: 'Adv. Kazi Mahmudur Rahman',
+      role: 'advocate_supreme_court',
+      roleLabel: 'Advocate, Supreme Court of Bangladesh',
+      organization: 'Dhaka Bar & Supreme Court Chambers',
+      statutoryRef: 'Companies Act 1994 & RJSC Regulations',
+      topicTag: 'Corporate Law & RJSC',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=faces',
+      text: 'Remarkable milestone for corporate compliance in Bangladesh! Having seasoned barristers at E-Lawyers working alongside chartered tax specialists under one roof drastically speeds up RJSC name clearance, cross-border shareholder agreements, and post-incorporation statutory filings.',
+      date: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+      helpfulCount: 19,
+      parentId: null,
+      isVerifiedProfessional: true
+    },
+    {
+      id: 'fb-comment-2',
+      articleId: 'facebook-post-1718531953613967',
+      commentType: 'question',
+      authorName: 'Tanveer Hasan',
+      role: 'corporate_counsel',
+      roleLabel: 'Corporate Legal Counsel & Startup Founder',
+      organization: 'TechVanguard Bangladesh',
+      statutoryRef: 'Section 166, Income Tax Act 2023',
+      topicTag: 'Tax Assessment & ITA 2023',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
+      text: 'Congratulations to the entire team! Does E-Lawyers assist foreign investors and joint-venture companies in obtaining BIDA work permits and initial RJSC branch office licenses as part of this unified ecosystem?',
+      date: new Date(Date.now() - 2.5 * 3600 * 1000).toISOString(),
+      helpfulCount: 12,
+      parentId: null,
+      isVerifiedProfessional: true
+    },
+    {
+      id: 'fb-comment-3',
+      articleId: 'facebook-post-1718531953613967',
+      commentType: 'insight',
+      authorName: 'Barrister Ekramul Haque',
+      role: 'barrister',
+      roleLabel: 'Head of Legal Chambers, E-Lawyers',
+      organization: 'E-LAWYERS Chambers & Corporate Law Practice',
+      statutoryRef: 'BIDA Act 2016 & Foreign Exchange Regulation Act 1947',
+      topicTag: 'Corporate Law & RJSC',
+      avatar: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&h=150&fit=crop&crop=faces',
+      text: 'Thank you Tanveer! Yes, absolutely. Our dedicated foreign direct investment (FDI) wing handles end-to-end BIDA registration, RJSC liaison/branch office approvals, Bangladesh Bank 18A/18B reporting, and outward remittance compliance for international joint ventures.',
+      date: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
+      helpfulCount: 24,
+      parentId: 'fb-comment-2',
+      isVerifiedProfessional: true
+    }
   ]
 };
 

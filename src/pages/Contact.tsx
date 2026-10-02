@@ -33,6 +33,8 @@ import { ContactFaq } from '../components/ContactFaq';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { ContactTestimonialsCarousel } from '../components/ContactTestimonialsCarousel';
+import { FacebookPostEngageBar } from '../components/FacebookPostEngageBar';
+import { FacebookPostComments } from '../components/FacebookPostComments';
 import { redirectToAppointment, APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
 
 export function Contact() {
@@ -740,6 +742,52 @@ export function Contact() {
                     @elawyerssbd
                   </span>
                 </div>
+              </div>
+
+              {/* Official Facebook Live Post Embed */}
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-950/80 border border-teal-500/30 flex flex-col items-center justify-center relative z-10 shadow-inner overflow-hidden">
+                <div className="w-full flex items-center justify-between text-xs text-teal-300 font-bold mb-2 px-1">
+                  <span className="flex items-center gap-1.5">
+                    <Facebook className="w-3.5 h-3.5 text-[#1877F2]" />
+                    Featured Facebook Post
+                  </span>
+                  <a
+                    href="https://www.facebook.com/photo/?fbid=1718531953613967&set=a.706589084808264"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-teal-400 hover:text-white underline inline-flex items-center gap-1"
+                  >
+                    View on Facebook <ArrowUpRight className="w-3 h-3" />
+                  </a>
+                </div>
+                <div className="w-full flex justify-center overflow-hidden rounded-xl bg-slate-900 min-h-[350px]">
+                  <iframe 
+                    src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1718531953613967%26set%3Da.706589084808264&show_text=true&width=500" 
+                    width="500" 
+                    height="429" 
+                    style={{ border: 'none', overflow: 'hidden', maxWidth: '100%' }} 
+                    scrolling="no" 
+                    frameBorder="0" 
+                    allowFullScreen={true} 
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    title="E-LAWYERS Official Facebook Post"
+                    className="w-full max-w-[500px] h-[429px]"
+                  />
+                </div>
+
+                {/* Social Interaction Buttons directly below iframe */}
+                <FacebookPostEngageBar 
+                  postUrl="https://www.facebook.com/photo/?fbid=1718531953613967&set=a.706589084808264"
+                  postTitle="E-LAWYERS Official Facebook Post"
+                  initialLikes={184}
+                  variant="dark"
+                />
+
+                {/* Comments Component below Social Interaction Buttons */}
+                <FacebookPostComments 
+                  contentId="facebook-post-1718531953613967"
+                  postUrl="https://www.facebook.com/photo/?fbid=1718531953613967&set=a.706589084808264"
+                />
               </div>
 
               {/* Official Social Links with Real Brand Logos */}

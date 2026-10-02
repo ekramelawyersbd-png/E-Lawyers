@@ -13,6 +13,8 @@ import {
   CheckCircle2, 
   Globe
 } from 'lucide-react';
+import { FacebookPostEngageBar } from './FacebookPostEngageBar';
+import { FacebookPostComments } from './FacebookPostComments';
 
 interface EcosystemSocialKitProps {
   articleId: string;
@@ -194,6 +196,41 @@ Where Business Strategy Meets Legal Excellence.
               </div>
               <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs sm:text-sm text-slate-200 font-mono whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto">
                 {fbCaption}
+              </div>
+
+              {/* Live Facebook Post Embed */}
+              <div className="mt-4 pt-4 border-t border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-3">
+                  Live Facebook Announcement Post
+                </span>
+                <div className="flex justify-center p-3 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
+                  <iframe 
+                    src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1718531953613967%26set%3Da.706589084808264&show_text=true&width=500" 
+                    width="500" 
+                    height="429" 
+                    style={{ border: 'none', overflow: 'hidden', maxWidth: '100%' }} 
+                    scrolling="no" 
+                    frameBorder="0" 
+                    allowFullScreen={true} 
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    title="Facebook Announcement"
+                    className="w-full max-w-[500px] h-[430px]"
+                  />
+                </div>
+
+                {/* Social Interaction Buttons directly below iframe */}
+                <FacebookPostEngageBar 
+                  postUrl="https://www.facebook.com/photo/?fbid=1718531953613967&set=a.706589084808264"
+                  postTitle="Official Strategic Partnership Announcement"
+                  initialLikes={184}
+                  variant="dark"
+                />
+
+                {/* Comments Component below Social Interaction Buttons */}
+                <FacebookPostComments 
+                  contentId="facebook-post-1718531953613967"
+                  postUrl="https://www.facebook.com/photo/?fbid=1718531953613967&set=a.706589084808264"
+                />
               </div>
             </div>
           )}

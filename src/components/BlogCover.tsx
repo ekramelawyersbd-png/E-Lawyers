@@ -92,6 +92,18 @@ export function BlogCover({ article, className = '', showCaption = true }: BlogC
 
   const CategoryIcon = theme.icon;
 
+  const handleImageError = () => {
+    // If remote ibb fails or is blocked, try local cached asset
+    if (article.imageUrl?.includes('ibb.co')) {
+      const img = document.querySelector('#blog-cover-container img') as HTMLImageElement;
+      if (img && !img.src.includes('salary-tds-cover.png')) {
+        img.src = '/salary-tds-cover.png';
+        return;
+      }
+    }
+    setImageError(true);
+  };
+
   // Determine active image: article's specific imageUrl if present, else fallback to high-res category-specific image
   const activeImageUrl = (!imageError && article.imageUrl) 
     ? article.imageUrl 
@@ -110,7 +122,7 @@ export function BlogCover({ article, className = '', showCaption = true }: BlogC
             <img
               src={activeImageUrl}
               alt={article.title}
-              onError={() => setImageError(true)}
+              onError={handleImageError}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />

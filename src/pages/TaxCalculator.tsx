@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink, Share2 } from 'lucide-react';
+import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink, Share2, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { TaxHistory, SavedCalculation } from '../components/calculator/TaxHistory';
 import { ShareTaxScenarioModal } from '../components/tax/ShareTaxScenarioModal';
@@ -100,10 +101,10 @@ export function TaxCalculator() {
     const dependentsCount = parseInt(disabledDependents) || 0;
 
     // Current Year Calculation (2026-27)
-    let baseExemption = 400000;
-    if (category === 'women_senior') baseExemption = 450000;
-    else if (category === 'disabled') baseExemption = 525000;
-    else if (category === 'freedom_fighter') baseExemption = 550000;
+    let baseExemption = 375000;
+    if (category === 'women_senior') baseExemption = 425000;
+    else if (category === 'disabled') baseExemption = 500000;
+    else if (category === 'freedom_fighter') baseExemption = 525000;
 
     const totalExemption = baseExemption + (dependentsCount * 50000);
     const taxableIncome = Math.max(0, totalIncome - totalExemption);
@@ -115,14 +116,14 @@ export function TaxCalculator() {
       { limit: 300000, rate: 0.10 },
       { limit: 400000, rate: 0.15 },
       { limit: 500000, rate: 0.20 },
-      { limit: 1000000, rate: 0.25 },
+      { limit: 2000000, rate: 0.25 },
       { limit: Infinity, rate: 0.30 }
     ];
 
     const slabBreakdown = [];
 
     slabBreakdown.push({
-      label: `First Tk ${totalExemption.toLocaleString()}`,
+      label: `First Tk ${totalExemption.toLocaleString()} (Tax-Free)`,
       amount: Math.min(totalIncome, totalExemption),
       rate: '0%',
       tax: 0
@@ -150,12 +151,10 @@ export function TaxCalculator() {
     const rebate3 = 1000000;
     const eligibleRebate = totalIncome > 0 ? Math.min(rebate1, rebate2, rebate3) : 0;
 
-    // Minimum Tax
+    // Minimum Tax (Uniform BDT 5,000 for AY 2026-27 whenever income exceeds tax-free threshold)
     let minTax = 0;
     if (totalIncome > totalExemption) {
-      if (location === 'dhaka_ctg') minTax = 5000;
-      else if (location === 'other_city') minTax = 4000;
-      else minTax = 3000;
+      minTax = 5000;
     }
 
     let netTax = grossTax - eligibleRebate;
@@ -163,6 +162,7 @@ export function TaxCalculator() {
       netTax = minTax;
     }
     netTax = Math.max(0, netTax);
+    const monthlyTds = Math.round(netTax / 12);
 
     // Previous Year Calculation (2025-26)
     let prevBaseExemption = 350000;
@@ -207,6 +207,7 @@ export function TaxCalculator() {
       eligibleRebate,
       minTax,
       netTax,
+      monthlyTds,
       slabBreakdown,
       prevNetTax,
       diff
@@ -321,10 +322,10 @@ export function TaxCalculator() {
                   onChange={(e) => setCategory(e.target.value as TaxpayerCategory)}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium appearance-none"
                 >
-                  <option value="general">General</option>
-                  <option value="women_senior">Women & Senior Citizens (65+)</option>
-                  <option value="disabled">Disabled Person</option>
-                  <option value="freedom_fighter">War-Wounded Freedom Fighter</option>
+                  <option value="general">General Taxpayer (Tax-free: Tk 3,75,000)</option>
+                  <option value="women_senior">Women &amp; Senior Citizens 65+ (Tk 4,25,000)</option>
+                  <option value="disabled">Third-Gender / Physically Challenged (Tk 5,00,000)</option>
+                  <option value="freedom_fighter">Gazetted War-Wounded / July Fighter (Tk 5,25,000)</option>
                 </select>
               </div>
 
@@ -335,9 +336,9 @@ export function TaxCalculator() {
                   onChange={(e) => setLocation(e.target.value as LocationCategory)}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium appearance-none"
                 >
-                  <option value="dhaka_ctg">Dhaka & Chattogram City Corporation</option>
-                  <option value="other_city">Other City Corporations</option>
-                  <option value="other">Other Areas</option>
+                  <option value="dhaka_ctg">Dhaka &amp; Chattogram (Uniform Min. Tax: Tk 5,000)</option>
+                  <option value="other_city">Other City Corporations (Uniform Min. Tax: Tk 5,000)</option>
+                  <option value="other">Other Areas / Municipalities (Uniform Min. Tax: Tk 5,000)</option>
                 </select>
               </div>
 
@@ -420,7 +421,7 @@ export function TaxCalculator() {
                  </div>
                </div>
 
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                  <div className="bg-emerald-800/50 p-4 rounded-2xl border border-emerald-700/50">
                    <div className="text-emerald-200 text-xs font-bold uppercase tracking-widest mb-1">Gross Tax</div>
                    <div className="text-xl font-bold h-7 flex items-center">
@@ -433,6 +434,35 @@ export function TaxCalculator() {
                      {isCalculating ? <div className="h-6 w-24 bg-emerald-700/60 rounded-md animate-pulse" /> : `Tk ${Math.round(calculation.eligibleRebate).toLocaleString()}`}
                    </div>
                  </div>
+                 <div className="bg-emerald-800/70 p-4 rounded-2xl border border-emerald-500/50 shadow-inner">
+                   <div className="text-emerald-200 text-xs font-bold uppercase tracking-widest mb-1">Monthly Salary TDS</div>
+                   <div className="text-xl font-bold text-emerald-300 h-7 flex items-center">
+                     {isCalculating ? <div className="h-6 w-24 bg-emerald-700/60 rounded-md animate-pulse" /> : `Tk ${calculation.monthlyTds.toLocaleString()}`}
+                   </div>
+                   <span className="text-[10px] text-emerald-300/80">Annual Payable ÷ 12</span>
+                 </div>
+               </div>
+
+               {/* Salary TDS Guide Banner */}
+               <div className="mt-4 p-4 rounded-2xl bg-emerald-800/40 border border-emerald-600/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                 <div className="space-y-0.5">
+                   <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                     2026–2027 Payroll Framework
+                   </span>
+                   <h4 className="text-sm font-bold text-white pt-1">
+                     Salary TDS in Bangladesh: Complete Withholding Guide
+                   </h4>
+                   <p className="text-xs text-slate-300">
+                     Learn the Sixth Schedule 1/3 statutory salary exemption, Withholding Tax Rules 2026, and payroll compliance.
+                   </p>
+                 </div>
+                 <Link
+                   to="/article/salary-tds-bangladesh-complete-guide-2026-2027"
+                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 text-xs font-bold transition-all shadow-sm shrink-0"
+                 >
+                   <span>Read Guide</span>
+                   <ArrowRight className="w-3.5 h-3.5" />
+                 </Link>
                </div>
 
                <div className="flex items-center justify-between mb-2 mt-6 border-t border-emerald-800/50 pt-4">
