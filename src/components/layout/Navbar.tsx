@@ -865,18 +865,8 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* div:nth-of-type(2) - Mobile Navigation Options */}
-          <div 
-            style={{
-              paddingTop: '8px',
-              paddingLeft: '80px',
-              paddingRight: '28px',
-              paddingBottom: '11px',
-              width: '358px',
-              height: '296px'
-            }}
-            className="space-y-1 overflow-y-auto"
-          >
+          {/* div:nth-of-type(2) - Mobile Navigation Options (Compact 30% reduced) */}
+          <div className="px-3 pt-2 pb-6 space-y-1">
             {/* Mobile Home */}
             <Link
               to="/"
