@@ -93,7 +93,14 @@ export function BlogCover({ article, className = '', showCaption = true }: BlogC
   const CategoryIcon = theme.icon;
 
   const handleImageError = () => {
-    // If remote ibb fails or is blocked, try local cached asset
+    // If remote ibb or r2 fails or is blocked, try local cached asset
+    if (article.imageUrl?.includes('r2.dev') || article.id.includes('trade-license')) {
+      const img = document.querySelector('#blog-cover-container img') as HTMLImageElement;
+      if (img && !img.src.includes('trade-license-cover.png')) {
+        img.src = '/trade-license-cover.png';
+        return;
+      }
+    }
     if (article.imageUrl?.includes('ibb.co')) {
       const img = document.querySelector('#blog-cover-container img') as HTMLImageElement;
       if (img && !img.src.includes('salary-tds-cover.png')) {

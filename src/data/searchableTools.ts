@@ -13,6 +13,18 @@ export interface SearchableTool {
 
 export const searchableTaxTools: SearchableTool[] = [
   {
+    id: 'trade-license-guide-dncc-dscc',
+    name: 'Trade License Guide (DNCC & DSCC)',
+    shortName: 'Trade License Guide',
+    category: 'Statutory Guide',
+    description: 'Complete operational and legal guide to Trade License in Bangladesh, DNCC/DSCC requirements, application, renewal & costs.',
+    path: '/article/trade-license-bangladesh-guide-dncc-dscc',
+    iconName: 'Building2',
+    badge: 'DNCC & DSCC',
+    tags: ['trade license', 'dncc', 'dscc', 'trade license bangladesh', 'city corporation', 'trade license renewal', 'trade license cost', 'business registration', 'dhaka'],
+    featured: true
+  },
+  {
     id: 'total-income-calculation',
     name: 'Total Income Calculation 2026–2027',
     shortName: 'Total Income & 10 Heads',

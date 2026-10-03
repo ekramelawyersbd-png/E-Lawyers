@@ -286,6 +286,92 @@ export function Article() {
         }
       ];
     }
+    if (article.id === 'trade-license-bangladesh-guide-dncc-dscc') {
+      return [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: 'Trade License in Bangladesh: Importance, Requirements, Application Process, Renewal, and Cost Guide (Dhaka North & Dhaka South City Corporation)',
+          description: 'Learn everything about Trade License in Bangladesh including importance, required documents, application process, renewal procedure, and estimated costs for Dhaka North and Dhaka South City Corporation.',
+          author: {
+            '@type': 'Organization',
+            name: 'Accounticca × E-Lawyers Advisory Group',
+            url: 'https://accounticca.com/'
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'Accounticca & E-Lawyers',
+            url: 'https://accounticca.com/'
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': 'https://accounticca.com/article/trade-license-bangladesh-guide-dncc-dscc'
+          },
+          keywords: [
+            'Trade License Bangladesh',
+            'Dhaka City Corporation Trade License',
+            'DNCC Trade License',
+            'DSCC Trade License',
+            'Trade License Renewal Bangladesh',
+            'Trade License Cost in Bangladesh'
+          ]
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Is a trade license mandatory in Bangladesh?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Yes, most businesses operating commercially require a trade license from the relevant local authority.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'Can I run an online business without a trade license?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Online businesses may also require a trade license depending on their business activities and legal requirements.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'How long does it take to get a trade license?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The timeframe depends on application accuracy, document completeness, and verification process, typically 3 to 7 working days.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'How much does a trade license cost in Dhaka?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The cost varies depending on business category, location, and city corporation assessment, typically ranging between BDT 1,500 and BDT 25,000+.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'How often should a trade license be renewed?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Trade licenses generally require annual renewal, covering the fiscal year from July 1 to June 30.'
+              }
+            },
+            {
+              '@type': 'Question',
+              name: 'Can one trade license cover multiple businesses or locations?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Usually, a trade license applies to a specific business activity and location. Separate licenses are required for different activities or branch locations.'
+              }
+            }
+          ]
+        }
+      ];
+    }
     if (article.id === 'investment-tax-rebate-bangladesh-2026-2027') {
       return {
         '@context': 'https://schema.org',
