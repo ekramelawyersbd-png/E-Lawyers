@@ -12,7 +12,6 @@ import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { SEO } from '../components/SEO';
-import { DailyUpdatesSection } from '../components/DailyUpdatesSection';
 
 export function Home() {
   const navigate = useNavigate();
@@ -489,9 +488,6 @@ export function Home() {
           </div>
         </div>
       </section>
-
-      {/* Daily Updates - Live Regulatory & Tax Dispatches via Google Search Grounding */}
-      <DailyUpdatesSection />
 
       {/* 2. Latest Articles */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
