@@ -1,6 +1,14 @@
 import { Article, Author, Category } from '../types';
 import { tradeLicenseArticle } from './tradeLicenseArticle';
 import { ircErcArticle } from './ircErcArticle';
+import { businessProfessionalIncomeArticle } from './businessProfessionalIncomeArticle';
+import { shareholderDirectorTaxArticle } from './shareholderDirectorTaxArticle';
+import { pensionTaxArticle } from './pensionTaxArticle';
+import { housePropertyTaxArticle } from './housePropertyTaxArticle';
+import { agriculturalTaxArticle } from './agriculturalTaxArticle';
+import { turnoverTaxArticle } from './turnoverTaxArticle';
+import { taxRebateCeilingArticle } from './taxRebateCeilingArticle';
+import { corporateTaxRates2026Article } from './corporateTaxRates2026Article';
 import { salaryTdsArticle } from './salaryTdsArticle';
 import { strategicPartnershipArticle } from './strategicPartnershipArticle';
 import { investmentTaxRebateArticle } from './investmentTaxRebateArticle';
@@ -54,6 +62,14 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  corporateTaxRates2026Article,
+  taxRebateCeilingArticle,
+  turnoverTaxArticle,
+  agriculturalTaxArticle,
+  housePropertyTaxArticle,
+  pensionTaxArticle,
+  shareholderDirectorTaxArticle,
+  businessProfessionalIncomeArticle,
   ircErcArticle,
   tradeLicenseArticle,
   salaryTdsArticle,

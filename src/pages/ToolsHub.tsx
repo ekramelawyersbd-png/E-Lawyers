@@ -1,16 +1,21 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown } from 'lucide-react';
+import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
 import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisualizer';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
+import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalculator';
+import { MinimumTurnoverTaxCalculator } from '../components/tax/MinimumTurnoverTaxCalculator';
+import { InvestmentBasedTaxRebateCalculator } from '../components/tax/InvestmentBasedTaxRebateCalculator';
+import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
+import { QuickComplianceTipsSidebar } from '../components/tools/QuickComplianceTipsSidebar';
 import { Gallery } from '../components/Gallery';
 import { ResourceLibrary } from '../components/tools/ResourceLibrary';
 import { ServiceSEO } from '../components/SEO';
 
 export function ToolsHub() {
-  
   const [hiddenTools, setHiddenTools] = useState<string[]>([]);
+  const [compareFlatRate, setCompareFlatRate] = useState<boolean>(true);
 
   useEffect(() => {
     const savedPrefs = localStorage.getItem('toolsPreferences');
@@ -44,6 +49,30 @@ export function ToolsHub() {
       icon: <Calculator className="w-8 h-8" />,
       path: '/tax-calculator',
       color: 'bg-emerald-100 text-emerald-700',
+    },
+    {
+      name: 'Agricultural Tax Calculator',
+      description: 'Calculate net agricultural income, apply Section 43 deemed 60% expenses, Clause 20 exemption, and tax slabs.',
+      tooltip: 'Under Sections 40–44 of Income Tax Act 2023 with FY 2026-27 statutory slabs.',
+      icon: <Wheat className="w-8 h-8" />,
+      path: '#agri-tax-tool',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      name: 'Minimum Turnover Tax Calculator',
+      description: 'Calculate applicable turnover tax based on the 0% (up to 2 crore), 0.5% (2-4 crore), and 1% (above 4 crore) slabs.',
+      tooltip: 'NBR restructured minimum turnover slabs under Income Tax Act with loss-making business insulation.',
+      icon: <Building2 className="w-8 h-8" />,
+      path: '#minimum-turnover-tax-tool',
+      color: 'bg-indigo-100 text-indigo-800',
+    },
+    {
+      name: 'Investment-Based Tax Rebate Calculator',
+      description: 'Calculate maximum tax credit by taking the lowest of 3% taxable income, 10% eligible investment, and Tk. 7,50,000 ceiling.',
+      tooltip: 'Under Bangladesh Finance Act 2026 & Section 78 with real-time 3-limit evaluation.',
+      icon: <Sparkles className="w-8 h-8" />,
+      path: '#investment-rebate-calculator-tool',
+      color: 'bg-emerald-100 text-emerald-800',
     },
     {
       name: 'Compliance Calendar',
@@ -84,6 +113,22 @@ export function ToolsHub() {
       icon: <FolderDown className="w-8 h-8" />,
       path: '#resource-library',
       color: 'bg-indigo-100 text-indigo-800',
+    },
+    {
+      name: 'RJSC Fee Estimator',
+      description: 'Estimate government incorporation fees and stamp duties based on authorized capital.',
+      tooltip: 'Statutory fees under Companies Act 1994 and Stamp Act Schedule 1.',
+      icon: <Building2 className="w-8 h-8" />,
+      path: '#rjsc-fee-estimator-tool',
+      color: 'bg-blue-100 text-blue-800',
+    },
+    {
+      name: 'Corporate Tax Calculator (FY 2026-27)',
+      description: 'Calculate corporate taxes for listed vs non-listed entities, evaluate 2.5% banking penalties, and project IPO savings.',
+      tooltip: 'Compare non-listed (27.5%), listed >10% IPO (20%), and listed ≤10% IPO (25%) rates under the NBR 5-year roadmap.',
+      icon: <Building2 className="w-8 h-8" />,
+      path: '#corporate-tax-tool',
+      color: 'bg-indigo-100 text-indigo-900',
     }
   ];
   const visibleTools = tools.filter(t => !hiddenTools.includes(t.name));
@@ -191,9 +236,24 @@ export function ToolsHub() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-6">
-        <h2 className="text-xl font-bold text-slate-800">Interactive Utilities</h2>
-        <div className="h-px bg-slate-200 flex-1 ml-4"></div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-800">Interactive Utilities</h2>
+          <div className="h-px bg-slate-200 w-16 sm:w-28 hidden sm:block"></div>
+        </div>
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('toggle-compliance-tips'))}
+            className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl border border-emerald-300 font-bold transition-all shadow-2xs hover:scale-102 cursor-pointer"
+            title="Click to toggle the Quick Compliance Tips sidebar"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Quick Compliance Tips</span>
+            <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-1.5 py-0.5 rounded-md font-extrabold uppercase">Live</span>
+          </button>
+        </div>
       </div>
       
       <div className="tools-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -316,9 +376,79 @@ export function ToolsHub() {
         <EarlyFilingIncentive initialPayableTax={500000} />
       </div>
 
-      <div className="mt-16">
+      <div id="agri-tax-tool" className="mt-16 scroll-mt-8">
+        <AgriculturalTaxCalculator />
+      </div>
+
+      <div id="minimum-turnover-tax-tool" className="mt-16 scroll-mt-8 space-y-4">
+        <span id="turnover-tax-tool" className="sr-only">Turnover Tax Calculator</span>
+        
+        {/* Tax Comparison Quick Toggle Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-indigo-200/80 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-indigo-100 text-indigo-800 shrink-0">
+              <Scale className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-base text-slate-900">
+                  Minimum Turnover Tax & Savings Calculator
+                </h3>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  NBR Slabs
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Toggle the 1% flat rate comparison to evaluate cash flow savings under the revised 3-tier structure.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 self-start sm:self-center bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shrink-0">
+            <span className="text-xs font-bold text-slate-700">Tax Comparison:</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={compareFlatRate}
+              onClick={() => setCompareFlatRate(!compareFlatRate)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
+                compareFlatRate ? 'bg-indigo-600' : 'bg-slate-300'
+              }`}
+              title="Toggle comparison against 1% flat rate"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  compareFlatRate ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <span className={`text-xs font-extrabold ${compareFlatRate ? 'text-indigo-700' : 'text-slate-400'}`}>
+              {compareFlatRate ? '1% Flat vs Slabs' : 'Slabs Only'}
+            </span>
+          </div>
+        </div>
+
+        <MinimumTurnoverTaxCalculator 
+          initialShowComparison={compareFlatRate} 
+          key={String(compareFlatRate)} 
+          onComparisonToggle={(enabled) => setCompareFlatRate(enabled)}
+        />
+      </div>
+
+      <div id="investment-rebate-calculator-tool" className="mt-16 scroll-mt-8">
+        <InvestmentBasedTaxRebateCalculator />
+      </div>
+
+      <div id="rjsc-fee-estimator-tool" className="mt-16 scroll-mt-8">
         <RJSCFeeEstimator />
       </div>
+
+      <div id="corporate-tax-tool" className="mt-16 scroll-mt-8">
+        <CorporateTaxRateCalculator />
+      </div>
+
+      {/* Context-Aware Quick Compliance Tips Sidebar */}
+      <QuickComplianceTipsSidebar />
     </div>
   );
 }

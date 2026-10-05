@@ -36,6 +36,12 @@ import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRebateCalculator';
 import { TotalIncomeCalculator } from '../components/tax/TotalIncomeCalculator';
+import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalculator';
+import { Clause20ExemptionCard } from '../components/tax/Clause20ExemptionCard';
+import { TurnoverTaxCalculator } from '../components/tax/TurnoverTaxCalculator';
+import { TurnoverSlabsSummaryCard } from '../components/tax/TurnoverSlabsSummaryCard';
+import { TaxRebateCeilingCard } from '../components/tax/TaxRebateCeilingCard';
+import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
 import { TaxReturnChecklist } from '../components/tax/TaxReturnChecklist';
 import { TaxSummaryDashboard } from '../components/tax/TaxSummaryDashboard';
 import { ImageGallery } from '../components/ImageGallery';
@@ -620,6 +626,45 @@ export function Article() {
                   <TotalIncomeCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
                 </div>
               </>
+            )}
+
+            {article.id === 'agricultural-income-tax-bangladesh-2026-2027' && (
+              <>
+                <div className="my-12 scroll-mt-24" id="clause-20-exemption-card">
+                  <Clause20ExemptionCard className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="agricultural-tax-calculator-tool">
+                  <AgriculturalTaxCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+              </>
+            )}
+
+            {article.id === 'minimum-turnover-tax-slabs-bangladesh-2026-2027' && (
+              <>
+                <div className="my-12 scroll-mt-24" id="turnover-slabs-summary-card">
+                  <TurnoverSlabsSummaryCard className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="turnover-tax-calculator-tool">
+                  <TurnoverTaxCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+              </>
+            )}
+
+            {article.id === 'tax-rebate-ceiling-bangladesh-finance-act-2026' && (
+              <>
+                <div className="my-12 scroll-mt-24" id="tax-rebate-ceiling-card">
+                  <TaxRebateCeilingCard className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="investment-tax-rebate-calculator-tool">
+                  <InvestmentTaxRebateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+              </>
+            )}
+
+            {article.id === 'corporate-tax-rates-bangladesh-fy-2026-27' && (
+              <div className="my-12 scroll-mt-24" id="corporate-tax-calculator-tool">
+                <CorporateTaxRateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              </div>
             )}
 
             {/* Dynamic Gallery Images */}

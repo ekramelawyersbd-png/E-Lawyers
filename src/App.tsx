@@ -88,6 +88,15 @@ export default function App() {
                 <Route path="blog/accounting-finance-solutions" element={<Navigate to="/article/accounting-finance-solutions" replace />} />
                 <Route path="investment-tax-rebate-bangladesh-2026-2027" element={<Navigate to="/article/investment-tax-rebate-bangladesh-2026-2027" replace />} />
                 <Route path="total-income-calculation-bangladesh-2026-2027" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="agricultural-tax-calculator" element={<Navigate to="/tools#agri-tax-tool" replace />} />
+                <Route path="agricultural-income-tax-calculator" element={<Navigate to="/tools#agri-tax-tool" replace />} />
+                <Route path="turnover-tax-calculator" element={<Navigate to="/tools#minimum-turnover-tax-tool" replace />} />
+                <Route path="minimum-turnover-tax-calculator" element={<Navigate to="/tools#minimum-turnover-tax-tool" replace />} />
+                <Route path="minimum-turnover-tax-bangladesh-2026-2027" element={<Navigate to="/article/minimum-turnover-tax-slabs-bangladesh-2026-2027" replace />} />
+                <Route path="tax-rebate-ceiling-bangladesh-finance-act-2026" element={<Navigate to="/article/tax-rebate-ceiling-bangladesh-finance-act-2026" replace />} />
+                <Route path="tax-rebate-ceiling-2026" element={<Navigate to="/article/tax-rebate-ceiling-bangladesh-finance-act-2026" replace />} />
+                <Route path="investment-rebate-calculator" element={<Navigate to="/tools#investment-rebate-calculator-tool" replace />} />
+                <Route path="investment-based-tax-rebate-calculator" element={<Navigate to="/tools#investment-rebate-calculator-tool" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

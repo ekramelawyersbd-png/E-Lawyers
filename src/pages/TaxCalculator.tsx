@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink, Share2, ArrowRight } from 'lucide-react';
+import { Calculator, Info, DollarSign, PieChart as PieChartIcon, Save, Check, BarChart, Calendar, ExternalLink, Share2, ArrowRight, Wheat } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { TaxHistory, SavedCalculation } from '../components/calculator/TaxHistory';
 import { ShareTaxScenarioModal } from '../components/tax/ShareTaxScenarioModal';
+import { IndividualTaxSlabsCard } from '../components/tax/IndividualTaxSlabsCard';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
@@ -100,11 +101,11 @@ export function TaxCalculator() {
     const totalInvestments = parseFloat(investments) || 0;
     const dependentsCount = parseInt(disabledDependents) || 0;
 
-    // Current Year Calculation (2026-27)
-    let baseExemption = 375000;
-    if (category === 'women_senior') baseExemption = 425000;
-    else if (category === 'disabled') baseExemption = 500000;
-    else if (category === 'freedom_fighter') baseExemption = 525000;
+    // Current Year Calculation (2026-27 under Bangladesh Finance Act 2026)
+    let baseExemption = 400000;
+    if (category === 'women_senior') baseExemption = 450000;
+    else if (category === 'disabled') baseExemption = 525000;
+    else if (category === 'freedom_fighter') baseExemption = 550000;
 
     const totalExemption = baseExemption + (dependentsCount * 50000);
     const taxableIncome = Math.max(0, totalIncome - totalExemption);
@@ -116,7 +117,7 @@ export function TaxCalculator() {
       { limit: 300000, rate: 0.10 },
       { limit: 400000, rate: 0.15 },
       { limit: 500000, rate: 0.20 },
-      { limit: 2000000, rate: 0.25 },
+      { limit: 1000000, rate: 0.25 },
       { limit: Infinity, rate: 0.30 }
     ];
 
@@ -275,6 +276,26 @@ export function TaxCalculator() {
         <p className="text-slate-600 text-lg max-w-3xl">
           Estimate your net tax liability instantly based on the latest slabs from the Bangladesh Finance Act 2026.
         </p>
+
+        <div className="flex flex-wrap gap-2 mt-4">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-700 text-white shadow-xs">
+            <Calculator className="w-3.5 h-3.5" />
+            General Individual Tax Calculator
+          </span>
+          <Link
+            to="/article/agricultural-income-tax-bangladesh-2026-2027#agricultural-tax-calculator-tool"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+          >
+            <Wheat className="w-3.5 h-3.5 text-emerald-600" />
+            Agricultural Income Tax Calculator (Sec 40–44) &rarr;
+          </Link>
+          <Link
+            to="/corporate-planner"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+          >
+            Corporate Tax Planner &rarr;
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -322,10 +343,10 @@ export function TaxCalculator() {
                   onChange={(e) => setCategory(e.target.value as TaxpayerCategory)}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium appearance-none"
                 >
-                  <option value="general">General Taxpayer (Tax-free: Tk 3,75,000)</option>
-                  <option value="women_senior">Women &amp; Senior Citizens 65+ (Tk 4,25,000)</option>
-                  <option value="disabled">Third-Gender / Physically Challenged (Tk 5,00,000)</option>
-                  <option value="freedom_fighter">Gazetted War-Wounded / July Fighter (Tk 5,25,000)</option>
+                  <option value="general">General Resident Individual (Tax-free: Tk 4,00,000)</option>
+                  <option value="women_senior">Women &amp; Seniors 65+ years (Tax-free: Tk 4,50,000)</option>
+                  <option value="disabled">Disabled Persons (Tax-free: Tk 5,25,000)</option>
+                  <option value="freedom_fighter">War-wounded Freedom Fighters (Tax-free: Tk 5,50,000)</option>
                 </select>
               </div>
 
@@ -629,6 +650,11 @@ export function TaxCalculator() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Statutory Tax Slabs Reference Card */}
+      <div className="mt-12">
+        <IndividualTaxSlabsCard />
       </div>
 
       {/* Share Calculation Modal */}

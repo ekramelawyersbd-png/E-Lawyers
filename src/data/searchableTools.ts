@@ -49,6 +49,30 @@ export const searchableTaxTools: SearchableTool[] = [
     featured: true
   },
   {
+    id: 'agricultural-tax-calculator',
+    name: 'Agricultural Income Tax Calculator 2026–2027',
+    shortName: 'Agri Tax Calculator',
+    category: 'Tax Calculator',
+    description: 'Calculate net agricultural income, apply Section 43 deemed 60% expense rule or actual records, Clause 20 BDT 2 Lakh farmer exemption, and FY 2026-27 tax slabs.',
+    path: '/article/agricultural-income-tax-bangladesh-2026-2027#agricultural-tax-calculator-tool',
+    iconName: 'Calculator',
+    badge: 'AY 2026-27 Slabs',
+    tags: ['agricultural tax', 'agriculture income', 'কৃষি আয়', 'farmer tax', 'section 43', '60% expense', 'clause 20', 'ay 2026-27', 'agro business', 'crop tax'],
+    featured: true
+  },
+  {
+    id: 'clause-20-agri-exemption',
+    name: 'Clause 20 Agricultural Exemption Guide',
+    shortName: 'Clause 20 Exemption Card',
+    category: 'Compliance Reference',
+    description: 'Visual summary card of strict statutory conditions for BDT 2 Lakh agricultural exemption under Sixth Schedule Part 1 Clause 20.',
+    path: '/article/agricultural-income-tax-bangladesh-2026-2027#clause-20-exemption-card',
+    iconName: 'ShieldCheck',
+    badge: 'Sixth Schedule',
+    tags: ['clause 20', 'dofa 20', 'কৃষি কর অব্যাহতি', 'agricultural exemption', '2 lakh exemption', 'farmer by occupation', 'income tax act 2023'],
+    featured: true
+  },
+  {
     id: 'tax-calculator',
     name: 'Tax Calculator 2026-27',
     shortName: 'Tax Calculator',
@@ -203,5 +227,29 @@ export const searchableTaxTools: SearchableTool[] = [
     badge: 'Deadlines Tracker',
     tags: ['calendar', 'deadline', 'due date', 'statutory timeline', 'monthly returns', 'annual return', 'tax day', 'vat deadline', 'compliance calendar'],
     featured: false
+  },
+  {
+    id: 'corporate-tax-rates-2026-calculator',
+    name: 'Corporate Tax Rates & Comparison Calculator (FY 2026-27)',
+    shortName: 'Corporate Tax Calculator',
+    category: 'Tax Calculator',
+    description: 'Calculate corporate income tax for non-listed (27.5%), listed >10% IPO (20%), and listed ≤10% IPO (25%) companies, with +2.5% banking channel penalty modeling.',
+    path: '/tools#corporate-tax-tool',
+    iconName: 'Building2',
+    badge: 'FY 2026-27 Slabs',
+    tags: ['corporate tax', 'listed company', 'non-listed company', 'ipo', 'banking channels', '2.5% penalty', '27.5%', '20%', '25%', '30%', 'dse', 'cse', 'capital market', 'private limited'],
+    featured: true
+  },
+  {
+    id: 'corporate-tax-guide-2026-2027',
+    name: 'Corporate Tax Rates in Bangladesh FY 2026-27: Complete Guide',
+    shortName: 'Corporate Tax Guide',
+    category: 'Statutory Guide',
+    description: 'Analysis of FY 2026-27 corporate tax rates, banking channel conditions (+2.5% penalty), listed vs non-listed comparisons, and IPO benefits.',
+    path: '/article/corporate-tax-rates-bangladesh-fy-2026-27',
+    iconName: 'FileText',
+    badge: 'Listed vs Non-Listed',
+    tags: ['corporate tax rates bangladesh', 'fy 2026-27', 'listed vs non-listed', 'banking penalty', 'ipo tax benefit', '5-year roadmap', 'income tax act 2023'],
+    featured: true
   }
 ];

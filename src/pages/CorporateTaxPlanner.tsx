@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { ServiceSEO } from '../components/SEO';
+import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
 
 type CompanyCategory = 
   | 'public_10' 
@@ -14,21 +15,22 @@ type CompanyCategory =
 
 const TAX_RATES: Record<CompanyCategory, { label: string, standard: number, reduced: number, condition?: string }> = {
   public_10: { 
-    label: 'Publicly traded (min 10% IPO)', 
+    label: 'Publicly Traded (IPO > 10% of Capital)', 
     standard: 0.225, 
     reduced: 0.20, 
-    condition: 'if all income transactions are conducted through bank transfer' 
+    condition: 'if all transactions and income are conducted through formal banking channels (avoids 2.5% penalty)' 
   },
   public_other: { 
-    label: 'Other publicly traded', 
+    label: 'Other Publicly Traded (IPO ≤ 10% of Capital)', 
     standard: 0.275, 
     reduced: 0.25, 
-    condition: 'if all income transactions are conducted through bank transfer' 
+    condition: 'if all transactions and income are conducted through formal banking channels (avoids 2.5% penalty)' 
   },
   non_public: { 
-    label: 'Non-publicly traded', 
-    standard: 0.275, 
-    reduced: 0.275 
+    label: 'Non-Listed Company (Private Ltd / OPC)', 
+    standard: 0.30, 
+    reduced: 0.275,
+    condition: 'if all transactions and income are conducted through formal banking channels (avoids 2.5% penalty)' 
   },
   bank_listed: { 
     label: 'Banks, Insurance & Financial (Listed)', 
@@ -58,7 +60,7 @@ export function CorporateTaxPlanner() {
   const [revenue, setRevenue] = useState<string>('');
   const [expenses, setExpenses] = useState<string>('');
   const [plannedCapEx, setPlannedCapEx] = useState<string>('');
-  const [meetsConditions, setMeetsConditions] = useState<boolean>(false);
+  const [meetsConditions, setMeetsConditions] = useState<boolean>(true);
   const [plansEarlyFiling, setPlansEarlyFiling] = useState<boolean>(true);
 
   const analysis = useMemo(() => {
@@ -153,12 +155,15 @@ export function CorporateTaxPlanner() {
           <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-700">
             <Building2 className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Corporate Tax Planner</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Corporate Tax Planner & Slabs 2026-27</h1>
         </div>
         <p className="text-slate-600 text-lg max-w-3xl">
-          Analyze your financial data and discover strategies to minimize your corporate tax liability for the Assessment Year 2026-27.
+          Analyze corporate tax slabs (20%, 25%, 27.5%), test banking channel compliance (+2.5% penalty), and project long-term capital market listing savings for the Assessment Year 2026–27.
         </p>
       </div>
+
+      {/* Interactive Slabs & Capital Market Comparison Calculator */}
+      <CorporateTaxRateCalculator className="mb-12" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
