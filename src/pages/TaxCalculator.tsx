@@ -637,16 +637,14 @@ export function TaxCalculator() {
                 <h4 className="text-base font-bold text-white mb-1">Need help filing your income tax return?</h4>
                 <p className="text-xs text-emerald-100">Schedule a 1-on-1 advisory with certified tax lawyers and consultants.</p>
               </div>
-              <a
-                href="https://appointment.accounticca.com"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/contact"
                 className="inline-flex items-center gap-2 bg-white text-emerald-900 hover:bg-emerald-50 px-5 py-2.5 rounded-xl font-bold text-xs shadow transition-colors shrink-0"
               >
                 <Calendar className="w-4 h-4 text-emerald-700" />
                 <span>Book Tax Consultation</span>
-                <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
-              </a>
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-700" />
+              </Link>
             </div>
           )}
         </div>

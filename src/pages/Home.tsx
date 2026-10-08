@@ -320,15 +320,13 @@ export function Home() {
               
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4">
-                <a 
-                  href="https://appointment.accounticca.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <Link 
+                  to="/contact" 
                   className="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:-translate-y-0.5 text-sm sm:text-base"
                 >
                   <span>Book Consultation</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
                 <Link 
                   to="/category/compliance" 
                   className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5 text-sm sm:text-base"
@@ -921,24 +919,20 @@ export function Home() {
               Our expert team of corporate lawyers, tax consultants, and VAT specialists are ready to help your business grow securely.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <a 
-                href="https://appointment.accounticca.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <Link 
+                to="/contact" 
                 className="w-full sm:w-auto bg-white text-emerald-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
               >
                 <span>Book Consultation</span>
-                <ExternalLink className="w-5 h-5 text-emerald-800" />
-              </a>
-              <a 
-                href="https://appointment.accounticca.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+                <ArrowRight className="w-5 h-5 text-emerald-800" />
+              </Link>
+              <Link 
+                to="/contact" 
                 className="w-full sm:w-auto bg-emerald-700 text-white hover:bg-emerald-600 border border-emerald-500 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
               >
                 <span>Request Callback</span>
-                <ExternalLink className="w-5 h-5 text-emerald-200" />
-              </a>
+                <ArrowRight className="w-5 h-5 text-emerald-200" />
+              </Link>
             </div>
           </div>
         </div>

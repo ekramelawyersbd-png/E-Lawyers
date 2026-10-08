@@ -21,7 +21,11 @@ import {
 
 const STORAGE_KEY = 'bd_tax_planner_scenarios_v1';
 
-export function TaxDeadlineNavDropdown() {
+interface TaxDeadlineNavDropdownProps {
+  className?: string;
+}
+
+export function TaxDeadlineNavDropdown({ className = '' }: TaxDeadlineNavDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scenarios, setScenarios] = useState<TaxScenario[]>([]);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
@@ -78,7 +82,7 @@ export function TaxDeadlineNavDropdown() {
   const isUrgent = primary ? primary.isUrgent : false;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         type="button"
         id="navbar-tax-deadline-btn"

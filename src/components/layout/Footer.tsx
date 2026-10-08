@@ -5,11 +5,12 @@ import {
   Linkedin, 
   Facebook, 
   Instagram, 
-  Youtube 
+  Youtube,
+  ArrowRight
 } from 'lucide-react';
 import { NewsletterSignup } from '../NewsletterSignup';
 import { LanguageToggle } from '../LanguageToggle';
-import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
+import { buildAppointmentUrl } from '../../utils/appointmentRedirect';
 
 export function Footer() {
   return (
@@ -110,6 +111,8 @@ export function Footer() {
               }}
             >
               <li><Link to="/" className="hover:text-emerald-400 transition-colors">Blog Categories</Link></li>
+              <li><Link to="/resource-library" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Resource Library (PDFs)</Link></li>
+              <li><Link to="/shop" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Legal & Tax Shop (Digital)</Link></li>
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
               <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
               <li>
@@ -126,18 +129,16 @@ export function Footer() {
           <div style={{ textAlign: 'justify' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Get in Touch</h3>
             <p className="text-sm text-slate-500 font-medium mb-4">
-              Need immediate legal or tax assistance? Connect directly with our experts on our appointment platform.
+              Need immediate legal or tax assistance? Connect directly with our experts through our contact desk.
             </p>
-            <a 
-              href={APPOINTMENT_BASE_URL} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <Link 
+              to="/contact" 
               className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"
             >
               <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
-              <span>Book a Consultation</span>
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
-            </a>
+              <span>Contact Our Advisors</span>
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </div>
         </div>
 

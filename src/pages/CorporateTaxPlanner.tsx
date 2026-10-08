@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Calculator, Info, DollarSign, Lightbulb, TrendingDown, ArrowRight, Building2, CheckCircle2, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { ServiceSEO } from '../components/SEO';
@@ -367,15 +368,13 @@ export function CorporateTaxPlanner() {
                 </span>
               </p>
               <div className="pt-2">
-                <a
-                  href="https://appointment.accounticca.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/contact"
                   className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-100/60 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition-colors"
                 >
                   <span>Book Consultation with Corporate Tax Specialist</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
           </div>

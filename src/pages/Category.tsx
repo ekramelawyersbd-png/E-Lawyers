@@ -61,7 +61,7 @@ export function Category() {
       {/* Articles Grid */}
       {articles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map(article => (
+          {articles.map((article, articleIndex) => (
             <Link key={article.id} to={`/article/${article.id}`} className="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden">
               <div className="aspect-video w-full overflow-hidden">
                 <img 
@@ -76,7 +76,15 @@ export function Category() {
                   <span className="text-slate-400">{format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
                 </div>
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">
+                  <h3 
+                    style={articleIndex === 3 ? {
+                      fontFamily: 'Arial',
+                      textAlign: 'justify',
+                      fontWeight: 'bold',
+                      fontSize: '14px'
+                    } : undefined}
+                    className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight"
+                  >
                     {article.title}
                   </h3>
                   <BookmarkButton 

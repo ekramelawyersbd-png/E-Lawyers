@@ -739,15 +739,13 @@ export function WealthSurchargeVisualizer({
                   <Info className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   Form IT-10B reconciliation required for net wealth &gt; 4 Crore.
                 </span>
-                <a
-                  href="https://appointment.accounticca.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/contact"
                   className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 font-bold underline shrink-0"
                 >
                   <span>Book Wealth Tax Review</span>
                   <ArrowRight className="w-3 h-3" />
-                </a>
+                </Link>
               </div>
 
             </div>

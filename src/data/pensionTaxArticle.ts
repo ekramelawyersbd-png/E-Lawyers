@@ -335,7 +335,7 @@ We support retired civil servants, private executives, senior citizens, and NRBs
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Schedule a Retirement Tax Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Tax Advisory & Planning Desk:** [/contact](/contact)
 * **Chambers Portal:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

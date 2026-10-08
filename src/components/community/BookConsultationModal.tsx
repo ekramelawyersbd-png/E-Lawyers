@@ -85,7 +85,7 @@ export function BookConsultationModal({
           </div>
 
           <p className="text-xs text-slate-500 leading-relaxed">
-            Appointments with <strong>{expert.name}</strong> are scheduled through our centralized appointment booking portal at <span className="text-emerald-700 font-semibold">appointment.accounticca.com</span>. Any details entered below will be forwarded automatically.
+            Inquiries with <strong>{expert.name}</strong> are processed directly through our centralized advisory desk. Any details entered below will be forwarded automatically.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,8 +184,8 @@ export function BookConsultationModal({
               onClick={handleDirectBooking}
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 underline inline-flex items-center gap-1 py-1"
             >
-              <span>Skip form & book on portal directly</span>
-              <ExternalLink className="w-3 h-3" />
+              <span>Skip form & contact desk directly</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
             <div className="flex items-center gap-2 justify-end">
               <button
@@ -199,7 +199,7 @@ export function BookConsultationModal({
                 type="submit"
                 className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"
               >
-                <span>Continue to Portal</span>
+                <span>Submit Inquiry</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

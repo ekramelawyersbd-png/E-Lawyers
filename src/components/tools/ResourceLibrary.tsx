@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   FileText, 
   Download, 
@@ -12,7 +13,8 @@ import {
   FileCheck2, 
   Briefcase, 
   Users, 
-  Sparkles 
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import { RESOURCE_TEMPLATES, ResourceTemplate } from '../../data/resourceTemplates';
 import { generateTemplatePDF } from '../../utils/resourcePdfGenerator';
@@ -112,7 +114,7 @@ export function ResourceLibrary() {
           <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6">
             Download print-ready PDF templates and editable drafts for common legal and tax documents in Bangladesh. Prepared in compliance with the Contract Act 1872, Income Tax Act 2023, and Labour Act 2006.
           </p>
-          <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-300">
+          <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-300 mb-6">
             <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>Bangladeshi Jurisdiction Tested</span>
@@ -125,6 +127,15 @@ export function ResourceLibrary() {
               <FileCheck2 className="w-4 h-4 text-amber-400" />
               <span>Assessment Year 2026-27 Compliant</span>
             </div>
+          </div>
+          <div>
+            <Link
+              to="/resource-library"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
+            >
+              <span>Open Dedicated Resource Library Page</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       </div>

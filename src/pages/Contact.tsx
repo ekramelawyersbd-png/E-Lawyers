@@ -33,7 +33,6 @@ import { ContactFaq } from '../components/ContactFaq';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { ContactTestimonialsCarousel } from '../components/ContactTestimonialsCarousel';
-import { redirectToAppointment, APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
 
 export function Contact() {
   const [firstName, setFirstName] = useState('');
@@ -45,6 +44,8 @@ export function Contact() {
   const [message, setMessage] = useState('');
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+
+  const [submitted, setSubmitted] = useState(false);
 
   const primaryPhone = '+880 1335-230170';
   const rawTelNumber = '+8801335230170';
@@ -68,15 +69,7 @@ export function Contact() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const fullName = `${firstName} ${lastName}`.trim();
-    redirectToAppointment({
-      name: fullName,
-      email,
-      phone,
-      service: `${service}${companyName ? ` (${companyName})` : ''}`,
-      notes: message,
-      source: 'Contact Page Inquiry'
-    });
+    setSubmitted(true);
   };
 
   return (
@@ -143,13 +136,11 @@ export function Contact() {
           {/* Hero Quick Action Buttons */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href={APPOINTMENT_BASE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#inquiry-form-section"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/30 transition-all duration-200 group"
             >
               <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
-              <span>Book an Appointment</span>
+              <span>Submit an Inquiry</span>
               <ArrowRight className="w-4 h-4 text-emerald-200 group-hover:translate-x-1 transition-transform" />
             </a>
 
@@ -459,23 +450,6 @@ export function Contact() {
                   </a>
 
                   <a
-                    href={APPOINTMENT_BASE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-400 hover:shadow-xs transition-all group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Calendar className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-emerald-700">
-                        appointment.accounticca.com
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-emerald-700">
-                      Booking Engine <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </a>
-
-                  <a
                     href="https://blog.accounticca.com"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -552,23 +526,6 @@ export function Contact() {
                     </div>
                     <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-teal-700">
                       Legal Firm Portal <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </a>
-
-                  <a
-                    href={APPOINTMENT_BASE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-teal-400 hover:shadow-xs transition-all group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Calendar className="w-4 h-4 text-teal-700" />
-                      <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-teal-700">
-                        appointment.accounticca.com
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-teal-700">
-                      Shared Booking Engine <ExternalLink className="w-3 h-3" />
                     </span>
                   </a>
 
@@ -830,7 +787,7 @@ export function Contact() {
       <ContactTestimonialsCarousel />
 
       {/* Main Dual Columns: Inquiry Form & Practice Capabilities */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section id="inquiry-form-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Form Column (7 cols) */}
           <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm">
@@ -845,9 +802,37 @@ export function Contact() {
             </div>
 
             <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
-              Complete your brief below. For guaranteed time-slot confirmation, submitting this form transfers your structured brief directly to our central booking portal (<span className="text-emerald-700 font-bold">appointment.accounticca.com</span>) without losing entered information.
+              Complete your brief below. Our senior advisory leads review every corporate inquiry and respond within 2 to 4 business hours.
             </p>
 
+            {submitted ? (
+              <div className="p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-14 h-14 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-md">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">Inquiry Received Successfully</h3>
+                <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                  Thank you, <strong>{firstName} {lastName}</strong>. Your matter brief regarding <strong>{service}</strong> has been assigned to our senior advisory desk. We will reach out to you at <strong>{email}</strong> or <strong>{phone}</strong> shortly.
+                </p>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFirstName('');
+                      setLastName('');
+                      setEmail('');
+                      setPhone('');
+                      setCompanyName('');
+                      setMessage('');
+                    }}
+                    className="px-6 py-2.5 rounded-xl bg-white border border-emerald-300 text-emerald-800 font-bold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
+                  >
+                    Submit Another Inquiry
+                  </button>
+                </div>
+              </div>
+            ) : (
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -958,23 +943,21 @@ export function Contact() {
                 type="submit"
                 className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl px-6 py-4 font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg cursor-pointer group"
               >
-                <span>Proceed to Appointment Scheduling</span>
+                <span>Submit Inquiry to Advisory Desk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <div className="flex items-center justify-between text-xs text-slate-500 pt-2 flex-wrap gap-2">
-                <span>Prefer direct booking without form?</span>
+                <span>Need immediate telephone assistance?</span>
                 <a
-                  href={APPOINTMENT_BASE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`tel:${rawTelNumber}`}
                   className="font-bold text-emerald-700 hover:text-emerald-800 underline inline-flex items-center gap-1"
                 >
-                  <span>Open appointment.accounticca.com directly</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <span>Call Direct Desk: {primaryPhone}</span>
                 </a>
               </div>
             </form>
+            )}
           </div>
 
           {/* Practice Sidebar (5 cols) */}
@@ -1071,9 +1054,7 @@ export function Contact() {
             
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
-                href={APPOINTMENT_BASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#inquiry-form-section"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg transition-all duration-200 group"
               >
                 <span>Schedule Your Consultation Today</span>

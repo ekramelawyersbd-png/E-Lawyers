@@ -376,7 +376,7 @@ We assist private property owners, commercial mall developers, corporate tenants
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Schedule a Property Tax Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Property Tax Advisory Desk:** [/contact](/contact)
 * **Official Chambers Website:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

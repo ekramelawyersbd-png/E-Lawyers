@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Sparkles, 
   RefreshCw, 
@@ -586,15 +587,13 @@ export function DailyUpdatesSection() {
             Dispatches are synthesized using Google Search Grounding across authoritative Bangladesh statutory portals. Consult certified tax practitioners for formal legal vetting before filing.
           </span>
         </div>
-        <a
-          href="https://appointment.accounticca.com"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          to="/contact"
           className="font-bold text-emerald-700 hover:text-emerald-800 whitespace-nowrap inline-flex items-center gap-1"
         >
           <span>Consult a Tax Lawyer</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
-        </a>
+        </Link>
       </div>
     </section>
   );

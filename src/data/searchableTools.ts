@@ -198,11 +198,11 @@ export const searchableTaxTools: SearchableTool[] = [
     shortName: 'Resource Library',
     category: 'Utility',
     description: 'Download standard NDA agreements, service contracts, board resolutions, and tax return filing checklists.',
-    path: '/tools#resource-library',
+    path: '/resource-library',
     iconName: 'FolderDown',
     badge: 'Downloadable Docs',
     tags: ['pdf', 'download', 'template', 'nda', 'agreement', 'checklist', 'board resolution', 'draft', 'contract', 'resource library'],
-    featured: false
+    featured: true
   },
   {
     id: 'glossary',
@@ -250,6 +250,18 @@ export const searchableTaxTools: SearchableTool[] = [
     iconName: 'FileText',
     badge: 'Listed vs Non-Listed',
     tags: ['corporate tax rates bangladesh', 'fy 2026-27', 'listed vs non-listed', 'banking penalty', 'ipo tax benefit', '5-year roadmap', 'income tax act 2023'],
+    featured: true
+  },
+  {
+    id: 'accounticca-digital-shop',
+    name: 'Accounticca Legal, Tax & Corporate Shop',
+    shortName: 'Digital Store & Templates',
+    category: 'Utility',
+    description: 'Download practitioner-drafted contracts, NDA agreements, AY 2026-27 tax return Excel workbooks, TDS calculators, and RJSC packs.',
+    path: '/shop',
+    iconName: 'FolderDown',
+    badge: 'Digital Store',
+    tags: ['shop', 'store', 'buy', 'digital templates', 'contracts', 'nda', 'income tax excel', 'tds calculator', 'employment agreement', 'books', 'rjsc kit'],
     featured: true
   }
 ];

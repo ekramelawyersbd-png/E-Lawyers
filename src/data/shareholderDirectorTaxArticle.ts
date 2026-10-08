@@ -358,7 +358,7 @@ We support company founders, managing directors, and corporate boards with:
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Schedule a Corporate Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Advisory & Inquiries Desk:** [/contact](/contact)
 * **Official Website:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

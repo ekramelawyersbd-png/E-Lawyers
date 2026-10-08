@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Star, 
@@ -288,16 +289,13 @@ export function Testimonials({
               <span>Share Your Story</span>
             </button>
 
-            <a
+            <Link
               id="book-consultancy-cta-btn"
-              href="https://appointment.accounticca.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              to="/contact"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 font-semibold text-sm transition-all shadow-md hover:shadow-emerald-600/20"
             >
               <span>Consult an Expert</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         </div>
 

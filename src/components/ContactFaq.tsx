@@ -60,7 +60,7 @@ export const CONTACT_FAQS: ContactFAQItem[] = [
     answer: 'All electronic inquiries submitted via our contact forms or direct email desks are acknowledged immediately and assigned to a practice lead within 2 to 4 business hours. For scheduled appointments via our booking engine, confirmation is instant with automated calendar invitations. If your matter is time-sensitive (such as an NBR show-cause notice deadline or urgent High Court filing), we advise calling our direct hunting desk immediately.',
     keyPoints: [
       'Guaranteed 24-hour formal response window for online briefs',
-      'Instant calendar booking on appointment.accounticca.com',
+      'Instant direct inquiry routing to senior practice leads',
       'Urgent hotline support via +880 1335-230170 (Lines 70–81)'
     ],
     actionLink: {

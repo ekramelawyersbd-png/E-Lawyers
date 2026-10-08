@@ -410,7 +410,7 @@ Ensuring your trade license is accurately categorized, promptly renewed, and upd
 * 🔹 **E-LAWYERS:** [elawyersbd.com](https://elawyersbd.com)
 * 🔹 **ACCOUNTICCA:** [accounticca.com](https://accounticca.com)
 * 🎓 **ACCOUNTICCA Academy:** [academy.accounticca.com](https://academy.accounticca.com)
-* 📅 **Book an Appointment:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* 📅 **Inquiries & Consultation:** [/contact](/contact)
 * 📰 **ACCOUNTICCA Blog:** [blog.accounticca.com](https://blog.accounticca.com)
 
 #### 💼 ACCOUNTICCA: Connect With Us

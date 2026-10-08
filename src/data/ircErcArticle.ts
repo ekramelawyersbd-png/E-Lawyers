@@ -395,7 +395,7 @@ We assist foreign investors, local enterprises, and growing startups with turnke
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Book a Regulatory Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Regulatory & Legal Advisory Desk:** [/contact](/contact)
 * **Chambers Website:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

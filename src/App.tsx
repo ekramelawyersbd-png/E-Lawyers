@@ -27,9 +27,12 @@ import { TermsConditions } from './pages/TermsConditions';
 import { TdsReference } from './pages/TdsReference';
 import { TaxPlanner } from './pages/TaxPlanner';
 import { TaxRefundGuide } from './pages/TaxRefundGuide';
+import { Shop } from './pages/Shop';
+import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { BookmarkProvider } from './contexts/BookmarkContext';
+import { CartProvider } from './contexts/CartContext';
 import { BookmarkNotificationToast } from './components/BookmarkNotificationToast';
 import { ScrollManager } from './components/layout/ScrollManager';
 import { NotFound } from './pages/NotFound';
@@ -39,12 +42,18 @@ export default function App() {
     <LanguageProvider>
       <AuthProvider>
         <BookmarkProvider>
-          <BrowserRouter>
-            <ScrollManager />
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="category/:id" element={<Category />} />
+          <CartProvider>
+            <BrowserRouter>
+              <ScrollManager />
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="shop" element={<Shop />} />
+                  <Route path="store" element={<Navigate to="/shop" replace />} />
+                  <Route path="products" element={<Navigate to="/shop" replace />} />
+                  <Route path="resource-library" element={<ResourceLibraryPage />} />
+                  <Route path="resources" element={<Navigate to="/resource-library" replace />} />
+                  <Route path="category/:id" element={<Category />} />
                 <Route path="article/:id" element={<Article />} />
                 <Route path="tax-refund-guide" element={<TaxRefundGuide />} />
                 <Route path="community" element={<Community />} />
@@ -102,6 +111,7 @@ export default function App() {
             </Routes>
             <BookmarkNotificationToast />
           </BrowserRouter>
+          </CartProvider>
         </BookmarkProvider>
       </AuthProvider>
     </LanguageProvider>

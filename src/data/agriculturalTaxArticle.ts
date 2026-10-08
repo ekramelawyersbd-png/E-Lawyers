@@ -362,7 +362,7 @@ We support commercial agro-enterprises, dairy & poultry conglomerates, fish hatc
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Schedule a Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Contact & Advisory Desk:** [/contact](/contact)
 * **Official Chambers Website:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

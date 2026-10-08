@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useId } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   ChevronDown, 
   Search, 
@@ -11,7 +12,8 @@ import {
   ExternalLink,
   Copy,
   Check,
-  Briefcase
+  Briefcase,
+  ArrowRight
 } from 'lucide-react';
 
 export interface FAQItem {
@@ -386,15 +388,13 @@ export function FAQ({
                 >
                   Reset Filters
                 </button>
-                <a
-                  href="https://appointment.accounticca.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/contact"
                   className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-colors"
                 >
                   <span>Ask an Expert</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
           ) : (
@@ -525,15 +525,13 @@ export function FAQ({
               Get personalized legal advice or tax filing support tailored to your unique corporate or individual requirements.
             </p>
           </div>
-          <a
-            href="https://appointment.accounticca.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl transition-all shadow-lg hover:shadow-emerald-500/20 shrink-0 transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"
           >
             <span>Book Consultation</span>
-            <ExternalLink className="w-4 h-4" aria-hidden="true" />
-          </a>
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

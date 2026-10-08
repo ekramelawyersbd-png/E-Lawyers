@@ -418,7 +418,7 @@ We support corporations, medical professionals, legal practitioners, IT exporter
 * **Location:** G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205, Bangladesh
 
 #### 🌐 Schedule a Consultation
-* **Appointment Portal:** [appointment.accounticca.com](https://appointment.accounticca.com)
+* **Business Advisory & Tax Desk:** [/contact](/contact)
 * **Official Portal:** [elawyersbd.com](https://elawyersbd.com)
 `
 };

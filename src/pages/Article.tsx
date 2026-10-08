@@ -853,15 +853,13 @@ export function Article() {
                 </div>
                 <h3 className="text-xl font-bold mb-3 relative z-10">Company Registration Service</h3>
                 <p className="text-slate-400 text-sm mb-6 relative z-10">End-to-end RJSC incorporation and trade license acquisition.</p>
-                <a 
-                  href="https://appointment.accounticca.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <Link 
+                  to="/contact" 
                   className="inline-flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-colors relative z-10 shadow-md"
                 >
                   <span>Book Consultation</span>
                   <ExternalLink className="w-4 h-4 text-emerald-200" />
-                </a>
+                </Link>
               </div>
 
             </div>

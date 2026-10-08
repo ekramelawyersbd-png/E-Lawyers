@@ -1,0 +1,358 @@
+export interface ShopProduct {
+  id: string;
+  title: string;
+  slug: string;
+  category: 'Legal Contracts' | 'Tax & VAT Toolkits' | 'Books & Manuals' | 'Corporate & RJSC' | 'Expert Advisory';
+  price: number;
+  originalPrice: number;
+  rating: number;
+  reviewsCount: number;
+  format: string;
+  badge?: 'Bestseller' | 'New' | 'Popular' | 'Essential' | 'Updated for 2026';
+  shortDescription: string;
+  fullDescription: string;
+  governingLaw?: string;
+  pagesOrFiles: string;
+  features: string[];
+  samplePreviewSnippet?: string;
+  imageUrl: string;
+  authorOrVettedBy: string;
+}
+
+export const SHOP_CATEGORIES = [
+  'All Products',
+  'Legal Contracts',
+  'Tax & VAT Toolkits',
+  'Books & Manuals',
+  'Corporate & RJSC',
+  'Expert Advisory'
+] as const;
+
+export type ShopCategory = typeof SHOP_CATEGORIES[number];
+
+export const SHOP_PRODUCTS: ShopProduct[] = [
+  {
+    id: 'mutual-nda-pro-kit',
+    title: 'Mutual Non-Disclosure Agreement (NDA) Pro Kit',
+    slug: 'mutual-nda-pro-kit',
+    category: 'Legal Contracts',
+    price: 950,
+    originalPrice: 1500,
+    rating: 4.95,
+    reviewsCount: 142,
+    format: 'DOCX + PDF • Bilingual Clause Notes',
+    badge: 'Bestseller',
+    shortDescription: 'Bilateral confidentiality agreement protecting proprietary business secrets, trade algorithms, client lists, and technical data in Bangladesh.',
+    fullDescription: 'A comprehensive, practitioner-drafted bilateral non-disclosure agreement strictly tailored to Bangladesh jurisdiction under the Contract Act 1872 and Arbitration Act 2001. Formatted in clean, editable Microsoft Word (.docx) with clause-by-clause commentary, exclusions, survival covenants, and Dhaka-seated dispute resolution provisions.',
+    governingLaw: 'Contract Act, 1872 & Arbitration Act, 2001 (Bangladesh)',
+    pagesOrFiles: '6 Pages • 2 File Formats (.docx, .pdf)',
+    features: [
+      'Editable Microsoft Word (.docx) & Print-Ready PDF',
+      'Definitions of Technical, Financial & Operational Confidential Information',
+      'Non-solicitation of employees and clients clause',
+      'Specific exclusions (court subpoena, prior knowledge, independent development)',
+      'Arbitration clause seated in Dhaka under the Arbitration Act, 2001',
+      'Bilingual guidance notes on execution on non-judicial stamp duty'
+    ],
+    samplePreviewSnippet: 'This Mutual Non-Disclosure Agreement is entered into by and between the Disclosing Party and Receiving Party. The Receiving Party agrees to protect Confidential Information with at least the standard of reasonable care...',
+    imageUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Adv. Ekram Hossain, Advocate, Supreme Court of Bangladesh'
+  },
+  {
+    id: 'income-tax-return-workbook-2026',
+    title: 'Bangladesh Income Tax Return Workbook (AY 2026–2027)',
+    slug: 'income-tax-return-workbook-2026',
+    category: 'Tax & VAT Toolkits',
+    price: 1450,
+    originalPrice: 2500,
+    rating: 4.98,
+    reviewsCount: 218,
+    format: 'Excel (.xlsx) • Automated Macros & Formulas',
+    badge: 'Updated for 2026',
+    shortDescription: 'Complete, automated Excel spreadsheet for calculating individual tax across all 10 income heads, Section 78 investment rebates, and Form IT-10B net wealth statement.',
+    fullDescription: 'The ultimate tax filing workbook designed for tax practitioners, corporate executives, and accountants. Fully updated for Finance Act 2026 and Income Tax Act 2023. Contains dynamic formula-driven schedules for salaries, house property, agricultural income (Section 43 60% deemed rate), business income, capital gains, the revised 3-tier investment rebate cap, and net wealth surcharge calculations.',
+    governingLaw: 'Income Tax Act, 2023 & Finance Act 2026',
+    pagesOrFiles: '1 Master Excel File • 8 Integrated Worksheets',
+    features: [
+      'Automated AY 2026–27 progressive slab calculations (up to 30% top bracket)',
+      'Dynamic Section 78 rebate ceiling calculator (lowest of 3% income, 10% investment, Tk. 7.5L)',
+      'Pre-formatted IT-11GA Return of Income printable summary',
+      'Form IT-10B Statement of Assets, Liabilities & Net Wealth Surcharge check',
+      'Early filing 5% incentive rebate deduction calculation',
+      'Built-in validation checks to prevent mathematical and e-Return filing errors'
+    ],
+    samplePreviewSnippet: '=IF(TaxableIncome<=ExemptionLimit, 0, CalculateProgressiveSlabs(TaxableIncome, AY2026_27_SLABS))... RebateLimit = MIN(TaxableIncome*0.03, EligibleInv*0.10, 750000)',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Senior Tax & Audit Practice Division'
+  },
+  {
+    id: 'employment-contract-hr-handbook',
+    title: 'Employment Contract & HR Policy Manual (Labour Act 2006)',
+    slug: 'employment-contract-hr-handbook',
+    category: 'Legal Contracts',
+    price: 1850,
+    originalPrice: 3000,
+    rating: 4.92,
+    reviewsCount: 96,
+    format: 'DOCX + PDF • Comprehensive HR Package',
+    badge: 'Essential',
+    shortDescription: 'Legally compliant full-time employment agreement, probation clauses, termination notice terms, IP assignment, and workplace conduct policies.',
+    fullDescription: 'Drafted in strict conformity with the Bangladesh Labour Act, 2006 (and latest Labour Rules amendments). Protects employers from unlawful termination claims and employee disputes while clearly delineating working hours, overtime, festival bonuses, provident fund/gratuity, disciplinary procedures, non-compete, and confidentiality obligations.',
+    governingLaw: 'Bangladesh Labour Act, 2006 & Labour Rules',
+    pagesOrFiles: '14 Pages • Editable Word & PDF formats',
+    features: [
+      'Appointment letter template with detailed probation and confirmation terms',
+      'Festival allowance, leave encashment, and provident fund rules',
+      'Statutory notice period and severance compensation clauses (Sections 26 & 27)',
+      'Strict intellectual property assignment & work-for-hire covenants',
+      'Non-disclosure, non-disparagement, and client non-solicitation clauses',
+      'Code of conduct, anti-harassment policy, and grievance redressal process'
+    ],
+    samplePreviewSnippet: 'The Employee acknowledges that all inventions, designs, source code, and works created during employment are the sole and exclusive property of the Employer...',
+    imageUrl: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Adv. Ekram Hossain & Corporate HR Legal Team'
+  },
+  {
+    id: 'tds-vds-automation-calculator-2026',
+    title: 'TDS & VDS Withholding Tax Master Toolkit 2026',
+    slug: 'tds-vds-automation-calculator-2026',
+    category: 'Tax & VAT Toolkits',
+    price: 1250,
+    originalPrice: 2000,
+    rating: 4.96,
+    reviewsCount: 164,
+    format: 'Excel (.xlsx) • Searchable Rate Database',
+    badge: 'Popular',
+    shortDescription: 'Interactive tax deducted at source (TDS) and VAT deducted at source (VDS) calculator with statutory section lookups and challan reconciliation.',
+    fullDescription: 'Never make an incorrect withholding deduction again. This automated spreadsheet features a searchable statutory database covering Sections 89 to 130 of the Income Tax Act 2023, paired with current SRO VAT withholding rules (Mushak 6.3 / 6.6). Just enter invoice value and vendor TIN/BIN status to instantly receive exact TDS & VDS amounts and required Challan codes.',
+    governingLaw: 'Income Tax Act 2023 & VAT and SD Act 2012',
+    pagesOrFiles: '1 Master Excel File • Real-time Tax Rate Engine',
+    features: [
+      'Lookup engine for 40+ statutory withholding categories (rent, goods, services, commission, etc.)',
+      'Automatic 50% TDS markup calculation if supplier lacks 12-digit e-TIN or proof of return submission',
+      'VDS deduction matrix matching SRO 149-Ain/2020/110-Mushak guidelines',
+      'Monthly Withholding Statement (Section 177) data formatting template',
+      'Government treasury deposit Challan bank code directory'
+    ],
+    samplePreviewSnippet: '=VLOOKUP(ServiceCategory, TDS_Tax_Matrix_2026, 4, FALSE) * IF(HasTIN_Proof, 1.0, 1.5) * GrossInvoiceAmount...',
+    imageUrl: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Withholding Tax Advisory Division'
+  },
+  {
+    id: 'handbook-income-tax-act-2023-finance-act-2026',
+    title: 'Handbook on Income Tax Act 2023 & Finance Act 2026 (eBook)',
+    slug: 'handbook-income-tax-act-2023-finance-act-2026',
+    category: 'Books & Manuals',
+    price: 950,
+    originalPrice: 1600,
+    rating: 4.97,
+    reviewsCount: 189,
+    format: 'Digital eBook (PDF) • Searchable & Bookmarked',
+    badge: 'Bestseller',
+    shortDescription: 'Authoritative practitioner guide dissecting the new direct tax framework, revised slabs, corporate incentives, wealth surcharge, and penalty rules.',
+    fullDescription: 'Written by experienced Supreme Court advocates and chartered accountants, this comprehensive handbook bridges the gap between statutory text and practical e-Return execution. Features side-by-side comparative analyses between the repealed 1984 Ordinance and the 2023 Act, along with all crucial amendments introduced by the Finance Act 2026.',
+    governingLaw: 'National Board of Revenue (NBR) Direct Tax Legislation',
+    pagesOrFiles: '240 Pages • Fully Indexed Digital PDF',
+    features: [
+      'In-depth chapter-by-chapter legal commentary on Sections 1 to 345',
+      'Practical calculation case studies for salaried, business, and corporate assessees',
+      'Detailed breakdown of Section 78 investment rebate limits & ceiling',
+      'Agricultural income assessment rules (Section 40–44) & deemed 60% expenses',
+      'Tax dispute resolution, Commissioner (Appeals), and Appellate Tribunal procedures',
+      'Annotated statutory forms directory (IT-11GA, IT-10B, IT-88)'
+    ],
+    samplePreviewSnippet: 'Chapter 7: Assessment of Total Income. Under Section 32, total income is classified under ten distinct heads. The taxpayer must note that losses under heads cannot be arbitrarily set off...',
+    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Adv. Ekram Hossain & Accounticca Legal Research Team'
+  },
+  {
+    id: 'company-incorporation-starter-pack-rjsc',
+    title: 'RJSC Company Incorporation & Secretarial Starter Pack',
+    slug: 'company-incorporation-starter-pack-rjsc',
+    category: 'Corporate & RJSC',
+    price: 2400,
+    originalPrice: 4000,
+    rating: 4.94,
+    reviewsCount: 78,
+    format: 'DOCX + PDF • Complete Legal Documentation Kit',
+    badge: 'Essential',
+    shortDescription: 'Draft Memorandum & Articles of Association (MoA & AoA), Form XII, First Board Meeting Minutes, and Bank Account Opening Resolutions.',
+    fullDescription: 'Everything required to form and register a Private Limited Company with the Registrar of Joint Stock Companies and Firms (RJSC) in Bangladesh. Includes comprehensive main and ancillary business objects clauses for modern tech startups, export-import, consultancies, and commercial trade, drafted to pass RJSC scrutiny without rejection.',
+    governingLaw: 'Companies Act, 1994 (Bangladesh)',
+    pagesOrFiles: '28 Pages • 6 Separate Legal Documents',
+    features: [
+      'Standard Memorandum of Association (MoA) with multi-sector business objects clauses',
+      'Standard Articles of Association (AoA) with share transfer & director qualification provisions',
+      'Form XII (Particulars of Directors) template formatted for RJSC digital upload',
+      'First Board of Directors Meeting Minutes approving seal, banking & registration',
+      'Bank Account Opening Board Resolution customized for Bangladesh commercial banks',
+      'Step-by-step RJSC digital filing process checklist and stamp duty cost guide'
+    ],
+    samplePreviewSnippet: 'THE COMPANIES ACT, 1994. MEMORANDUM OF ASSOCIATION OF [COMPANY NAME] LIMITED. 1. The name of the Company is... 2. The Registered Office of the Company will be situated in Bangladesh...',
+    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Corporate Secretarial Division'
+  },
+  {
+    id: 'shareholders-agreement-startup-kit',
+    title: 'Shareholders\' Agreement (SHA) & Founder Vesting Kit',
+    slug: 'shareholders-agreement-startup-kit',
+    category: 'Legal Contracts',
+    price: 2900,
+    originalPrice: 5000,
+    rating: 4.93,
+    reviewsCount: 65,
+    format: 'DOCX + PDF • Institutional Investor Standard',
+    badge: 'Popular',
+    shortDescription: 'Institutional-grade Shareholders\' Agreement featuring 4-year reverse vesting, cliff periods, Drag-Along, Tag-Along, ROFR, and Pre-emption rights.',
+    fullDescription: 'Crucial for startup co-founders and early-stage companies raising capital in Bangladesh. Avoid co-founder disputes and deadlocks with institutional-grade provisions governing equity dilution, share transfers, right of first refusal, board representation, quorum, deadlock resolution, and good-leaver / bad-leaver vesting schedules.',
+    governingLaw: 'Companies Act, 1994 & Contract Act, 1872',
+    pagesOrFiles: '18 Pages • Fully Customizable Word Document',
+    features: [
+      '4-Year reverse vesting schedule with 1-year cliff terms for founders',
+      'Right of First Refusal (ROFR) and Pre-emptive Subscription rights',
+      'Tag-Along Rights (protecting minority shareholders) and Drag-Along provisions',
+      'Reserved matters requiring unanimous or super-majority shareholder approval',
+      'Good leaver vs Bad leaver share forfeiture and repurchase mechanisms',
+      'Mediation and expedited arbitration mechanism under Bangladesh law'
+    ],
+    samplePreviewSnippet: 'In the event that any Founder terminates their engagement prior to the expiration of the Vesting Period, the Company shall have the right to repurchase all Unvested Shares at nominal par value...',
+    imageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'E-Lawyers Venture & Corporate Practice Group'
+  },
+  {
+    id: 'vat-mushak-9-1-master-workbook',
+    title: 'VAT Mushak 9.1 Return Prep & Reconciliation Workbook',
+    slug: 'vat-mushak-9-1-master-workbook',
+    category: 'Tax & VAT Toolkits',
+    price: 1850,
+    originalPrice: 3200,
+    rating: 4.91,
+    reviewsCount: 88,
+    format: 'Excel (.xlsx) • Automated Sub-Forms',
+    badge: 'Popular',
+    shortDescription: 'Complete preparation sheet for monthly VAT Return Form 9.1 with automated Input Tax Credit (Mushak 6.3/6.6), VDS ledger, and treasury challans.',
+    fullDescription: 'Simplifies monthly online VAT return filing on the NBR IVAS portal. Maps sales, standard rated supplies, exempt supplies, zero-rated exports, input tax credits, VDS withholding by clients, and decreasing adjustments directly into corresponding sub-forms (Sub-form Ka through Gha) of Form Mushak 9.1.',
+    governingLaw: 'Value Added Tax and Supplementary Duty Act, 2012',
+    pagesOrFiles: '1 Master Excel File • 10 Interactive Linked Worksheets',
+    features: [
+      'Sub-Form 9.1 auto-mapping engine for input tax credit eligibility check',
+      'Mushak 6.3 Sales Register & Mushak 6.4 Purchase Register integration',
+      'Decreasing adjustments ledger for VDS deducted by withholding entities',
+      'Auto-calculation of Net VAT Payable, Closing Balance & Treasury Challan',
+      'Reconciliation worksheet between monthly VAT return and audited P&L accounts'
+    ],
+    samplePreviewSnippet: '=SUMIFS(Sales_Register[VAT_Amount], Sales_Register[Rate], "15%") - Input_Tax_Credit_Eligible - Total_VDS_Deducted...',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Indirect Tax (VAT) Practice'
+  },
+  {
+    id: 'commercial-lease-agreement-pro',
+    title: 'Commercial Office & Commercial Space Lease Agreement',
+    slug: 'commercial-lease-agreement-pro',
+    category: 'Legal Contracts',
+    price: 1450,
+    originalPrice: 2200,
+    rating: 4.89,
+    reviewsCount: 71,
+    format: 'DOCX + PDF • Landlord & Tenant Balanced',
+    badge: 'Essential',
+    shortDescription: 'Standard long-term commercial lease agreement for corporate offices, retail showrooms, and factory spaces in Dhaka and Chittagong.',
+    fullDescription: 'Comprehensive commercial tenancy agreement governing security deposit terms, utility allocations, service charge maintenance, sub-letting restrictions, rent increment schedules, permitted business uses, structural repairs, default remedies, and mutual termination notice periods.',
+    governingLaw: 'Transfer of Property Act, 1882 & Premises Rent Control Act, 1991',
+    pagesOrFiles: '9 Pages • Word & PDF formats',
+    features: [
+      'Clear definition of advance security deposit and rent adjustment mechanisms',
+      'Maintenance, utility surcharge, and commercial service charge responsibility split',
+      'Right of inspection, fire safety compliance, and signage rights',
+      'Force Majeure and destruction of commercial premises clause',
+      'Notice period and peaceful possession handover covenants',
+      'Non-judicial stamp duty guidance notes for registration'
+    ],
+    samplePreviewSnippet: 'The Tenant agrees to pay the agreed monthly rent in advance on or before the 10th day of each calendar month. The Landlord acknowledges receipt of security deposit...',
+    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'E-Lawyers Property & Real Estate Counsel'
+  },
+  {
+    id: 'rjsc-secretarial-compliance-manual',
+    title: 'Corporate Secretarial & RJSC Compliance Manual (Handbook)',
+    slug: 'rjsc-secretarial-compliance-manual',
+    category: 'Books & Manuals',
+    price: 1150,
+    originalPrice: 1850,
+    rating: 4.93,
+    reviewsCount: 54,
+    format: 'Digital eBook (PDF) • Illustrated Compliance Guide',
+    badge: 'Updated for 2026',
+    shortDescription: 'Step-by-step guidebook to annual general meetings (AGM), Form 23B, Form IX, share transfers (Form 117), and RJSC online portal workflows.',
+    fullDescription: 'A practical, desktop handbook for company secretaries, directors, and corporate lawyers handling routine and statutory filings with the Registrar of Joint Stock Companies and Firms in Bangladesh. Covers timelines, penalties for delayed filings, digital signature requirements, and audited financial statements submission.',
+    governingLaw: 'Companies Act, 1994 (Sections 77–190)',
+    pagesOrFiles: '160 Pages • Digital PDF with Searchable Index',
+    features: [
+      'Annual Statutory Filing schedule (Schedule X, Form 23B, Form IX, Balance Sheet)',
+      'Procedure for increasing Authorized & Paid-up Capital step-by-step',
+      'Director appointment, resignation, and removal legal protocols',
+      'Mortgage and charge creation (Form XVIII) with commercial banks',
+      'Handling show-cause notices and RJSC striking-off / winding-up procedures'
+    ],
+    samplePreviewSnippet: 'Section 107 requires every company to hold an Annual General Meeting once in every calendar year and not more than fifteen months after the holding of the last preceding meeting...',
+    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Corporate Governance & Advisory Team'
+  },
+  {
+    id: 'advisory-legal-document-vetting-session',
+    title: '1-on-1 Legal Contract Vetting Session (30 Mins)',
+    slug: 'advisory-legal-document-vetting-session',
+    category: 'Expert Advisory',
+    price: 3500,
+    originalPrice: 5000,
+    rating: 5.0,
+    reviewsCount: 42,
+    format: 'Live Video Consultation + Redlined Markups',
+    badge: 'Popular',
+    shortDescription: 'Direct review and clause-by-clause legal risk assessment of your commercial agreement by a Supreme Court of Bangladesh Advocate.',
+    fullDescription: 'Before signing any high-stakes contract, lease, investment agreement, or vendor SLA, have it meticulously reviewed by an experienced advocate. Includes an advance review of up to 10 pages, a 30-minute private video conference call, tailored legal recommendations, and a redlined document highlighting risks, liabilities, and missing protections.',
+    governingLaw: 'Advocate Consultation & Client Privilege',
+    pagesOrFiles: '30-Minute Video Call • Advance Document Review up to 10 Pages',
+    features: [
+      'Direct consultation with Adv. Ekram Hossain or senior corporate counsel',
+      'Redlined draft with risk comments delivered via email',
+      'Identification of hidden liabilities, indemnity traps, and one-sided clauses',
+      'Enforceability review under Bangladesh courts and arbitration rules',
+      'Actionable recommendations for renegotiation'
+    ],
+    samplePreviewSnippet: 'Personalized private consultation booked via secure calendar. Advance document review initiated within 2 business hours of booking...',
+    imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'E-Lawyers Senior Advocates & Barristers'
+  },
+  {
+    id: 'advisory-corporate-tax-filing-strategy',
+    title: 'Corporate Tax Assessment & Filing Strategy Session (45 Mins)',
+    slug: 'advisory-corporate-tax-filing-strategy',
+    category: 'Expert Advisory',
+    price: 4000,
+    originalPrice: 6000,
+    rating: 4.97,
+    reviewsCount: 38,
+    format: 'Private Consultation + Strategy Memo',
+    badge: 'Essential',
+    shortDescription: 'Strategic corporate tax planning session to assess FY 2026–27 rates, banking penalty avoidance, depreciation allowances, and e-Return prep.',
+    fullDescription: 'Tailored for business owners, managing directors, and CFOs. A 45-minute deep-dive consultation analyzing your company’s profit projections, evaluating whether your entity qualifies for the 20% or 25% listed rate or 27.5% private rate, ensuring banking compliance to prevent the 2.5% penalty, and designing statutory deduction roadmaps under the Income Tax Act 2023.',
+    governingLaw: 'Income Tax Act 2023 & NBR Corporate Direct Tax Guidelines',
+    pagesOrFiles: '45-Minute Strategy Call • Written Key Recommendations Memo',
+    features: [
+      'Analysis of applicable corporate tax rate (20%, 25%, 27.5% or 30%)',
+      'Audit risk evaluation for cash transactions & banking compliance',
+      'Capital expenditure (CapEx) depreciation optimization plan',
+      'Disallowed expenses check under Section 55',
+      'Advance Income Tax (AIT) and TDS credit reconciliation roadmap'
+    ],
+    samplePreviewSnippet: 'Confidential corporate strategy session to optimize tax posture and prepare documentation prior to return submission to the Deputy Commissioner of Taxes (DCT)...',
+    imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Accounticca Corporate Tax Practice Directors'
+  }
+];
+
+export interface CartItem {
+  product: ShopProduct;
+  quantity: number;
+}
