@@ -225,24 +225,24 @@ export function Community({ initialTab }: CommunityProps) {
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* 1. Hero Section (Community Landing) */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-16 pb-20 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/40">
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-emerald-50/40 to-slate-100/70 text-slate-900 pt-16 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80">
         {/* Subtle decorative mesh background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.25),rgba(255,255,255,0))] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.12),rgba(255,255,255,0))] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-semibold mb-6 backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-6 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
             <span>Accounticca Verified Professional Network</span>
           </div>
 
           {/* New Hero Copy */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.15]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.15]">
             Bangladesh's Professional Network for Legal, Tax & Business Experts
           </h1>
-          <p className="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
+          <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
             Connect with lawyers, accountants, tax consultants, and entrepreneurs. Share knowledge, solve problems, and build your professional reputation.
           </p>
 
@@ -250,37 +250,37 @@ export function Community({ initialTab }: CommunityProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <button
               onClick={() => setIsApplicationModalOpen(true)}
-              className="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-2xl font-extrabold text-sm sm:text-base transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold text-sm sm:text-base transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <UserPlus className="w-5 h-5" />
-              Join Community
+              <UserPlus className="w-5 h-5 text-white" />
+              <span>Join Community</span>
             </button>
             <button
               onClick={() => expertsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full sm:w-auto px-8 py-3.5 bg-white/10 hover:bg-white/15 text-white border border-white/20 rounded-2xl font-bold text-sm sm:text-base backdrop-blur-md transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-950 border border-slate-300 rounded-2xl font-bold text-sm sm:text-base transition-all shadow-2xs hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Users className="w-5 h-5 text-emerald-400" />
-              Explore Experts
+              <Users className="w-5 h-5 text-emerald-600" />
+              <span>Explore Experts</span>
             </button>
           </div>
 
           {/* Community Statistics Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-8 border-t border-slate-800/80">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-white/10 text-center hover:bg-white/10 transition-colors">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-400 mb-1">10,000+</div>
-              <div className="text-xs sm:text-sm font-semibold text-slate-300">Professionals</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-8 border-t border-slate-200">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-600 mb-1">10,000+</div>
+              <div className="text-xs sm:text-sm font-semibold text-slate-600">Professionals</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-white/10 text-center hover:bg-white/10 transition-colors">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-teal-400 mb-1">2,500+</div>
-              <div className="text-xs sm:text-sm font-semibold text-slate-300">Discussions</div>
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-teal-600 mb-1">2,500+</div>
+              <div className="text-xs sm:text-sm font-semibold text-slate-600">Discussions</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-white/10 text-center hover:bg-white/10 transition-colors">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-400 mb-1">500+</div>
-              <div className="text-xs sm:text-sm font-semibold text-slate-300">Expert Contributors</div>
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-600 mb-1">500+</div>
+              <div className="text-xs sm:text-sm font-semibold text-slate-600">Expert Contributors</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-white/10 text-center hover:bg-white/10 transition-colors">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-blue-400 mb-1">50+</div>
-              <div className="text-xs sm:text-sm font-semibold text-slate-300">Industry Topics</div>
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-blue-600 mb-1">50+</div>
+              <div className="text-xs sm:text-sm font-semibold text-slate-600">Industry Topics</div>
             </div>
           </div>
         </div>

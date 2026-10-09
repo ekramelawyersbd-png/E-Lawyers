@@ -17,6 +17,7 @@ export interface ShopProduct {
   samplePreviewSnippet?: string;
   imageUrl: string;
   authorOrVettedBy: string;
+  status?: 'published' | 'draft';
 }
 
 export const SHOP_CATEGORIES = [

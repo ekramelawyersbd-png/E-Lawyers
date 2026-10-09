@@ -2,9 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
+// Custom authentication domain configuration
+// Setting authDomain to 'blog.accounticca.com' ensures Google Sign-In displays
+// "Choose an account to continue to blog.accounticca.com" instead of the raw firebaseapp.com subdomain.
 const firebaseConfig = {
   apiKey: "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg",
-  authDomain: "gen-lang-client-0396222608.firebaseapp.com",
+  authDomain: "blog.accounticca.com",
   projectId: "gen-lang-client-0396222608",
   storageBucket: "gen-lang-client-0396222608.firebasestorage.app",
   messagingSenderId: "425825496026",

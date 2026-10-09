@@ -23,26 +23,34 @@ import {
   ChevronRight,
   ExternalLink,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Lock,
+  LogOut
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
-import { SHOP_PRODUCTS, SHOP_CATEGORIES, ShopProduct, ShopCategory } from '../data/shopProducts';
+import { SHOP_CATEGORIES, ShopProduct, ShopCategory } from '../data/shopProducts';
+import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
+import { useShopAuth } from '../contexts/ShopAuthContext';
 import { CartDrawer } from '../components/shop/CartDrawer';
-import { ProductQuickViewModal } from '../components/shop/ProductQuickViewModal';
 import { CheckoutModal } from '../components/shop/CheckoutModal';
 
 export function Shop() {
+  const { products, loading } = useProducts();
   const { addToCart, totalItemsCount, setIsCartOpen } = useCart();
+  const { adminUser, isAuthenticated, logout } = useShopAuth();
 
   const [selectedCategory, setSelectedCategory] = useState<ShopCategory>('All Products');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'bestselling' | 'price_low' | 'price_high' | 'rating'>('bestselling');
   
-  // Modals state
-  const [quickViewProduct, setQuickViewProduct] = useState<ShopProduct | null>(null);
+  // Checkout modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [instantCheckoutProduct, setInstantCheckoutProduct] = useState<ShopProduct | null>(null);
+
+  // Draft vs Published stats
+  const publishedCount = useMemo(() => products.filter(p => p.status !== 'draft').length, [products]);
+  const draftsCount = useMemo(() => products.filter(p => p.status === 'draft').length, [products]);
 
   // Added-to-cart animation feedback map
   const [addedIds, setAddedIds] = useState<Record<string, boolean>>({});
@@ -67,7 +75,8 @@ export function Shop() {
 
   // Filtered and sorted products
   const filteredProducts = useMemo(() => {
-    let prods = [...SHOP_PRODUCTS];
+    // Only items with Published status should be displayed on the public Shop Page
+    let prods = products.filter(p => p.status !== 'draft');
 
     if (selectedCategory !== 'All Products') {
       prods = prods.filter(p => p.category === selectedCategory);
@@ -94,7 +103,7 @@ export function Shop() {
     }
 
     return prods;
-  }, [selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedCategory, searchQuery, sortBy]);
 
   const faqs = [
     {
@@ -141,25 +150,75 @@ export function Shop() {
         ]}
       />
 
+      {/* Admin Session Security Bar (Visible only when authorized admin is logged in) */}
+      {isAuthenticated && adminUser && (
+        <div className="bg-slate-900 border-b border-slate-800 text-white text-xs py-2.5 px-4 sm:px-6 lg:px-8 shadow-inner">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-extrabold text-emerald-400">Admin Session Active:</span>
+              <span className="text-slate-300 font-mono text-[11px] bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                {adminUser?.email || 'admin@admin.com'}
+              </span>
+              <span className="hidden md:inline text-[11px] text-slate-400">
+                ({publishedCount} Published Live • {draftsCount} Drafts Hidden)
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs">
+              <Link
+                to="/admin/shop"
+                className="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+              >
+                <span>⚙️ Admin Catalog Desk</span>
+                {draftsCount > 0 && (
+                  <span className="px-1.5 py-0.2 bg-amber-400 text-slate-950 font-black rounded-full text-[10px]">
+                    {draftsCount} Drafts
+                  </span>
+                )}
+              </Link>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-1 border border-slate-700 cursor-pointer"
+                title="Sign out of admin session"
+              >
+                <LogOut className="w-3 h-3 text-slate-400" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Header Section */}
-      <section className="bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 text-white pt-14 pb-16 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
+      <section className="bg-gradient-to-b from-slate-50 via-emerald-50/40 to-slate-100/70 text-slate-900 pt-14 pb-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 relative overflow-hidden">
         {/* Glow ambient background elements */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
             
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Official Digital Repository • Accounticca × E-Lawyers</span>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/80 text-emerald-800 border border-emerald-300 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Official Digital Repository • Accounticca × E-Lawyers</span>
+              </div>
+              <Link
+                to="/admin/shop"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-colors"
+                title="Open Shop Product Admin Desk"
+              >
+                <span>⚙️ Manage Products (Admin)</span>
+              </Link>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Legal, Tax & Corporate <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Compliance Store</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Legal, Tax & Corporate <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-700">Compliance Store</span>
             </h1>
 
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
               Practitioner-drafted legal agreements, automated NBR tax & VAT workbooks, corporate secretarial toolkits, and on-demand legal advisory sessions.
             </p>
 
@@ -172,13 +231,13 @@ export function Shop() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search NDA, Income Tax Excel, Employment Agreement, RJSC Kit..."
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-slate-900 rounded-2xl border border-white/20 focus:border-emerald-400 text-sm font-semibold placeholder-slate-400 focus:placeholder-slate-500 focus:outline-none transition-all shadow-lg"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white text-slate-900 focus:bg-white rounded-2xl border border-slate-300 focus:border-emerald-500 text-sm font-semibold placeholder-slate-400 focus:placeholder-slate-500 focus:outline-none transition-all shadow-md"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white bg-white/10 px-2 py-1 rounded-md"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md"
                   >
                     Clear
                   </button>
@@ -187,17 +246,17 @@ export function Shop() {
             </div>
 
             {/* Trust Points Pill Strip */}
-            <div className="pt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-300 font-medium">
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-600 font-medium">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Supreme Court Advocate Vetted</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>FY 2026–27 Statutory Compliance</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Download className="w-4 h-4 text-emerald-400" />
+                <Download className="w-4 h-4 text-emerald-600" />
                 <span>Instant Word, Excel & PDF Delivery</span>
               </div>
             </div>
@@ -302,8 +361,8 @@ export function Shop() {
                   key={product.id}
                   className="group bg-white rounded-3xl border border-slate-200 hover:border-emerald-300 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
                 >
-                  {/* Card Image & Badges */}
-                  <div className="relative aspect-16/10 bg-slate-100 overflow-hidden">
+                  {/* Card Image & Badges (Clickable to /shop/:slug) */}
+                  <Link to={`/shop/${product.slug}`} className="relative aspect-16/10 bg-slate-100 overflow-hidden block">
                     <img
                       src={product.imageUrl}
                       alt={product.title}
@@ -333,7 +392,7 @@ export function Shop() {
                       <span className="font-semibold truncate">{product.format}</span>
                       <span className="font-mono text-emerald-300 shrink-0">{product.pagesOrFiles}</span>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Card Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
@@ -345,9 +404,11 @@ export function Shop() {
                         <span className="text-[11px] text-slate-400">({product.reviewsCount})</span>
                       </div>
 
-                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-emerald-700 transition-colors line-clamp-2">
-                        {product.title}
-                      </h3>
+                      <Link to={`/shop/${product.slug}`}>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-emerald-700 transition-colors line-clamp-2">
+                          {product.title}
+                        </h3>
+                      </Link>
 
                       <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
                         {product.shortDescription}
@@ -370,15 +431,14 @@ export function Shop() {
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setQuickViewProduct(product)}
-                        className="text-xs text-slate-600 hover:text-slate-900 font-bold inline-flex items-center gap-1 p-1 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                        title="Quick Preview"
+                      <Link
+                        to={`/shop/${product.slug}`}
+                        className="text-xs text-slate-600 hover:text-emerald-700 font-bold inline-flex items-center gap-1 p-1 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                        title="View Full Product Details"
                       >
                         <Eye className="w-3.5 h-3.5 text-slate-400" />
                         <span>Preview</span>
-                      </button>
+                      </Link>
                     </div>
                   </div>
 
@@ -532,16 +592,6 @@ export function Shop() {
           setInstantCheckoutProduct(null);
           setIsCheckoutOpen(true);
         }} 
-      />
-
-      {/* Product Quick View Modal */}
-      <ProductQuickViewModal
-        product={quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onInstantCheckout={(product) => {
-          setInstantCheckoutProduct(product);
-          setIsCheckoutOpen(true);
-        }}
       />
 
       {/* Checkout Modal */}

@@ -28,8 +28,13 @@ import { TdsReference } from './pages/TdsReference';
 import { TaxPlanner } from './pages/TaxPlanner';
 import { TaxRefundGuide } from './pages/TaxRefundGuide';
 import { Shop } from './pages/Shop';
+import { ProductDetail } from './pages/ProductDetail';
+import { AdminShop } from './pages/AdminShop';
+import { ShopAdminLogin } from './pages/ShopAdminLogin';
+import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
 import { AuthProvider } from './contexts/AuthContext';
+import { ShopAuthProvider } from './contexts/ShopAuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { BookmarkProvider } from './contexts/BookmarkContext';
 import { CartProvider } from './contexts/CartContext';
@@ -41,17 +46,32 @@ export default function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <BookmarkProvider>
-          <CartProvider>
-            <BrowserRouter>
-              <ScrollManager />
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="shop" element={<Shop />} />
-                  <Route path="store" element={<Navigate to="/shop" replace />} />
-                  <Route path="products" element={<Navigate to="/shop" replace />} />
-                  <Route path="resource-library" element={<ResourceLibraryPage />} />
+        <ShopAuthProvider>
+          <BookmarkProvider>
+            <CartProvider>
+              <BrowserRouter>
+                <ScrollManager />
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    
+                    {/* Admin Authentication Login Pages */}
+                    <Route path="admin/login" element={<ShopAdminLogin />} />
+                    <Route path="shop/login" element={<Navigate to="/admin/login" replace />} />
+
+                    {/* Public Shop Pages (Open to All Visitors, Displays Published Catalog) */}
+                    <Route path="shop" element={<Shop />} />
+                    <Route path="shop/:slug" element={<ProductDetail />} />
+                    <Route path="shop/product/:slug" element={<ProductDetail />} />
+                    
+                    {/* Admin Shop Catalog Desk (Protected by Authorized Credentials: hmekram@gmail.com) */}
+                    <Route path="admin/shop" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />
+                    <Route path="admin/products" element={<Navigate to="/admin/shop" replace />} />
+                    <Route path="admin" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />
+                    
+                    <Route path="store" element={<Navigate to="/shop" replace />} />
+                    <Route path="products" element={<Navigate to="/shop" replace />} />
+                    <Route path="resource-library" element={<ResourceLibraryPage />} />
                   <Route path="resources" element={<Navigate to="/resource-library" replace />} />
                   <Route path="category/:id" element={<Category />} />
                 <Route path="article/:id" element={<Article />} />
@@ -113,6 +133,7 @@ export default function App() {
           </BrowserRouter>
           </CartProvider>
         </BookmarkProvider>
+        </ShopAuthProvider>
       </AuthProvider>
     </LanguageProvider>
   );

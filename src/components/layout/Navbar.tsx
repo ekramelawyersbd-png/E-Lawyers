@@ -38,6 +38,7 @@ import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBookmarks } from '../../contexts/BookmarkContext';
 import { useCart } from '../../contexts/CartContext';
+import { useShopAuth } from '../../contexts/ShopAuthContext';
 import { LanguageToggle } from '../LanguageToggle';
 import { TaxDeadlineNavDropdown } from '../tax/TaxDeadlineNavDropdown';
 import { GlobalSearchAutocomplete } from '../search/GlobalSearchAutocomplete';
@@ -65,6 +66,7 @@ export function Navbar() {
   const { user, logout } = useAuth();
   const { count: savedBookmarkCount } = useBookmarks();
   const { totalItemsCount, toggleCart } = useCart();
+  const { isAuthenticated: isShopAdminAuthenticated } = useShopAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -680,13 +682,18 @@ export function Navbar() {
               to="/shop"
               className={cn(
                 "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-[13px] tracking-wide transition-all duration-200 whitespace-nowrap",
-                location.pathname === '/shop'
+                location.pathname.startsWith('/shop') || location.pathname.startsWith('/admin/shop')
                   ? "bg-white text-emerald-800 shadow-2xs font-extrabold ring-1 ring-emerald-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold"
+                  : isShopAdminAuthenticated
+                    ? "text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 font-bold border border-emerald-200/80"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold"
               )}
             >
               <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Shop</span>
+              <span>{isShopAdminAuthenticated ? 'Admin Shop' : 'Shop'}</span>
+              {isShopAdminAuthenticated && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              )}
             </Link>
 
             {/* Contact */}
@@ -1217,18 +1224,18 @@ export function Navbar() {
               to="/shop"
               className={cn(
                 "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[35px]",
-                location.pathname === '/shop'
+                location.pathname.startsWith('/shop') || location.pathname.startsWith('/admin/shop')
                   ? "text-emerald-950 bg-emerald-50/90 border border-emerald-300 font-extrabold shadow-2xs" 
                   : "text-slate-700 hover:text-emerald-800 hover:bg-slate-50/80 active:bg-slate-100"
               )}
               onClick={() => setIsOpen(false)}
             >
               <div className="flex items-center gap-2">
-                <ShoppingBag className={cn("w-4 h-4", location.pathname === '/shop' ? "text-emerald-600" : "text-slate-500")} />
-                <span>Legal &amp; Tax Store</span>
+                <ShoppingBag className={cn("w-4 h-4", location.pathname.startsWith('/shop') ? "text-emerald-600" : "text-slate-500")} />
+                <span>{isShopAdminAuthenticated ? 'Admin Legal & Tax Store' : 'Legal & Tax Store'}</span>
               </div>
               <span className="inline-flex items-center gap-1 text-[9px] font-extrabold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.2 rounded-full">
-                Shop
+                {isShopAdminAuthenticated ? 'Admin Desk' : 'Shop'}
               </span>
             </Link>
 

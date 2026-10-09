@@ -1,14 +1,300 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import multer from "multer";
+import { SHOP_PRODUCTS, ShopProduct } from "./src/data/shopProducts";
+
+// Admin authorized credentials
+const ADMIN_AUTHORIZED_EMAILS = ["admin@admin.com", "hmekram@gmail.com", "hmekram@mail.com"];
+const ADMIN_AUTHORIZED_PASSWORD = "123ekraM.com";
+
+interface AdminSession {
+  token: string;
+  email: string;
+  role: "admin";
+  createdAt: number;
+  expiresAt: number;
+}
+
+const PRODUCTS_STORAGE_FILE = path.join(process.cwd(), "data", "shop-products-server.json");
+const SESSIONS_STORAGE_FILE = path.join(process.cwd(), "data", "admin-sessions-server.json");
+
+function loadAdminSessions(): Map<string, AdminSession> {
+  const map = new Map<string, AdminSession>();
+  try {
+    if (fs.existsSync(SESSIONS_STORAGE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SESSIONS_STORAGE_FILE, "utf-8"));
+      if (Array.isArray(data)) {
+        const now = Date.now();
+        for (const s of data) {
+          if (s.expiresAt > now) {
+            map.set(s.token, s);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[Admin Auth] Notice reading session storage:", err);
+  }
+  return map;
+}
+
+function saveAdminSessions(map: Map<string, AdminSession>) {
+  try {
+    const list = Array.from(map.values()).filter(s => s.expiresAt > Date.now());
+    fs.writeFileSync(SESSIONS_STORAGE_FILE, JSON.stringify(list, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Admin Auth] Notice saving sessions:", err);
+  }
+}
+
+function loadServerProducts(): ShopProduct[] {
+  try {
+    if (fs.existsSync(PRODUCTS_STORAGE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(PRODUCTS_STORAGE_FILE, "utf-8"));
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn("[Shop Products] Notice reading products storage:", err);
+  }
+  // Initialize with default SHOP_PRODUCTS
+  saveServerProducts(SHOP_PRODUCTS);
+  return [...SHOP_PRODUCTS];
+}
+
+function saveServerProducts(products: ShopProduct[]) {
+  try {
+    fs.writeFileSync(PRODUCTS_STORAGE_FILE, JSON.stringify(products, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Shop Products] Notice saving products storage:", err);
+  }
+}
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  const adminSessions = loadAdminSessions();
+
+  // Helper middleware to strictly enforce admin authentication on server-side
+  const requireAdminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        error: "Unauthorized: Admin authentication token required to access this resource.",
+        code: "AUTH_REQUIRED"
+      });
+    }
+
+    const token = authHeader.substring(7).trim();
+    const session = adminSessions.get(token);
+
+    if (!session || session.expiresAt <= Date.now()) {
+      if (session) {
+        adminSessions.delete(token);
+        saveAdminSessions(adminSessions);
+      }
+      return res.status(401).json({
+        error: "Unauthorized: Admin session is invalid or has expired. Please log in again.",
+        code: "SESSION_EXPIRED"
+      });
+    }
+
+    if (!ADMIN_AUTHORIZED_EMAILS.some(e => e.toLowerCase() === session.email.toLowerCase())) {
+      return res.status(403).json({
+        error: "Forbidden: Only authorized administrator can access this resource.",
+        code: "FORBIDDEN"
+      });
+    }
+
+    // Attach verified admin to request
+    (req as any).adminSession = session;
+    next();
+  };
+
+  // --- Admin Authentication API Endpoints ---
+  app.post("/api/admin/login", (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const normalizedEmail = (email || "").trim().toLowerCase();
+      const providedPassword = (password || "").trim();
+
+      const isAuthorizedEmail = ADMIN_AUTHORIZED_EMAILS.some(e => e.toLowerCase() === normalizedEmail);
+      if (!isAuthorizedEmail || providedPassword !== ADMIN_AUTHORIZED_PASSWORD) {
+        return res.status(401).json({
+          error: "Invalid email or password. Verify administrator credentials.",
+          code: "INVALID_CREDENTIALS"
+        });
+      }
+
+      // Generate a secure session token
+      const token = crypto.randomBytes(32).toString("hex");
+      const session: AdminSession = {
+        token,
+        email: normalizedEmail,
+        role: "admin",
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+
+      adminSessions.set(token, session);
+      saveAdminSessions(adminSessions);
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          email: normalizedEmail,
+          role: "admin",
+          name: "Adv. Ekram Hossain",
+          title: "Supreme Court Advocate & Corporate Tax Lead"
+        }
+      });
+    } catch (err: any) {
+      console.error("[Admin Login Error]", err);
+      res.status(500).json({ error: "Internal server error during authentication" });
+    }
+  });
+
+  app.get("/api/admin/verify", (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ authenticated: false, error: "No bearer token provided" });
+    }
+
+    const token = authHeader.substring(7).trim();
+    const session = adminSessions.get(token);
+
+    if (!session || session.expiresAt <= Date.now()) {
+      if (session) {
+        adminSessions.delete(token);
+        saveAdminSessions(adminSessions);
+      }
+      return res.status(401).json({ authenticated: false, error: "Session expired or invalid" });
+    }
+
+    res.json({
+      authenticated: true,
+      user: {
+        email: session.email,
+        role: session.role,
+        name: "Adv. Ekram Hossain",
+        title: "Supreme Court Advocate & Corporate Tax Lead"
+      }
+    });
+  });
+
+  app.post("/api/admin/logout", (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7).trim();
+      adminSessions.delete(token);
+      saveAdminSessions(adminSessions);
+    }
+    res.json({ success: true, message: "Logged out successfully" });
+  });
+
+  // --- Shop Products APIs: Public read for published items, Admin access for all & mutations ---
+  app.get("/api/shop/products", (req, res) => {
+    try {
+      const products = loadServerProducts();
+      
+      // Check if request is from authenticated admin
+      const authHeader = req.headers.authorization;
+      let isAdmin = false;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7).trim();
+        const session = adminSessions.get(token);
+        if (session && session.expiresAt > Date.now() && ADMIN_AUTHORIZED_EMAILS.some(e => e.toLowerCase() === session.email.toLowerCase())) {
+          isAdmin = true;
+        }
+      }
+
+      if (isAdmin) {
+        // Authorized Admin gets all products including drafts
+        return res.json({ products, isAdmin: true });
+      } else {
+        // Public visitors only see published products (drafts remain hidden)
+        const publishedProducts = products.filter(p => p.status !== 'draft');
+        return res.json({ products: publishedProducts, isAdmin: false });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to load products" });
+    }
+  });
+
+  app.post("/api/shop/products", requireAdminAuth, (req, res) => {
+    try {
+      const newOrUpdatedProduct: ShopProduct = req.body;
+      if (!newOrUpdatedProduct || !newOrUpdatedProduct.title) {
+        return res.status(400).json({ error: "Product title is required" });
+      }
+
+      const products = loadServerProducts();
+      const existingIdx = products.findIndex(p => p.id === newOrUpdatedProduct.id || p.slug === newOrUpdatedProduct.slug);
+
+      if (existingIdx >= 0) {
+        products[existingIdx] = { ...products[existingIdx], ...newOrUpdatedProduct };
+      } else {
+        products.unshift(newOrUpdatedProduct);
+      }
+
+      saveServerProducts(products);
+      res.json({ success: true, product: newOrUpdatedProduct, products });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to save product" });
+    }
+  });
+
+  app.patch("/api/shop/products/:id/toggle-publish", requireAdminAuth, (req, res) => {
+    try {
+      const { id } = req.params;
+      const products = loadServerProducts();
+      const prod = products.find(p => p.id === id || p.slug === id);
+
+      if (!prod) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      const nextStatus: "published" | "draft" = prod.status === "draft" ? "published" : "draft";
+      prod.status = nextStatus;
+
+      saveServerProducts(products);
+      res.json({ success: true, product: prod, newStatus: nextStatus, products });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to toggle status" });
+    }
+  });
+
+  app.delete("/api/shop/products/:id", requireAdminAuth, (req, res) => {
+    try {
+      const { id } = req.params;
+      const products = loadServerProducts();
+      const updated = products.filter(p => p.id !== id && p.slug !== id);
+
+      saveServerProducts(updated);
+      res.json({ success: true, deletedId: id, products: updated });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to delete product" });
+    }
+  });
+
+  app.post("/api/shop/products/reset", requireAdminAuth, (req, res) => {
+    try {
+      const defaults = [...SHOP_PRODUCTS];
+      saveServerProducts(defaults);
+      res.json({ success: true, products: defaults });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to reset products" });
+    }
+  });
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
@@ -408,6 +694,44 @@ Each object must follow this exact JSON schema:
     } catch (error) {
       console.error("Error in newsletter subscription:", error);
       res.status(500).json({ error: "Failed to process newsletter subscription." });
+    }
+  });
+
+  // Firebase Authentication Custom Domain Reverse Proxy
+  // Allows https://blog.accounticca.com/__/auth/* to seamlessly serve Firebase OAuth handlers
+  app.all("/__/auth/*", async (req, res) => {
+    try {
+      const targetUrl = `https://gen-lang-client-0396222608.firebaseapp.com${req.originalUrl}`;
+      const forwardHeaders: Record<string, string> = {};
+      for (const [key, val] of Object.entries(req.headers)) {
+        if (key.toLowerCase() !== "host" && typeof val === "string") {
+          forwardHeaders[key] = val;
+        }
+      }
+      forwardHeaders["host"] = "gen-lang-client-0396222608.firebaseapp.com";
+
+      const fetchOptions: RequestInit = {
+        method: req.method,
+        headers: forwardHeaders,
+      };
+
+      if (!["GET", "HEAD"].includes(req.method) && req.body) {
+        fetchOptions.body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+      }
+
+      const response = await fetch(targetUrl, fetchOptions);
+
+      res.status(response.status);
+      response.headers.forEach((val, key) => {
+        if (key.toLowerCase() !== "content-encoding") {
+          res.setHeader(key, val);
+        }
+      });
+      const data = await response.arrayBuffer();
+      res.send(Buffer.from(data));
+    } catch (err: any) {
+      console.error("[Firebase Auth Proxy Error]:", err);
+      res.status(502).send("Auth Proxy Gateway Error");
     }
   });
 

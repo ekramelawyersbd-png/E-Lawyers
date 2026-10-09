@@ -98,6 +98,31 @@
         "featured": "boolean",
         "createdAt": "timestamp"
       }
+    },
+    {
+      "name": "products",
+      "description": "Digital legal and tax templates, compliance kits, and advisory products",
+      "fields": {
+        "title": "string",
+        "slug": "string",
+        "category": "string",
+        "price": "number",
+        "originalPrice": "number",
+        "rating": "number",
+        "reviewsCount": "number",
+        "format": "string",
+        "badge": "string",
+        "shortDescription": "string",
+        "fullDescription": "string",
+        "governingLaw": "string",
+        "pagesOrFiles": "string",
+        "features": "array",
+        "samplePreviewSnippet": "string",
+        "imageUrl": "string",
+        "authorOrVettedBy": "string",
+        "status": "string",
+        "updatedAt": "timestamp"
+      }
     }
   ],
   "relationships": [

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   X, 
   Trash2, 
@@ -129,17 +130,27 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
                     key={item.product.id}
                     className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-emerald-200 transition-all flex gap-3.5"
                   >
-                    <img
-                      src={item.product.imageUrl}
-                      alt={item.product.title}
-                      className="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-200"
-                    />
+                    <Link
+                      to={`/shop/${item.product.slug}`}
+                      onClick={() => setIsCartOpen(false)}
+                      className="shrink-0 block"
+                    >
+                      <img
+                        src={item.product.imageUrl}
+                        alt={item.product.title}
+                        className="w-16 h-16 rounded-xl object-cover border border-slate-200 hover:opacity-90 transition-opacity"
+                      />
+                    </Link>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-1">
-                        <h4 className="font-bold text-xs text-slate-900 leading-snug line-clamp-2">
+                        <Link
+                          to={`/shop/${item.product.slug}`}
+                          onClick={() => setIsCartOpen(false)}
+                          className="font-bold text-xs text-slate-900 leading-snug line-clamp-2 hover:text-emerald-700 transition-colors"
+                        >
                           {item.product.title}
-                        </h4>
+                        </Link>
                         <button
                           type="button"
                           onClick={() => removeFromCart(item.product.id)}

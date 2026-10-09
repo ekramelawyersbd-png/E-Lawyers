@@ -88,6 +88,7 @@ export function Footer() {
               <li><Link to="/" className="hover:text-emerald-400 transition-colors">Blog Categories</Link></li>
               <li><Link to="/resource-library" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Resource Library (PDFs)</Link></li>
               <li><Link to="/shop" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Legal & Tax Shop (Digital)</Link></li>
+              <li className="hidden"><Link to="/admin/shop" className="hidden">Catalog Admin & Add Products</Link></li>
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
               <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
               <li>
@@ -118,7 +119,14 @@ export function Footer() {
         </div>
 
         {/* Verified Ecosystem Media & Social Hubs (ACCOUNTICCA × E-LAWYERS) */}
-        <div className="border-t border-slate-800/80 mt-12 pt-8 pb-2">
+        <div 
+          className="border-t border-slate-800/80 mt-12 pt-8 pb-2"
+          style={{
+            marginTop: '120px',
+            paddingTop: '6px',
+            paddingLeft: '0px'
+          }}
+        >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5 text-center md:text-left">
               <span className="text-xs font-bold text-white tracking-wide">
