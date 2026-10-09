@@ -125,46 +125,5 @@ const TRUST_BADGES = [
 ];
 
 export function ContactTestimonialsCarousel() {
-  return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="client-testimonials">
-      {/* 1. Institutional Trust Badges Strip */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 border border-emerald-900/50 shadow-xl relative overflow-hidden">
-        {/* Subtle Ambient Orbs */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-6">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 mb-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              Institutional Credibility &amp; Trust
-            </span>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Trusted by Leading Bangladeshi Enterprises &amp; Foreign Investors
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
-            {TRUST_BADGES.map((badge, idx) => (
-              <div 
-                key={idx}
-                className="bg-slate-800/80 hover:bg-slate-800 rounded-2xl p-4 border border-slate-700/80 hover:border-emerald-500/40 transition-all duration-200 flex flex-col items-center text-center group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform shadow-xs">
-                  {badge.icon}
-                </div>
-                <h4 className="text-xs sm:text-sm font-bold text-white mb-1 group-hover:text-emerald-300 transition-colors">
-                  {badge.title}
-                </h4>
-                <p className="text-[11px] text-slate-400 leading-snug">
-                  {badge.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-    </section>
-  );
+  return null;
 }

@@ -31,7 +31,6 @@ import {
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
-import { ContactTestimonialsCarousel } from '../components/ContactTestimonialsCarousel';
 
 export function Contact() {
   const [firstName, setFirstName] = useState('');
@@ -478,12 +477,8 @@ export function Contact() {
               <div>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-900 border border-teal-500/30 p-1 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
-                      <img 
-                        src="/elawyers-emblem.png" 
-                        alt="E-LAWYERS" 
-                        className="w-full h-full object-contain" 
-                      />
+                    <div className="w-10 h-10 rounded-xl bg-teal-700 text-white flex items-center justify-center font-black text-lg shadow-sm">
+                      E
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-slate-900">E-LAWYERS</h3>
@@ -781,9 +776,6 @@ export function Contact() {
           </div>
         </div>
       </section>
-
-      {/* Verified Client Testimonials & Institutional Trust Badges Carousel */}
-      <ContactTestimonialsCarousel />
 
       {/* Main Dual Columns: Inquiry Form & Practice Capabilities */}
       <section id="inquiry-form-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-24">
