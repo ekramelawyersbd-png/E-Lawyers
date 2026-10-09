@@ -217,58 +217,58 @@ export function Home() {
         ]}
       />
       {/* 1. Hero Section */}
-      <section className="w-full relative bg-[#071426] overflow-hidden">
+      <section className="w-full relative bg-gradient-to-b from-slate-50 via-emerald-50/40 to-slate-100/70 border-b border-slate-200/80 overflow-hidden">
         {/* Subtle radial glow and modern background pattern */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-[#00A878]/20 rounded-full blur-[120px] mix-blend-screen animate-in fade-in duration-1000" />
-          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-[#00A878]/10 rounded-full blur-[100px] mix-blend-screen" />
+          <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] mix-blend-multiply animate-in fade-in duration-1000" />
+          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-[100px] mix-blend-multiply" />
           {/* Abstract Grid/Pattern Overlay */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTM5LjUgMGguNXY0MGgtLjV6TTAgMzkuNXYuNWg0MHYtLjV6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDIpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-70" />
         </div>
         
         <div className="relative z-10 flex flex-col justify-center min-h-[calc(100vh-80px)] pt-8 pb-16 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Content Area */}
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide mb-5 shadow-sm backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs font-bold tracking-wide mb-5 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
                 <span>Bangladesh Regulatory &amp; Corporate Intelligence</span>
               </div>
               
               {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[58px] font-extrabold tracking-tight text-white mb-4 leading-[1.1]">
-                Compliance <span className="text-emerald-400">Hub</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-[58px] font-extrabold tracking-tight text-slate-900 mb-4 leading-[1.1]">
+                Compliance <span className="text-emerald-600">Hub</span>
               </h1>
               
               {/* Refined Credibility Line */}
-              <div className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs sm:text-sm text-slate-300 font-medium mb-6 py-2 px-3.5 sm:px-4 rounded-xl bg-white/[0.05] border border-white/10 shadow-sm backdrop-blur-md">
-                <span className="text-slate-400 font-normal">Powered by</span>
+              <div className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs sm:text-sm text-slate-700 font-medium mb-6 py-2 px-3.5 sm:px-4 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+                <span className="text-slate-500 font-normal">Powered by</span>
                 <a 
                   href="https://elawyersbd.com/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-1 font-semibold text-emerald-400 hover:text-emerald-300 underline-offset-4 hover:underline transition-colors"
+                  className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 underline-offset-4 hover:underline transition-colors"
                 >
                   <span>E-Lawyers</span>
-                  <ExternalLink className="w-3 h-3 text-emerald-400/80" />
+                  <ExternalLink className="w-3 h-3 text-emerald-700" />
                 </a>
-                <span className="text-slate-500">&amp;</span>
+                <span className="text-slate-400">&amp;</span>
                 <a 
                   href="https://accounticca.com/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-1 font-semibold text-emerald-400 hover:text-emerald-300 underline-offset-4 hover:underline transition-colors"
+                  className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 underline-offset-4 hover:underline transition-colors"
                 >
                   <span>Accounticca</span>
-                  <ExternalLink className="w-3 h-3 text-emerald-400/80" />
+                  <ExternalLink className="w-3 h-3 text-emerald-700" />
                 </a>
-                <span className="text-slate-500 hidden sm:inline">—</span>
-                <span className="text-slate-200 font-medium">Simplifying Legal &amp; Financial Compliance</span>
+                <span className="text-slate-400 hidden sm:inline">—</span>
+                <span className="text-slate-700 font-semibold">Simplifying Legal &amp; Financial Compliance</span>
               </div>
               
               {/* Value Proposition */}
               <p 
-                className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl mb-8 font-normal text-justify"
+                className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mb-8 font-normal text-justify"
                 style={{ textAlign: 'justify' }}
               >
                 Authoritative statutory guidance, tax calculators, and actionable regulatory insights. Built for entrepreneurs, CFOs, and practitioners navigating Bangladesh legal and financial compliance.
@@ -278,7 +278,7 @@ export function Home() {
               <div className="mb-5 max-w-xl relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <form 
-                  className="relative flex items-center bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1.5 border border-slate-700/80 shadow-2xl transition-all"
+                  className="relative flex items-center bg-white rounded-2xl p-1.5 border border-slate-300 shadow-md transition-all"
                   onSubmit={(e) => {
                     e.preventDefault();
                     const form = e.target as HTMLFormElement;
@@ -293,9 +293,9 @@ export function Home() {
                     name="search"
                     type="text" 
                     placeholder="Search Income Tax sections, RJSC filings, VAT circulars..." 
-                    className="w-full bg-transparent border-none py-3.5 pl-12 pr-4 text-white placeholder:text-slate-400 focus:outline-none text-sm sm:text-base font-medium"
+                    className="w-full bg-transparent border-none py-3.5 pl-12 pr-4 text-slate-900 placeholder:text-slate-400 focus:outline-none text-sm sm:text-base font-medium"
                   />
-                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 sm:px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0">
+                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-md shrink-0">
                     Search
                   </button>
                 </form>
@@ -303,17 +303,17 @@ export function Home() {
 
               {/* Quick Interactive Tool Tags */}
               <div className="flex flex-wrap items-center gap-2 mb-8 max-w-xl">
-                <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Quick Tools:</span>
-                <Link to="/tax-calculator" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Quick Tools:</span>
+                <Link to="/tax-calculator" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors">
                   Tax Calculator
                 </Link>
-                <Link to="/tds-guide" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                <Link to="/tds-guide" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors">
                   TDS Guide
                 </Link>
-                <Link to="/corporate-planner" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                <Link to="/corporate-planner" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors">
                   Corporate Tax
                 </Link>
-                <Link to="/vat-guide" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                <Link to="/vat-guide" className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors">
                   VAT Guide
                 </Link>
               </div>
@@ -322,14 +322,14 @@ export function Home() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link 
                   to="/contact" 
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:-translate-y-0.5 text-sm sm:text-base"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md hover:-translate-y-0.5 text-sm sm:text-base"
                 >
                   <span>Book Consultation</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link 
                   to="/category/compliance" 
-                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5 text-sm sm:text-base"
+                  className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 hover:text-slate-950 px-7 py-3.5 rounded-xl font-bold transition-all flex items-center gap-2 hover:-translate-y-0.5 text-sm sm:text-base shadow-2xs"
                 >
                   <span>Compliance Checklists</span>
                   <ArrowRight className="w-4 h-4" />
@@ -341,12 +341,12 @@ export function Home() {
             <div className="lg:col-span-5 space-y-4">
               {currentHeroArticle && (
                 <div className="relative group animate-in fade-in zoom-in-95 slide-in-from-right-8 duration-1000 delay-150">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-emerald-500/30 to-slate-800 rounded-[26px] blur-sm opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <div className="relative flex flex-col bg-slate-900/85 backdrop-blur-2xl border border-slate-700/70 p-6 sm:p-7 rounded-[22px] shadow-2xl overflow-hidden">
+                  <div className="absolute -inset-1 bg-gradient-to-br from-emerald-500/20 to-slate-200 rounded-[26px] blur-sm opacity-50 group-hover:opacity-80 transition duration-500"></div>
+                  <div className="relative flex flex-col bg-white border border-slate-200/90 p-6 sm:p-7 rounded-[22px] shadow-lg overflow-hidden">
                     
                     {/* Header: Recent Insights Tabs (1 to 3) & Navigation */}
                     <div className="flex items-center justify-between gap-2 mb-5">
-                      <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                      <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
                         {heroRecentArticles.map((article, idx) => (
                           <button
                             key={article.id}
@@ -355,7 +355,7 @@ export function Home() {
                             className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                               heroArticleIndex === idx
                                 ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                             }`}
                             title={`View recent article ${idx + 1}`}
                           >
@@ -368,7 +368,7 @@ export function Home() {
                         <button
                           type="button"
                           onClick={() => setHeroArticleIndex((prev) => (prev > 0 ? prev - 1 : heroRecentArticles.length - 1))}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5"
+                          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer border border-slate-200"
                           title="Previous recent article"
                           aria-label="Previous article"
                         >
@@ -377,7 +377,7 @@ export function Home() {
                         <button
                           type="button"
                           onClick={() => setHeroArticleIndex((prev) => (prev < heroRecentArticles.length - 1 ? prev + 1 : 0))}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5"
+                          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer border border-slate-200"
                           title="Next recent article"
                           aria-label="Next article"
                         >
@@ -391,50 +391,50 @@ export function Home() {
                       className="group/link flex flex-col flex-1"
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg">
-                          <Sparkles className="w-3 h-3 text-emerald-400" />
+                        <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg">
+                          <Sparkles className="w-3 h-3 text-emerald-600" />
                           <span>{currentHeroArticle.category || 'Recent Insight'}</span>
                         </div>
-                        <span className="text-slate-400 text-xs font-semibold flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
-                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-slate-600 text-xs font-semibold flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                          <Clock className="w-3.5 h-3.5 text-slate-500" />
                           {calculateReadingTime(currentHeroArticle.content)} min
                         </span>
                       </div>
                       
-                      <h2 className="text-lg sm:text-xl font-bold text-white mb-2.5 leading-snug group-hover/link:text-emerald-300 transition-colors line-clamp-2">
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2.5 leading-snug group-hover/link:text-emerald-700 transition-colors line-clamp-2">
                         {currentHeroArticle.title}
                       </h2>
                       
                       <p 
-                        className="text-slate-400 text-xs sm:text-sm mb-5 line-clamp-2 leading-relaxed text-justify"
+                        className="text-slate-600 text-xs sm:text-sm mb-5 line-clamp-2 leading-relaxed text-justify"
                         style={{ textAlign: 'justify' }}
                       >
                         {currentHeroArticle.excerpt}
                       </p>
                       
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
                         <div className="flex items-center gap-3">
                           <img 
                             src={currentHeroArticle.author.avatarUrl} 
                             alt={currentHeroArticle.author.name} 
-                            className="w-8 h-8 rounded-full object-cover border border-slate-700 shadow-sm" 
+                            className="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-sm" 
                           />
                           <div>
-                            <p className="text-xs font-bold text-white">{currentHeroArticle.author.name}</p>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-xs font-bold text-slate-900">{currentHeroArticle.author.name}</p>
+                            <p className="text-[10px] text-slate-500">
                               {currentHeroArticle.publishedAt ? format(new Date(currentHeroArticle.publishedAt), 'MMM d, yyyy') : 'Recent Update'}
                             </p>
                           </div>
                         </div>
-                        <span className="w-8 h-8 rounded-full bg-emerald-600/20 text-emerald-400 group-hover/link:bg-emerald-600 group-hover/link:text-white flex items-center justify-center transition-all duration-300">
+                        <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 group-hover/link:bg-emerald-600 group-hover/link:text-white flex items-center justify-center transition-all duration-300">
                           <ArrowUpRight className="w-4 h-4" />
                         </span>
                       </div>
                     </Link>
 
                     {/* Compact Mini-List for the other 2 recent articles */}
-                    <div className="mt-4 pt-3.5 border-t border-slate-800/80 space-y-1.5">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <div className="mt-4 pt-3.5 border-t border-slate-100 space-y-1.5">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                         Top 3 Recent Updates:
                       </div>
                       {heroRecentArticles.map((article, idx) => (
@@ -444,13 +444,13 @@ export function Home() {
                           onClick={() => setHeroArticleIndex(idx)}
                           className={`w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
                             heroArticleIndex === idx 
-                              ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-300' 
-                              : 'hover:bg-white/5 text-slate-400 hover:text-slate-200'
+                              ? 'bg-emerald-50 border border-emerald-300 text-emerald-900 font-bold' 
+                              : 'hover:bg-slate-50 text-slate-600 hover:text-slate-900'
                           }`}
                         >
                           <span className="truncate pr-2 font-medium flex items-center gap-1.5">
-                            <span className="text-emerald-500 font-bold shrink-0">0{idx + 1}.</span>
-                            <FileText className="w-3 h-3 text-emerald-400/80 shrink-0" />
+                            <span className="text-emerald-700 font-bold shrink-0">0{idx + 1}.</span>
+                            <FileText className="w-3 h-3 text-emerald-600 shrink-0" />
                             <span className="truncate">{article.title}</span>
                           </span>
                           <span className="text-[10px] text-slate-500 shrink-0">
@@ -466,20 +466,20 @@ export function Home() {
 
               {/* Three SaaS Compliance Pillar Badges */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
-                  <Landmark className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Corporate</div>
-                  <div className="text-xs text-slate-300 font-medium">RJSC &amp; Companies</div>
+                <div className="bg-white border border-slate-200/90 shadow-2xs rounded-xl p-3 text-center hover:border-emerald-500/40 transition-colors">
+                  <Landmark className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                  <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5">Corporate</div>
+                  <div className="text-xs text-slate-700 font-medium">RJSC &amp; Companies</div>
                 </div>
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
-                  <Calculator className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">Tax 2023</div>
-                  <div className="text-xs text-slate-300 font-medium">NBR SROs &amp; Slabs</div>
+                <div className="bg-white border border-slate-200/90 shadow-2xs rounded-xl p-3 text-center hover:border-emerald-500/40 transition-colors">
+                  <Calculator className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                  <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5">Tax 2023</div>
+                  <div className="text-xs text-slate-700 font-medium">NBR SROs &amp; Slabs</div>
                 </div>
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-center hover:border-emerald-500/30 transition-colors">
-                  <FileText className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">VAT &amp; TDS</div>
-                  <div className="text-xs text-slate-300 font-medium">Withholding Rules</div>
+                <div className="bg-white border border-slate-200/90 shadow-2xs rounded-xl p-3 text-center hover:border-emerald-500/40 transition-colors">
+                  <FileText className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                  <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5">VAT &amp; TDS</div>
+                  <div className="text-xs text-slate-700 font-medium">Withholding Rules</div>
                 </div>
               </div>
             </div>

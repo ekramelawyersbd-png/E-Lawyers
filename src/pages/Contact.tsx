@@ -29,7 +29,6 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { ContactFaq } from '../components/ContactFaq';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { ContactTestimonialsCarousel } from '../components/ContactTestimonialsCarousel';
@@ -75,44 +74,44 @@ export function Contact() {
   return (
     <div className="min-h-screen bg-slate-50/60 pb-20">
       {/* 1. Full-Screen Edge-to-Edge Hero Section (Matching Community Hero) */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/40">
+      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-slate-50 to-white text-slate-900 pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 shadow-2xs">
         {/* Subtle decorative mesh background and ambient orbs */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.25),rgba(255,255,255,0))] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.12),rgba(255,255,255,0))] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Breadcrumb Navigation */}
         <div className="max-w-7xl mx-auto mb-8 relative z-10">
-          <nav className="flex items-center text-xs sm:text-sm font-medium text-emerald-300/80 overflow-x-auto whitespace-nowrap">
-            <Link to="/" className="flex items-center text-emerald-300 hover:text-white transition-colors">
+          <nav className="flex items-center text-xs sm:text-sm font-medium text-emerald-800/80 overflow-x-auto whitespace-nowrap">
+            <Link to="/" className="flex items-center text-emerald-700 hover:text-emerald-950 transition-colors">
               <Home className="w-3.5 h-3.5 mr-1" />
               <span>Home</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-500 shrink-0" />
-            <span className="text-white font-semibold">Contact Us</span>
+            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-400 shrink-0" />
+            <span className="text-slate-900 font-bold">Contact Us</span>
           </nav>
         </div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           {/* Eyebrow Header Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-semibold mb-2 backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-2 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
             <span>Integrated Advisory Ecosystem</span>
           </div>
 
           {/* Hero Main Heading & Dual Identity */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.2] space-y-2">
-            <span className="block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-300/90">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.2] space-y-2">
+            <span className="block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-600">
               Contact Us
             </span>
             <span className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1">
-              <span className="bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 bg-clip-text text-transparent drop-shadow-sm tracking-tight font-black">
+              <span className="bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 bg-clip-text text-transparent drop-shadow-xs tracking-tight font-black">
                 ACCOUNTICCA
               </span>
-              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 font-light text-base sm:text-xl shadow-inner select-none">
+              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-medium text-base sm:text-xl shadow-xs select-none">
                 ×
               </span>
-              <span className="bg-gradient-to-r from-teal-300 via-cyan-300 to-emerald-200 bg-clip-text text-transparent drop-shadow-sm tracking-tight font-black">
+              <span className="bg-gradient-to-r from-teal-800 via-emerald-700 to-teal-900 bg-clip-text text-transparent drop-shadow-xs tracking-tight font-black">
                 E-LAWYERS
               </span>
             </span>
@@ -120,16 +119,16 @@ export function Contact() {
 
           {/* Core Taglines */}
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-800">
               Complete Business Support. One Ecosystem.
             </h2>
-            <p className="text-base sm:text-lg italic font-medium text-emerald-300/90">
+            <p className="text-base sm:text-lg italic font-semibold text-emerald-700">
               Where Business Strategy Meets Legal Excellence.
             </p>
           </div>
 
           {/* Value Proposition Description */}
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto font-normal">
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto font-normal">
             Whether you require corporate legal counsel, tax &amp; VAT optimization, statutory audit, or end-to-end business consultancy, our integrated team provides unified, cross-disciplinary advisory under one roof.
           </p>
 
@@ -137,37 +136,37 @@ export function Contact() {
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="#inquiry-form-section"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/30 transition-all duration-200 group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 group"
             >
-              <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+              <Calendar className="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" />
               <span>Submit an Inquiry</span>
-              <ArrowRight className="w-4 h-4 text-emerald-200 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 text-emerald-100 group-hover:translate-x-1 transition-transform" />
             </a>
 
             <a
               href={`tel:${rawTelNumber}`}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700/80 font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-md transition-all duration-200 group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-950 border border-slate-300 font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-sm transition-all duration-200 group"
             >
-              <Phone className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
+              <Phone className="w-4 h-4 text-emerald-600 group-hover:rotate-12 transition-transform" />
               <span>Call Our Direct Desk</span>
-              <span className="text-xs text-emerald-400 font-mono font-medium hidden md:inline">
+              <span className="text-xs text-emerald-700 font-mono font-bold hidden md:inline">
                 ({primaryPhone})
               </span>
             </a>
           </div>
 
           {/* Trust Badges */}
-          <div className="pt-8 border-t border-emerald-900/40 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-300 font-semibold">
+          <div className="pt-8 border-t border-slate-200 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-600 font-semibold">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Dual-Firm Chartered Advisory
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Direct Senior Partner Oversight
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Guaranteed 24-Hour Inquiry Turnaround
             </span>
           </div>
@@ -1037,9 +1036,6 @@ export function Contact() {
           </div>
         </div>
       </section>
-
-      {/* Interactive Service FAQ Accordion Section */}
-      <ContactFaq />
 
       {/* Closing Value Prompt (Action Step: Friction-Reducing Closing CTA instead of repetition) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
