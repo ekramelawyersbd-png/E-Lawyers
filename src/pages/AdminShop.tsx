@@ -30,7 +30,14 @@ import {
 import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
 import { useShopAuth } from '../contexts/ShopAuthContext';
-import { ShopProduct, SHOP_CATEGORIES, ShopCategory } from '../data/shopProducts';
+import { 
+  ShopProduct, 
+  SHOP_CATEGORIES, 
+  ShopCategory,
+  ProductType,
+  PRODUCT_TYPES,
+  inferProductType
+} from '../data/shopProducts';
 import { generateSlug } from '../services/productService';
 
 // Curated Unsplash images for quick selection by admin
@@ -69,6 +76,7 @@ export function AdminShop() {
   // Filter & Search in Admin list
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilterCategory, setSelectedFilterCategory] = useState<string>('All');
+  const [selectedFilterType, setSelectedFilterType] = useState<string>('All');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -80,6 +88,7 @@ export function AdminShop() {
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [category, setCategory] = useState<ShopProduct['category']>('Legal Contracts');
+  const [productType, setProductType] = useState<ProductType>('Templates');
   const [price, setPrice] = useState<number>(1000);
   const [originalPrice, setOriginalPrice] = useState<number>(1500);
   const [badge, setBadge] = useState<string>('New');
@@ -117,6 +126,7 @@ export function AdminShop() {
     setTitle('');
     setSlug('');
     setCategory('Legal Contracts');
+    setProductType('Templates');
     setPrice(1200);
     setOriginalPrice(2000);
     setBadge('New');
@@ -145,6 +155,7 @@ export function AdminShop() {
     setTitle(prod.title);
     setSlug(prod.slug);
     setCategory(prod.category);
+    setProductType(prod.productType || inferProductType(prod));
     setPrice(prod.price);
     setOriginalPrice(prod.originalPrice);
     setBadge(prod.badge || '');
@@ -207,6 +218,7 @@ export function AdminShop() {
       title: title.trim(),
       slug: finalSlug,
       category,
+      productType,
       price: Number(price) || 0,
       originalPrice: Number(originalPrice) || Number(price) || 0,
       rating: 4.95,
@@ -267,16 +279,19 @@ export function AdminShop() {
 
   // Filtered products list
   const filteredProducts = products.filter(p => {
+    const pType = p.productType || inferProductType(p);
     const matchesSearch = 
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchTerm.toLowerCase());
+      p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pType.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCat = selectedFilterCategory === 'All' || p.category === selectedFilterCategory;
+    const matchesType = selectedFilterType === 'All' || pType === selectedFilterType;
     const matchesStatus = 
       selectedStatusFilter === 'all' ||
       (selectedStatusFilter === 'published' && p.status !== 'draft') ||
       (selectedStatusFilter === 'draft' && p.status === 'draft');
-    return matchesSearch && matchesCat && matchesStatus;
+    return matchesSearch && matchesCat && matchesType && matchesStatus;
   });
 
   // Calculate catalog stats
@@ -501,7 +516,22 @@ export function AdminShop() {
 
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Category <span className="text-red-500">*</span>
+                          Product Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={productType}
+                          onChange={(e) => setProductType(e.target.value as ProductType)}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none"
+                        >
+                          {PRODUCT_TYPES.filter(t => t !== 'All Types').map(t => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Discipline / Category <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={category}
@@ -970,7 +1000,7 @@ export function AdminShop() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div className="sm:col-span-8 relative">
+              <div className="sm:col-span-6 relative">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
@@ -981,7 +1011,20 @@ export function AdminShop() {
                 />
               </div>
 
-              <div className="sm:col-span-4">
+              <div className="sm:col-span-3">
+                <select
+                  value={selectedFilterType}
+                  onChange={(e) => setSelectedFilterType(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl text-xs font-semibold focus:outline-none"
+                >
+                  <option value="All">All Types ({products.length})</option>
+                  {PRODUCT_TYPES.filter(t => t !== 'All Types').map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="sm:col-span-3">
                 <select
                   value={selectedFilterCategory}
                   onChange={(e) => setSelectedFilterCategory(e.target.value)}
@@ -1002,7 +1045,7 @@ export function AdminShop() {
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Item</th>
-                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">Type & Category</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Price</th>
                   <th className="py-3 px-4">Direct Page URL</th>
@@ -1013,6 +1056,7 @@ export function AdminShop() {
                 {filteredProducts.map((prod) => {
                   const isDraft = prod.status === 'draft';
                   const isToggling = togglingId === prod.id;
+                  const pType = prod.productType || inferProductType(prod);
 
                   return (
                     <tr key={prod.id} className="hover:bg-slate-50/60 transition-colors">
@@ -1032,15 +1076,28 @@ export function AdminShop() {
                         </div>
                       </td>
 
-                      {/* Category & Badge */}
+                      {/* Type & Category */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex flex-col items-start gap-1">
-                          <span className="font-semibold text-slate-700">{prod.category}</span>
-                          {prod.badge && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-slate-900 text-amber-300">
-                              {prod.badge}
+                          <div className="flex items-center gap-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                              pType === 'Templates'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : pType === 'Legal Kits'
+                                ? 'bg-indigo-100 text-indigo-800 border border-indigo-300'
+                                : pType === 'Consultation'
+                                ? 'bg-purple-100 text-purple-800 border border-purple-300'
+                                : 'bg-amber-100 text-amber-800 border border-amber-300'
+                            }`}>
+                              {pType}
                             </span>
-                          )}
+                            {prod.badge && (
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-slate-900 text-amber-300">
+                                {prod.badge}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-500">{prod.category}</span>
                         </div>
                       </td>
 

@@ -1,8 +1,19 @@
+export type ProductType = 'Templates' | 'Consultation' | 'Legal Kits' | 'Books & Manuals';
+
+export const PRODUCT_TYPES: ('All Types' | ProductType)[] = [
+  'All Types',
+  'Templates',
+  'Consultation',
+  'Legal Kits',
+  'Books & Manuals'
+];
+
 export interface ShopProduct {
   id: string;
   title: string;
   slug: string;
   category: 'Legal Contracts' | 'Tax & VAT Toolkits' | 'Books & Manuals' | 'Corporate & RJSC' | 'Expert Advisory';
+  productType?: ProductType;
   price: number;
   originalPrice: number;
   rating: number;
@@ -18,6 +29,25 @@ export interface ShopProduct {
   imageUrl: string;
   authorOrVettedBy: string;
   status?: 'published' | 'draft';
+}
+
+export function inferProductType(product: Partial<ShopProduct>): ProductType {
+  if (product.productType) return product.productType;
+  if (product.category === 'Expert Advisory') return 'Consultation';
+  if (product.category === 'Books & Manuals') return 'Books & Manuals';
+  const title = (product.title || '').toLowerCase();
+  const format = (product.format || '').toLowerCase();
+  const cat = (product.category || '').toLowerCase();
+  if (title.includes('kit') || title.includes('pack') || title.includes('starter') || title.includes('bundle') || cat.includes('corporate & rjsc')) {
+    return 'Legal Kits';
+  }
+  if (title.includes('consultation') || title.includes('session') || title.includes('advisory') || format.includes('video') || format.includes('consultation')) {
+    return 'Consultation';
+  }
+  if (title.includes('manual') || title.includes('book') || title.includes('ebook') || title.includes('guide')) {
+    return 'Books & Manuals';
+  }
+  return 'Templates';
 }
 
 export const SHOP_CATEGORIES = [
@@ -37,6 +67,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Mutual Non-Disclosure Agreement (NDA) Pro Kit',
     slug: 'mutual-nda-pro-kit',
     category: 'Legal Contracts',
+    productType: 'Legal Kits',
     price: 950,
     originalPrice: 1500,
     rating: 4.95,
@@ -64,6 +95,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Bangladesh Income Tax Return Workbook (AY 2026–2027)',
     slug: 'income-tax-return-workbook-2026',
     category: 'Tax & VAT Toolkits',
+    productType: 'Templates',
     price: 1450,
     originalPrice: 2500,
     rating: 4.98,
@@ -91,6 +123,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Employment Contract & HR Policy Manual (Labour Act 2006)',
     slug: 'employment-contract-hr-handbook',
     category: 'Legal Contracts',
+    productType: 'Legal Kits',
     price: 1850,
     originalPrice: 3000,
     rating: 4.92,
@@ -118,6 +151,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'TDS & VDS Withholding Tax Master Toolkit 2026',
     slug: 'tds-vds-automation-calculator-2026',
     category: 'Tax & VAT Toolkits',
+    productType: 'Templates',
     price: 1250,
     originalPrice: 2000,
     rating: 4.96,
@@ -144,6 +178,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Handbook on Income Tax Act 2023 & Finance Act 2026 (eBook)',
     slug: 'handbook-income-tax-act-2023-finance-act-2026',
     category: 'Books & Manuals',
+    productType: 'Books & Manuals',
     price: 950,
     originalPrice: 1600,
     rating: 4.97,
@@ -171,6 +206,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'RJSC Company Incorporation & Secretarial Starter Pack',
     slug: 'company-incorporation-starter-pack-rjsc',
     category: 'Corporate & RJSC',
+    productType: 'Legal Kits',
     price: 2400,
     originalPrice: 4000,
     rating: 4.94,
@@ -198,6 +234,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Shareholders\' Agreement (SHA) & Founder Vesting Kit',
     slug: 'shareholders-agreement-startup-kit',
     category: 'Legal Contracts',
+    productType: 'Legal Kits',
     price: 2900,
     originalPrice: 5000,
     rating: 4.93,
@@ -225,6 +262,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'VAT Mushak 9.1 Return Prep & Reconciliation Workbook',
     slug: 'vat-mushak-9-1-master-workbook',
     category: 'Tax & VAT Toolkits',
+    productType: 'Templates',
     price: 1850,
     originalPrice: 3200,
     rating: 4.91,
@@ -251,6 +289,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Commercial Office & Commercial Space Lease Agreement',
     slug: 'commercial-lease-agreement-pro',
     category: 'Legal Contracts',
+    productType: 'Templates',
     price: 1450,
     originalPrice: 2200,
     rating: 4.89,
@@ -278,6 +317,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Corporate Secretarial & RJSC Compliance Manual (Handbook)',
     slug: 'rjsc-secretarial-compliance-manual',
     category: 'Books & Manuals',
+    productType: 'Books & Manuals',
     price: 1150,
     originalPrice: 1850,
     rating: 4.93,
@@ -304,6 +344,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: '1-on-1 Legal Contract Vetting Session (30 Mins)',
     slug: 'advisory-legal-document-vetting-session',
     category: 'Expert Advisory',
+    productType: 'Consultation',
     price: 3500,
     originalPrice: 5000,
     rating: 5.0,
@@ -330,6 +371,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     title: 'Corporate Tax Assessment & Filing Strategy Session (45 Mins)',
     slug: 'advisory-corporate-tax-filing-strategy',
     category: 'Expert Advisory',
+    productType: 'Consultation',
     price: 4000,
     originalPrice: 6000,
     rating: 4.97,

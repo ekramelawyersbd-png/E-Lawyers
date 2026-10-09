@@ -33,7 +33,7 @@ import { useCart } from '../contexts/CartContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { CartDrawer } from '../components/shop/CartDrawer';
 import { CheckoutModal } from '../components/shop/CheckoutModal';
-import { ShopProduct } from '../data/shopProducts';
+import { ShopProduct, inferProductType } from '../data/shopProducts';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -306,9 +306,33 @@ export function ProductDetail() {
                       {product.badge}
                     </span>
                   )}
-                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/95 text-slate-800 backdrop-blur-xs shadow-xs border border-white/60">
+                  {(() => {
+                    const pType = product.productType || inferProductType(product);
+                    return (
+                      <Link
+                        to={`/shop?type=${encodeURIComponent(pType)}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider backdrop-blur-xs shadow-xs transition-transform hover:scale-105 ${
+                          pType === 'Templates'
+                            ? 'bg-emerald-600 text-white'
+                            : pType === 'Legal Kits'
+                            ? 'bg-indigo-600 text-white'
+                            : pType === 'Consultation'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-amber-600 text-white'
+                        }`}
+                        title={`Browse all ${pType} in Shop`}
+                      >
+                        {pType}
+                      </Link>
+                    );
+                  })()}
+                  <Link
+                    to={`/shop?category=${encodeURIComponent(product.category)}`}
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/95 text-slate-800 backdrop-blur-xs shadow-xs border border-white/60 hover:bg-white hover:text-emerald-700 transition-colors"
+                    title={`Browse all ${product.category} in Shop`}
+                  >
                     {product.category}
-                  </span>
+                  </Link>
                 </div>
 
                 {discountPercent > 0 && (

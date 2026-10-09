@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   ShoppingBag, 
   Search, 
@@ -25,10 +25,24 @@ import {
   ChevronDown,
   ChevronUp,
   Lock,
-  LogOut
+  LogOut,
+  Video,
+  Package,
+  BookOpen,
+  Layers,
+  X,
+  RotateCcw,
+  SlidersHorizontal
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
-import { SHOP_CATEGORIES, ShopProduct, ShopCategory } from '../data/shopProducts';
+import { 
+  SHOP_CATEGORIES, 
+  ShopProduct, 
+  ShopCategory,
+  ProductType,
+  PRODUCT_TYPES,
+  inferProductType
+} from '../data/shopProducts';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
@@ -39,9 +53,19 @@ export function Shop() {
   const { products, loading } = useProducts();
   const { addToCart, totalItemsCount, setIsCartOpen } = useCart();
   const { adminUser, isAuthenticated, logout } = useShopAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [selectedCategory, setSelectedCategory] = useState<ShopCategory>('All Products');
-  const [searchQuery, setSearchQuery] = useState('');
+  // Read initial query params if present
+  const paramType = searchParams.get('type') as ProductType | null;
+  const paramCat = searchParams.get('category') as ShopCategory | null;
+
+  const [selectedType, setSelectedType] = useState<'All Types' | ProductType>(
+    paramType && (PRODUCT_TYPES as readonly string[]).includes(paramType) ? paramType : 'All Types'
+  );
+  const [selectedCategory, setSelectedCategory] = useState<ShopCategory>(
+    paramCat && (SHOP_CATEGORIES as readonly string[]).includes(paramCat) ? paramCat : 'All Products'
+  );
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState<'bestselling' | 'price_low' | 'price_high' | 'rating'>('bestselling');
   
   // Checkout modal state
@@ -49,8 +73,39 @@ export function Shop() {
   const [instantCheckoutProduct, setInstantCheckoutProduct] = useState<ShopProduct | null>(null);
 
   // Draft vs Published stats
-  const publishedCount = useMemo(() => products.filter(p => p.status !== 'draft').length, [products]);
+  const publishedProducts = useMemo(() => products.filter(p => p.status !== 'draft'), [products]);
+  const publishedCount = publishedProducts.length;
   const draftsCount = useMemo(() => products.filter(p => p.status === 'draft').length, [products]);
+
+  // Dynamic Type & Category item counts among live published products
+  const typeCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      'All Types': publishedProducts.length,
+      'Templates': 0,
+      'Consultation': 0,
+      'Legal Kits': 0,
+      'Books & Manuals': 0
+    };
+    publishedProducts.forEach(p => {
+      const t = p.productType || inferProductType(p);
+      if (counts[t] !== undefined) {
+        counts[t]++;
+      }
+    });
+    return counts;
+  }, [publishedProducts]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      'All Products': publishedProducts.length
+    };
+    SHOP_CATEGORIES.forEach(c => {
+      if (c !== 'All Products') {
+        counts[c] = publishedProducts.filter(p => p.category === c).length;
+      }
+    });
+    return counts;
+  }, [publishedProducts]);
 
   // Added-to-cart animation feedback map
   const [addedIds, setAddedIds] = useState<Record<string, boolean>>({});
@@ -73,10 +128,22 @@ export function Shop() {
     setIsCheckoutOpen(true);
   };
 
+  // Reset all filters helper
+  const handleResetFilters = () => {
+    setSelectedType('All Types');
+    setSelectedCategory('All Products');
+    setSearchQuery('');
+    setSearchParams({});
+  };
+
   // Filtered and sorted products
   const filteredProducts = useMemo(() => {
     // Only items with Published status should be displayed on the public Shop Page
     let prods = products.filter(p => p.status !== 'draft');
+
+    if (selectedType !== 'All Types') {
+      prods = prods.filter(p => (p.productType || inferProductType(p)) === selectedType);
+    }
 
     if (selectedCategory !== 'All Products') {
       prods = prods.filter(p => p.category === selectedCategory);
@@ -84,12 +151,17 @@ export function Shop() {
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      prods = prods.filter(p => 
-        p.title.toLowerCase().includes(q) ||
-        p.shortDescription.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.features.some(f => f.toLowerCase().includes(q))
-      );
+      prods = prods.filter(p => {
+        const pType = (p.productType || inferProductType(p)).toLowerCase();
+        return (
+          p.title.toLowerCase().includes(q) ||
+          p.shortDescription.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          pType.includes(q) ||
+          p.format.toLowerCase().includes(q) ||
+          p.features.some(f => f.toLowerCase().includes(q))
+        );
+      });
     }
 
     if (sortBy === 'bestselling') {
@@ -103,7 +175,7 @@ export function Shop() {
     }
 
     return prods;
-  }, [products, selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedType, selectedCategory, searchQuery, sortBy]);
 
   const faqs = [
     {
@@ -268,85 +340,320 @@ export function Shop() {
       {/* Main Catalog Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
-        {/* Category Filter & Sorting Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        {/* Category & Product Type Filter System Hub */}
+        <div className="space-y-6 mb-8">
           
-          {/* Category Pills */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {SHOP_CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`text-xs px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-slate-900 text-white shadow-md'
-                      : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+          {/* 1. Primary Product Type Segmented Tabs */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-2 sm:p-2.5 shadow-sm">
+            <div className="flex items-center justify-between px-3 pt-1.5 pb-2 text-xs border-b border-slate-100 mb-2">
+              <span className="font-extrabold uppercase tracking-wider text-slate-500 text-[11px] flex items-center gap-1.5">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Filter by Product Type</span>
+              </span>
+              <span className="text-[11px] text-slate-400 font-semibold hidden sm:inline">
+                Click any type to narrow down catalog
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+              {[
+                {
+                  id: 'All Types' as const,
+                  label: 'All Products',
+                  subtitle: 'All Formats',
+                  icon: <Layers className="w-4 h-4" />,
+                  count: typeCounts['All Types'],
+                  accent: 'emerald'
+                },
+                {
+                  id: 'Templates' as const,
+                  label: 'Templates',
+                  subtitle: 'Agreements & Excel',
+                  icon: <FileText className="w-4 h-4" />,
+                  count: typeCounts['Templates'],
+                  accent: 'emerald'
+                },
+                {
+                  id: 'Consultation' as const,
+                  label: 'Consultation',
+                  subtitle: '1-on-1 Advisory Calls',
+                  icon: <Video className="w-4 h-4" />,
+                  count: typeCounts['Consultation'],
+                  accent: 'purple'
+                },
+                {
+                  id: 'Legal Kits' as const,
+                  label: 'Legal Kits',
+                  subtitle: 'Turnkey Bundles',
+                  icon: <Package className="w-4 h-4" />,
+                  count: typeCounts['Legal Kits'],
+                  accent: 'indigo'
+                },
+                {
+                  id: 'Books & Manuals' as const,
+                  label: 'Books & Manuals',
+                  subtitle: 'Statutory Guides',
+                  icon: <BookOpen className="w-4 h-4" />,
+                  count: typeCounts['Books & Manuals'],
+                  accent: 'amber'
+                }
+              ].map((item) => {
+                const isSelected = selectedType === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedType(item.id);
+                      setSearchParams(prev => {
+                        const next = new URLSearchParams(prev);
+                        if (item.id === 'All Types') {
+                          next.delete('type');
+                        } else {
+                          next.set('type', item.id);
+                        }
+                        return next;
+                      });
+                    }}
+                    className={`p-3 rounded-2xl text-left transition-all duration-200 cursor-pointer flex flex-col justify-between border relative overflow-hidden group ${
+                      isSelected
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-emerald-500/50'
+                        : 'bg-slate-50/70 hover:bg-white text-slate-700 border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                        isSelected 
+                          ? 'bg-emerald-500/20 text-emerald-400' 
+                          : 'bg-white text-slate-600 border border-slate-200 group-hover:text-emerald-700'
+                      }`}>
+                        {item.icon}
+                      </div>
+                      <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                        isSelected
+                          ? 'bg-emerald-500 text-slate-950 font-black'
+                          : 'bg-slate-200/80 text-slate-600 font-bold'
+                      }`}>
+                        {item.count}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className={`text-xs font-black tracking-tight ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                        {item.label}
+                      </div>
+                      <div className={`text-[10px] truncate ${isSelected ? 'text-slate-300' : 'text-slate-400 font-medium'}`}>
+                        {item.subtitle}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Sort By Dropdown */}
-          <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
-            <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" />
-              Sort:
-            </span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-2xs"
-            >
-              <option value="bestselling">Most Popular</option>
-              <option value="rating">Highest Rated</option>
-              <option value="price_low">Price: Low to High</option>
-              <option value="price_high">Price: High to Low</option>
-            </select>
+          {/* 2. Practice Area Domain & Sort Row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
+            
+            {/* Practice Area Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 pl-1 hidden sm:inline">
+                Practice Area:
+              </span>
+              {SHOP_CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                const count = categoryCounts[cat] ?? 0;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setSearchParams(prev => {
+                        const next = new URLSearchParams(prev);
+                        if (cat === 'All Products') {
+                          next.delete('category');
+                        } else {
+                          next.set('category', cat);
+                        }
+                        return next;
+                      });
+                    }}
+                    className={`text-xs px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-emerald-700 text-white shadow-xs font-extrabold'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-500'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-between md:justify-end">
+              <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5 text-slate-400" />
+                Sort:
+              </span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-2xs"
+              >
+                <option value="bestselling">Most Popular</option>
+                <option value="rating">Highest Rated</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+              </select>
+            </div>
+
           </div>
+
+          {/* 3. Active Filter Chips & Feedback Bar */}
+          {(selectedType !== 'All Types' || selectedCategory !== 'All Products' || searchQuery.trim() !== '') && (
+            <div className="flex flex-wrap items-center justify-between gap-2.5 bg-emerald-50/70 border border-emerald-200/70 rounded-2xl px-4 py-2.5 text-xs text-emerald-950">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-extrabold text-emerald-800 text-[11px] uppercase tracking-wider flex items-center gap-1">
+                  Active Filters:
+                </span>
+
+                {selectedType !== 'All Types' && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-700 text-white font-bold text-[11px] shadow-2xs">
+                    <span>Type: {selectedType}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedType('All Types');
+                        setSearchParams(prev => {
+                          const next = new URLSearchParams(prev);
+                          next.delete('type');
+                          return next;
+                        });
+                      }}
+                      className="hover:text-emerald-200 cursor-pointer ml-0.5"
+                      title="Clear type filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {selectedCategory !== 'All Products' && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-[11px]">
+                    <span>Area: {selectedCategory}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory('All Products');
+                        setSearchParams(prev => {
+                          const next = new URLSearchParams(prev);
+                          next.delete('category');
+                          return next;
+                        });
+                      }}
+                      className="hover:text-emerald-950 cursor-pointer ml-0.5"
+                      title="Clear practice area filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {searchQuery.trim() !== '' && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white text-slate-800 border border-slate-300 font-bold text-[11px]">
+                    <span>Query: "{searchQuery}"</span>
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="hover:text-slate-950 cursor-pointer ml-0.5"
+                      title="Clear search query"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1 text-[11px] font-extrabold text-emerald-800 hover:text-emerald-950 underline cursor-pointer shrink-0"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset All Filters</span>
+              </button>
+            </div>
+          )}
 
         </div>
 
-        {/* Results Counter */}
+        {/* Results Counter Summary */}
         <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-6">
           <span>
-            Showing <strong>{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'item' : 'items'}
-            {selectedCategory !== 'All Products' && ` in ${selectedCategory}`}
+            Showing <strong className="text-slate-900 font-black">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+            {selectedType !== 'All Types' && <span> under type <strong className="text-emerald-800">{selectedType}</strong></span>}
+            {selectedCategory !== 'All Products' && <span> in <strong className="text-slate-800">{selectedCategory}</strong></span>}
           </span>
           {searchQuery && (
-            <span>
-              Search query: <em>"{searchQuery}"</em>
+            <span className="truncate max-w-xs text-right">
+              Matched query: <em>"{searchQuery}"</em>
             </span>
           )}
         </div>
 
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 max-w-md mx-auto space-y-4 my-8">
-            <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+          <div className="bg-white rounded-3xl p-10 text-center border border-slate-200 max-w-lg mx-auto space-y-4 my-8 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
               <Search className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">No products match your search</h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Try searching with different terms like "NDA", "Tax", "RJSC", or reset your category filters.
+              <h3 className="text-base sm:text-lg font-black text-slate-900">No products match your filter criteria</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                No items found for {selectedType !== 'All Types' ? `type "${selectedType}"` : ''} 
+                {selectedCategory !== 'All Products' ? ` in "${selectedCategory}"` : ''}
+                {searchQuery ? ` matching "${searchQuery}"` : ''}.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedCategory('All Products');
-                setSearchQuery('');
-              }}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors"
-            >
-              Reset Filters
-            </button>
+
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset All Filters</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSelectedType('Templates'); setSelectedCategory('All Products'); setSearchQuery(''); }}
+                className="px-3.5 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Browse Templates ({typeCounts['Templates']})
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSelectedType('Consultation'); setSelectedCategory('All Products'); setSearchQuery(''); }}
+                className="px-3.5 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Browse Consultation ({typeCounts['Consultation']})
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSelectedType('Legal Kits'); setSelectedCategory('All Products'); setSearchQuery(''); }}
+                className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Browse Legal Kits ({typeCounts['Legal Kits']})
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -355,6 +662,7 @@ export function Shop() {
               const discountPercent = Math.round(
                 ((product.originalPrice - product.price) / product.originalPrice) * 100
               );
+              const pType = product.productType || inferProductType(product);
 
               return (
                 <div
@@ -376,9 +684,45 @@ export function Shop() {
                           {product.badge}
                         </span>
                       )}
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/90 text-slate-800 backdrop-blur-xs border border-white/40">
+
+                      {/* Product Type Badge (Interactive click-to-filter) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedType(pType);
+                        }}
+                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider backdrop-blur-xs shadow-2xs transition-all hover:scale-105 cursor-pointer flex items-center gap-1 ${
+                          pType === 'Templates' 
+                            ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                            : pType === 'Legal Kits'
+                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                            : pType === 'Consultation'
+                            ? 'bg-purple-600 text-white hover:bg-purple-500'
+                            : 'bg-amber-600 text-white hover:bg-amber-500'
+                        }`}
+                        title={`Filter by type: ${pType}`}
+                      >
+                        {pType === 'Templates' && <FileText className="w-3 h-3" />}
+                        {pType === 'Legal Kits' && <Package className="w-3 h-3" />}
+                        {pType === 'Consultation' && <Video className="w-3 h-3" />}
+                        {pType === 'Books & Manuals' && <BookOpen className="w-3 h-3" />}
+                        <span>{pType}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedCategory(product.category);
+                        }}
+                        className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/90 text-slate-800 backdrop-blur-xs border border-white/40 hover:bg-white hover:text-emerald-700 transition-colors cursor-pointer"
+                        title={`Filter by discipline: ${product.category}`}
+                      >
                         {product.category}
-                      </span>
+                      </button>
                     </div>
 
                     {discountPercent > 0 && (

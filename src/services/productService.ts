@@ -7,7 +7,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { SHOP_PRODUCTS, ShopProduct } from '../data/shopProducts';
+import { SHOP_PRODUCTS, ShopProduct, inferProductType } from '../data/shopProducts';
 import { getStoredAdminToken } from '../contexts/ShopAuthContext';
 
 const STORAGE_KEY = 'accounticca_shop_products_catalog';
@@ -22,7 +22,10 @@ export function getLocalProducts(): ShopProduct[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map((p: any) => ({
+          ...p,
+          productType: p.productType || inferProductType(p)
+        }));
       }
     }
   } catch (err) {
@@ -60,8 +63,12 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data.products) && data.products.length > 0) {
-        setLocalProducts(data.products);
-        return data.products;
+        const normalized = data.products.map((p: any) => ({
+          ...p,
+          productType: p.productType || inferProductType(p)
+        }));
+        setLocalProducts(normalized);
+        return normalized;
       }
     }
   } catch (apiErr) {
@@ -80,6 +87,11 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
           title: data.title || '',
           slug: data.slug || docSnap.id,
           category: data.category || 'Legal Contracts',
+          productType: data.productType || inferProductType({
+            title: data.title,
+            category: data.category,
+            format: data.format
+          }),
           price: Number(data.price) || 0,
           originalPrice: Number(data.originalPrice) || Number(data.price) || 0,
           rating: Number(data.rating) || 4.9,
@@ -131,6 +143,7 @@ async function seedDefaultProductsToFirestore(products: ShopProduct[]): Promise<
 export async function saveProduct(product: ShopProduct): Promise<ShopProduct> {
   const normalizedProduct: ShopProduct = {
     ...product,
+    productType: product.productType || inferProductType(product),
     status: product.status === 'draft' ? 'draft' : 'published'
   };
 
