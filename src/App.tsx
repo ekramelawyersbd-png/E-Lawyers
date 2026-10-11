@@ -21,6 +21,8 @@ import { Team } from './pages/Team';
 import { VatGuide } from './pages/VatGuide';
 import { Contact } from './pages/Contact';
 import { Auth } from './pages/Auth';
+import { ProfilePage } from './pages/ProfilePage';
+import { WorkspaceHub } from './pages/WorkspaceHub';
 import { FaqPage } from './pages/FaqPage';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsConditions } from './pages/TermsConditions';
@@ -95,7 +97,10 @@ export default function App() {
                 <Route path="tds-guide" element={<TdsReference />} />
                 <Route path="tds-reference" element={<Navigate to="/tds-guide" replace />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="workspace" element={<ShopAdminRouteGuard><WorkspaceHub /></ShopAdminRouteGuard>} />
                 <Route path="auth" element={<Auth />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="settings" element={<Navigate to="/profile" replace />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsConditions />} />
                 <Route path="company-reg" element={<Navigate to="/article/company-reg" replace />} />

@@ -22,10 +22,12 @@ import {
   Copy,
   Printer,
   SlidersHorizontal,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
+import { UserProfile } from '../components/profile/UserProfile';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
@@ -48,8 +50,8 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles'>(
-    tabParam === 'articles' ? 'articles' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile'>(
+    tabParam === 'articles' ? 'articles' : (tabParam === 'profile' || tabParam === 'settings') ? 'profile' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -60,12 +62,14 @@ export function Dashboard() {
   useEffect(() => {
     if (tabParam === 'articles') {
       setActiveTab('articles');
+    } else if (tabParam === 'profile' || tabParam === 'settings') {
+      setActiveTab('profile');
     } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
       setActiveTab('saved');
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -274,6 +278,26 @@ export function Dashboard() {
               <span>My Contributions</span>
             </button>
 
+            <button 
+              id="dashboard-tab-profile"
+              onClick={() => switchTab('profile')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'profile' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-emerald-600" /> 
+                <span>Account Profile</span>
+              </div>
+              {user && (
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                  Active
+                </span>
+              )}
+            </button>
+
             <div className="pt-2">
               {user ? (
                 <button
@@ -342,10 +366,14 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="flex-1 space-y-8">
-        <ComplianceCalendar />
-        <ComplianceChecklist />
+        {activeTab === 'profile' ? (
+          <UserProfile />
+        ) : (
+          <>
+            <ComplianceCalendar />
+            <ComplianceChecklist />
 
-        <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
+            <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 border-b border-slate-100 pb-6">
             <div>
@@ -727,6 +755,8 @@ export function Dashboard() {
             </div>
           )}
         </div>
+        </>
+        )}
       </main>
     </div>
   );

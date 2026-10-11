@@ -31,7 +31,8 @@ import {
   Languages,
   ShoppingBag,
   MoreVertical,
-  Bell
+  Bell,
+  Download
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../lib/utils';
@@ -169,6 +170,12 @@ export function Navbar() {
       path: '/tools', 
       description: 'Calculators, compliance checklists & utilities',
       icon: Wrench 
+    },
+    { 
+      name: 'Google Workspace Hub', 
+      path: '/workspace', 
+      description: 'Drive, Sheets, Calendar, Docs & Meetings integration',
+      icon: Briefcase 
     },
     { 
       name: 'Resource Library (PDFs)', 
@@ -840,12 +847,12 @@ export function Navbar() {
                       )}
                     </Link>
                     <Link
-                      to="/dashboard?tab=settings"
+                      to="/profile"
                       className="flex items-center gap-3 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 transition-colors"
                       onClick={() => setUserMenuOpen(false)}
                     >
-                      <Settings className="w-4 h-4" />
-                      Account Settings
+                      <User className="w-4 h-4" />
+                      Profile &amp; Preferences
                     </Link>
                     <button
                       onClick={() => {
@@ -886,9 +893,9 @@ export function Navbar() {
       {/* Mobile menu (Three Dot menu drawer for mobile) */}
       {isOpen && (
         <div className="lg:hidden border-t border-slate-200/90 bg-white shadow-2xl absolute left-0 right-0 w-full max-h-[calc(100vh-72px)] overflow-y-auto overscroll-contain z-50">
-          {/* Mobile Quick Actions: Cart & Tax Alerts (moved to three dot for mobile) */}
+          {/* Mobile Quick Actions: Cart, Tax Alerts & Install App */}
           <div className="px-4 pt-3 pb-2 border-b border-slate-100 bg-white">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {/* Mobile Cart Trigger */}
               <button
                 type="button"
@@ -896,17 +903,17 @@ export function Navbar() {
                   setIsOpen(false);
                   toggleCart();
                 }}
-                className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 hover:bg-emerald-50/80 border border-slate-200/80 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 transition-all cursor-pointer shadow-2xs"
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-slate-50 hover:bg-emerald-50/80 border border-slate-200/80 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 transition-all cursor-pointer shadow-2xs"
                 title="Shopping Cart"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100/90 flex items-center justify-center text-emerald-800 shrink-0">
-                    <ShoppingBag className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-emerald-100/90 flex items-center justify-center text-emerald-800 shrink-0">
+                    <ShoppingBag className="w-3 h-3" />
                   </div>
-                  <span className="text-xs font-bold">Cart</span>
+                  <span className="text-[11px] font-bold truncate">Cart</span>
                 </div>
                 {totalItemsCount > 0 ? (
-                  <span className="bg-emerald-600 text-white font-extrabold text-[10px] min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center shadow-xs">
+                  <span className="bg-emerald-600 text-white font-extrabold text-[9px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-xs">
                     {totalItemsCount}
                   </span>
                 ) : (
@@ -918,19 +925,40 @@ export function Navbar() {
               <Link
                 to="/tax-planner"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 hover:bg-emerald-50/80 border border-slate-200/80 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 transition-all shadow-2xs"
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-slate-50 hover:bg-emerald-50/80 border border-slate-200/80 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 transition-all shadow-2xs"
                 title="Tax Deadlines & Alerts"
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-amber-100/90 flex items-center justify-center text-amber-800 shrink-0">
-                    <Bell className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-amber-100/90 flex items-center justify-center text-amber-800 shrink-0">
+                    <Bell className="w-3 h-3" />
                   </div>
-                  <span className="text-xs font-bold truncate">Tax Alerts</span>
+                  <span className="text-[11px] font-bold truncate">Alerts</span>
                 </div>
-                <span className="text-[10px] font-extrabold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded-md shrink-0">
+                <span className="text-[9px] font-extrabold text-amber-800 bg-amber-100 px-1 py-0.5 rounded-md shrink-0">
                   Dates
                 </span>
               </Link>
+
+              {/* Mobile Install App Option */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  window.dispatchEvent(new CustomEvent('open-pwa-install'));
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 hover:border-emerald-300 text-emerald-800 transition-all cursor-pointer shadow-2xs"
+                title="Install Compliance Hub as Mobile App"
+              >
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-emerald-700 flex items-center justify-center text-white shrink-0">
+                    <Download className="w-3 h-3" />
+                  </div>
+                  <span className="text-[11px] font-bold truncate">App</span>
+                </div>
+                <span className="text-[9px] font-extrabold text-emerald-700 bg-white border border-emerald-200 px-1 py-0.5 rounded-md shrink-0">
+                  Save
+                </span>
+              </button>
             </div>
           </div>
 

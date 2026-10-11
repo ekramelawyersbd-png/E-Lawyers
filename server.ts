@@ -8,7 +8,14 @@ import multer from "multer";
 import { SHOP_PRODUCTS, ShopProduct } from "./src/data/shopProducts";
 
 // Admin authorized credentials
-const ADMIN_AUTHORIZED_EMAILS = ["admin@admin.com", "hmekram@gmail.com", "hmekram@mail.com"];
+const ADMIN_AUTHORIZED_EMAILS = [
+  "admin@admin.com",
+  "hmekram@gmail.com",
+  "hmekram@mail.com",
+  "ekram.elawyersbd@gmail.com",
+  "ekram@elawyersbd.com",
+  "admin@erpforu.com"
+];
 const ADMIN_AUTHORIZED_PASSWORD = "123ekraM.com";
 
 interface AdminSession {
@@ -160,6 +167,51 @@ async function startServer() {
     } catch (err: any) {
       console.error("[Admin Login Error]", err);
       res.status(500).json({ error: "Internal server error during authentication" });
+    }
+  });
+
+  // Bridge endpoint: When an authorized admin signs in via Google OAuth, create admin session token
+  app.post("/api/admin/oauth-sync", (req, res) => {
+    try {
+      const { email, displayName } = req.body;
+      const normalizedEmail = (email || "").trim().toLowerCase();
+
+      const isAuthorizedEmail = ADMIN_AUTHORIZED_EMAILS.some(e => e.toLowerCase() === normalizedEmail);
+      if (!isAuthorizedEmail) {
+        return res.status(403).json({
+          success: false,
+          error: "Email is not authorized for administrator access.",
+          isAdmin: false
+        });
+      }
+
+      // Generate a secure session token
+      const token = crypto.randomBytes(32).toString("hex");
+      const session: AdminSession = {
+        token,
+        email: normalizedEmail,
+        role: "admin",
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+
+      adminSessions.set(token, session);
+      saveAdminSessions(adminSessions);
+
+      res.json({
+        success: true,
+        isAdmin: true,
+        token,
+        user: {
+          email: normalizedEmail,
+          role: "admin",
+          name: displayName || "Adv. Ekram Hossain",
+          title: "Supreme Court Advocate & Corporate Tax Lead"
+        }
+      });
+    } catch (err: any) {
+      console.error("[Admin OAuth Sync Error]", err);
+      res.status(500).json({ error: "Failed to sync OAuth admin session" });
     }
   });
 

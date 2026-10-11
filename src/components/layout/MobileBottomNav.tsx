@@ -66,7 +66,7 @@ export function MobileBottomNav() {
 
         {/* Profile */}
         <Link
-          to={user ? '/dashboard' : '/auth'}
+          to={user ? '/profile' : '/auth'}
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${
             isProfile ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}

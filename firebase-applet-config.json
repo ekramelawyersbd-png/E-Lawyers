@@ -2,11 +2,10 @@
   "projectId": "gen-lang-client-0396222608",
   "appId": "1:425825496026:web:f1564f14d5ae5ba920eee3",
   "apiKey": "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg",
-  "authDomain": "blog.accounticca.com",
-  "firestoreDatabaseId": "ai-studio-accounticcainsig-89414606-29ba-4643-944b-e0ac41725d03",
+  "authDomain": "accounticca.com",
   "storageBucket": "gen-lang-client-0396222608.firebasestorage.app",
   "messagingSenderId": "425825496026",
-  "measurementId": "",
+  "measurementId": "G-P4WQ33CP7G",
   "oAuthClientId": "425825496026-le9aaadep0l8ffqvh9aivgmdi2e0pebc.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }

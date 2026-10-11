@@ -73,7 +73,10 @@ export function Contact() {
   return (
     <div className="min-h-screen bg-slate-50/60 pb-20">
       {/* 1. Full-Screen Edge-to-Edge Hero Section (Matching Community Hero) */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-slate-50 to-white text-slate-900 pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 shadow-2xs">
+      <section 
+        className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-slate-50 to-white text-slate-900 pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 shadow-2xs"
+        style={{ paddingTop: '62px', paddingBottom: '62px', marginLeft: '1px', marginRight: '1px' }}
+      >
         {/* Subtle decorative mesh background and ambient orbs */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.12),rgba(255,255,255,0))] pointer-events-none" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -96,17 +99,20 @@ export function Contact() {
           style={{ marginTop: '-86px' }}
         >
           {/* Eyebrow Header Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-2 shadow-2xs">
+          <div className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-2 shadow-2xs">
             <Sparkles className="w-4 h-4 text-emerald-600" />
             <span>Integrated Advisory Ecosystem</span>
           </div>
 
           {/* Hero Main Heading & Dual Identity */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.2] space-y-2">
-            <span className="block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-600">
+            <span className="hidden sm:block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-600">
               Contact Us
             </span>
-            <span className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1">
+            <span 
+              className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1"
+              style={{ paddingTop: '62px' }}
+            >
               <span className="bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 bg-clip-text text-transparent drop-shadow-xs tracking-tight font-black">
                 ACCOUNTICCA
               </span>

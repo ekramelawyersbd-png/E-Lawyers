@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
+import { auth, fallbackAuth, db } from '../lib/firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { authService, ERPAuthUser } from '../services/authService';
 
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const handleAuthState = async (currentUser: User | null) => {
       if (currentUser) {
         setUser(currentUser);
         const currentEmail = (currentUser.email || currentUser.providerData?.[0]?.email || '').trim().toLowerCase();
@@ -36,7 +36,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           "superadmin@erpforu.com",
           "info@erpforu.com",
           "ekram@elawyersbd.com",
-          "hmekram@gmail.com"
+          "ekram.elawyersbd@gmail.com",
+          "hmekram@gmail.com",
+          "hmekram@mail.com",
+          "admin@admin.com"
         ].includes(currentEmail);
 
         const role: 'admin' | 'client' = isAdmin ? 'admin' : 'client';
@@ -45,6 +48,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         try {
           const token = await currentUser.getIdToken();
+          const rawProviderId = currentUser.providerData?.[0]?.providerId || '';
+          const provider: 'google' | 'facebook' | 'email' = 
+            rawProviderId === 'facebook.com' ? 'facebook' :
+            rawProviderId === 'google.com' ? 'google' : 'email';
+
           const sessionUser: ERPAuthUser = {
             uid: currentUser.uid,
             email: currentEmail,
@@ -52,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             photoURL: currentUser.photoURL || null,
             role,
             roleId,
-            provider: (currentUser.providerData?.[0]?.providerId === 'facebook.com' ? 'facebook' : 'google') as 'google' | 'facebook',
+            provider,
             token
           };
           setAuthUser(sessionUser);
@@ -76,14 +84,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error("Error creating user profile", e);
         }
       } else {
-        setUser(null);
-        setAuthUser(null);
-        localStorage.removeItem('erp_auth_user');
+        if (!auth.currentUser && !fallbackAuth.currentUser) {
+          setUser(null);
+          setAuthUser(null);
+          localStorage.removeItem('erp_auth_user');
+        }
       }
       setLoading(false);
-    });
+    };
 
-    return unsubscribe;
+    const unsub1 = onAuthStateChanged(auth, handleAuthState);
+    const unsub2 = onAuthStateChanged(fallbackAuth, handleAuthState);
+
+    return () => {
+      unsub1();
+      unsub2();
+    };
   }, []);
 
   const signInWithGoogle = async (): Promise<ERPAuthUser> => {
