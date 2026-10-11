@@ -1,4 +1,4 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb } from 'lucide-react';
+import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb, Gem } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
@@ -8,6 +8,7 @@ import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalc
 import { MinimumTurnoverTaxCalculator } from '../components/tax/MinimumTurnoverTaxCalculator';
 import { InvestmentBasedTaxRebateCalculator } from '../components/tax/InvestmentBasedTaxRebateCalculator';
 import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
+import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
 import { QuickComplianceTipsSidebar } from '../components/tools/QuickComplianceTipsSidebar';
 import { Gallery } from '../components/Gallery';
 import { ResourceLibrary } from '../components/tools/ResourceLibrary';
@@ -49,6 +50,14 @@ export function ToolsHub() {
       icon: <Calculator className="w-8 h-8" />,
       path: '/tax-calculator',
       color: 'bg-emerald-100 text-emerald-700',
+    },
+    {
+      name: 'Capital Gains Tax Calculator',
+      description: 'Calculate capital gains tax on land, real estate, personal valuables, and shares under Finance Act 2026.',
+      tooltip: 'Holding period rules (>5 yrs 15% flat, ≤5 yrs slab rates), 3-year installment facility, and 5% valuables rate.',
+      icon: <Scale className="w-8 h-8" />,
+      path: '#capital-gains-tax-tool',
+      color: 'bg-teal-100 text-teal-800',
     },
     {
       name: 'Agricultural Tax Calculator',
@@ -433,6 +442,10 @@ export function ToolsHub() {
           key={String(compareFlatRate)} 
           onComparisonToggle={(enabled) => setCompareFlatRate(enabled)}
         />
+      </div>
+
+      <div id="capital-gains-tax-tool" className="mt-16 scroll-mt-8">
+        <CapitalGainsTaxCalculator />
       </div>
 
       <div id="investment-rebate-calculator-tool" className="mt-16 scroll-mt-8">

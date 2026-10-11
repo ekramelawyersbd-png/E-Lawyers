@@ -242,15 +242,7 @@ export function Footer() {
           style={{ paddingTop: '30px', marginTop: '0px' }}
         >
           <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="text-[11px] font-bold text-slate-500">NBR Portal: Connected</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              <span className="text-[11px] font-bold text-slate-500">RJSC System: Online</span>
-            </div>
-            <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-800 sm:pl-6">
+            <div className="flex items-center gap-2.5">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Language:</span>
               <LanguageToggle variant="dark" />
             </div>

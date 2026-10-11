@@ -541,7 +541,7 @@ export function Home() {
 
           {/* 4-Column x 2-Row Articles Grid (4 boxes per line, 2 lines) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {displayLatestArticles.map(article => (
+            {displayLatestArticles.map((article, idx) => (
               <Link 
                 key={article.id} 
                 to={`/article/${article.id}`} 
@@ -567,10 +567,26 @@ export function Home() {
                 </div>
                 
                 <div className="p-4 sm:p-5 flex-1 flex flex-col">
-                  <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
+                  <h3 
+                    className="text-base font-bold text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug"
+                    style={idx === 0 ? {
+                      fontSize: '17px',
+                      fontWeight: 'bold',
+                      fontFamily: 'Arial',
+                      lineHeight: '19px'
+                    } : undefined}
+                  >
                     {article.title}
                   </h3>
-                  <p className="text-slate-500 text-xs mb-4 line-clamp-2 leading-relaxed flex-1 font-normal">
+                  <p 
+                    className="text-slate-500 text-xs mb-4 line-clamp-2 leading-relaxed flex-1 font-normal"
+                    style={idx === 0 ? {
+                      color: '#110101',
+                      textAlign: 'justify',
+                      fontFamily: 'Arial',
+                      lineHeight: '16.5px'
+                    } : undefined}
+                  >
                     {article.excerpt}
                   </p>
                   
@@ -596,7 +612,14 @@ export function Home() {
                         url={`/article/${article.id}`} 
                         className="text-slate-400 hover:text-emerald-600 transition-colors p-1" 
                       />
-                      <span className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-emerald-600 group-hover:text-white text-slate-500 flex items-center justify-center transition-all duration-200">
+                      <span 
+                        className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-emerald-600 group-hover:text-white text-slate-500 flex items-center justify-center transition-all duration-200"
+                        style={idx === 0 ? {
+                          color: '#1554e8',
+                          fontWeight: 'bold',
+                          lineHeight: '27px'
+                        } : undefined}
+                      >
                         <ArrowUpRight className="w-3 h-3" />
                       </span>
                     </div>

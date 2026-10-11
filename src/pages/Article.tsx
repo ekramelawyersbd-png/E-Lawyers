@@ -42,6 +42,7 @@ import { TurnoverTaxCalculator } from '../components/tax/TurnoverTaxCalculator';
 import { TurnoverSlabsSummaryCard } from '../components/tax/TurnoverSlabsSummaryCard';
 import { TaxRebateCeilingCard } from '../components/tax/TaxRebateCeilingCard';
 import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
+import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
 import { TaxReturnChecklist } from '../components/tax/TaxReturnChecklist';
 import { TaxSummaryDashboard } from '../components/tax/TaxSummaryDashboard';
 import { ImageGallery } from '../components/ImageGallery';
@@ -664,6 +665,12 @@ export function Article() {
             {article.id === 'corporate-tax-rates-bangladesh-fy-2026-27' && (
               <div className="my-12 scroll-mt-24" id="corporate-tax-calculator-tool">
                 <CorporateTaxRateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              </div>
+            )}
+
+            {(article.id === 'capital-gains-tax-bangladesh-finance-act-2026' || article.id === 'capital-gains-tax-calculation-examples-ay-2026-27') && (
+              <div className="my-12 scroll-mt-24" id="capital-gains-tax-calculator-tool">
+                <CapitalGainsTaxCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
               </div>
             )}
 

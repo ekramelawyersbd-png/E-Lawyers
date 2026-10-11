@@ -91,7 +91,10 @@ export function Contact() {
           </nav>
         </div>
 
-        <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
+        <div 
+          className="max-w-5xl mx-auto text-center relative z-10 space-y-6"
+          style={{ marginTop: '-86px' }}
+        >
           {/* Eyebrow Header Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-2 shadow-2xs">
             <Sparkles className="w-4 h-4 text-emerald-600" />

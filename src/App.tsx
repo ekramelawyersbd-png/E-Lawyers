@@ -126,6 +126,10 @@ export default function App() {
                 <Route path="tax-rebate-ceiling-2026" element={<Navigate to="/article/tax-rebate-ceiling-bangladesh-finance-act-2026" replace />} />
                 <Route path="investment-rebate-calculator" element={<Navigate to="/tools#investment-rebate-calculator-tool" replace />} />
                 <Route path="investment-based-tax-rebate-calculator" element={<Navigate to="/tools#investment-rebate-calculator-tool" replace />} />
+                <Route path="capital-gains-tax-calculator" element={<Navigate to="/tools#capital-gains-tax-tool" replace />} />
+                <Route path="capital-gains-calculator" element={<Navigate to="/tools#capital-gains-tax-tool" replace />} />
+                <Route path="financial-assets-tax" element={<Navigate to="/article/financial-assets-income-tax-bangladesh-ita-2023" replace />} />
+                <Route path="financial-assets-income-tax" element={<Navigate to="/article/financial-assets-income-tax-bangladesh-ita-2023" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

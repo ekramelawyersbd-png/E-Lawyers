@@ -1,4 +1,7 @@
 import { Article, Author, Category } from '../types';
+import { financialAssetsIncomeTaxArticle } from './financialAssetsIncomeTaxArticle';
+import { capitalGainsCalculationExamples2026Article } from './capitalGainsCalculationExamples2026Article';
+import { capitalGainsTax2026Article } from './capitalGainsTax2026Article';
 import { tradeLicenseArticle } from './tradeLicenseArticle';
 import { ircErcArticle } from './ircErcArticle';
 import { businessProfessionalIncomeArticle } from './businessProfessionalIncomeArticle';
@@ -62,6 +65,9 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  financialAssetsIncomeTaxArticle,
+  capitalGainsCalculationExamples2026Article,
+  capitalGainsTax2026Article,
   corporateTaxRates2026Article,
   taxRebateCeilingArticle,
   turnoverTaxArticle,
