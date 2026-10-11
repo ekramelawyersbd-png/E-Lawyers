@@ -15,8 +15,6 @@ import { SEO } from '../components/SEO';
 
 export function Home() {
   const navigate = useNavigate();
-  const [newsFontScale, setNewsFontScale] = useState(1);
-  const [isHighContrast, setIsHighContrast] = useState(false);
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
   const [isLoadingGuides, setIsLoadingGuides] = useState(true);
   const [heroArticleIndex, setHeroArticleIndex] = useState(0);
@@ -35,9 +33,6 @@ export function Home() {
       setIsLoadingGuides(false);
     }, 600);
   };
-
-  const handleIncreaseFont = () => setNewsFontScale(p => Math.min(p + 1, 3));
-  const handleDecreaseFont = () => setNewsFontScale(p => Math.max(p - 1, 0));
 
   // Sort all articles by published date descending and extract top 3 for hero switcher
   const heroRecentArticles = [...mockArticles]
@@ -940,67 +935,6 @@ export function Home() {
 
       {/* Frequently Asked Legal & Tax Queries */}
       <FAQ />
-
-      {/* 10. Newsletter Subscription */}
-            <section id="newsletter" className={`py-20 px-4 sm:px-6 lg:px-8 text-center relative group transition-colors ${isHighContrast ? 'bg-black border-t-[6px] border-yellow-400' : 'bg-emerald-50 border-t border-emerald-100'}`}>
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 flex items-center gap-2">
-          
-          <button 
-            type="button" 
-            onClick={() => setIsHighContrast(!isHighContrast)} 
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-sm ${isHighContrast ? 'bg-yellow-400 text-black border-yellow-400 hover:bg-yellow-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'}`}
-            title="Toggle High Contrast Mode"
-          >
-            <Contrast className="w-3.5 h-3.5" />
-            High Contrast
-          </button>
-          
-          <div className={`flex items-center gap-1 border rounded-lg p-1 shadow-sm transition-colors ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white border-slate-200'}`}>
-            <button type="button" onClick={handleDecreaseFont} disabled={newsFontScale === 0} className={`p-1 rounded disabled:opacity-30 disabled:hover:bg-transparent ${isHighContrast ? 'text-yellow-400 hover:text-black hover:bg-yellow-400' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`} title="Decrease font size">
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-            <Type className={`w-3.5 h-3.5 ${isHighContrast ? 'text-white' : 'text-slate-400'}`} />
-            <button type="button" onClick={handleIncreaseFont} disabled={newsFontScale === 3} className={`p-1 rounded disabled:opacity-30 disabled:hover:bg-transparent ${isHighContrast ? 'text-yellow-400 hover:text-black hover:bg-yellow-400' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`} title="Increase font size">
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          <ShareSectionButton 
-            title="Stay Updated with Legal & Tax News"
-            text="Subscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox."
-            url="/#newsletter"
-            className={isHighContrast ? '!bg-black !text-yellow-400 !border-yellow-400 hover:!bg-yellow-400 hover:!text-black' : ''}
-          />
-          <BookmarkSectionButton 
-            id="newsletter-section" 
-            title="Legal & Tax News Newsletter" 
-            url="/#newsletter"
-            className={isHighContrast ? '!bg-black !text-yellow-400 !border-yellow-400 hover:!bg-yellow-400 hover:!text-black' : ''}
-          />
-          <CopySectionButton 
-            content="Stay Updated with Legal & Tax News
-
-Subscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox.
-
-By subscribing, you agree to our Privacy Policy and Terms of Service." 
-            className={isHighContrast ? '!bg-black !text-yellow-400 !border-yellow-400 hover:!bg-yellow-400 hover:!text-black' : ''}
-          />
-        </div>
-        <div className={`max-w-4xl mx-auto p-8 md:p-12 rounded-[2.5rem] shadow-2xl border relative overflow-hidden ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white/80 backdrop-blur-2xl border-white shadow-emerald-900/5'}`}>
-          {!isHighContrast && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl -z-10 pointer-events-none" />
-          )}
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors shadow-sm relative z-10 ${isHighContrast ? 'bg-black border-2 border-yellow-400 text-yellow-400' : 'bg-emerald-100 text-emerald-600'}`}>
-            <MessageSquare className="w-8 h-8" />
-          </div>
-          <h2 className={`relative z-10 ${['text-2xl md:text-3xl', 'text-3xl md:text-4xl', 'text-4xl md:text-5xl', 'text-5xl md:text-6xl'][newsFontScale]} font-bold mb-4 transition-all ${isHighContrast ? 'text-white' : 'text-slate-900'}`}>Stay Updated with Legal & Tax News</h2>
-          <p className={`relative z-10 ${['text-base', 'text-lg', 'text-xl', 'text-2xl'][newsFontScale]} mb-10 transition-all ${isHighContrast ? 'text-yellow-400 font-bold tracking-wide' : 'text-slate-600'}`}>
-            Subscribe to our newsletter to receive the latest legal updates, NBR circulars, and compliance tips directly in your inbox.
-          </p>
-          <div className="text-left mt-8 max-w-2xl mx-auto relative z-10"><NewsletterSignup variant="full-width" /></div>
-          <p className={`relative z-10 text-xs mt-6 transition-colors ${isHighContrast ? 'text-white font-bold' : 'text-slate-500'}`}>By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
-          <SectionNote id="newsletter-section" isHighContrast={isHighContrast} />
-        </div>
-      </section>
     </div>
   );
 }

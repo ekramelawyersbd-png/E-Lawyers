@@ -90,15 +90,6 @@ export function Footer() {
               <li><Link to="/shop" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Legal & Tax Shop (Digital)</Link></li>
               <li className="hidden"><Link to="/admin/shop" className="hidden">Catalog Admin & Add Products</Link></li>
               <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
-              <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">Legal & Tax FAQs</Link></li>
-              <li>
-                <Link 
-                  to="/contact" 
-                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <span>Contact Us</span>
-                </Link>
-              </li>
             </ul>
           </div>
 

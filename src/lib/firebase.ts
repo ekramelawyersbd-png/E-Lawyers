@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 
 // Custom authentication domain configuration
 // Setting authDomain to 'blog.accounticca.com' ensures Google Sign-In displays
@@ -22,3 +22,10 @@ export const db = getFirestore(app, "ai-studio-accounticcainsig-89414606-29ba-46
 
 // Initialize Auth
 export const auth = getAuth(app);
+
+// Authentication Providers
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+export const facebookProvider = new FacebookAuthProvider();
+
