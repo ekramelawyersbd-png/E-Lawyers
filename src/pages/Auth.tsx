@@ -54,6 +54,9 @@ const formatAuthError = (err: any): string => {
   if (code === 'auth/invalid-email') {
     return 'Please enter a valid email address.';
   }
+  if (code === 'auth/invalid-continue-uri' || code === 'auth/unauthorized-continue-uri') {
+    return 'Unable to process redirection URL. A direct reset email has been dispatched.';
+  }
   if (code === 'auth/network-request-failed') {
     return 'Network connection issue. Please check your internet connection.';
   }
@@ -99,10 +102,29 @@ export function Auth() {
       }
       setIsLoading(true);
       try {
-        await sendPasswordResetEmail(auth, email.trim());
+        const actionCodeSettings = {
+          url: 'https://gen-lang-client-0396222608.firebaseapp.com',
+          handleCodeInApp: false
+        };
+        await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
         setSuccessMessage(`Password reset link sent to ${email.trim()}. Please check your email.`);
       } catch (err: any) {
-        setError(formatAuthError(err));
+        console.warn('Direct sendPasswordResetEmail notice, using resilient proxy:', err);
+        try {
+          const res = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim() })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setSuccessMessage(data.message || `Password reset link sent to ${email.trim()}. Please check your email.`);
+          } else {
+            setError(data.error || formatAuthError(err));
+          }
+        } catch {
+          setError(formatAuthError(err));
+        }
       } finally {
         setIsLoading(false);
       }

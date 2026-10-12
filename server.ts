@@ -215,6 +215,49 @@ async function startServer() {
     }
   });
 
+  // Resilient Password Reset endpoint avoiding iframe invalid-continue-uri
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      const normalizedEmail = (email || "").trim().toLowerCase();
+      if (!normalizedEmail || !normalizedEmail.includes("@")) {
+        return res.status(400).json({ success: false, error: "Valid email address is required" });
+      }
+
+      const apiKey = "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg";
+      const targetUrl = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`;
+      
+      const payload = {
+        requestType: "PASSWORD_RESET",
+        email: normalizedEmail,
+        continueUrl: "https://gen-lang-client-0396222608.firebaseapp.com"
+      };
+
+      const response = await fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data: any = await response.json();
+      if (!response.ok) {
+        console.error("[Password Reset API Error]", data);
+        return res.status(response.status).json({
+          success: false,
+          error: data?.error?.message || "Failed to send reset link."
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: `Password reset link sent to ${normalizedEmail}. Please check your inbox.`
+      });
+    } catch (err: any) {
+      console.error("[Reset Password Server Error]", err);
+      return res.status(500).json({ success: false, error: "Internal server error dispatching reset email" });
+    }
+  });
+
   app.get("/api/admin/verify", (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

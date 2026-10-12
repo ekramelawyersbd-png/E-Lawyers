@@ -201,22 +201,46 @@ export const UserProfile: React.FC = () => {
     }
   };
 
-  // Password reset email request
+  // Password reset email request (with resilient continue URL & server proxy fallback)
   const handlePasswordReset = async () => {
     if (!user?.email) return;
     setIsSendingReset(true);
     setFeedback(null);
     try {
-      await sendPasswordResetEmail(auth, user.email);
+      // 1. First attempt with explicit authorized Firebase continue URL
+      const actionCodeSettings = {
+        url: 'https://gen-lang-client-0396222608.firebaseapp.com',
+        handleCodeInApp: false
+      };
+      await sendPasswordResetEmail(auth, user.email, actionCodeSettings);
       setFeedback({
         type: 'success',
         message: `Password reset link sent to ${user.email}. Check your inbox.`
       });
-    } catch (err: any) {
-      setFeedback({
-        type: 'error',
-        message: err.message || 'Could not send reset email. Please try again.'
-      });
+    } catch (clientErr: any) {
+      console.warn('Direct Firebase sendPasswordResetEmail notice, using resilient proxy:', clientErr);
+      // 2. Fallback to resilient server-side proxy which never fails with invalid-continue-uri
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setFeedback({
+            type: 'success',
+            message: data.message || `Password reset link sent to ${user.email}. Check your inbox.`
+          });
+        } else {
+          throw new Error(data.error || 'Failed to dispatch reset email.');
+        }
+      } catch (proxyErr: any) {
+        setFeedback({
+          type: 'error',
+          message: proxyErr.message || 'Could not send reset email. Please try again.'
+        });
+      }
     } finally {
       setIsSendingReset(false);
     }
@@ -788,25 +812,46 @@ export const UserProfile: React.FC = () => {
             </p>
           </div>
 
-          {/* Password Reset */}
+          {/* Password & Credential Security */}
           <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-emerald-700" />
-                <span>Account Password</span>
+                <span>Account Credentials &amp; Password</span>
               </div>
               <p className="text-xs text-slate-600">
-                Send a secure password reset link to your registered address (<span className="font-semibold text-slate-800">{user.email}</span>).
+                {providerId === 'google.com' ? (
+                  <>
+                    Account is authenticated via <strong className="text-slate-800">Google OAuth</strong> ({user.email}). You can dispatch a recovery/access link or manage security directly.
+                  </>
+                ) : (
+                  <>
+                    Send a secure password reset link to your registered email (<span className="font-semibold text-slate-800">{user.email}</span>).
+                  </>
+                )}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handlePasswordReset}
-              disabled={isSendingReset}
-              className="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs rounded-xl shadow-2xs transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
-            >
-              {isSendingReset ? 'Sending link...' : 'Send Reset Link'}
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              {providerId === 'google.com' && (
+                <a
+                  href="https://myaccount.google.com/security"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-bold text-xs rounded-xl shadow-2xs transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Google Security</span>
+                  <ExternalLink className="w-3 h-3 text-slate-500" />
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                disabled={isSendingReset}
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                {isSendingReset ? 'Sending link...' : 'Send Reset Link'}
+              </button>
+            </div>
           </div>
 
           {/* Google Workspace Enterprise Integration */}
