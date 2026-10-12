@@ -23,7 +23,10 @@ import {
   Printer,
   SlidersHorizontal,
   X,
-  User
+  User,
+  Briefcase,
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
@@ -50,8 +53,8 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile'>(
-    tabParam === 'articles' ? 'articles' : (tabParam === 'profile' || tabParam === 'settings') ? 'profile' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications'>(
+    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -59,17 +62,60 @@ export function Dashboard() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // My Applications & Interview Scheduler State
+  const [myApplications] = useState([
+    {
+      id: 'app-1',
+      jobTitle: 'Senior Corporate Tax Consultant',
+      department: 'Tax Advisory',
+      appliedDate: '2026-10-08',
+      status: 'Interview Scheduled',
+      interviewDate: '2026-10-25',
+      interviewTime: '11:00 AM - 11:45 AM',
+      mode: 'Google Meet (Online)',
+      location: 'Google Meet Video Call'
+    },
+    {
+      id: 'app-2',
+      jobTitle: 'VAT Compliance Specialist',
+      department: 'Legal & Compliance',
+      appliedDate: '2026-10-05',
+      status: 'Under Review',
+      interviewDate: 'TBD',
+      interviewTime: 'TBD',
+      mode: 'In-Person',
+      location: 'Gulshan Office, Dhaka'
+    }
+  ]);
+
+  const handleSyncGoogleCalendar = (app: typeof myApplications[0]) => {
+    const title = encodeURIComponent(`Interview: ${app.jobTitle} - E-Lawyers & Accounticca`);
+    const details = encodeURIComponent(`Interview session for ${app.jobTitle} (${app.department}). Status: ${app.status}.`);
+    const location = encodeURIComponent(app.location);
+    
+    const start = new Date(`${app.interviewDate !== 'TBD' ? app.interviewDate : '2026-10-25'}T11:00:00`);
+    const end = new Date(start.getTime() + 45 * 60000);
+    
+    const formatGCalDate = (d: Date) => d.toISOString().replace(/-|:|\.\d+/g, '');
+    const dates = `${formatGCalDate(start)}/${formatGCalDate(end)}`;
+
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
+    window.open(url, '_blank');
+  };
+
   useEffect(() => {
     if (tabParam === 'articles') {
       setActiveTab('articles');
     } else if (tabParam === 'profile' || tabParam === 'settings') {
       setActiveTab('profile');
+    } else if (tabParam === 'applications') {
+      setActiveTab('applications');
     } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
       setActiveTab('saved');
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -266,16 +312,21 @@ export function Dashboard() {
             </button>
 
             <button 
-              id="dashboard-tab-articles"
-              onClick={() => switchTab('articles')} 
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'articles' 
+              id="dashboard-tab-applications"
+              onClick={() => switchTab('applications')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'applications' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <PenSquare className="w-5 h-5" /> 
-              <span>My Contributions</span>
+              <div className="flex items-center gap-3">
+                <Briefcase className="w-5 h-5 text-emerald-600" />
+                <span>My Applications & Interviews</span>
+              </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                2
+              </span>
             </button>
 
             <button 
@@ -383,6 +434,11 @@ export function Dashboard() {
                     <>
                       <BookMarked className="w-6 h-6 text-emerald-600" />
                       <span>Saved Articles & Reference Library</span>
+                    </>
+                  ) : activeTab === 'applications' ? (
+                    <>
+                      <Briefcase className="w-6 h-6 text-emerald-600" />
+                      <span>My Applications & Interview Scheduler</span>
                     </>
                   ) : (
                     <>
@@ -505,7 +561,70 @@ export function Dashboard() {
             </div>
           )}
           
-          {activeTab === 'articles' ? (
+          {activeTab === 'applications' ? (
+            <div className="space-y-6">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Job Applications & Google Calendar API Sync</h3>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    View active job applications and sync your confirmed interview slots directly to your personal Google Calendar.
+                  </p>
+                </div>
+                <Link
+                  to="/careers"
+                  className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shrink-0 shadow-sm"
+                >
+                  Browse Career Openings
+                </Link>
+              </div>
+
+              <div className="space-y-4">
+                {myApplications.map((app) => (
+                  <div key={app.id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
+                          {app.department}
+                        </span>
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                          app.status === 'Interview Scheduled' 
+                            ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                            : 'bg-slate-100 text-slate-700'
+                        }`}>
+                          {app.status}
+                        </span>
+                      </div>
+                      <h4 className="text-lg font-bold text-slate-900">{app.jobTitle}</h4>
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium">
+                        <span>Applied on: {app.appliedDate}</span>
+                        <span>•</span>
+                        <span>Mode: {app.mode}</span>
+                        {app.interviewDate !== 'TBD' && (
+                          <>
+                            <span>•</span>
+                            <span className="text-emerald-700 font-bold">Interview: {app.interviewDate} ({app.interviewTime})</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleSyncGoogleCalendar(app)}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm cursor-pointer"
+                        title="Sync interview slot to Google Calendar API"
+                      >
+                        <Calendar className="w-4 h-4 text-emerald-100" />
+                        <span>Add to Google Calendar API</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activeTab === 'articles' ? (
             <div id="my-articles-empty-state" className="flex flex-col items-center justify-center h-64 text-center">
               <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
                 <FileText className="w-8 h-8" />

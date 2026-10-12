@@ -35,8 +35,7 @@ import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
-import { CareerPage } from './pages/CareerPage';
-import { CareerFormsPage } from './pages/CareerFormsPage';
+import { JobOpenings } from './pages/JobOpenings';
 import { AuthProvider } from './contexts/AuthContext';
 import { ShopAuthProvider } from './contexts/ShopAuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -78,14 +77,13 @@ export default function App() {
                     <Route path="store" element={<Navigate to="/shop" replace />} />
                     <Route path="products" element={<Navigate to="/shop" replace />} />
                     <Route path="resource-library" element={<ResourceLibraryPage />} />
-                  <Route path="resources" element={<Navigate to="/resource-library" replace />} />
+                    <Route path="resources" element={<Navigate to="/resource-library" replace />} />
+                    <Route path="careers" element={<JobOpenings />} />
+                    <Route path="jobs" element={<Navigate to="/careers" replace />} />
                   <Route path="category/:id" element={<Category />} />
                 <Route path="article/:id" element={<Article />} />
                 <Route path="tax-refund-guide" element={<TaxRefundGuide />} />
                 <Route path="community" element={<Community />} />
-                <Route path="community/career" element={<CareerPage />} />
-                <Route path="community/career/forms" element={<CareerFormsPage />} />
-                <Route path="career" element={<Navigate to="/community/career" replace />} />
                 <Route path="experts" element={<Community initialTab="experts" />} />
                 <Route path="discussions" element={<Community initialTab="discussions" />} />
                 <Route path="dashboard" element={<Dashboard />} />

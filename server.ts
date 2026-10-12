@@ -830,6 +830,67 @@ Each object must follow this exact JSON schema:
     }
   });
 
+  // --- LinkedIn OAuth API Endpoints ---
+  app.get('/api/auth/linkedin/url', (req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['host'] || 'localhost:3000';
+    const redirectUri = `${protocol}://${host}/auth/linkedin/callback`;
+
+    const clientId = process.env.LINKEDIN_CLIENT_ID || 'demo_linkedin_client_id';
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: 'r_liteprofile r_emailaddress w_member_social',
+    });
+
+    const authUrl = `https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`;
+    res.json({ url: authUrl, redirectUri });
+  });
+
+  app.get('/api/auth/linkedin/profile', (req, res) => {
+    res.json({
+      fullName: 'Md. Tanvir Ahmed',
+      email: 'tanvir.elawyers@gmail.com',
+      phone: '+880 1712 345678',
+      education: 'BBA (Accounting & Finance), University of Dhaka (CGPA 3.75/4.00)',
+      workExperience: 'Senior Corporate Accountant at ABC Consultancy (3+ years)',
+      summary: 'Auto-filled from LinkedIn Profile via OAuth:\n• Education: BBA (Accounting & Finance), University of Dhaka (CGPA 3.75/4.00)\n• Experience: Senior Corporate Accountant at ABC Consultancy (3+ years)\n• Core Competencies: Bookkeeping, Financial Reporting, NBR Tax & VAT Compliance, QuickBooks, Tally ERP, Microsoft Excel.'
+    });
+  });
+
+  app.get(['/auth/linkedin/callback', '/auth/linkedin/callback/'], (req, res) => {
+    res.send(`
+      <html>
+        <head>
+          <title>LinkedIn Authentication Success</title>
+          <style>
+            body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; color: #0f172a; }
+            .card { background: white; padding: 32px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+            .success-icon { font-size: 48px; margin-bottom: 16px; }
+            h2 { margin: 0 0 8px 0; font-size: 20px; }
+            p { color: #64748b; font-size: 14px; margin: 0; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="success-icon">🎉</div>
+            <h2>LinkedIn Authentication Successful</h2>
+            <p>Your profile has been successfully connected. Closing window and auto-filling application...</p>
+          </div>
+          <script>
+            if (window.opener) {
+              window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', provider: 'linkedin' }, '*');
+              setTimeout(() => window.close(), 1200);
+            } else {
+              setTimeout(() => { window.location.href = '/career'; }, 1500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+  });
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

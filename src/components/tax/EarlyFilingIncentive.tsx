@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarCheck, Info, ArrowRight, ShieldCheck, Banknote, Sparkles } from 'lucide-react';
+import { CalendarCheck, Info, ArrowRight, ShieldCheck, Banknote, Sparkles, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface EarlyFilingIncentiveProps {
@@ -40,7 +40,15 @@ export function EarlyFilingIncentive({ initialPayableTax = 0, className = '' }: 
             File your income tax return early between <strong className="text-slate-800">July 1 and September 30</strong> to receive a 5% tax rebate on your net payable tax, up to BDT 25,000.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors shrink-0 shadow-xs"
+            title="Browse tax guides and professional tools in shop"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>Visit Shop</span>
+          </Link>
           <Link
             to="/article/benefits-of-filing-income-tax-return-bangladesh"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors shrink-0"

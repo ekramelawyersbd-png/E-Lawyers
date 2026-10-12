@@ -6,9 +6,10 @@ import { getAnalytics, isSupported } from 'firebase/analytics';
 // Firebase configuration
 // Custom authDomain: 'accounticca.com' ensures Google Sign-In displays:
 // "Choose an account to continue to accounticca.com"
+const isCustomDomain = typeof window !== 'undefined' && window.location.hostname === 'accounticca.com';
 const firebaseConfig = {
   apiKey: "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg",
-  authDomain: "accounticca.com",
+  authDomain: isCustomDomain ? "accounticca.com" : "gen-lang-client-0396222608.firebaseapp.com",
   projectId: "gen-lang-client-0396222608",
   storageBucket: "gen-lang-client-0396222608.firebasestorage.app",
   messagingSenderId: "425825496026",
