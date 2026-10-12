@@ -23,7 +23,8 @@ import {
   CheckCircle2, 
   Smartphone,
   Eye,
-  Sparkles
+  Sparkles,
+  ShoppingBag
 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { updateProfile, sendPasswordResetEmail } from 'firebase/auth';
@@ -31,6 +32,8 @@ import { auth, db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useBookmarks } from '../../contexts/BookmarkContext';
+import { usePurchases } from '../../contexts/PurchaseContext';
+import { SHOP_PRODUCTS, ShopProduct } from '../../data/shopProducts';
 import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
 
@@ -60,6 +63,8 @@ export const UserProfile: React.FC = () => {
   const { user, authUser, logout } = useAuth();
   const { language, setLanguage } = useLanguage();
   const { savedItems } = useBookmarks();
+  const { purchasedProductIds } = usePurchases();
+  const purchasedProducts = SHOP_PRODUCTS.filter(p => purchasedProductIds.includes(p.id));
 
   // Profile form state
   const [displayName, setDisplayName] = useState(user?.displayName || '');
@@ -85,7 +90,7 @@ export const UserProfile: React.FC = () => {
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [copiedUid, setCopiedUid] = useState(false);
-  const [activeSection, setActiveSection] = useState<'details' | 'preferences' | 'security'>('details');
+  const [activeSection, setActiveSection] = useState<'details' | 'preferences' | 'security' | 'purchases'>('details');
 
   // Load profile data from Firestore
   useEffect(() => {
@@ -256,6 +261,60 @@ export const UserProfile: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadInvoice = (product: ShopProduct) => {
+    const invoiceNum = `INV-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+    const invoiceDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const clientName = displayName || user?.displayName || user?.email || 'Valued Client';
+    const clientEmail = user?.email || 'client@elawyersbd.com';
+    const vatAmount = Math.round(product.price * 0.05);
+    const netAmount = product.price - vatAmount;
+
+    const invoiceText = `========================================================
+E-LAWYERS & ACCOUNTICCA TAX CONSULTANCY FIRM
+Official Commercial Tax Invoice / Transaction Receipt
+========================================================
+Invoice Number:   ${invoiceNum}
+Date of Issue:    ${invoiceDate}
+Payment Status:   PAID IN FULL (Verified & Encrypted)
+
+-- BILLING & CLIENT DETAILS --
+Client Name:      ${clientName}
+Email:            ${clientEmail}
+Jurisdiction:     People's Republic of Bangladesh
+
+-- TRANSACTION PARTICULARS --
+Item Description: ${product.title}
+Product SKU:      ${product.id}
+Category:         ${product.category}
+Format:           ${product.format}
+
+Net Amount:       ৳${netAmount.toLocaleString()} BDT
+VAT (5% Incl.):   ৳${vatAmount.toLocaleString()} BDT
+--------------------------------------------------------
+TOTAL PAID:       ৳${product.price.toLocaleString()} BDT
+--------------------------------------------------------
+
+Payment Gateway:  Secured SSLCommerz / bKash Gateway
+Reference Token:  ACC-TXN-${Math.floor(10000000 + Math.random() * 90000000)}
+
+Authorized Signatory & Seal:
+For E-Lawyers & Accounticca Practice Division
+Adv. Ekram Hossain, Supreme Court of Bangladesh
+
+Note: This is a system-generated computer invoice and serves as official proof of digital resource/tool acquisition under Bangladesh commercial regulations.
+========================================================`;
+
+    const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Invoice-${product.slug}-${invoiceNum}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (!user) {
     return (
       <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-slate-200/90 shadow-sm max-w-xl mx-auto space-y-5">
@@ -400,6 +459,18 @@ export const UserProfile: React.FC = () => {
           }`}
         >
           Security &amp; Sync
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSection('purchases')}
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeSection === 'purchases'
+              ? 'border-emerald-600 text-emerald-800'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <ShoppingBag className="w-3.5 h-3.5" />
+          <span>My Purchases ({purchasedProducts.length})</span>
         </button>
       </div>
 
@@ -875,6 +946,123 @@ export const UserProfile: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Section 4: My Purchases & Downloads */}
+      {activeSection === 'purchases' && (
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-emerald-600" />
+                <span>My Purchases &amp; Digital Downloads</span>
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Access and download your purchased digital workbooks, legal contracts, and compliance kits.
+              </p>
+            </div>
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-all self-start sm:self-auto"
+            >
+              <span>Explore Shop Store</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {purchasedProducts.length === 0 ? (
+            <div className="py-12 text-center space-y-4 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+              <div className="w-12 h-12 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+                <ShoppingBag className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-slate-800">No Purchases Found</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  You haven't unlocked any shop resources or toolkits yet. Visit the E-Lawyers Shop to explore professional kits.
+                </p>
+              </div>
+              <div>
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+                >
+                  <span>Browse Shop Catalog</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {purchasedProducts.map((product) => (
+                <div 
+                  key={product.id}
+                  className="p-5 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-white via-slate-50/40 to-emerald-50/20 hover:border-emerald-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.title} 
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs"
+                    />
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                          {product.category}
+                        </span>
+                        <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                          {product.format}
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+                        {product.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 line-clamp-1">
+                        {product.shortDescription}
+                      </p>
+                      <div className="text-[11px] text-slate-400 font-medium flex items-center gap-2">
+                        <span>Author: {product.authorOrVettedBy}</span>
+                        <span>•</span>
+                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Lifetime Access Unlocked
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-center">
+                    <a
+                      href={`#download-${product.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        alert(`Downloading digital asset for: ${product.title}\nFormat: ${product.format}\n\nYour secure download has started successfully!`);
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Download File</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadInvoice(product)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer"
+                      title="Download commercial invoice for this transaction"
+                    >
+                      <FileText className="w-4 h-4 text-emerald-400" />
+                      <span>Download Invoice</span>
+                    </button>
+                    <Link
+                      to={`/shop/${product.slug}`}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs rounded-xl border border-slate-300 transition-all"
+                    >
+                      <span>Details</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

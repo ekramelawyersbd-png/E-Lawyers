@@ -18,7 +18,9 @@ import {
   FileCheck2
 } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
+import { usePurchases } from '../../contexts/PurchaseContext';
 import { ShopProduct } from '../../data/shopProducts';
+import { Link } from 'react-router-dom';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   singleProduct
 }) => {
   const { items, subtotal, discount, total, clearCart } = useCart();
+  const { purchaseProduct } = usePurchases();
 
   // If singleProduct is passed from instant checkout, use it; otherwise use cart items
   const checkoutItems = singleProduct 
@@ -69,7 +72,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setTimeout(() => {
       const orderNum = `ACC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
       setCompletedOrderNumber(orderNum);
-      setPurchasedProducts(checkoutItems.map(i => i.product));
+      const prods = checkoutItems.map(i => i.product);
+      setPurchasedProducts(prods);
+      prods.forEach(p => purchaseProduct(p.id));
       setIsSubmitting(false);
       setIsOrderComplete(true);
       if (!singleProduct) {
@@ -165,6 +170,29 @@ Contact & Advisory: https://blog.accounticca.com/contact
           {isOrderComplete ? (
             /* Order Success View */
             <div className="p-6 sm:p-8 space-y-6">
+              {/* Toast Notification Banner confirming purchase and linking to My Purchases */}
+              <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in border border-emerald-400/40">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0 shadow-inner">
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h5 className="font-extrabold text-sm sm:text-base tracking-tight">Checkout Complete &amp; Unlocked!</h5>
+                    <p className="text-xs text-emerald-100 mt-0.5 leading-relaxed">
+                      Your purchased digital assets are now active. You can access and re-download them anytime from your <strong className="underline decoration-emerald-300 font-bold">My Purchases</strong> section.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/profile"
+                  onClick={onClose}
+                  className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-950 font-black text-xs rounded-xl shadow-md transition-all shrink-0 transform hover:scale-105"
+                >
+                  <span>View My Purchases</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
+                </Link>
+              </div>
+
               <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
                 <div className="w-14 h-14 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-md">
                   <Check className="w-8 h-8 stroke-3" />

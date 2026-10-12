@@ -35,11 +35,14 @@ import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
+import { CareerPage } from './pages/CareerPage';
+import { CareerFormsPage } from './pages/CareerFormsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ShopAuthProvider } from './contexts/ShopAuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { BookmarkProvider } from './contexts/BookmarkContext';
 import { CartProvider } from './contexts/CartContext';
+import { PurchaseProvider } from './contexts/PurchaseContext';
 import { BookmarkNotificationToast } from './components/BookmarkNotificationToast';
 import { ScrollManager } from './components/layout/ScrollManager';
 import { NotFound } from './pages/NotFound';
@@ -51,7 +54,8 @@ export default function App() {
         <ShopAuthProvider>
           <BookmarkProvider>
             <CartProvider>
-              <BrowserRouter>
+              <PurchaseProvider>
+                <BrowserRouter>
                 <ScrollManager />
                 <Routes>
                   <Route path="/" element={<Layout />}>
@@ -79,6 +83,9 @@ export default function App() {
                 <Route path="article/:id" element={<Article />} />
                 <Route path="tax-refund-guide" element={<TaxRefundGuide />} />
                 <Route path="community" element={<Community />} />
+                <Route path="community/career" element={<CareerPage />} />
+                <Route path="community/career/forms" element={<CareerFormsPage />} />
+                <Route path="career" element={<Navigate to="/community/career" replace />} />
                 <Route path="experts" element={<Community initialTab="experts" />} />
                 <Route path="discussions" element={<Community initialTab="discussions" />} />
                 <Route path="dashboard" element={<Dashboard />} />
@@ -140,6 +147,7 @@ export default function App() {
             </Routes>
             <BookmarkNotificationToast />
           </BrowserRouter>
+          </PurchaseProvider>
           </CartProvider>
         </BookmarkProvider>
         </ShopAuthProvider>

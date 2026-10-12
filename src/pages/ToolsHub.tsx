@@ -1,4 +1,4 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb, Gem } from 'lucide-react';
+import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb, Gem, ShieldCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
@@ -9,6 +9,9 @@ import { MinimumTurnoverTaxCalculator } from '../components/tax/MinimumTurnoverT
 import { InvestmentBasedTaxRebateCalculator } from '../components/tax/InvestmentBasedTaxRebateCalculator';
 import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
 import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
+import { DvcVerificationWidget } from '../components/DvcVerificationWidget';
+import { RequirePurchase } from '../components/shop/RequirePurchase';
+import { SHOP_PRODUCTS } from '../data/shopProducts';
 import { QuickComplianceTipsSidebar } from '../components/tools/QuickComplianceTipsSidebar';
 import { Gallery } from '../components/Gallery';
 import { ResourceLibrary } from '../components/tools/ResourceLibrary';
@@ -138,6 +141,14 @@ export function ToolsHub() {
       icon: <Building2 className="w-8 h-8" />,
       path: '#corporate-tax-tool',
       color: 'bg-indigo-100 text-indigo-900',
+    },
+    {
+      name: 'ICAB DVC Verification Portal',
+      description: 'Verify audited financial statements and income computation certificates under Income Tax Act Section 73 & ICAB standards.',
+      tooltip: 'Simulated secure API validation of Document Verification Codes (DVC) against Bangladesh regulatory standards.',
+      icon: <ShieldCheck className="w-8 h-8" />,
+      path: '#dvc-verification-tool',
+      color: 'bg-emerald-100 text-emerald-800',
     }
   ];
   const visibleTools = tools.filter(t => !hiddenTools.includes(t.name));
@@ -243,6 +254,13 @@ export function ToolsHub() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* DVC Verification Widget */}
+      <div id="dvc-verification-tool" className="mb-16 scroll-mt-24">
+        <RequirePurchase product={SHOP_PRODUCTS[1]} toolTitle="ICAB Document Verification Code (DVC) Checker & Audit Validator">
+          <DvcVerificationWidget />
+        </RequirePurchase>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">

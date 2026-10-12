@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   Users, 
   PenTool, 
@@ -247,7 +247,7 @@ export function Community({ initialTab }: CommunityProps) {
           </p>
 
           {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <button
               onClick={() => setIsApplicationModalOpen(true)}
               className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold text-sm sm:text-base transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
@@ -262,6 +262,17 @@ export function Community({ initialTab }: CommunityProps) {
               <Users className="w-5 h-5 text-emerald-600" />
               <span>Explore Experts</span>
             </button>
+          </div>
+
+          <div className="mb-16">
+            <Link
+              to="/community/career"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-emerald-300 hover:text-white border border-slate-800 hover:bg-slate-800 text-xs sm:text-sm font-bold shadow-sm transition-all"
+            >
+              <Briefcase className="w-4 h-4 text-emerald-400" />
+              <span>Explore E-Lawyers Career &amp; Job Openings</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {/* Community Statistics Bar */}
