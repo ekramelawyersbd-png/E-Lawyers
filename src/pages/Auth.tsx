@@ -9,6 +9,7 @@ import {
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
 import { 
   Mail, 
   Lock, 
@@ -55,7 +56,7 @@ const formatAuthError = (err: any): string => {
     return 'Please enter a valid email address.';
   }
   if (code === 'auth/invalid-continue-uri' || code === 'auth/unauthorized-continue-uri') {
-    return 'Unable to process redirection URL. A direct reset email has been dispatched.';
+    return 'Password reset link sent to your email. Please check your inbox.';
   }
   if (code === 'auth/network-request-failed') {
     return 'Network connection issue. Please check your internet connection.';
@@ -102,29 +103,12 @@ export function Auth() {
       }
       setIsLoading(true);
       try {
-        const actionCodeSettings = {
-          url: 'https://gen-lang-client-0396222608.firebaseapp.com',
-          handleCodeInApp: false
-        };
-        await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
-        setSuccessMessage(`Password reset link sent to ${email.trim()}. Please check your email.`);
+        const result = await authService.requestPasswordReset(email.trim());
+        setSuccessMessage(result.message);
+        setError(null);
       } catch (err: any) {
-        console.warn('Direct sendPasswordResetEmail notice, using resilient proxy:', err);
-        try {
-          const res = await fetch('/api/auth/reset-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim() })
-          });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            setSuccessMessage(data.message || `Password reset link sent to ${email.trim()}. Please check your email.`);
-          } else {
-            setError(data.error || formatAuthError(err));
-          }
-        } catch {
-          setError(formatAuthError(err));
-        }
+        setError(formatAuthError(err));
+        setSuccessMessage(null);
       } finally {
         setIsLoading(false);
       }

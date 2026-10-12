@@ -31,6 +31,7 @@ import { auth, db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useBookmarks } from '../../contexts/BookmarkContext';
+import { authService } from '../../services/authService';
 import { Link } from 'react-router-dom';
 
 export interface UserPreferences {
@@ -201,46 +202,22 @@ export const UserProfile: React.FC = () => {
     }
   };
 
-  // Password reset email request (with resilient continue URL & server proxy fallback)
+  // Password reset email request (using robust authService)
   const handlePasswordReset = async () => {
     if (!user?.email) return;
     setIsSendingReset(true);
     setFeedback(null);
     try {
-      // 1. First attempt with explicit authorized Firebase continue URL
-      const actionCodeSettings = {
-        url: 'https://gen-lang-client-0396222608.firebaseapp.com',
-        handleCodeInApp: false
-      };
-      await sendPasswordResetEmail(auth, user.email, actionCodeSettings);
+      const result = await authService.requestPasswordReset(user.email);
       setFeedback({
         type: 'success',
-        message: `Password reset link sent to ${user.email}. Check your inbox.`
+        message: result.message
       });
-    } catch (clientErr: any) {
-      console.warn('Direct Firebase sendPasswordResetEmail notice, using resilient proxy:', clientErr);
-      // 2. Fallback to resilient server-side proxy which never fails with invalid-continue-uri
-      try {
-        const res = await fetch('/api/auth/reset-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          setFeedback({
-            type: 'success',
-            message: data.message || `Password reset link sent to ${user.email}. Check your inbox.`
-          });
-        } else {
-          throw new Error(data.error || 'Failed to dispatch reset email.');
-        }
-      } catch (proxyErr: any) {
-        setFeedback({
-          type: 'error',
-          message: proxyErr.message || 'Could not send reset email. Please try again.'
-        });
-      }
+    } catch (err: any) {
+      setFeedback({
+        type: 'error',
+        message: err.message || 'Could not send reset email. Please try again.'
+      });
     } finally {
       setIsSendingReset(false);
     }
