@@ -1,4 +1,7 @@
 import { Article, Author, Category } from '../types';
+import { psrDisplaySection265Article } from './psrDisplaySection265Article';
+import { corporateTaxDeadline2026Article } from './corporateTaxDeadline2026Article';
+import { auditedFinancialStatementsArticle } from './auditedFinancialStatementsArticle';
 import { financialAssetsIncomeTaxArticle } from './financialAssetsIncomeTaxArticle';
 import { capitalGainsCalculationExamples2026Article } from './capitalGainsCalculationExamples2026Article';
 import { capitalGainsTax2026Article } from './capitalGainsTax2026Article';
@@ -65,6 +68,9 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  psrDisplaySection265Article,
+  corporateTaxDeadline2026Article,
+  auditedFinancialStatementsArticle,
   financialAssetsIncomeTaxArticle,
   capitalGainsCalculationExamples2026Article,
   capitalGainsTax2026Article,

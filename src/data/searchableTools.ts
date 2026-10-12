@@ -253,6 +253,42 @@ export const searchableTaxTools: SearchableTool[] = [
     featured: true
   },
   {
+    id: 'audited-financial-statements-guide',
+    name: 'Audited Financial Statements & Income Computation (কোম্পানির নিরীক্ষিত হিসাব ও আয় পরিগণনাপত্র)',
+    shortName: 'Audited Accounts & Computation',
+    category: 'Statutory Guide',
+    description: 'Provisions under Income Tax Act 2023 (Section 73, 166, 171) for audited financial statements, DVS codes, computation sheets, thresholds & deadlines.',
+    path: '/article/company-audited-financial-statements-income-computation-sheet-bangladesh',
+    iconName: 'FileText',
+    badge: 'Section 73 & DVS',
+    tags: ['audited accounts', 'নিরীক্ষিত আর্থিক বিবরণী', 'আয় পরিগণনাপত্র', 'income computation sheet', 'section 73', 'dvs', 'icab', 'corporate tax', 'tax day', 'company return'],
+    featured: true
+  },
+  {
+    id: 'corporate-tax-return-deadline-guide',
+    name: 'Corporate Income Tax Return Deadline 2026 (কোম্পানি রিটার্ন দাখিলের সংবিধিবদ্ধ সময়সীমা)',
+    shortName: 'Corporate Return Deadline',
+    category: 'Statutory Guide',
+    description: 'Statutory deadline for companies under Section 170(2) of the Income Tax Act 2023 (15th day of 9th month, e.g. 15 March 2027, or 15 September rule).',
+    path: '/article/corporate-income-tax-return-deadline-bangladesh-2026',
+    iconName: 'Calendar',
+    badge: 'Section 170(2)',
+    tags: ['corporate tax deadline', 'company return deadline', 'section 170(2)', 'march 15', 'september 15', 'tax day', 'company tax return bangladesh', 'finance act 2026'],
+    featured: true
+  },
+  {
+    id: 'psr-display-section-265-guide',
+    name: 'Display of Proof of Submission of Return (PSR) at Premises (ব্যবসায়িক প্রাঙ্গণে পিএসআর প্রদর্শন)',
+    shortName: 'PSR Display Guide',
+    category: 'Statutory Guide',
+    description: 'Mandatory display of latest PSR at business and professional premises under Section 265 of Income Tax Act 2023, penalties (BDT 20,000–50,000) & compliance checklist.',
+    path: '/article/display-proof-submission-return-psr-section-265-bangladesh',
+    iconName: 'Building2',
+    badge: 'Section 265 Penalty',
+    tags: ['psr display', 'proof of submission of return', 'section 265', 'conspicuous place', 'business premises', 'professional chamber', 'dct penalty', 'bdt 20000 to 50000', 'finance act 2026', 'e-return', 'acknowledgement'],
+    featured: true
+  },
+  {
     id: 'accounticca-digital-shop',
     name: 'Accounticca Legal, Tax & Corporate Shop',
     shortName: 'Digital Store & Templates',

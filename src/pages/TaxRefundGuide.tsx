@@ -577,14 +577,6 @@ export function TaxRefundGuide() {
 
       {/* 9. Related Articles */}
       <RelatedArticles currentArticle={article} maxItems={3} />
-
-      {/* 10. Newsletter Signup */}
-      <NewsletterSignup 
-        variant="full-width"
-        currentCategory={article.category}
-        sourceArticleTitle={article.title}
-        sourceArticleId={article.id}
-      />
     </>
   );
 }
