@@ -2,12 +2,18 @@ import { useState, useMemo, useEffect } from 'react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { CareerNewsletter } from '../components/career/CareerNewsletter';
 import { CareerTips } from '../components/career/CareerTips';
-import { Briefcase, Search, Filter, MapPin, DollarSign, Clock, CheckCircle2, ChevronRight, X, User, Mail, Phone, FileText, TrendingUp, Calendar, ExternalLink, Eye, Printer, Quote, Award, Sparkles, ChevronLeft } from 'lucide-react';
+import { MyApplicationsDashboard } from '../components/career/MyApplicationsDashboard';
+import { useAuth } from '../contexts/AuthContext';
+import { saveJobApplication, updateJobApplication } from '../services/jobApplicationService';
+import { Briefcase, Search, Filter, MapPin, DollarSign, Clock, CheckCircle2, ChevronRight, X, User, Mail, Phone, FileText, TrendingUp, Calendar, ExternalLink, Eye, Printer, Quote, Award, Sparkles, ChevronLeft, Tag, Layers, ArrowUpDown, Calculator, ShieldCheck, Cpu, BookOpen, UserCheck } from 'lucide-react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+export type JobCategory = 'Taxation' | 'Audit' | 'Accounting' | 'Business Tech' | 'Legal & Compliance' | 'Corporate Advisory';
 
 interface Job {
   id: string;
   title: string;
+  category: JobCategory;
   department: string;
   type: 'Full-time' | 'Part-time' | 'Contract';
   salaryMin: number;
@@ -23,6 +29,7 @@ const INITIAL_JOBS: Job[] = [
   {
     id: 'job-1',
     title: 'Senior Corporate Tax Consultant',
+    category: 'Taxation',
     department: 'Tax Advisory',
     type: 'Full-time',
     salaryMin: 60000,
@@ -41,7 +48,8 @@ const INITIAL_JOBS: Job[] = [
   {
     id: 'job-2',
     title: 'VAT Compliance Specialist',
-    department: 'Legal & Compliance',
+    category: 'Taxation',
+    department: 'Tax & Compliance',
     type: 'Full-time',
     salaryMin: 40000,
     salaryMax: 65000,
@@ -56,26 +64,29 @@ const INITIAL_JOBS: Job[] = [
     postedDate: '2026-10-03'
   },
   {
-    id: 'job-3',
-    title: 'Junior Legal Associate (RJSC & Company Law)',
-    department: 'Legal',
+    id: 'job-tax-3',
+    title: 'Tax Assessment & Appellate Associate',
+    category: 'Taxation',
+    department: 'Tax Advisory',
     type: 'Full-time',
-    salaryMin: 30000,
-    salaryMax: 45000,
+    salaryMin: 45000,
+    salaryMax: 75000,
     location: 'Dhaka (Motijheel)',
-    experience: '1-2 Years',
-    description: 'Assist with company incorporations, name clearance certificates, drafting MoA/AoA, and filing digital forms on the RJSC portal.',
+    experience: '2-4 Years',
+    description: 'Handle corporate income tax assessment cases, NBR appellate tribunal filings, dispute resolution, and withholding tax certifications under ITA 2023.',
     requirements: [
-      'LLB degree from a recognized university',
-      'Familiarity with Companies Act 1994 and RJSC digital portal procedures',
-      'Excellent drafting and documentation skills'
+      'Master in Taxation / BBA in Finance or LLB with Tax specialization',
+      'Experience drafting appeals to Commissioner (Appeals) and Taxes Appellate Tribunal',
+      'Thorough familiarity with Bangladesh Income Tax Act 2023 rules',
+      'Strong research and argumentation capabilities'
     ],
-    postedDate: '2026-10-05'
+    postedDate: '2026-10-08'
   },
   {
     id: 'job-4',
     title: 'Part-Time Financial Auditor & Accountant',
-    department: 'Accounting & Finance',
+    category: 'Audit',
+    department: 'Audit & Assurance',
     type: 'Part-time',
     salaryMin: 25000,
     salaryMax: 40000,
@@ -90,8 +101,66 @@ const INITIAL_JOBS: Job[] = [
     postedDate: '2026-09-28'
   },
   {
+    id: 'job-audit-2',
+    title: 'Statutory Auditor & Internal Controls Associate',
+    category: 'Audit',
+    department: 'Audit & Assurance',
+    type: 'Full-time',
+    salaryMin: 50000,
+    salaryMax: 80000,
+    location: 'Dhaka (Banani)',
+    experience: '3+ Years',
+    description: 'Execute statutory compliance audits, internal control evaluations, fraud risk assessments, and IFRS/BFRS financial statement verifications for corporate retainers.',
+    requirements: [
+      'CA Inter / ACCA Affiliate / CMA qualified or partially qualified',
+      'Minimum 3 years of auditing experience in a reputable chartered accounting firm',
+      'In-depth knowledge of Bangladesh Standards on Auditing (BSA) and IFRS',
+      'Proficiency in audit documentation software and data analytics'
+    ],
+    postedDate: '2026-10-07'
+  },
+  {
+    id: 'job-9',
+    title: 'Accountant (Accounts Division)',
+    category: 'Accounting',
+    department: 'Accounts Division',
+    type: 'Full-time',
+    salaryMin: 35000,
+    salaryMax: 55000,
+    location: 'Dhaka, Bangladesh (On-site)',
+    experience: 'Freshers & Experienced',
+    description: 'Manage client accounting operations, financial reporting, bookkeeping, and compliance support for growing businesses at E-Lawyers Legal & Business Consultancy Firm.',
+    requirements: [
+      'Strong knowledge of accounting principles & bookkeeping',
+      'Proficiency in Excel and accounting software (QuickBooks, Tally, Xero)',
+      'Ability to manage financial records with accuracy',
+      'Bachelor’s/Master’s degree in Accounting, Finance, B.Com, M.Com, or BBA/MBA'
+    ],
+    postedDate: '2026-10-13'
+  },
+  {
+    id: 'job-acc-2',
+    title: 'Senior Financial Accountant & Reporting Lead',
+    category: 'Accounting',
+    department: 'Accounting & Finance',
+    type: 'Full-time',
+    salaryMin: 55000,
+    salaryMax: 85000,
+    location: 'Dhaka (Gulshan)',
+    experience: '3-5 Years',
+    description: 'Direct day-to-day corporate general ledger operations, monthly financial close, trial balance reconciliation, cash flow forecasting, and payroll accounting.',
+    requirements: [
+      'Master’s degree in Accounting / MBA in Finance or CA Application Level',
+      '3-5 years managing corporate books, accounts payable/receivable, and bank reconciliations',
+      'Advanced mastery of QuickBooks, TallyPrime, and Excel financial modeling',
+      'Strong team supervision and client advisory presentation skills'
+    ],
+    postedDate: '2026-10-09'
+  },
+  {
     id: 'job-5',
     title: 'Full-Stack Developer (Tax & Legal Tech)',
+    category: 'Business Tech',
     department: 'Engineering',
     type: 'Full-time',
     salaryMin: 70000,
@@ -107,25 +176,46 @@ const INITIAL_JOBS: Job[] = [
     postedDate: '2026-10-06'
   },
   {
-    id: 'job-6',
-    title: 'Client Success & Advisory Manager',
-    department: 'Operations',
+    id: 'job-tech-2',
+    title: 'Legal Tech Solutions & Workflow Automation Engineer',
+    category: 'Business Tech',
+    department: 'Engineering',
     type: 'Full-time',
-    salaryMin: 45000,
-    salaryMax: 70000,
-    location: 'Dhaka',
-    experience: '3-5 Years',
-    description: 'Manage onboarding, appointment coordination, and ongoing service delivery for corporate legal and tax retainers.',
+    salaryMin: 65000,
+    salaryMax: 105000,
+    location: 'Dhaka / Hybrid',
+    experience: '2-4 Years',
+    description: 'Design and deploy automated regulatory document pipelines, tax return e-filing integrations, client intake workflows, and legal compliance databases.',
     requirements: [
-      'Bachelor’s degree in Business Administration or Law',
-      '3+ years in client relationship management or legal practice operations',
-      'Exceptional spoken and written English and Bengali'
+      'Bachelor’s in Computer Science, Software Engineering, or related field',
+      'Proficiency in TypeScript, Python, REST APIs, and modern database systems',
+      'Experience with workflow orchestration, PDF generation pipelines, or enterprise SaaS',
+      'Strong passion for modernizing legal and accounting operations in Bangladesh'
     ],
-    postedDate: '2026-09-25'
+    postedDate: '2026-10-10'
+  },
+  {
+    id: 'job-3',
+    title: 'Junior Legal Associate (RJSC & Company Law)',
+    category: 'Legal & Compliance',
+    department: 'Legal',
+    type: 'Full-time',
+    salaryMin: 30000,
+    salaryMax: 45000,
+    location: 'Dhaka (Motijheel)',
+    experience: '1-2 Years',
+    description: 'Assist with company incorporations, name clearance certificates, drafting MoA/AoA, and filing digital forms on the RJSC portal.',
+    requirements: [
+      'LLB degree from a recognized university',
+      'Familiarity with Companies Act 1994 and RJSC digital portal procedures',
+      'Excellent drafting and documentation skills'
+    ],
+    postedDate: '2026-10-05'
   },
   {
     id: 'job-7',
     title: 'Legal Researcher (High Court & Appellate Division)',
+    category: 'Legal & Compliance',
     department: 'Legal',
     type: 'Part-time',
     salaryMin: 20000,
@@ -141,8 +231,27 @@ const INITIAL_JOBS: Job[] = [
     postedDate: '2026-10-04'
   },
   {
+    id: 'job-6',
+    title: 'Client Success & Advisory Manager',
+    category: 'Corporate Advisory',
+    department: 'Operations',
+    type: 'Full-time',
+    salaryMin: 45000,
+    salaryMax: 70000,
+    location: 'Dhaka',
+    experience: '3-5 Years',
+    description: 'Manage onboarding, appointment coordination, and ongoing service delivery for corporate legal and tax retainers.',
+    requirements: [
+      'Bachelor’s degree in Business Administration or Law',
+      '3+ years in client relationship management or legal practice operations',
+      'Exceptional spoken and written English and Bengali'
+    ],
+    postedDate: '2026-09-25'
+  },
+  {
     id: 'job-8',
     title: 'Business Development Executive',
+    category: 'Corporate Advisory',
     department: 'Sales & Marketing',
     type: 'Full-time',
     salaryMin: 35000,
@@ -156,24 +265,6 @@ const INITIAL_JOBS: Job[] = [
       'Target-driven with excellent negotiation skills'
     ],
     postedDate: '2026-10-02'
-  },
-  {
-    id: 'job-9',
-    title: 'Accountant (Accounts Division)',
-    department: 'Accounts Division',
-    type: 'Full-time',
-    salaryMin: 35000,
-    salaryMax: 55000,
-    location: 'Dhaka, Bangladesh (On-site)',
-    experience: 'Freshers & Experienced',
-    description: 'Manage client accounting operations, financial reporting, bookkeeping, and compliance support for growing businesses at E-Lawyers Legal & Business Consultancy Firm.',
-    requirements: [
-      'Strong knowledge of accounting principles & bookkeeping',
-      'Proficiency in Excel and accounting software (QuickBooks, Tally, Xero)',
-      'Ability to manage financial records with accuracy',
-      'Bachelor’s/Master’s degree in Accounting, Finance, B.Com, M.Com, or BBA/MBA'
-    ],
-    postedDate: '2026-10-13'
   }
 ];
 
@@ -272,11 +363,17 @@ const TEAM_TESTIMONIALS = [
 ];
 
 export function JobOpenings() {
+  const { user, authUser } = useAuth();
+  const [activeViewTab, setActiveViewTab] = useState<'openings' | 'my-applications'>('openings');
+  const [submittedAppId, setSubmittedAppId] = useState<string | null>(null);
+  const [applicationsRefreshTrigger, setApplicationsRefreshTrigger] = useState(0);
+
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDepartment, setSelectedDepartment] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [minSalaryFilter, setMinSalaryFilter] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<'newest' | 'salary-high' | 'salary-low' | 'title'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'category' | 'salary-high' | 'salary-low' | 'title'>('newest');
   const [chartCategory, setChartCategory] = useState<'All' | 'Accounting' | 'Customer Care'>('All');
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
 
@@ -463,6 +560,17 @@ export function JobOpenings() {
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
     window.open(url, '_blank');
     setInterviewBooked(true);
+
+    if (submittedAppId && user) {
+      updateJobApplication(submittedAppId, user.uid, {
+        interviewDate,
+        interviewTime,
+        interviewMode,
+        interviewBooked: true,
+        status: 'Interview Scheduled'
+      }).catch(console.warn);
+      setApplicationsRefreshTrigger(prev => prev + 1);
+    }
   };
 
   const handleDownloadIcs = () => {
@@ -495,7 +603,50 @@ END:VCALENDAR`;
     link.click();
     document.body.removeChild(link);
     setInterviewBooked(true);
+
+    if (submittedAppId && user) {
+      updateJobApplication(submittedAppId, user.uid, {
+        interviewDate,
+        interviewTime,
+        interviewMode,
+        interviewBooked: true,
+        status: 'Interview Scheduled'
+      }).catch(console.warn);
+      setApplicationsRefreshTrigger(prev => prev + 1);
+    }
   };
+
+  const getCategoryBadgeStyle = (category: string) => {
+    switch (category) {
+      case 'Taxation':
+        return 'bg-emerald-50 text-emerald-800 border-emerald-300';
+      case 'Audit':
+        return 'bg-amber-50 text-amber-900 border-amber-300';
+      case 'Accounting':
+        return 'bg-blue-50 text-blue-900 border-blue-300';
+      case 'Business Tech':
+        return 'bg-purple-50 text-purple-900 border-purple-300';
+      case 'Legal & Compliance':
+        return 'bg-rose-50 text-rose-900 border-rose-300';
+      case 'Corporate Advisory':
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-300';
+    }
+  };
+
+  // Unique categories list with counts
+  const categoriesWithCounts = useMemo(() => {
+    const list: { id: string; label: string; count: number }[] = [
+      { id: 'All', label: 'All Categories', count: INITIAL_JOBS.length },
+      { id: 'Taxation', label: 'Taxation', count: INITIAL_JOBS.filter(j => j.category === 'Taxation').length },
+      { id: 'Audit', label: 'Audit', count: INITIAL_JOBS.filter(j => j.category === 'Audit').length },
+      { id: 'Accounting', label: 'Accounting', count: INITIAL_JOBS.filter(j => j.category === 'Accounting').length },
+      { id: 'Business Tech', label: 'Business Tech', count: INITIAL_JOBS.filter(j => j.category === 'Business Tech').length },
+      { id: 'Legal & Compliance', label: 'Legal & Compliance', count: INITIAL_JOBS.filter(j => j.category === 'Legal & Compliance').length },
+      { id: 'Corporate Advisory', label: 'Corporate Advisory', count: INITIAL_JOBS.filter(j => j.category === 'Corporate Advisory').length },
+    ];
+    return list;
+  }, []);
 
   // Extract unique departments
   const departments = useMemo(() => {
@@ -506,17 +657,33 @@ END:VCALENDAR`;
   // Filter and sort jobs
   const filteredJobs = useMemo(() => {
     return INITIAL_JOBS.filter(job => {
-      const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            job.department.toLowerCase().includes(searchQuery.toLowerCase());
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q ||
+                            job.title.toLowerCase().includes(q) ||
+                            job.description.toLowerCase().includes(q) ||
+                            job.department.toLowerCase().includes(q) ||
+                            job.category.toLowerCase().includes(q) ||
+                            job.requirements.some(r => r.toLowerCase().includes(q));
       
+      const matchesCategory = selectedCategory === 'All' || job.category === selectedCategory;
       const matchesDept = selectedDepartment === 'All' || job.department === selectedDepartment;
       const matchesType = selectedType === 'All' || job.type === selectedType;
       const matchesSalary = job.salaryMax >= minSalaryFilter;
 
-      return matchesSearch && matchesDept && matchesType && matchesSalary;
+      return matchesSearch && matchesCategory && matchesDept && matchesType && matchesSalary;
     }).sort((a, b) => {
-      if (sortBy === 'newest') {
+      if (sortBy === 'category') {
+        const categoryPriority = ['Taxation', 'Audit', 'Accounting', 'Business Tech', 'Legal & Compliance', 'Corporate Advisory'];
+        const pA = categoryPriority.indexOf(a.category);
+        const pB = categoryPriority.indexOf(b.category);
+        if (pA !== -1 && pB !== -1 && pA !== pB) {
+          return pA - pB;
+        }
+        if (a.category !== b.category) {
+          return a.category.localeCompare(b.category);
+        }
+        return b.salaryMax - a.salaryMax;
+      } else if (sortBy === 'newest') {
         return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime();
       } else if (sortBy === 'salary-high') {
         return b.salaryMax - a.salaryMax;
@@ -526,18 +693,47 @@ END:VCALENDAR`;
         return a.title.localeCompare(b.title);
       }
     });
-  }, [searchQuery, selectedDepartment, selectedType, minSalaryFilter, sortBy]);
+  }, [searchQuery, selectedCategory, selectedDepartment, selectedType, minSalaryFilter, sortBy]);
 
   const filteredChartData = useMemo(() => {
     if (chartCategory === 'All') return MARKET_SALARY_DATA;
     return MARKET_SALARY_DATA.filter(item => item.department.toLowerCase().includes(chartCategory.toLowerCase()));
   }, [chartCategory]);
 
-  const handleApplySubmit = (e: React.FormEvent) => {
+  const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!applicantName || !applicantEmail || !selectedJob) return;
+    
     // Clear draft on successful submission
     localStorage.removeItem(`job_draft_${selectedJob.id}`);
+    
+    try {
+      const saved = await saveJobApplication({
+        userId: user?.uid || `guest_${applicantEmail.replace(/[^a-zA-Z0-9]/g, '_')}`,
+        userEmail: applicantEmail,
+        jobId: selectedJob.id,
+        jobTitle: selectedJob.title,
+        category: selectedJob.category,
+        department: selectedJob.department,
+        jobType: selectedJob.type,
+        location: selectedJob.location,
+        salaryRange: `Tk ${selectedJob.salaryMin.toLocaleString()} - ${selectedJob.salaryMax.toLocaleString()} / mo`,
+        applicantName,
+        applicantEmail,
+        applicantPhone,
+        coverLetter,
+        status: 'Under Review',
+        interviewDate,
+        interviewTime,
+        interviewMode,
+        interviewBooked: false
+      });
+      setSubmittedAppId(saved.id);
+      setApplicationsRefreshTrigger(prev => prev + 1);
+    } catch (saveErr) {
+      console.warn('Error saving job application to database:', saveErr);
+    }
+
     setAppliedSuccess(true);
     setEmailSentStatus(true);
   };
@@ -560,10 +756,114 @@ END:VCALENDAR`;
         </p>
       </div>
 
+      {/* Navigation View Switcher Tabs: Open Positions vs My Applications */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-slate-50 p-2.5 rounded-2xl border border-slate-200/90">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('openings')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+              activeViewTab === 'openings'
+                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Briefcase className="w-4 h-4 text-emerald-600" />
+            <span>Open Job Positions ({INITIAL_JOBS.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('my-applications')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+              activeViewTab === 'my-applications'
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <UserCheck className="w-4 h-4 text-emerald-400" />
+            <span>My Applications Dashboard</span>
+            {user && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            )}
+          </button>
+        </div>
+
+        <div className="text-xs text-slate-500 font-medium px-2 flex items-center gap-2 self-start sm:self-auto">
+          {user ? (
+            <span className="inline-flex items-center gap-1.5 text-emerald-800 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Logged In: {authUser?.displayName || user.email?.split('@')[0]}</span>
+            </span>
+          ) : (
+            <span className="text-slate-500 flex items-center gap-1">
+              <span>Sign in to track real-time application status</span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {activeViewTab === 'my-applications' && (
+        <div className="mb-12 animate-in fade-in duration-200">
+          <MyApplicationsDashboard 
+            onBrowseJobs={() => setActiveViewTab('openings')}
+            refreshTrigger={applicationsRefreshTrigger}
+          />
+        </div>
+      )}
+
       {/* Filtering & Sorting Controls Bar */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs mb-10 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          
+      <div className={`${activeViewTab === 'my-applications' ? 'hidden' : 'block'}`}>
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs mb-10 space-y-6">
+        {/* Practice Category Quick Navigation Pills */}
+        <div className="space-y-3 pb-5 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Filter by Practice Category:
+              </span>
+            </div>
+            {selectedCategory !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setSelectedCategory('All')}
+                className="text-xs text-emerald-700 hover:text-emerald-900 font-bold underline flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+              >
+                <span>Clear Category Filter ({selectedCategory})</span>
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {categoriesWithCounts.map(cat => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-900 text-white shadow-sm ring-2 ring-emerald-500 scale-[1.02]'
+                      : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                    isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'
+                  }`}>
+                    {cat.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Search & Dropdown Filter Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
           {/* Search Box */}
           <div className="relative">
             <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Search Openings</label>
@@ -573,12 +873,28 @@ END:VCALENDAR`;
               </span>
               <input
                 type="text"
-                placeholder="Search job title, skills..."
+                placeholder="Search title, skills, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
             </div>
+          </div>
+
+          {/* Category Dropdown */}
+          <div>
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer"
+            >
+              {categoriesWithCounts.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.label} ({cat.count})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Department Filter */}
@@ -587,7 +903,7 @@ END:VCALENDAR`;
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer"
             >
               {departments.map(dept => (
                 <option key={dept} value={dept}>{dept}</option>
@@ -601,15 +917,14 @@ END:VCALENDAR`;
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer"
             >
-              <option value="All">All Types (Full-time / Part-time)</option>
+              <option value="All">All Types (Full / Part-time)</option>
               <option value="Full-time">Full-time</option>
               <option value="Part-time">Part-time</option>
               <option value="Contract">Contract</option>
             </select>
           </div>
-
         </div>
 
         {/* Salary Range Slider & Quick Brackets */}
@@ -627,7 +942,7 @@ END:VCALENDAR`;
                 <button
                   type="button"
                   onClick={() => setMinSalaryFilter(0)}
-                  className="text-xs text-slate-400 hover:text-slate-700 underline font-semibold"
+                  className="text-xs text-slate-400 hover:text-slate-700 underline font-semibold cursor-pointer"
                 >
                   Reset
                 </button>
@@ -661,7 +976,7 @@ END:VCALENDAR`;
                 key={val}
                 type="button"
                 onClick={() => setMinSalaryFilter(val)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   minSalaryFilter === val
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
@@ -674,21 +989,53 @@ END:VCALENDAR`;
         </div>
 
         {/* Sub-bar for Sorting & Results Count */}
-        <div className="hidden flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-500 gap-3">
-          <div className="font-bold">
-            Showing <span className="text-slate-900">{filteredJobs.length}</span> open positions matching your criteria
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-500 gap-3">
+          <div className="font-bold flex items-center flex-wrap gap-2">
+            <span>
+              Showing <strong className="text-slate-900">{filteredJobs.length}</strong> open {filteredJobs.length === 1 ? 'position' : 'positions'}
+            </span>
+            {selectedCategory !== 'All' && (
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getCategoryBadgeStyle(selectedCategory)}`}>
+                <span>Category: {selectedCategory}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory('All')}
+                  className="hover:opacity-75 cursor-pointer ml-1"
+                  title="Clear category filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {(searchQuery || selectedCategory !== 'All' || selectedDepartment !== 'All' || selectedType !== 'All' || minSalaryFilter > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                  setSelectedDepartment('All');
+                  setSelectedType('All');
+                  setMinSalaryFilter(0);
+                }}
+                className="text-xs text-slate-400 hover:text-slate-700 underline font-semibold ml-1 cursor-pointer"
+              >
+                Reset All Filters
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
             <span className="font-bold text-slate-700">Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none"
+              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
             >
               <option value="newest">Newest Posted</option>
-              <option value="salary-high">Highest Salary</option>
-              <option value="salary-low">Lowest Salary</option>
+              <option value="category">Category (Taxation, Audit, Accounting, Tech)</option>
+              <option value="salary-high">Highest Salary (High to Low)</option>
+              <option value="salary-low">Lowest Starting Salary</option>
               <option value="title">Job Title (A-Z)</option>
             </select>
           </div>
@@ -856,15 +1203,16 @@ END:VCALENDAR`;
             <Filter className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-slate-900 mb-1">No matching open positions</h3>
-          <p className="text-sm text-slate-500 mb-6">Try adjusting your department, job type, or salary filter criteria.</p>
+          <p className="text-sm text-slate-500 mb-6">Try adjusting your practice category, department, or salary filter criteria.</p>
           <button
             onClick={() => {
               setSearchQuery('');
+              setSelectedCategory('All');
               setSelectedDepartment('All');
               setSelectedType('All');
               setMinSalaryFilter(0);
             }}
-            className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors"
+            className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Reset All Filters
           </button>
@@ -878,9 +1226,19 @@ END:VCALENDAR`;
             >
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
-                    {job.department}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategory(job.category)}
+                      title={`Filter jobs by category: ${job.category}`}
+                      className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border transition-transform hover:scale-105 cursor-pointer ${getCategoryBadgeStyle(job.category)}`}
+                    >
+                      {job.category}
+                    </button>
+                    <span className="text-[11px] font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full">
+                      {job.department}
+                    </span>
+                  </div>
                   <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
                     {job.type}
                   </span>
@@ -947,6 +1305,18 @@ END:VCALENDAR`;
           ))}
         </div>
       )}
+
+      {/* My Applications Dashboard Section on /careers page */}
+      <div id="my-applications-section" className="pt-4">
+        <MyApplicationsDashboard 
+          onBrowseJobs={() => {
+            setActiveViewTab('openings');
+            window.scrollTo({ top: 350, behavior: 'smooth' });
+          }}
+          refreshTrigger={applicationsRefreshTrigger}
+        />
+      </div>
+      </div>
 
       {/* Application Modal */}
       {isModalOpen && selectedJob && (
@@ -1072,26 +1442,48 @@ END:VCALENDAR`;
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAppliedSuccess(false);
-                    setIsModalOpen(false);
-                    setSelectedJob(null);
-                    setInterviewBooked(false);
-                  }}
-                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
-                >
-                  Close & Return to Openings
-                </button>
+                <div className="flex flex-col sm:flex-row items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedSuccess(false);
+                      setIsModalOpen(false);
+                      setSelectedJob(null);
+                      setInterviewBooked(false);
+                      setActiveViewTab('my-applications');
+                    }}
+                    className="flex-1 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    <span>View in My Applications Dashboard</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedSuccess(false);
+                      setIsModalOpen(false);
+                      setSelectedJob(null);
+                      setInterviewBooked(false);
+                    }}
+                    className="py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer w-full sm:w-auto"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleApplySubmit} className="space-y-5">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 px-2.5 py-1 bg-emerald-50 rounded-full border border-emerald-200">
-                    {selectedJob.department}
-                  </span>
-                  <h2 className="text-xl font-extrabold text-slate-900 mt-2">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                    <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getCategoryBadgeStyle(selectedJob.category)}`}>
+                      {selectedJob.category}
+                    </span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 px-2.5 py-0.5 bg-slate-100 rounded-full border border-slate-200">
+                      {selectedJob.department}
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-slate-900 mt-1">
                     Apply for {selectedJob.title}
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1471,10 +1863,15 @@ END:VCALENDAR`;
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
-                  {selectedJobDetail.department}
-                </span>
-                <h2 className="text-2xl font-black text-slate-900 mt-2">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${getCategoryBadgeStyle(selectedJobDetail.category)}`}>
+                    {selectedJobDetail.category}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wider px-3 py-1 bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+                    {selectedJobDetail.department}
+                  </span>
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 mt-1">
                   {selectedJobDetail.title}
                 </h2>
                 <p className="text-sm text-slate-500 mt-0.5">
@@ -1484,7 +1881,7 @@ END:VCALENDAR`;
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print / Save PDF</span>
@@ -1492,9 +1889,9 @@ END:VCALENDAR`;
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+              <div><strong>Practice Category:</strong><br/><span className="font-semibold text-slate-800">{selectedJobDetail.category}</span></div>
               <div><strong>Job Type:</strong><br/>{selectedJobDetail.type}</div>
               <div><strong>Location:</strong><br/>{selectedJobDetail.location}</div>
-              <div><strong>Vacancies:</strong><br/>2 Positions</div>
               <div><strong>Salary:</strong><br/>Tk {selectedJobDetail.salaryMin.toLocaleString()} - {selectedJobDetail.salaryMax.toLocaleString()} / mo</div>
             </div>
 

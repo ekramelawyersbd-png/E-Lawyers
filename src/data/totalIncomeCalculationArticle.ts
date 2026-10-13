@@ -2,538 +2,352 @@ import { Article } from '../types';
 
 export const totalIncomeCalculationArticle: Article = {
   id: 'total-income-calculation-bangladesh-2026-2027',
-  title: 'How to Calculate Total Income in Bangladesh for 2026–2027',
-  metaTitle: 'How to Calculate Total Income in Bangladesh 2026–2027 | Income Tax Guide',
-  metaDescription: 'Learn how Total Income (মোট আয়) is calculated in Bangladesh for 2026–2027, including salary, rent, agriculture, business, capital gains, financial assets, other sources and foreign income.',
-  excerpt: 'Understanding Total Income (মোট আয়) under the Income Tax Act 2023 and IT-11GA framework for AY 2026–2027: head-by-head computation, statutory exemptions, deductions, and why Total Income differs from the 3% investment tax rebate base.',
+  title: 'How to Calculate Gross Income and Total Taxable Income in Bangladesh: A Complete Guide under the Income Tax Act, 2023',
+  metaTitle: 'How to Calculate Gross & Total Taxable Income Bangladesh 2026–27 | ITA 2023 Guide',
+  metaDescription: 'Complete practical guide to calculating Gross Income and Total Taxable Income under the Bangladesh Income Tax Act, 2023 for Tax Year 2026–27: seven heads of income, allowable deductions, tax-free thresholds, and Section 78 investment tax rebate with BDT examples.',
+  excerpt: 'A comprehensive, authoritative guide to computing Gross Receipts, Head-wise Income, and Total Taxable Income under the Income Tax Act, 2023 for Tax Year 2026–27. Covers the seven statutory heads of income, allowable deductions, Sixth Schedule salary exemptions, deemed additions, tax-free thresholds, slab calculations, and the Section 78 investment rebate.',
   category: 'Income Tax',
   categoryId: 'tax',
   author: {
-    id: 'adv-ekramul-hoque',
-    name: 'Advocate Ekramul Hoque',
-    role: 'Advocate, Supreme Court of Bangladesh & Tax Consultant',
+    id: 'elawyers-tax-practice',
+    name: 'E-Lawyers | Bangladesh Tax, Accounting & Compliance',
+    role: 'Taxation, Legal & Statutory Compliance Practice Group',
     avatarUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400',
-    bio: 'Advocate, Supreme Court of Bangladesh, specializing in Corporate Law, Income Tax Act 2023, VAT, and Dispute Resolution.'
+    bio: 'The corporate, direct taxation and dispute resolution division of E-Lawyers, counseling corporate enterprises, high-net-worth taxpayers, investors, and practitioners on the Income Tax Act 2023, VAT Act 2012, and NBR regulatory frameworks.'
   },
-  publishedAt: '2026-09-26T10:00:00.000Z',
-  readTime: 14,
+  publishedAt: '2026-10-13T13:00:00.000Z',
+  readTime: 18,
   imageUrl: '/total-income-calculation-bangladesh-2026-2027.jpg',
   tags: [
-    'Total Income Calculation Bangladesh 2026–2027',
-    'Total Income Bangladesh',
-    'মোট আয় নির্ণয়',
-    'Income Tax Bangladesh 2026–2027',
-    'Bangladesh Income Tax Guide',
-    'IT-11GA 2023',
-    'Income Tax Return Bangladesh',
-    'Taxable Income Bangladesh',
-    'Salary Income Tax Bangladesh',
-    'Business Income Tax Bangladesh',
-    'Rent Income Tax Bangladesh',
-    'Investment Tax Rebate Bangladesh',
-    'Section 78 Income Tax Act 2023',
-    'Bangladesh Tax Return 2026–27'
+    'Gross Income Bangladesh',
+    'Total Taxable Income Bangladesh',
+    'Income Tax Act 2023',
+    'Finance Act 2026',
+    'Seven Heads of Income',
+    'Salary Exemption Section 32',
+    'House Rent Income Deduction',
+    'Business Income Calculation',
+    'Capital Gains Tax Bangladesh',
+    'Financial Assets Income',
+    'Investment Tax Rebate Section 78',
+    'Tax Free Threshold 350000',
+    'IT-11GA Return 2023',
+    'Tax Slabs FY 2026-27'
   ],
-  likes: 382,
-  comments: 24,
+  likes: 495,
+  comments: 38,
   isExpertOpinion: true,
-  content: `# How Is Total Income Calculated in Bangladesh for 2026–2027?
+  content: `# How to Calculate Gross Income and Total Taxable Income in Bangladesh: A Complete Guide under the Income Tax Act, 2023
 
-Understanding **Total Income (মোট আয়)** is essential when calculating income tax and determining the investment tax rebate for Assessment Year **2026–2027**.
+**Tax Year 2026–27 | Seven Heads of Income | Allowable Deductions | Tax-Free Thresholds | Investment Tax Rebate**
 
-For tax purposes, a taxpayer generally calculates income separately under the applicable heads of income, applies the deductions, exemptions and allowable expenses relevant to each head, and then aggregates the resulting amounts to determine **Total Income**.
-
-In simplified form:
-
-> **Total Income = Aggregate of income computed under the applicable heads of income**
-
-However, the calculation is not simply the addition of all money received by a taxpayer. Certain receipts may be exempt, excluded, deductible or subject to specific tax treatment under the **Income Tax Act, 2023** and the applicable rules, schedules, notifications and guidance.
+**Applicable law:** Income Tax Act, 2023 (*Act No. 12 of 2023*), as amended by the Finance Act, 2026  
+**Effective period:** Income Year 2026–2027 (1 July 2026 to 30 June 2027) | Assessment Year 2027–2028  
+**Published by:** E-Lawyers | Bangladesh Tax, Accounting & Compliance  
 
 ---
 
-## 1. Determine Net Income Under Each Head
+## 1. Introduction
 
-Before calculating Total Income, the taxpayer should first determine the taxable income under each applicable source or head.
+Calculating income tax in Bangladesh requires more than adding up a taxpayer's annual salary, business revenue, rental receipts and investment earnings. The taxpayer must identify the source of each receipt, classify it under the appropriate head of income, apply allowable deductions, identify statutory exemptions, include applicable deemed income and calculate the resulting total income.
 
-The basic concept is:
+The Income Tax Act, 2023 establishes **seven statutory heads of income**. Sections 26, 29 and 30 deal with the scope, computation and classification of total income. The Act also contains specific provisions for income from individual sources, disallowed expenses, tax exemptions, tax deducted at source and investment-related tax rebates.
 
-$$\\text{Gross Receipts / Income} - \\text{Allowable Exemptions, Deductions and Expenses} = \\text{Income Computed Under the Relevant Head}$$
+For FY 2026–27, taxpayers must also consider the applicable amendments introduced by the Finance Act, 2026.
 
-The exact deductions depend on the nature of the income and the applicable provisions of the Income Tax Act, 2023.
-
-### Employment / Salary Income
-
-Salary income is calculated after applying the exemptions and exclusions available under the applicable provisions.
-
-Depending on the nature of the payment, certain allowances, benefits or employment-related receipts may receive specific tax treatment under the Sixth Schedule (Part 1 and Part 2).
-
-Therefore, the taxpayer should not simply use the total amount credited by the employer without checking whether any component is exempt or otherwise treated differently under the law.
-
-### Rent / House Property Income
-
-For rental or house-property income, the taxpayer generally starts with the relevant rental receipts and then applies the deductions permitted under the applicable provisions.
-
-Examples may include prescribed deductions relating to:
-
-* Statutory repairs and maintenance (e.g., 25% for residential properties, 30% for commercial properties);
-* Municipal or local government taxes where applicable;
-* Fire, hazard or property insurance premiums;
-* Mortgage interest or loan finance costs relating to acquisition, construction or renovation; and
-* Other deductions specifically allowed under the statutory law.
-
-The resulting amount is the income computed from the property for tax purposes.
-
-### Business or Profession Income
-
-For business or professional income, taxable income is generally determined after considering allowable business or professional expenses under the Income Tax Act.
-
-Personal expenses, non-allowable expenses, excessive cash payments without banking channels, and expenses not satisfying the statutory substantiation requirements should not automatically be deducted.
-
-<div className="my-8 rounded-2xl overflow-hidden border border-slate-200/90 shadow-lg bg-slate-900">
-  <img 
-    src="/bangladesh-tax-total-income-infographic.jpg" 
-    alt="Bangladesh Total Income Calculation IT-11GA Framework AY 2026-2027 Infographic" 
-    className="w-full h-auto object-cover rounded-xl"
-  />
-  <div className="p-3.5 bg-slate-900/95 border-t border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-    <span className="font-semibold text-emerald-400">IT-11GA (2023) Framework</span>
-    <span className="text-slate-400">Total Income (মোট আয়) Computation & Assessment Year 2026–2027</span>
-  </div>
-</div>
+This guide explains the calculation process through practical examples and a complete illustrative tax computation in Bangladeshi taka (BDT).
 
 ---
 
-## 2. The Major Income Categories Used in the Tax Return
+## 2. What Is Gross Income?
 
-The individual income tax return, including the **IT-11GA (2023)** return framework, requires taxpayers to report income under the applicable categories.
+Gross income is commonly used to describe income before certain deductions or adjustments. However, **gross receipts, income computed under an individual head, and total income are not interchangeable terms**.
 
-The major categories include:
+For example, a business receives BDT 5,000,000 from sales during the year. This is its gross turnover, not necessarily its taxable business income. Allowable business expenses, depreciation, disallowed expenditures and other adjustments must be considered.
 
-1. **Income from Employment**
-2. **Income from Rent**
-3. **Income from Agriculture**
-4. **Income from Business or Profession**
-5. **Capital Gains**
-6. **Income from Financial Assets**
-7. **Income from Other Sources**
-8. **Share of Income from a Partnership Firm or Association of Persons (AOP)**
-9. **Income of Spouse or Minor Child** (in applicable circumstances)
-10. **Foreign Income / Foreign Taxable Income** (where applicable)
+Similarly, when a taxpayer sells a capital asset, the gross sale proceeds are not automatically the taxable capital gain.
 
-These categories should be understood as **reporting and computation categories**. Their inclusion and tax treatment depend on the facts of the taxpayer and the applicable provisions of law.
+Under Sections 29 and 30 of the Income Tax Act, 2023, total income is computed by aggregating income calculated under the applicable heads of income, subject to the Act's rules.
+
+A simplified formula is:
+
+$$\\text{Total Income} = \\sum (\\text{Income Computed Under Each Head}) + \\text{Applicable Deemed Additions}$$
+
+Where applicable, deemed income must also be included under the statutory provision governing the transaction.
 
 ---
 
-## 3. Income from Employment
+## 3. The Seven Heads of Income: Section 30
 
-Employment income may include:
+Section 30 of the Income Tax Act, 2023 recognises seven heads of income:
 
-* Basic salary;
-* House rent allowances, medical allowances, and conveyance allowances;
-* Festival bonus, performance bonus, and incentive awards;
-* Overtime payments;
-* Arrears of salary received during the tax year;
-* Perquisites, car facilities, and subsidized utilities;
-* Benefits in kind and employer contributions to unapproved funds; and
-* Other employment-related receipts.
+1. **Income from Employment** (*Section 32*)
+2. **Income from Rent** (*Sections 36–39*)
+3. **Income from Agriculture** (*Sections 40–44*)
+4. **Income from Business** (*Sections 45–56*)
+5. **Capital Gains** (*Sections 57–61*)
+6. **Income from Financial Assets** (*Sections 62–65*)
+7. **Income from Other Sources** (*Sections 66–67*)
 
-However, not every amount received from an employer necessarily becomes taxable in full.
-
-Where an exemption or specific tax treatment is available under the Income Tax Act and applicable Sixth Schedule provisions (such as allowable salary exemption thresholds), that treatment should be applied before determining the taxable income from employment.
+In addition, taxpayers reporting through the National Board of Revenue's (NBR) comprehensive **IT-11GA (2023)** return framework must record supplementary categories, such as a partner's share of profit in a registered partnership firm or Association of Persons (AOP), applicable spouse or minor child income, and foreign-sourced income.
 
 ---
 
-## 4. Income from Rent
+## 4. Allowable Deductions and Exclusions per Head
 
-Income from rent generally relates to income derived from property.
+To compute the net taxable income for each statutory head, the taxpayer must apply the specific deductions, exclusions, and statutory caps authorized by law.
 
-The calculation should distinguish between:
+### 4.1 Head 1: Income from Employment (Section 32)
 
-* **Gross rental income** (actual rent received or receivable, plus any non-adjustable advance payments)
-* **Allowable statutory deductions** (repairs, maintenance, municipal rates, mortgage interest, insurance)
+Employment income includes basic pay, house rent allowance, medical allowance, conveyance allowance, festival bonuses, performance incentives, overtime, perquisites, and employer-provided facilities (such as vehicle and housing benefits).
 
-> **Income from Rent = Gross Rental Income − Allowable Statutory Deductions**
+* **Statutory Exemption Rule (Sixth Schedule, Part 1, Paragraph 1):**  
+  One-third ($1/3$) of total employment receipts or **BDT 450,000**, whichever is lower, is completely exempt from income tax.
+* **Formula:**  
+  $$\\text{Net Employment Income} = \\text{Gross Employment Receipts} - \\min\\left(\\frac{1}{3} \\times \\text{Gross Receipts}, \\; \\text{BDT 450,000}\\right)$$
 
-The taxpayer should use the deductions specifically permitted under the applicable tax provisions rather than deducting every subjective personal expense incurred in relation to the property.
+* **Example:**  
+  If an executive receives gross annual salary and bonuses of BDT 1,500,000:
+  * $1/3$ of BDT 1,500,000 = BDT 500,000
+  * Maximum statutory exemption = BDT 450,000
+  * Allowable exemption = BDT 450,000
+  * **Taxable Employment Income** = BDT 1,500,000 − BDT 450,000 = **BDT 1,050,000**.
 
----
+### 4.2 Head 2: Income from Rent (Sections 36–39)
 
-## 5. Income from Agriculture
+Income from house property or commercial premises is computed by taking gross rental receipts (including non-adjustable tenant advances) and subtracting allowable statutory expenditures:
 
-Agricultural income is reported separately where applicable.
+* **Statutory Repair and Maintenance Allowance:**  
+  * **Residential Property:** **25%** of annual rental value (*Section 37(1)(b)*)  
+  * **Commercial / Business Property:** **30%** of annual rental value
+* **Other Permissible Deductions:**  
+  * Municipal rates, local taxes, and government land revenue actually paid;  
+  * Property insurance premiums for fire, hazard, or earthquake;  
+  * Interest on borrowed capital used for purchase, construction, or renovation of the property;  
+  * Vacancy allowance where property remained genuinely vacant despite reasonable letting efforts.
 
-Depending on the nature and source of the agricultural income, specific computation rules, cost of production allowances, exemptions or tax treatments may apply.
+* **Example:**  
+  A landlord receives BDT 600,000 annual rent from a residential property and pays BDT 20,000 municipal holding tax:
+  * Gross Rent = BDT 600,000
+  * Less: 25% Statutory Repairs = BDT 150,000
+  * Less: Municipal Tax = BDT 20,000
+  * **Taxable Rental Income** = BDT 600,000 − BDT 150,000 − BDT 20,000 = **BDT 430,000**.
 
-Examples may include income from:
+### 4.3 Head 3: Income from Agriculture (Sections 40–44)
 
-* Crop production and commercial grain farming;
-* Tea, rubber, and horticulture plantations;
-* Fisheries, hatcheries, and aquaculture;
-* Livestock and dairy farming;
-* Poultry and feed production; and
-* Other qualifying agricultural activities.
+Agricultural receipts arise from cultivation of crops, tea, rubber, horticulture, fisheries, livestock, and poultry farming.
 
-The taxpayer should determine the taxable amount under the applicable provisions rather than automatically treating every agricultural receipt as taxable income.
+* **Production Cost Allowance:**  
+  Where detailed books of accounts are not maintained, a statutory production cost allowance of **60%** of gross agricultural market value is deductible.  
+  Where books of accounts are maintained, actual substantiated costs are deductible.
+* **Small Farmer Exemption:**  
+  Under the Sixth Schedule (Part 1, Paragraph 27), the first **BDT 200,000** of agricultural income is fully tax-free for marginal farmers whose sole livelihood is agriculture.
 
----
+### 4.4 Head 4: Income from Business (Sections 45–56)
 
-## 6. Income from Business or Profession
+Taxable business profit is computed on an accrual or cash accounting basis by deducting wholly and exclusively incurred business expenditures from gross turnover:
 
-Business or professional income may arise from activities such as:
+* **Allowable Expenses:** Rent of commercial premises, employee salaries, utility charges, marketing expenses, raw materials, professional fees, insurance, and tax depreciation computed under the Third Schedule.
+* **Key Disallowed Expenditures (Section 55):**  
+  * Any single expense payment exceeding statutory limits paid in cash rather than through official banking channels;  
+  * Payments where required TDS (Tax Deduction at Source) was not deducted or deposited into the government treasury;  
+  * Personal, drawing, or household expenses of proprietors and partners;  
+  * Unauthorized fines, penalties, or statutory late fees.
 
-* Trading, wholesale, and retail commerce;
-* Consultancy and professional advisory services;
-* Legal, accounting, medical, engineering, and architectural services;
-* Manufacturing and industrial production;
-* Contracting, supplying, and indenting;
-* Commission agency business;
-* Freelancing and digital economy services;
-* Transport and logistics; and
-* Other commercial enterprises.
+### 4.5 Head 5: Capital Gains (Sections 57–61)
 
-The taxable business or professional income is generally determined by deducting allowable business expenses from the relevant business receipts, subject to the limitations and conditions of the Income Tax Act.
+Capital gains arise from the sale, exchange, or transfer of capital assets (land, buildings, listed securities, private company shares, patents, trademarks).
 
-> **Business Income = Business Receipts − Allowable Business Expenses**
+* **Formula:**  
+  $$\\text{Capital Gain} = \\text{Transfer Value / Consideration} - (\\text{Cost of Acquisition} + \\text{Cost of Improvement} + \\text{Transfer Expenses})$$
+* **Special Tax Rates:**  
+  Under Finance Act 2026, capital gains from immovable property transfers or specified securities transfers may be subject to preferential final rates (e.g., 15%) or normal slabs depending on holding period and asset classification.
 
-Proper books of accounts, invoices, bank records, withholding tax certificates, and supporting vouchers should be maintained to substantiate the income and expenses reported in the return.
+### 4.6 Head 6: Income from Financial Assets (Sections 62–65)
 
----
+Financial asset income covers bank interest, savings account profit, fixed deposit (FDR) interest, Islamic banking profit, dividend distributions, and profits on government savings certificates (Sanchayapatra).
 
-## 7. Capital Gains
+* **Deductions:** Bank service charges, excise duty directly associated with collection, or commission fees paid to banks.
+* **TDS Withholding Note:** Bank interest is typically subjected to 10% (with TIN/PSR) or 15% (without PSR) TDS under Section 102. Gross interest must be reported in total income, with credit claimed for TDS withheld.
 
-Capital gains may arise from the transfer or disposal of capital assets, such as real estate, land, listed or unlisted company shares, commercial licenses, or intellectual property rights.
+### 4.7 Head 7: Income from Other Sources (Sections 66–67)
 
-Depending on the nature of the asset, acquisition cost, transfer value, holding period, and applicable legal provisions, the taxable capital gain may be calculated differently.
+Residual income that does not fit under the preceding six heads falls under Section 66. This includes royalties, technical service fees, government cash subsidies, guest honoraria, and certain gifts or grants.
 
-Therefore, the taxpayer should not necessarily treat the entire sale proceeds as taxable capital gain.
-
-> **Capital Gain = Relevant Transfer Value − (Cost of Acquisition + Allowable Capital Expenditure & Transfer Costs)**
-
-The actual computation must follow the provisions applicable to the particular asset and transaction, including any special rates or exemptions notified by the NBR.
-
----
-
-## 8. Income from Financial Assets
-
-Financial-asset income may include income such as:
-
-* Bank interest and profit on savings accounts;
-* Interest from fixed deposits (FDR) and term deposits;
-* Profit from Islamic financial instruments and Sukuk;
-* Dividends from listed companies, mutual funds, or private entities;
-* Interest on government securities, treasury bills, and treasury bonds;
-* Income from savings certificates (Sanchayapatra); and
-* Other income arising from investments in financial assets.
-
-The taxpayer should also consider whether tax has already been deducted at source (TDS under Sections 102, 105, 117, etc.) and whether the income is subject to any special, reduced, or final tax treatment.
-
-**Tax deducted at source is not automatically the same thing as taxable income.**
-
-The gross income and the tax deducted at source should be reported and reconciled separately according to the applicable return requirements.
+* **Deductions:** Reasonable expenses incurred wholly and exclusively for the purpose of earning that specific income.
 
 ---
 
-## 9. Income from Other Sources
+## 5. Deemed Income and Special Additions: Section 67
 
-Income that does not fall within another specific head may be taxable under **Income from Other Sources**, depending on the applicable law.
+The Income Tax Act, 2023 contains powerful anti-avoidance and deemed income provisions under Section 67. The following transactions are treated as deemed taxable income under *Income from Other Sources*:
 
-Examples may include:
-
-* Royalties and copyright fees;
-* Patent, trademark, and franchise license fees;
-* Honorarium, guest speaker fees, and examination assessment fees;
-* Certain service fees, commission, or prize winnings;
-* Government cash subsidies, incentives, and export cash assistances; and
-* Other taxable miscellaneous receipts covered by the relevant provisions.
-
-The exact tax treatment depends on the nature and source of the receipt.
+1. **Unexplained Cash Credits:** Any sum credited in the taxpayer's books or bank account for which the taxpayer cannot offer a satisfactory explanation regarding nature and source (*Section 67(1)*).
+2. **Unexplained Investments & Bullion:** Unrecorded investments in land, real estate, gold, or valuable assets where the declared funds fall short of actual market expenditure (*Section 67(2)*).
+3. **Underpriced Property Purchases:** If a taxpayer purchases property at a consideration significantly lower than the fair market stamp value or registered value, the difference is deemed as income.
+4. **Contract Cancellation Compensation:** Forfeited deposits or liquidated damages received upon the cancellation of a commercial contract (*Section 67(4)*).
+5. **Loan Waivers & Debt Forgiveness:** Any commercial loan or advance waived or written off by a lender is treated as deemed taxable profit.
+6. **Cash Loans Exceeding Statutory Thresholds:** Loans or gifts received in cash without banking channels violating Section 261.
 
 ---
 
-## 10. Share of Income from a Partnership Firm or Association of Persons
+## 6. Total Income vs. Total Taxable Income: Reconciling the Difference
 
-Where an individual receives or is entitled to a share of income from a partnership firm or Association of Persons (AOP), the amount must be treated according to the specific provisions applicable to partnership/AOP income.
+A frequent source of confusion is whether **Total Income** equals the base for the **3% Investment Tax Rebate**.
 
-This point is particularly important when calculating the **investment tax rebate**, because the income-rebate formula applies different treatment to a taxpayer's share of partnership/AOP income.
+Under **Section 78** of the Income Tax Act, 2023:
 
-Therefore, taxpayers should not assume that the treatment of partnership income for **Total Income** is necessarily identical to its treatment for the **3% investment-rebate calculation**. Under Section 78, partnership income where tax has already been assessed on the firm is generally excluded from the 3% qualifying income base!
+$$\\text{Qualifying Income Base for 3\\% Rebate} = \\text{Total Income} - \\text{Exempt Income} - \\text{Taxed Partnership Profits} - \\text{Sec 163 Final Tax Income}$$
 
----
-
-## 11. Income of Spouse or Minor Child
-
-Under the circumstances prescribed by the Income Tax Act, 2023, income of a spouse or minor child may be required to be considered in the return of another taxpayer where the statutory conditions are satisfied (for instance, assets transferred without adequate consideration).
-
-This does **not** mean that the income of every spouse or minor child is automatically added to the taxpayer's income.
-
-The specific statutory conditions must be examined before including such income.
+* **Partnership Firm Profit Share (Head 8):** While included in the taxpayer's overall total income for progressive rate assessment, it is **excluded from the 3% rebate base** if tax has already been assessed and paid by the partnership firm.
+* **Exempt Income:** Agriculture exemptions or foreign remittances are excluded from the rebate calculation base.
 
 ---
 
-## 12. Foreign Income
+## 7. Personal Tax-Free Thresholds for FY 2026–27
 
-A resident taxpayer may have foreign-source income that is taxable in Bangladesh on a worldwide income basis under the applicable provisions.
+For individual taxpayers, the first slice of total taxable income is exempt from tax up to the following statutory thresholds:
 
-Examples may include:
-
-* Foreign employment salary or overseas consulting fees;
-* Foreign business or branch operations income;
-* Foreign professional income and digital services fees;
-* Foreign investment returns, capital gains, and dividend payouts;
-* Foreign bank interest; and
-* Other taxable foreign-source income.
-
-The taxpayer should also consider applicable provisions concerning:
-
-* Foreign tax credit (FTC) for taxes paid abroad;
-* Double taxation avoidance agreements (DTAA) relief;
-* Tax treaties with specific countries; and
-* Mandatory disclosure of foreign assets and income in the Statement of Assets and Liabilities (IT-10B).
+| Taxpayer Category | Tax-Free Threshold (BDT) |
+| :--- | :---: |
+| **General Individual Taxpayers (Male)** | **BDT 350,000** |
+| **Female Taxpayers and Senior Citizens (Aged 65 Years and Above)** | **BDT 400,000** |
+| **Physically Challenged Individuals and Third-Gender Taxpayers** | **BDT 475,000** |
+| **Gazetted War-Wounded Freedom Fighters** | **BDT 500,000** |
+| **Parents or Legal Guardians of Disabled Children** | **+BDT 50,000** per disabled child added to base threshold |
 
 ---
 
-## Total Income Calculation — Simplified Formula
+## 8. Progressive Tax Slabs for FY 2026–27
 
-Once the income under the applicable categories has been computed, the taxpayer can aggregate the relevant amounts.
+Once the applicable threshold is exhausted, the remaining taxable income is taxed progressively across five progressive brackets:
 
-### **Total Income =**
+| Tax Slab Bracket | Taxable Income Slice | Applicable Tax Rate |
+| :--- | :--- | :---: |
+| **1st Slab** | On the first BDT 350,000 (or applicable threshold) | **0% (Nil)** |
+| **2nd Slab** | On the next BDT 100,000 | **5%** |
+| **3rd Slab** | On the next BDT 400,000 | **10%** |
+| **4th Slab** | On the next BDT 500,000 | **15%** |
+| **5th Slab** | On the next BDT 500,000 | **20%** |
+| **6th Slab** | On the remaining balance of total taxable income | **25%** |
 
-$$\begin{aligned}
-\text{Total Income} = &\quad \text{Employment Income} \\
-&+ \text{Rent Income} \\
-&+ \text{Agricultural Income} \\
-&+ \text{Business / Professional Income} \\
-&+ \text{Capital Gains} \\
-&+ \text{Financial Asset Income} \\
-&+ \text{Other Sources Income} \\
-&+ \text{Applicable Partnership / AOP Income} \\
-&+ \text{Applicable Spouse / Minor Child Income} \\
-&+ \text{Applicable Foreign Taxable Income}
-\end{aligned}$$
+### Minimum Tax by Location
 
-<div className="my-8 rounded-2xl overflow-hidden border border-slate-200/90 shadow-lg bg-slate-900">
-  <img 
-    src="/bangladesh-tax-total-income-formula-infographic.jpg" 
-    alt="Bangladesh Total Income Calculation Simplified Formula and Aggregate Methodology" 
-    className="w-full h-auto object-cover rounded-xl"
-  />
-  <div className="p-3.5 bg-slate-900/95 border-t border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-    <span className="font-semibold text-emerald-400">Total Income Aggregation</span>
-    <span className="text-slate-400">Income Tax Act 2023 Statutory Heads Formula</span>
-  </div>
-</div>
+Under Section 163 and applicable schedules, every individual taxpayer having taxable income exceeding the threshold must pay at least the statutory minimum tax:
 
-This produces the taxpayer's **Total Income**, subject to the detailed rules, exclusions, exemptions, and special tax treatments prescribed by the Income Tax Act, 2023.
+* **Dhaka and Chattogram City Corporation Areas:** **BDT 5,000**
+* **Other City Corporation Areas:** **BDT 4,000**
+* **Non-City Corporation / Rural Areas:** **BDT 3,000**
 
 ---
 
-## Total Income vs. Taxable Income: Are They the Same?
+## 9. Investment Tax Rebate Formula: Section 78
 
-These terms are often used interchangeably in everyday discussions, but taxpayers should be careful.
+Taxpayers who invest in approved financial instruments (DPS up to BDT 120,000, life insurance premium, government treasury bonds, listed mutual funds, national savings certificates) are entitled to a direct tax rebate:
 
-**Total Income** is the aggregate income computed under the applicable heads after applying the relevant statutory rules.
+$$\\text{Allowable Tax Rebate} = \\min\\Big(3\\% \\times \\text{Qualifying Total Income}, \\; 10\\% \\times \\text{Qualifying Investments}, \\; \\text{BDT 750,000}\\Big)$$
 
-The amount used for calculating the **investment tax rebate's 3% limit** may be different because **Section 78** contains specific exclusions from the income base used for that calculation.
-
-> **Total Income for return purposes $\neq$ necessarily the exact income base used for the 3% investment tax rebate limit.**
-
-This distinction is extremely important for tax planning.
+The rebate is deducted directly from gross income tax liability to determine net payable tax.
 
 ---
 
-## Total Income and the 3% Investment Tax Rebate
+## 10. Complete Illustrative Case Study & Tax Computation
 
-For Assessment Year 2026–2027, the investment tax rebate is subject to three limits:
+Let us examine a complete, realistic scenario of an individual taxpayer (Resident Male, residing in Dhaka City Corporation).
 
-1. **3% of qualifying total income**
-2. **10% of qualifying investment and expenditure**
-3. **Tk. 7,50,000 (Statutory Maximum Cap)**
+### 10.1 Taxpayer's Inflows & Receipts (FY 2026–27)
 
-The allowable rebate is the **lowest** of these three amounts:
-
-$$\text{Investment Tax Rebate} = \min\left(3\% \times \text{Qualifying Income}, \; 10\% \times \text{Qualifying Investment}, \; \text{Tk. 7,50,000}\right)$$
-
-The important point is that the **3% calculation does not necessarily use every amount appearing in the taxpayer's overall Total Income**.
-
-Certain categories (such as tax-exempt income, partnership firm profit shares assessed at the firm level, and income subject to minimum/final tax under Section 163) are excluded or treated separately under the statutory provisions.
+* **Gross Employment Receipts:** BDT 1,200,000
+* **House Rent Receipts (Residential):** BDT 480,000 (Municipal tax paid: BDT 10,000)
+* **Business Revenue (Consultancy):** BDT 600,000 (Allowable expenses: BDT 200,000)
+* **Bank Interest (FDR):** BDT 100,000 (TDS withheld at source: BDT 10,000)
+* **Profit Share from Registered Partnership Firm (Taxed at firm level):** BDT 200,000
+* **Eligible Investments Made:** BDT 180,000 (DPS BDT 120,000 + Life Insurance BDT 60,000)
 
 ---
 
-## Example: Why the 3% Base May Differ from Total Income
+### 10.2 Step 1: Head-by-Head Income Computation
 
-Suppose a taxpayer has the following income components:
+| Head of Income | Gross Inflow (BDT) | Statutory Deductions & Exemptions | Net Taxable Amount (BDT) |
+| :--- | :---: | :--- | :---: |
+| **1. Employment** | 1,200,000 | Less: Exemption $\\min(1/3, \\; 450,000) = 400,000$ | **800,000** |
+| **2. House Rent** | 480,000 | Less: 25% Repairs (120,000) + Municipal Tax (10,000) | **350,000** |
+| **3. Business** | 600,000 | Less: Allowable business expenses (200,000) | **400,000** |
+| **4. Financial Assets** | 100,000 | No statutory deductions applicable | **100,000** |
+| **5. Partnership Profit Share** | 200,000 | Taxed at firm level | **200,000** |
+| **Total Income (Section 30)** | **2,580,000** | **Total Deductions = BDT 730,000** | **BDT 1,850,000** |
 
-| Income Category | Amount (Tk.) | Included in Total Income? | Included in 3% Rebate Base? |
+---
+
+### 10.3 Step 2: Determining Qualifying Base for Section 78 Rebate
+
+* **Total Income:** BDT 1,850,000
+* **Less: Partnership Share Taxed at Firm Level:** BDT 200,000
+* **Qualifying Income Base for 3% Rebate:** **BDT 1,650,000**
+
+---
+
+### 10.4 Step 3: Progressive Tax Slab Computation
+
+With a tax-free threshold of **BDT 350,000** (General Male):
+
+| Slab Bracket | Taxable Slice (BDT) | Rate | Tax Amount (BDT) |
 | :--- | :---: | :---: | :---: |
-| Employment Income | 10,00,000 | Yes | Yes |
-| Business Income | 5,00,000 | Yes | Yes |
-| Bank / Financial Income | 2,00,000 | Yes | Yes |
-| Tax-exempt income (Agriculture/Remittance) | 1,00,000 | Disclosed separately | **No (Excluded)** |
-| Partnership / AOP share | 2,00,000 | Yes (Under Head 8) | **No (Excluded under Sec 78)** |
-| **Total / Base Amount** | **Tk. 19,00,000** | **Total Income = Tk. 19,00,000** | **Qualifying Base = Tk. 17,00,000** |
-
-The taxpayer's overall reported income contains all relevant categories according to the applicable return rules.
-
-However, when determining the **3% investment-rebate limit**, the statutory exclusions must be applied:
-
-* $3\% \times \text{Tk. 17,00,000} = \text{Tk. 51,000}$
-* (If calculated erroneously on full Tk. 19,00,000, it would be Tk. 57,000, creating an erroneous tax claim!)
-
-Therefore, the taxpayer should not simply take the final figure appearing on the return and multiply it by 3% without checking the specific Section 78 requirements.
+| 1st Slab: First BDT 350,000 | 350,000 | 0% | 0 |
+| 2nd Slab: Next BDT 100,000 | 100,000 | 5% | 5,000 |
+| 3rd Slab: Next BDT 400,000 | 400,000 | 10% | 40,000 |
+| 4th Slab: Next BDT 500,000 | 500,000 | 15% | 75,000 |
+| 5th Slab: Next BDT 500,000 | 500,000 | 20% | 100,000 |
+| Balance: Remaining BDT 0 | 0 | 25% | 0 |
+| **Total Taxable Income** | **BDT 1,850,000** | — | **Gross Tax = BDT 220,000** |
 
 ---
 
-## A Practical Tax-Return Workflow
+### 10.5 Step 4: Investment Tax Rebate Calculation
 
-A taxpayer can follow this 8-step sequence when preparing the annual return:
-
-### Step 1 — Identify all income sources
-Prepare a complete list of employment, rent, agriculture, business, capital gains, financial assets, other sources, and applicable foreign income.
-
-### Step 2 — Compute income under each head
-Apply the relevant deductions, exemptions, statutory production costs, repair allowances, and statutory computation rules.
-
-### Step 3 — Aggregate the applicable income
-Combine the computed income under the relevant heads to determine **Total Income**.
-
-### Step 4 — Identify special tax treatments
-Check whether any income is exempt, subject to reduced tax, subject to final tax (TDS under Section 163), subject to minimum tax, or excluded from rebate calculations.
-
-### Step 5 — Calculate gross tax liability
-Apply the applicable individual income-tax rates and slabs for AY 2026–2027.
-
-### Step 6 — Calculate investment tax rebate
-Apply the AY 2026–2027 three-limit formula: **Lower of 3% Qualifying Income, 10% Qualifying Investment, and Tk. 7,50,000**.
-
-### Step 7 — Adjust applicable taxes already paid
-Deduct Tax Deducted at Source (TDS), Advance Income Tax (AIT), and prior adjustments.
-
-### Step 8 — Check minimum tax and surcharge
-Verify minimum tax based on city corporation / municipal location (Tk. 5,000 / Tk. 4,000 / Tk. 3,000) and net wealth surcharge thresholds.
+* **Limit 1 (3% of Qualifying Base):** $3\\% \\times 1,650,000 = \\text{BDT } 49,500$
+* **Limit 2 (10% of Actual Investment):** $10\\% \\times 180,000 = \\text{BDT } 18,000$
+* **Limit 3 (Statutory Ceiling):** BDT 750,000
+* **Allowable Rebate:** $\\min(49,500, \\; 18,000, \\; 750,000) =$ **BDT 18,000**
 
 ---
 
-## Key Point for Taxpayers
+### 10.6 Step 5: Net Tax Liability & Final Reconciliation
 
-The most important lesson is that **Total Income is not simply the total amount of money received during the year**.
-
-The taxpayer must first determine the taxable income under each applicable head after applying the deductions, exemptions, and computation rules permitted by law.
-
-Then the relevant amounts are aggregated.
-
-For investment tax rebate purposes, a **separate qualifying-income calculation** may be necessary because the law specifies which categories are included or excluded from the 3% calculation.
-
-Therefore, taxpayers should avoid calculating their investment rebate simply by taking the total cash receipts or bank credits and multiplying the amount by 3%.
-
----
-
-## Quick Reference Summary
-
-| Income Head / Issue | Statutory Treatment under Income Tax Act, 2023 |
-| :--- | :--- |
-| **Salary / Employment** | Compute under employment-income rules; apply Sixth Schedule exemptions. |
-| **Rent / House Property** | Gross rent less statutory maintenance (25% residential / 30% commercial), rates, interest. |
-| **Agriculture** | Compute according to agricultural provisions, allowable costs, and agricultural exemptions. |
-| **Business** | Gross business receipts less allowable commercial expenses and statutory depreciation. |
-| **Profession** | Professional fees and receipts less allowable expenses incurred exclusively for profession. |
-| **Capital Gain** | Net transfer proceeds less acquisition cost and allowable transfer expenditure. |
-| **Financial Assets** | Interest, dividends, securities and sanchayapatra; reconcile gross income and TDS separately. |
-| **Other Sources** | Royalties, honorarium, cash incentives, and other non-classified taxable receipts. |
-| **Partnership / AOP** | Apply specific statutory treatment; excluded from 3% rebate base under Section 78. |
-| **Spouse / Minor Child** | Include only where statutory conditions (asset transfer without consideration) apply. |
-| **Foreign Income** | Worldwide income taxable for residents; check foreign tax credit & tax treaties. |
-| **Investment Rebate** | Separate 3% qualifying-income calculation applies under Section 78. |
-| **Rebate Formula** | **Lower of: (1) 3% of Qualifying Income, (2) 10% of Eligible Investment, (3) Tk. 7,50,000.** |
+| Particulars | Calculation | Amount (BDT) |
+| :--- | :--- | :---: |
+| **Gross Tax on Slabs** | Slab calculation | 220,000 |
+| **Less: Investment Tax Rebate** | Section 78 allowable rebate | (18,000) |
+| **Tax Payable after Rebate** | 220,000 − 18,000 | **202,000** |
+| **Check Minimum Tax** | Dhaka City Corp minimum is BDT 5,000 (Exceeded) | 202,000 |
+| **Less: Tax Deducted at Source (TDS)** | Bank FDR TDS under Section 102 | (10,000) |
+| **Net Balance Payable with Return** | **Final Tax Payable under Section 173** | **BDT 192,000** |
 
 ---
 
-## Conclusion
+## 11. Practical Tax-Return Preparation Checklist
 
-For Assessment Year **2026–2027**, correctly determining **Total Income (মোট আয়)** is the foundation of an accurate Bangladesh income-tax return.
+To prepare an audit-proof annual tax return under the IT-11GA framework:
 
-The taxpayer should calculate income separately under each applicable head, apply the permitted deductions and exemptions, and then aggregate the resulting amounts.
-
-At the same time, taxpayers should remember that the **income base used for the investment tax rebate is subject to its own statutory rules**. Consequently, the figure used for the 3% investment-rebate limit may not always be identical to the simple Total Income figure reported elsewhere in the return.
-
-For this reason, proper classification of income, correct application of exemptions and deductions, and careful review of the Section 78 investment-rebate provisions are essential when preparing an income-tax return for 2026–2027.
-
-***
-
-# বাংলা সংস্করণ (In Bangla)
-
-# বাংলাদেশে ২০২৬–২০২৭ করবর্ষে মোট আয় কীভাবে নির্ণয় করবেন?
-
-২০২৬–২০২৭ করবর্ষে (Assessment Year 2026–2027) আয়কর হিসাব এবং বিনিয়োগজনিত কর রেয়াত (Investment Tax Rebate) নির্ধারণের জন্য **মোট আয় (Total Income)** সঠিকভাবে নিরূপণ করা অত্যন্ত গুরুত্বপূর্ণ।
-
-আয়কর আইন, ২০২৩ অনুযায়ী একজন করদাতা সরাসরি তার ব্যাংক হিসাবে আসা সমস্ত অর্থকে মোট আয় হিসেবে ধরতে পারবেন না। বরং কর আইনের নির্দিষ্ট খাতভিত্তিক (Heads of Income) আয় নির্ধারণ করে, অনুমোদিত খরচ ও অব্যাহতি বাদ দিয়ে অবশেষে তা যোগ করে মোট আয় নির্ণয় করতে হয়।
-
-> **মোট আয় = প্রযোজ্য আয়ের খাতসমূহ হতে পরিগণিত আয়ের সমষ্টি**
+1. **Collect Employer Tax Statement:** Secure Form 108 statement or monthly salary certificate showing basic salary, allowances, and tax deducted.
+2. **Reconcile Tenancy Agreements:** Maintain written rental agreements, tenant deposit slips, bank rent credits, and municipal holding tax receipts.
+3. **Audit Business Books:** Ensure business expenditures exceeding BDT 50,000 are settled via cheques, bank transfers, or MFS to prevent disallowance under Section 55.
+4. **Collect Financial Certificates:** Obtain TDS certificates from banks for interest on FDR, savings accounts, and Sanchayapatra encashments.
+5. **Preserve Investment Receipts:** Gather bank DPS statements, life insurance premium receipts, and treasury bond purchase challans.
+6. **Submit via NBR e-Return Portal:** File through the official NBR e-tax portal (\`etaxnbr.gov.bd\`) before the annual Tax Day deadline (30 November) to avoid Section 272 late filing penalties.
 
 ---
 
-## ১. আয়ের প্রতিটি খাতের নিট আয় নির্ধারণ
+## 12. Frequently Asked Questions (FAQ)
 
-আয়কর আইন, ২০২৩ অনুযায়ী মোট আয় নির্ণয়ের সাধারণ সূত্র হলো:
+### Can I claim house rent repair expenses if my actual repair expense was zero?
+**Yes.** The statutory repair and maintenance allowance under Section 37 (25% for residential, 30% for commercial) is a statutory standard deduction allowed irrespective of whether actual maintenance was higher or lower.
 
-$$\text{মোট প্রাপ্তি / গ্রস আয়} - \text{আইনসম্মত অব্যাহতি, কর্তন ও অনুমোদনযোগ্য খরচ} = \text{সংশ্লিষ্ট খাতের করযোগ্য আয়}$$
+### Does gross turnover equal taxable business income?
+**No.** Gross turnover is raw sales. Taxable business income is gross turnover minus allowable operational expenses, cost of goods sold, and tax depreciation.
 
-### বেতন বা চাকরি হতে আয় (Employment Income)
-বেতন হতে আয় গণনার ক্ষেত্রে নিয়োগকর্তা কর্তৃক প্রদত্ত সকল ভাতা স্বয়ংক্রিয়ভাবে করযোগ্য নাও হতে পারে। ষষ্ঠ তফসিলে উল্লেখিত অব্যাহতি এবং বিধিসমূহ প্রয়োগ করে করযোগ্য বেতন বের করতে হবে।
-
-### বাড়ি ভাড়া বা গৃহ-সম্পত্তি হতে আয় (Rent / House Property)
-ভাড়া হতে প্রাপ্ত মোট আয় থেকে বিধিবদ্ধ মেরামত ও রক্ষণাবেক্ষণ খরচ (আবাসিক ক্ষেত্রে ২৫%, বাণিজ্যিক ক্ষেত্রে ৩০%), পৌর কর, গৃহঋণের সুদ ইত্যাদি বাদ দিয়ে নিট ভাড়া আয় গণনা করা হয়।
-
-### ব্যবসা বা পেশা হতে আয় (Business / Profession)
-ব্যবসার মোট বিক্রয় বা প্রাপ্তি হতে আয়কর আইন অনুযায়ী অনুমোদনযোগ্য ব্যবসায়িক খরচ বাদ দিয়ে নিট ব্যবসায়িক মুনাফা বের করতে হয়। ব্যক্তিগত খরচ বা হিসাববিহীন নগদ ব্যয় অনুমোদিত হবে না।
-
----
-
-## ২. আয়কর রিটার্ন (IT-11GA) অনুযায়ী আয়ের ১০টি প্রধান খাত
-
-এনবিআরের **আইটি-১১গ (২০২৩)** ফরম অনুযায়ী আয়ের প্রধান ১০টি খাত হলো:
-
-1. চাকরি হতে আয় (Employment Income)
-2. ভাড়া হতে আয় (Rent Income)
-3. কৃষি হতে আয় (Agricultural Income)
-4. ব্যবসা বা পেশা হতে আয় (Business / Profession Income)
-5. মূলধনি আয় বা ক্যাপিটাল গেইন (Capital Gains)
-6. আর্থিক পরিসম্পদ হতে আয় (Financial Assets Income: ব্যাংক সুদ, ডিভিডেন্ড, সঞ্চয়পত্র)
-7. অন্যান্য উৎস হতে আয় (Other Sources: রয়্যালটি, সম্মানী, প্রণোদনা)
-8. অংশীদারি ফার্ম বা ব্যক্তিসংঘের আয়ের অংশ (Share of Partnership / AOP)
-9. প্রযোজ্য ক্ষেত্রে স্বামী/স্ত্রী বা অপ্রাপ্তবয়স্ক সন্তানের আয় (Spouse / Minor Child Income)
-10. প্রযোজ্য ক্ষেত্রে বৈদেশিক আয় (Foreign Income)
-
----
-
-## মোট আয় বনাম ৩% বিনিয়োগ রেয়াতের ভিত্তি: পার্থক্য কোথায়?
-
-অনেকে মনে করেন রিটার্নে প্রদর্শিত মোট আয় এবং বিনিয়োগ রেয়াতের ৩% নির্ধারণের ভিত্তি এক। কিন্তু আয়কর আইন ২০২৩-এর **ধারা ৭৮** অনুযায়ী:
-
-* অংশীদারি ফার্মের আয়ের অংশ যেখানে ফার্ম পর্যায়ে কর প্রদান করা হয়েছে তা ৩% রেয়াত গণনার ভিত্তি থেকে বাদ দিতে হয়।
-* সম্পূর্ণ কর অব্যাহতিপ্রাপ্ত আয় ৩% গণনায় অন্তর্ভুক্ত হয় না।
-
-অতএব:
-> **রিটার্নে প্রদর্শিত মোট আয় $\neq$ ৩% বিনিয়োগ রেয়াত গণনার ভিত্তি**
-
----
-
-## ২০২৬–২০২৭ করবর্ষে বিনিয়োগ কর রেয়াত গণনার সূত্র
-
-আয়কর আইন অনুযায়ী রেয়াতের পরিমাণ হবে নিম্নলিখিত তিনটি পরিমাণের মধ্যে যা **সর্বনিম্ন**:
-
-1. **যোগ্য মোট আয়ের ৩%**
-2. **অনুমোদনযোগ্য মোট বিনিয়োগ ও ব্যয়ের ১০%**
-3. **সর্বোচ্চ সীমা ৭,৫০,০০০ টাকা**
-
-$$\text{কর রেয়াত} = \min\left(\text{যোগ্য আয়ের ৩\%}, \; \text{বিনিয়োগের ১০\%}, \; \text{৭,৫০,০০০ টাকা}\right)$$
-
----
-
-## করদাতাদের জন্য সংক্ষিপ্ত পরামর্শ
-
-* প্রতিটি খাতের বৈধ ভাউচার, ব্যাংক স্টেটমেন্ট ও চালানের কপি সংরক্ষণ করুন।
-* সঞ্চয়পত্র ও ব্যাংক জমার উৎসে কর কর্তন (TDS) সনদ সংগ্রহ করুন।
-* ধারা ৭৮ অনুযায়ী বিনিয়োগের উপযুক্ত খাত (ডিপিএস, জীবন বীমা, সরকারি সিকিউরিটিজ, ইত্যাদি) নিশ্চিত হয়ে রেয়াত দাবি করুন।
+### Can I take the 3% investment rebate on my total income if I have partnership income?
+**No.** Under Section 78, partnership firm profits that have already suffered tax at the firm level must be excluded from the 3% qualifying total income base.
 
 ---
 

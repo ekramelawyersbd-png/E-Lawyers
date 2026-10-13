@@ -38,6 +38,11 @@ import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRe
 import { TotalIncomeCalculator } from '../components/tax/TotalIncomeCalculator';
 import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalculator';
 import { Clause20ExemptionCard } from '../components/tax/Clause20ExemptionCard';
+import { Section66Vs67SummaryCard } from '../components/tax/Section66Vs67SummaryCard';
+import { OtherSourcesDocChecklist } from '../components/tax/OtherSourcesDocChecklist';
+import { TdsLotteryGiftsFreelanceCard } from '../components/tax/TdsLotteryGiftsFreelanceCard';
+import { TaxableVsExemptIncomeCalculator } from '../components/tax/TaxableVsExemptIncomeCalculator';
+import { GrossVsTaxableIncomeCard } from '../components/tax/GrossVsTaxableIncomeCard';
 import { TurnoverTaxCalculator } from '../components/tax/TurnoverTaxCalculator';
 import { TurnoverSlabsSummaryCard } from '../components/tax/TurnoverSlabsSummaryCard';
 import { TaxRebateCeilingCard } from '../components/tax/TaxRebateCeilingCard';
@@ -552,18 +557,93 @@ export function Article() {
               />
             )}
 
+            {/* Interactive Section 66 vs. Section 67 Summary Box for Quick Reference */}
+            {article.id === 'income-from-other-sources-sections-66-67-income-tax-act-2023' && (
+              <div className="my-8 not-prose" id="section-66-vs-67-summary-tool">
+                <Section66Vs67SummaryCard 
+                  showBengaliDefault={language === 'bn'} 
+                  className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                />
+              </div>
+            )}
+
+            {/* Interactive TDS Screener for Lottery, Gifts, Loans, and Freelance Income */}
+            {article.id === 'tds-lottery-winnings-gifts-loans-freelance-income-bangladesh-2026-2027' && (
+              <div className="my-8 not-prose" id="tds-lottery-gifts-freelance-tool">
+                <TdsLotteryGiftsFreelanceCard 
+                  showBengaliDefault={language === 'bn'} 
+                  className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                />
+              </div>
+            )}
+
+            {/* Interactive Taxable vs Exempt Income Calculator & Screener */}
+            {article.id === 'taxable-and-non-taxable-income-bangladesh-guide-2026-2027' && (
+              <div className="my-8 not-prose" id="taxable-vs-exempt-income-tool">
+                <TaxableVsExemptIncomeCalculator 
+                  showBengaliDefault={language === 'bn'} 
+                  className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                />
+              </div>
+            )}
+
+            {/* Interactive Gross vs Taxable Income Card */}
+            {article.id === 'total-income-calculation-bangladesh-2026-2027' && (
+              <div className="my-8 not-prose" id="gross-vs-taxable-income-tool">
+                <GrossVsTaxableIncomeCard 
+                  showBengaliDefault={language === 'bn'} 
+                  className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                />
+              </div>
+            )}
+
             {/* 2-7. Article Content Area (Markdown) */}
             <div id="article-content-body" className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
               <Markdown 
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
-                components={{...markdownComponents, "document-checklist": () => <DocumentChecklist /> } as any}
+                components={{
+                  ...markdownComponents, 
+                  "document-checklist": () => <DocumentChecklist />,
+                  "other-sources-checklist": () => (
+                    <div className="my-10 not-prose">
+                      <OtherSourcesDocChecklist 
+                        showBengaliDefault={language === 'bn'}
+                        className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                      />
+                    </div>
+                  ),
+                  "tds-lottery-gifts-screener": () => (
+                    <div className="my-10 not-prose">
+                      <TdsLotteryGiftsFreelanceCard 
+                        showBengaliDefault={language === 'bn'}
+                        className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                      />
+                    </div>
+                  ),
+                  "taxable-exempt-screener": () => (
+                    <div className="my-10 not-prose">
+                      <TaxableVsExemptIncomeCalculator 
+                        showBengaliDefault={language === 'bn'}
+                        className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                      />
+                    </div>
+                  )
+                } as any}
               >
                 {localizedContent}
               </Markdown>
             </div>
 
             {/* Conditional Checklists Injection */}
+            {article.id === 'income-from-other-sources-sections-66-67-income-tax-act-2023' && (
+              <div className="my-12 scroll-mt-24 not-prose" id="tax-documentation-checklist-tool">
+                <OtherSourcesDocChecklist 
+                  showBengaliDefault={language === 'bn'}
+                  className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
+                />
+              </div>
+            )}
             {article.id === 'required-documents-rjsc-annual-return-filing-bangladesh' && (
               <ComplianceChecklist />
             )}

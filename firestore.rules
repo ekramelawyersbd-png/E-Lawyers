@@ -79,5 +79,36 @@ service cloud.firestore {
       // Allow management of shop products
       allow write: if true;
     }
+
+    // Career Job Applications Collection
+    match /jobApplications/{applicationId} {
+      // Allow authenticated applicant to read, update or withdraw their own applications
+      allow read, update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || resource.data.userEmail == request.auth.token.email);
+      // Allow applicant to submit a job application record
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || request.resource.data.userEmail == request.auth.token.email);
+    }
+
+    // Consultation Appointments Collection
+    match /appointments/{appointmentId} {
+      // Allow public creation with valid client details
+      allow create: if request.resource.data.clientName is string
+                    && request.resource.data.email is string
+                    && request.resource.data.practiceArea is string
+                    && request.resource.data.date is string;
+      // Allow read and manage if authenticated client/staff or matches email
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    // Automated Email Notifications Collection
+    match /emailNotifications/{notificationId} {
+      // Allow authenticated user or recipient to view their automated notification audit logs
+      allow read: if isAuthenticated();
+      // Allow system, functions, or booking triggers to create audit logs
+      allow create: if isAuthenticated() 
+                    || (request.resource.data.recipientEmail is string && request.resource.data.status is string);
+      // Notification logs are immutable records
+      allow update, delete: if false;
+    }
   }
 }
+

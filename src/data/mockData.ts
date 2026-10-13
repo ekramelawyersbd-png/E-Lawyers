@@ -19,6 +19,9 @@ import { salaryTdsArticle } from './salaryTdsArticle';
 import { strategicPartnershipArticle } from './strategicPartnershipArticle';
 import { investmentTaxRebateArticle } from './investmentTaxRebateArticle';
 import { totalIncomeCalculationArticle } from './totalIncomeCalculationArticle';
+import { otherSourcesTaxArticle } from './otherSourcesTaxArticle';
+import { tdsLotteryGiftsFreelanceArticle } from './tdsLotteryGiftsFreelanceArticle';
+import { taxableNonTaxableIncomeArticle } from './taxableNonTaxableIncomeArticle';
 
 import { teamMembers } from './teamData';
 
@@ -68,6 +71,9 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  taxableNonTaxableIncomeArticle,
+  tdsLotteryGiftsFreelanceArticle,
+  otherSourcesTaxArticle,
   psrDisplaySection265Article,
   corporateTaxDeadline2026Article,
   auditedFinancialStatementsArticle,

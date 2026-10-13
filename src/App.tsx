@@ -127,6 +127,10 @@ export default function App() {
                 <Route path="blog/accounting-finance-solutions" element={<Navigate to="/article/accounting-finance-solutions" replace />} />
                 <Route path="investment-tax-rebate-bangladesh-2026-2027" element={<Navigate to="/article/investment-tax-rebate-bangladesh-2026-2027" replace />} />
                 <Route path="total-income-calculation-bangladesh-2026-2027" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="how-to-calculate-gross-income-and-total-taxable-income-bangladesh" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="gross-income-and-total-taxable-income-bangladesh-ita-2023" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="calculate-gross-income-bangladesh" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
+                <Route path="calculate-total-income-bangladesh" element={<Navigate to="/article/total-income-calculation-bangladesh-2026-2027" replace />} />
                 <Route path="agricultural-tax-calculator" element={<Navigate to="/tools#agri-tax-tool" replace />} />
                 <Route path="agricultural-income-tax-calculator" element={<Navigate to="/tools#agri-tax-tool" replace />} />
                 <Route path="turnover-tax-calculator" element={<Navigate to="/tools#minimum-turnover-tax-tool" replace />} />

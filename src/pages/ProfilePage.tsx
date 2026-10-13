@@ -11,8 +11,8 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50/70 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <ServiceSEO
-        title="Account Profile & Preferences | Compliance Hub"
-        description="View your verified account details, manage statutory tax and VAT notifications, and update corporate credentials."
+        title="Account Profile, Preferences & Consultations | Compliance Hub"
+        description="View your verified account details, track booked legal and tax consultations, manage statutory notifications, and update corporate credentials."
         serviceType="User Profile Management"
         canonicalUrl="/profile"
       />

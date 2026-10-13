@@ -24,7 +24,8 @@ import {
   Smartphone,
   Eye,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  Calendar
 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { updateProfile, sendPasswordResetEmail } from 'firebase/auth';
@@ -35,7 +36,9 @@ import { useBookmarks } from '../../contexts/BookmarkContext';
 import { usePurchases } from '../../contexts/PurchaseContext';
 import { SHOP_PRODUCTS, ShopProduct } from '../../data/shopProducts';
 import { authService } from '../../services/authService';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { MyAppointmentsView } from './MyAppointmentsView';
+import { fetchUserAppointments } from '../../services/appointmentService';
 
 export interface UserPreferences {
   language: 'en' | 'bn';
@@ -84,13 +87,43 @@ export const UserProfile: React.FC = () => {
     return { ...DEFAULT_PREFERENCES, language };
   });
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const tabParam = searchParams.get('tab');
+
   // UI state
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [copiedUid, setCopiedUid] = useState(false);
-  const [activeSection, setActiveSection] = useState<'details' | 'preferences' | 'security' | 'purchases'>('details');
+  const [appointmentsCount, setAppointmentsCount] = useState<number>(0);
+  const [activeSection, setActiveSection] = useState<'details' | 'preferences' | 'security' | 'purchases' | 'appointments'>(() => {
+    if (tabParam === 'appointments' || location.hash === '#appointments') {
+      return 'appointments';
+    }
+    if (tabParam === 'purchases') return 'purchases';
+    if (tabParam === 'security') return 'security';
+    if (tabParam === 'preferences') return 'preferences';
+    return 'details';
+  });
+
+  // Sync tab with URL parameter or hash
+  useEffect(() => {
+    if (tabParam === 'appointments' || location.hash === '#appointments') {
+      setActiveSection('appointments');
+    }
+  }, [tabParam, location.hash]);
+
+  // Load appointments count for navigation tab indicator
+  useEffect(() => {
+    if (!user) return;
+    fetchUserAppointments(user.uid, user.email || undefined)
+      .then(apps => {
+        setAppointmentsCount(apps.length);
+      })
+      .catch(() => {});
+  }, [user]);
 
   // Load profile data from Firestore
   useEffect(() => {
@@ -429,7 +462,10 @@ Note: This is a system-generated computer invoice and serves as official proof o
       <div className="flex items-center gap-2 border-b border-slate-200/80 pb-px">
         <button
           type="button"
-          onClick={() => setActiveSection('details')}
+          onClick={() => {
+            setActiveSection('details');
+            setSearchParams({});
+          }}
           className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
             activeSection === 'details'
               ? 'border-emerald-600 text-emerald-800'
@@ -440,7 +476,10 @@ Note: This is a system-generated computer invoice and serves as official proof o
         </button>
         <button
           type="button"
-          onClick={() => setActiveSection('preferences')}
+          onClick={() => {
+            setActiveSection('preferences');
+            setSearchParams({ tab: 'preferences' });
+          }}
           className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
             activeSection === 'preferences'
               ? 'border-emerald-600 text-emerald-800'
@@ -451,7 +490,10 @@ Note: This is a system-generated computer invoice and serves as official proof o
         </button>
         <button
           type="button"
-          onClick={() => setActiveSection('security')}
+          onClick={() => {
+            setActiveSection('security');
+            setSearchParams({ tab: 'security' });
+          }}
           className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
             activeSection === 'security'
               ? 'border-emerald-600 text-emerald-800'
@@ -462,7 +504,10 @@ Note: This is a system-generated computer invoice and serves as official proof o
         </button>
         <button
           type="button"
-          onClick={() => setActiveSection('purchases')}
+          onClick={() => {
+            setActiveSection('purchases');
+            setSearchParams({ tab: 'purchases' });
+          }}
           className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
             activeSection === 'purchases'
               ? 'border-emerald-600 text-emerald-800'
@@ -471,6 +516,28 @@ Note: This is a system-generated computer invoice and serves as official proof o
         >
           <ShoppingBag className="w-3.5 h-3.5" />
           <span>My Purchases ({purchasedProducts.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveSection('appointments');
+            setSearchParams({ tab: 'appointments' });
+          }}
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeSection === 'appointments'
+              ? 'border-emerald-600 text-emerald-800'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <Calendar className="w-3.5 h-3.5" />
+          <span>My Appointments</span>
+          {appointmentsCount > 0 && (
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+              activeSection === 'appointments' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+            }`}>
+              {appointmentsCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -1064,6 +1131,11 @@ Note: This is a system-generated computer invoice and serves as official proof o
             </div>
           )}
         </div>
+      )}
+
+      {/* Section 5: My Appointments Dashboard */}
+      {activeSection === 'appointments' && (
+        <MyAppointmentsView />
       )}
 
     </div>

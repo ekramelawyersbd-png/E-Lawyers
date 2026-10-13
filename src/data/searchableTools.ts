@@ -26,14 +26,14 @@ export const searchableTaxTools: SearchableTool[] = [
   },
   {
     id: 'total-income-calculation',
-    name: 'Total Income Calculation 2026–2027',
-    shortName: 'Total Income & 10 Heads',
+    name: 'How to Calculate Gross Income and Total Taxable Income (FY 2026–27)',
+    shortName: 'Gross & Total Income Guide',
     category: 'Statutory Guide',
-    description: 'Calculate Total Income (মোট আয়) across 10 statutory heads under Income Tax Act 2023 and reconcile the Section 78 3% rebate base.',
+    description: 'Complete guide and interactive aggregator to compute Gross Receipts, 7 statutory heads of income, allowable deductions, Section 78 investment rebate, and FY 2026–27 tax slabs.',
     path: '/article/total-income-calculation-bangladesh-2026-2027',
     iconName: 'Calculator',
-    badge: 'IT-11GA Framework',
-    tags: ['total income', 'মোট আয়', '10 heads', 'heads of income', 'salary', 'rent', 'business', 'agriculture', 'capital gains', 'section 78', 'investment rebate', 'ay 2026-27'],
+    badge: 'ITA 2023 & Finance Act 2026',
+    tags: ['gross income', 'total income', 'taxable income', 'মোট আয়', 'seven heads', 'heads of income', 'salary exemption', 'rent deduction', 'business income', 'section 78', 'investment rebate', 'ay 2026-27', 'tax slabs'],
     featured: true
   },
   {
@@ -213,8 +213,20 @@ export const searchableTaxTools: SearchableTool[] = [
     path: '/glossary',
     iconName: 'BookOpen',
     badge: 'Definitions Hub',
-    tags: ['glossary', 'dictionary', 'definition', 'legal terms', 'tax terms', 'fiscal jargon', 'assessment', 'depreciation', 'glossary terms'],
+    tags: ['glossary', 'dictionary', 'definition', 'legal terms', 'tax terms', 'fiscal jargon', 'assessment', 'depreciation', 'glossary terms', 'terms'],
     featured: false
+  },
+  {
+    id: 'interactive-key-terms-hub',
+    name: 'Interactive Key Terms Guide: TDS, VAT & Sixth Schedule',
+    shortName: 'Interactive Terms Guide',
+    category: 'Compliance Reference',
+    description: 'Interactive educational hub defining TDS (Sec 86-142), VAT (Act 2012), Sixth Schedule exemptions & rebates, with live simulators, 5-step workflows, and penalty guides.',
+    path: '/glossary#interactive-key-terms-hub',
+    iconName: 'Scale',
+    badge: 'TDS, VAT & 6th Sch',
+    tags: ['tds', 'vat', 'sixth schedule', 'interactive glossary', 'withholding tax', 'mushak', 'vds', 'psr', 'tax exemptions', 'investment rebate', 'dps rebate', 'section 163', 'glossary'],
+    featured: true
   },
   {
     id: 'compliance-calendar',
@@ -298,6 +310,30 @@ export const searchableTaxTools: SearchableTool[] = [
     iconName: 'FolderDown',
     badge: 'Digital Store',
     tags: ['shop', 'store', 'buy', 'digital templates', 'contracts', 'nda', 'income tax excel', 'tds calculator', 'employment agreement', 'books', 'rjsc kit'],
+    featured: true
+  },
+  {
+    id: 'taxable-vs-exempt-income-screener',
+    name: 'Taxable vs. Non-Taxable Income Screener & Calculator FY 2026–27',
+    shortName: 'Taxable vs Exempt Income',
+    category: 'Tax Calculator',
+    description: 'Calculate statutory salary exemption (lesser of 1/3rd or BDT 450,000), screen 7 statutory heads of income, test freelance ITES & family gift exemptions, and calculate FY 2026-27 progressive slab tax.',
+    path: '/article/taxable-and-non-taxable-income-bangladesh-guide-2026-2027#taxable-vs-exempt-income-tool',
+    iconName: 'Calculator',
+    badge: 'Sixth Sched. Pt 1',
+    tags: ['taxable income', 'non-taxable income', 'exempt income', 'salary exemption', '1/3rd 450k', 'seven heads', 'freelance tax', 'gift exemption', 'sixth schedule', 'tax slabs 2026-27'],
+    featured: true
+  },
+  {
+    id: 'accounting-tax-glossary',
+    name: 'Accounting & Legal Glossary: TDS, VAT & Sixth Schedule',
+    shortName: 'Tax Glossary & Quiz',
+    category: 'Compliance Reference',
+    description: 'Authoritative dictionary defining TDS, VAT, Sixth Schedule, PSR, e-TIN, and BIN with legal citations, BDT examples, side-by-side concept comparison, and interactive knowledge quiz.',
+    path: '/glossary',
+    iconName: 'BookOpen',
+    badge: 'Interactive Glossary',
+    tags: ['glossary', 'dictionary', 'tds', 'vat', 'sixth schedule', 'ait', 'psr', 'tin', 'bin', 'mushak 6.3', 'mushak 9.1', 'quiz', 'definition', 'terminology'],
     featured: true
   }
 ];

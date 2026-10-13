@@ -123,6 +123,42 @@
         "status": "string",
         "updatedAt": "timestamp"
       }
+    },
+    {
+      "name": "appointments",
+      "description": "Booked client legal and tax consultation dockets",
+      "fields": {
+        "referenceId": "string",
+        "clientName": "string",
+        "email": "string",
+        "phone": "string",
+        "companyName": "string",
+        "practiceArea": "string",
+        "mode": "string",
+        "date": "string",
+        "timeSlot": "string",
+        "status": "string",
+        "userId": "string",
+        "userEmail": "string",
+        "createdAt": "timestamp",
+        "updatedAt": "timestamp",
+        "rating": "map"
+      }
+    },
+    {
+      "name": "emailNotifications",
+      "description": "Automated email notification audit trails dispatched by Cloud Functions and Mailer Hub",
+      "fields": {
+        "referenceId": "string",
+        "appointmentId": "string",
+        "recipientEmail": "string",
+        "clientName": "string",
+        "status": "string",
+        "subject": "string",
+        "messageId": "string",
+        "sentAt": "timestamp",
+        "delivered": "boolean"
+      }
     }
   ],
   "relationships": [
@@ -139,6 +175,11 @@
     {
       "parent": "users",
       "child": "comments",
+      "type": "one-to-many"
+    },
+    {
+      "parent": "appointments",
+      "child": "emailNotifications",
       "type": "one-to-many"
     }
   ]
