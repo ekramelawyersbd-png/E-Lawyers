@@ -197,7 +197,7 @@ export function Home() {
   return (
     <div>
       <SEO
-        title="Compliance Hub | Legal, Tax, VAT, Accounting & Business Technology Platform"
+        title="Accounticca Blog Hub | Legal, Tax, VAT, Accounting & Business Technology"
         description="Empowering Bangladeshi businesses, startups, and foreign investors with integrated legal governance, NBR tax advisory, RJSC compliance, and fractional CFO leadership."
         canonicalUrl="/"
         keywords={[
