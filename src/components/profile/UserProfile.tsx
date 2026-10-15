@@ -1110,6 +1110,27 @@ Note: This is a system-generated computer invoice and serves as official proof o
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-center">
+                    {product.brochureUrl && (
+                      product.brochureUrl.startsWith('/') ? (
+                        <Link
+                          to={product.brochureUrl}
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Access Unlocked Link</span>
+                        </Link>
+                      ) : (
+                        <a
+                          href={product.brochureUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Open Resource</span>
+                        </a>
+                      )
+                    )}
                     <a
                       href={`#download-${product.id}`}
                       onClick={(e) => {

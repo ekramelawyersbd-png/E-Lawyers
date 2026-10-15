@@ -22,6 +22,12 @@ export function getLocalProducts(): ShopProduct[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        const existingKeys = new Set(parsed.map((p: any) => p.slug || p.id));
+        SHOP_PRODUCTS.forEach(sp => {
+          if (!existingKeys.has(sp.slug) && !existingKeys.has(sp.id)) {
+            parsed.push(sp);
+          }
+        });
         return parsed.map((p: any) => ({
           ...p,
           productType: p.productType || inferProductType(p)

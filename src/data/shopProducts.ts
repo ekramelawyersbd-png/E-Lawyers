@@ -121,6 +121,37 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     authorOrVettedBy: 'Accounticca Senior Tax & Audit Practice Division'
   },
   {
+    id: 'income-tax-calculator-2026-27',
+    title: 'Income Tax Calculator 2026–27 (Interactive Assessment Tool)',
+    slug: 'income-tax-calculator-2026-27',
+    category: 'Tax & VAT Toolkits',
+    productType: 'Templates',
+    price: 850,
+    originalPrice: 1500,
+    rating: 4.99,
+    reviewsCount: 312,
+    format: 'Interactive Web Application + Instant Calculation Engine',
+    badge: 'Updated for 2026',
+    shortDescription: 'Full verified access to the automated personal & corporate income tax calculation engine for Assessment Year 2026–2027.',
+    fullDescription: 'Instant unlocked access to the official Accounticca & E-Lawyers interactive Income Tax Calculator for Bangladesh Assessment Year 2026–2027 (Finance Act 2026). Computes accurate gross tax across all individual taxpayer slabs, Sixth Schedule Part 3 & Section 78 investment tax rebates, monthly salary TDS withholding deductions, municipal minimum taxes (BDT 5,000 / 4,000 / 3,000), early submission incentives, and side-by-side comparative analysis with the 2025–26 fiscal year.',
+    governingLaw: 'Income Tax Act, 2023 & Finance Act, 2026 (Bangladesh)',
+    pagesOrFiles: 'Live Interactive Assessment Tool • Real-time Calculation Engine',
+    features: [
+      'Statutory Finance Act 2026 progressive individual tax slabs (0% to 30%)',
+      'Dynamic 3-tier investment rebate cap computation (Sec 78, Sixth Schedule Part 3)',
+      'Dedicated taxpayer categories (General, Women/Seniors 65+, Disabled, Freedom Fighters)',
+      'Salary TDS monthly deduction and withholding schedules',
+      'Area-based minimum tax verification (Dhaka & Chattogram City Corp, other cities, rural)',
+      'AY 2025–26 vs AY 2026–27 comparative savings analysis',
+      'Scenario sharing, exportable breakdowns, and printable tax summaries'
+    ],
+    samplePreviewSnippet: 'AY 2026–27 Tax Slabs: 0% up to Tk 4,00,000; 5% on next Tk 1,00,000; 10% on next Tk 4,00,000; 15% on next Tk 5,00,000; 20% on next Tk 5,00,000; 25% on next Tk 20,00,000; 30% on balance.',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Adv. Ekram Hossain, Advocate Supreme Court of Bangladesh',
+    brochureUrl: '/tax-calculator',
+    requiresPurchaseToAccess: true
+  },
+  {
     id: 'employment-contract-hr-handbook',
     title: 'Employment Contract & HR Policy Manual (Labour Act 2006)',
     slug: 'employment-contract-hr-handbook',

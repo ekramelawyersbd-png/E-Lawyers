@@ -736,7 +736,7 @@ export function AdminShop() {
 
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                            <Link2 className="h-4 w-4" />
+                            <Link2 className="h-4 w-4 text-emerald-600" />
                           </div>
                           <input
                             type="text"
@@ -753,7 +753,7 @@ export function AdminShop() {
                               }
                             }}
                             placeholder="/tax-refund-guide or https://drive.google.com/file.pdf"
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 focus:border-emerald-500 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-900 shadow-2xs transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none text-slate-900 shadow-2xs transition-all"
                           />
                         </div>
 
@@ -771,23 +771,29 @@ export function AdminShop() {
                                 Restrict to Completed Purchases
                               </span>
                               <span className="text-slate-500 block text-[11px] leading-tight">
-                                Users cannot enter or use this internal link without completing the shop purchase.
+                                User cannot enter or use this link without completing the shop purchase. After completing payment, access is unlocked.
                               </span>
                             </div>
                           </label>
 
-                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 bg-white/80 px-2.5 py-1 rounded-lg border border-slate-200/60 shrink-0">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            <span>Enforced by Shop Checkout Barrier</span>
+                          <div className="flex items-center gap-1.5 text-[10px] text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-lg border border-emerald-300/70 font-semibold shrink-0">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                            <span>Unlocked After Payment</span>
                           </div>
                         </div>
 
                         {/* Informational notice when internal route is gated */}
                         {(requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))) && (
-                          <div className="p-2.5 bg-amber-50/90 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2">
-                            <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                            <div className="leading-snug">
-                              <strong>Internal App Route Protection Active:</strong> Visitors attempting to access this link from the product page will be blocked until their shop order is completed and verified.
+                          <div className="p-3 bg-gradient-to-r from-amber-50 to-emerald-50/50 rounded-xl border border-amber-300 text-[11px] text-amber-950 flex items-start gap-2.5 shadow-2xs">
+                            <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                            <div className="leading-snug space-y-1">
+                              <div>
+                                <strong>Payment Access Gate Active:</strong> Without completing the shop payment process, visitors are barred from using this link.
+                              </div>
+                              <div className="text-emerald-900 font-semibold flex items-center gap-1 pt-0.5">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <span>After completing the payment, user can immediately access and enter this link from the checkout confirmation, product page, and user profile.</span>
+                              </div>
                             </div>
                           </div>
                         )}

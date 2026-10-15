@@ -417,16 +417,27 @@ export function ProductDetail() {
                         <span>Locked • Requires Purchase</span>
                       </button>
                     ) : (
-                      <a
-                        href={product.brochureUrl}
-                        target={product.brochureUrl.startsWith('/') ? undefined : '_blank'}
-                        rel={product.brochureUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                        className="inline-flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
-                      >
-                        <FileDown className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{isGatedInternalLink ? 'Enter Unlocked Link' : 'Download Brochure'}</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
-                      </a>
+                      product.brochureUrl.startsWith('/') ? (
+                        <Link
+                          to={product.brochureUrl}
+                          className="inline-flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
+                        >
+                          <FileDown className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{isGatedInternalLink ? 'Enter Unlocked Link' : 'Download Brochure'}</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400" />
+                        </Link>
+                      ) : (
+                        <a
+                          href={product.brochureUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
+                        >
+                          <FileDown className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{isGatedInternalLink ? 'Enter Unlocked Link' : 'Download Brochure'}</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400" />
+                        </a>
+                      )
                     )}
                   </div>
                 )}
@@ -502,15 +513,25 @@ export function ProductDetail() {
                         <p className="text-[11px] text-emerald-700">Detailed specifications, terms and interactive access ready</p>
                       </div>
                     </div>
-                    <a
-                      href={product.brochureUrl}
-                      target={product.brochureUrl.startsWith('/') ? undefined : '_blank'}
-                      rel={product.brochureUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm shrink-0"
-                    >
-                      <span>Enter &amp; Use Link</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    {product.brochureUrl.startsWith('/') ? (
+                      <Link
+                        to={product.brochureUrl}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm shrink-0"
+                      >
+                        <span>Enter &amp; Use Link</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
+                    ) : (
+                      <a
+                        href={product.brochureUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm shrink-0"
+                      >
+                        <span>Enter &amp; Use Link</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </div>
                 )
               )}
