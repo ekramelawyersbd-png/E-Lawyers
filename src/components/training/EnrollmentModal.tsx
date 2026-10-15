@@ -121,6 +121,8 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
                 <input
                   type="text"
                   id="name"
+                  name="name"
+                  autoComplete="name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -134,6 +136,8 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
                 <input
                   type="email"
                   id="email"
+                  name="email"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -147,6 +151,8 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
                 <input
                   type="tel"
                   id="phone"
+                  name="tel"
+                  autoComplete="tel"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}

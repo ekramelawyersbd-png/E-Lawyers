@@ -351,44 +351,166 @@ export function Auth() {
             </div>
           )}
 
+          {/* Prominent 1-Click Google Sign-In (Top of Form) */}
+          {mode !== 'forgot' && (
+            <div className="mt-6 space-y-3">
+              {/* Google Sign In Button */}
+              <button
+                onClick={handleGoogleSignIn}
+                type="button"
+                disabled={isLoading || isGoogleLoading || isFacebookLoading}
+                aria-label="Sign in with Google"
+                className="w-full relative flex items-center justify-center gap-3 min-h-[50px] py-2.5 px-4 rounded-xl border border-slate-300 hover:border-emerald-500/70 hover:bg-slate-50/90 active:bg-slate-100 active:scale-[0.99] text-xs sm:text-sm font-bold text-slate-800 shadow-xs hover:shadow-md transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer bg-white group focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              >
+                {isGoogleLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-emerald-600 shrink-0" />
+                ) : (
+                  <svg className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                )}
+                <span>
+                  {isGoogleLoading
+                    ? 'Connecting to Google...'
+                    : mode === 'signup'
+                      ? 'Sign up with Google'
+                      : 'Sign in with Google'}
+                </span>
+                <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-auto shadow-2xs">
+                  ⚡ 1-Click
+                </span>
+              </button>
+
+              {/* Facebook Sign In Button */}
+              <button
+                onClick={handleFacebookSignIn}
+                type="button"
+                disabled={isLoading || isGoogleLoading || isFacebookLoading}
+                className="w-full relative flex justify-center items-center gap-2.5 min-h-[44px] py-2 px-4 border border-[#1877F2]/30 hover:border-[#1877F2] rounded-xl shadow-2xs hover:shadow-xs bg-[#1877F2]/5 hover:bg-[#1877F2]/10 active:bg-[#1877F2]/20 active:scale-[0.99] text-xs sm:text-sm font-semibold text-[#1877F2] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#1877F2]/40"
+              >
+                {isFacebookLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-[#1877F2] shrink-0" />
+                ) : (
+                  <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                )}
+                <span>{isFacebookLoading ? 'Connecting to Facebook...' : 'Continue with Facebook'}</span>
+              </button>
+
+              {/* Divider between Social & Email */}
+              <div className="relative pt-3 pb-1">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-[11px] uppercase tracking-wider font-semibold">
+                  <span className="px-3 bg-white text-slate-400">
+                    {mode === 'signup' ? 'Or register with email' : 'Or continue with email'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Email / Password Form */}
-          <form className="mt-6 space-y-4" onSubmit={handleEmailAuthSubmit}>
+          <form className="mt-4 space-y-4" onSubmit={handleEmailAuthSubmit}>
+            {/* Active Submission Progress Bar */}
+            {isLoading && (
+              <div className="w-full bg-emerald-100 rounded-full h-1 overflow-hidden relative animate-pulse">
+                <div className="bg-emerald-600 h-1 rounded-full w-full animate-indeterminate" />
+              </div>
+            )}
             
             {/* Full Name Field (Sign Up Only) */}
             {mode === 'signup' && (
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Name</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <UserIcon className="h-4 w-4" />
+                  <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+                    isLoading ? 'text-emerald-600' : 'text-slate-400'
+                  }`}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                    ) : (
+                      <UserIcon className="h-4 w-4" />
+                    )}
                   </div>
                   <input
                     type="text"
+                    id="auth-fullname"
+                    name="name"
+                    autoComplete="name"
                     required
+                    disabled={isLoading}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
+                    className={`pl-10 pr-3 block w-full rounded-xl border py-2.5 text-sm text-slate-900 transition-all ${
+                      isLoading 
+                        ? 'border-emerald-300 bg-emerald-50/30 ring-2 ring-emerald-500/20 cursor-wait' 
+                        : 'border-slate-200 bg-slate-50/80 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs'
+                    }`}
                     placeholder="e.g. Ekramul Haque"
                   />
+                  {isLoading && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Email Address Field */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">Email Address</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="auth-email" className="block text-xs font-bold text-slate-700">Email Address</label>
+                {isLoading && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 animate-pulse">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Processing...
+                  </span>
+                )}
+              </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="h-4 w-4" />
+                <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+                  isLoading ? 'text-emerald-600' : 'text-slate-400'
+                }`}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                  ) : (
+                    <Mail className="h-4 w-4" />
+                  )}
                 </div>
                 <input
                   type="email"
+                  id="auth-email"
+                  name="email"
+                  autoComplete="email"
                   required
+                  disabled={isLoading}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
+                  className={`pl-10 pr-10 block w-full rounded-xl border py-2.5 text-sm text-slate-900 transition-all ${
+                    isLoading 
+                      ? 'border-emerald-300 bg-emerald-50/30 ring-2 ring-emerald-500/20 cursor-wait' 
+                      : 'border-slate-200 bg-slate-50/80 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs'
+                  }`}
                   placeholder="name@example.com"
                 />
+                {isLoading ? (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -396,37 +518,54 @@ export function Auth() {
             {mode !== 'forgot' && (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Password</label>
+                  <label htmlFor="auth-password" className="block text-xs font-bold text-slate-700">Password</label>
                   {mode === 'login' && (
                     <button
                       type="button"
+                      disabled={isLoading}
                       onClick={() => { setMode('forgot'); resetFormFeedback(); }}
-                      className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                      className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50"
                     >
                       Forgot password?
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Lock className="h-4 w-4" />
+                  <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+                    isLoading ? 'text-emerald-600' : 'text-slate-400'
+                  }`}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                    ) : (
+                      <Lock className="h-4 w-4" />
+                    )}
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    id="auth-password"
+                    name="password"
+                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                     required
+                    disabled={isLoading}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 block w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
+                    className={`pl-10 pr-10 block w-full rounded-xl border py-2.5 text-sm text-slate-900 transition-all ${
+                      isLoading 
+                        ? 'border-emerald-300 bg-emerald-50/30 ring-2 ring-emerald-500/20 cursor-wait' 
+                        : 'border-slate-200 bg-slate-50/80 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs'
+                    }`}
                     placeholder="••••••••"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  {!isLoading && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -434,27 +573,43 @@ export function Auth() {
             {/* Confirm Password Field (Sign Up Only) */}
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Confirm Password</label>
+                <label htmlFor="auth-confirm-password" className="block text-xs font-bold text-slate-700 mb-1.5">Confirm Password</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <KeyRound className="h-4 w-4" />
+                  <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+                    isLoading ? 'text-emerald-600' : 'text-slate-400'
+                  }`}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                    ) : (
+                      <KeyRound className="h-4 w-4" />
+                    )}
                   </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
+                    id="auth-confirm-password"
+                    name="confirm-password"
+                    autoComplete="new-password"
                     required
+                    disabled={isLoading}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10 block w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
+                    className={`pl-10 pr-10 block w-full rounded-xl border py-2.5 text-sm text-slate-900 transition-all ${
+                      isLoading 
+                        ? 'border-emerald-300 bg-emerald-50/30 ring-2 ring-emerald-500/20 cursor-wait' 
+                        : 'border-slate-200 bg-slate-50/80 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs'
+                    }`}
                     placeholder="••••••••"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  {!isLoading && (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -463,18 +618,28 @@ export function Auth() {
             <button
               type="submit"
               disabled={isLoading || isGoogleLoading || isFacebookLoading}
-              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer mt-2"
+              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-150 disabled:opacity-75 disabled:cursor-wait cursor-pointer mt-2"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin text-white" />}
-              <span>
-                {isLoading 
-                  ? 'Processing...' 
-                  : mode === 'signup' 
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4.5 h-4.5 animate-spin text-white shrink-0" />
+                  <span>
+                    {mode === 'signup' 
+                      ? 'Creating Your Account...' 
+                      : mode === 'forgot'
+                        ? 'Sending Reset Link...'
+                        : 'Verifying & Signing In...'}
+                  </span>
+                </>
+              ) : (
+                <span>
+                  {mode === 'signup' 
                     ? 'Create My Account' 
                     : mode === 'forgot'
                       ? 'Send Password Reset Email'
                       : 'Sign In'}
-              </span>
+                </span>
+              )}
             </button>
           </form>
 
@@ -488,60 +653,6 @@ export function Auth() {
               >
                 ← Back to Sign In
               </button>
-            </div>
-          )}
-
-          {/* Social Sign-In (Only on Login & Sign Up) */}
-          {mode !== 'forgot' && (
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase tracking-wider font-semibold">
-                  <span className="px-3 bg-white text-slate-400">Or continue with</span>
-                </div>
-              </div>
-
-              <div className="mt-5 space-y-3">
-                {/* Google Sign In Button */}
-                <button
-                  onClick={handleGoogleSignIn}
-                  type="button"
-                  disabled={isLoading || isGoogleLoading || isFacebookLoading}
-                  aria-label="Continue with Google"
-                  className="w-full relative flex justify-center items-center gap-3 min-h-[46px] py-2.5 px-4 border border-slate-300 hover:border-slate-400 rounded-xl shadow-xs hover:shadow-sm bg-white hover:bg-slate-50/90 active:bg-slate-100 active:scale-[0.99] text-xs sm:text-sm font-semibold text-slate-700 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                >
-                  {isGoogleLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-slate-600 shrink-0" />
-                  ) : (
-                    <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                      <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
-                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                    </svg>
-                  )}
-                  <span>{isGoogleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
-                </button>
-
-                {/* Facebook Sign In Button */}
-                <button
-                  onClick={handleFacebookSignIn}
-                  type="button"
-                  disabled={isLoading || isGoogleLoading || isFacebookLoading}
-                  className="w-full relative flex justify-center items-center gap-3 py-2.5 px-4 border border-[#1877F2] rounded-xl shadow-2xs hover:shadow-xs bg-[#1877F2] hover:bg-[#166FE5] active:bg-[#1464CC] active:scale-[0.99] text-xs sm:text-sm font-bold text-white transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#1877F2]/50"
-                >
-                  {isFacebookLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
-                  ) : (
-                    <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  )}
-                  <span>{isFacebookLoading ? 'Connecting to Facebook...' : 'Continue with Facebook'}</span>
-                </button>
-              </div>
             </div>
           )}
 

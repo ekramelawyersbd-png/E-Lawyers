@@ -167,6 +167,9 @@ export function AccountantApplicationModal({ isOpen, onClose }: AccountantApplic
                   <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
                   <input
                     type="text"
+                    name="name"
+                    id="accountant-fullname"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -179,6 +182,9 @@ export function AccountantApplicationModal({ isOpen, onClose }: AccountantApplic
                     <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
                     <input
                       type="email"
+                      name="email"
+                      id="accountant-email"
+                      autoComplete="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -189,7 +195,10 @@ export function AccountantApplicationModal({ isOpen, onClose }: AccountantApplic
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">Contact Number *</label>
                     <input
-                      type="text"
+                      type="tel"
+                      name="tel"
+                      id="accountant-phone"
+                      autoComplete="tel"
                       required
                       value={contactNumber}
                       onChange={(e) => setContactNumber(e.target.value)}

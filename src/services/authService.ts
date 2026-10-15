@@ -1,5 +1,5 @@
 import { signInWithPopup, signOut, User } from 'firebase/auth';
-import { auth, googleProvider, facebookProvider } from '../lib/firebase';
+import { auth, fallbackAuth, googleProvider, facebookProvider } from '../lib/firebase';
 
 export interface ERPAuthUser {
   uid: string;
@@ -17,8 +17,26 @@ export const authService = {
   // 🌐 Google Sign-In
   // ──────────────────────────────────────────
   loginWithGoogle: async (): Promise<ERPAuthUser> => {
-    // 1. Trigger Firebase Google Popup
-    const userCred = await signInWithPopup(auth, googleProvider);
+    // 1. Trigger Firebase Google Popup with fallback resilience
+    let userCred;
+    try {
+      userCred = await signInWithPopup(auth, googleProvider);
+    } catch (popupErr: any) {
+      if (
+        fallbackAuth && 
+        popupErr?.code !== 'auth/popup-closed-by-user' && 
+        popupErr?.code !== 'auth/cancelled-popup-request'
+      ) {
+        try {
+          userCred = await signInWithPopup(fallbackAuth, googleProvider);
+        } catch {
+          throw popupErr;
+        }
+      } else {
+        throw popupErr;
+      }
+    }
+
     const user: User = userCred.user;
     const userEmail = (user.email || user.providerData?.[0]?.email || '').trim().toLowerCase();
 

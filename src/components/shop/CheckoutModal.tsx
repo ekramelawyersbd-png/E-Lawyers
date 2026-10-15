@@ -300,6 +300,9 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         </label>
                         <input
                           type="text"
+                          name="name"
+                          id="checkout-name"
+                          autoComplete="name"
                           required
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
@@ -315,6 +318,9 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           </label>
                           <input
                             type="email"
+                            name="email"
+                            id="checkout-email"
+                            autoComplete="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -329,6 +335,9 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           </label>
                           <input
                             type="tel"
+                            name="tel"
+                            id="checkout-phone"
+                            autoComplete="tel"
                             required
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
@@ -344,6 +353,9 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         </label>
                         <input
                           type="text"
+                          name="organization"
+                          id="checkout-company"
+                          autoComplete="organization"
                           value={company}
                           onChange={(e) => setCompany(e.target.value)}
                           placeholder="e.g. Apex Tech Ventures Ltd."

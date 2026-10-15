@@ -679,6 +679,9 @@ export function AppointmentBookingForm() {
                   <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
+                    name="name"
+                    id="booking-client-name"
+                    autoComplete="name"
                     required
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
@@ -696,6 +699,9 @@ export function AppointmentBookingForm() {
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="email"
+                    name="email"
+                    id="booking-client-email"
+                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -715,6 +721,9 @@ export function AppointmentBookingForm() {
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="tel"
+                    name="tel"
+                    id="booking-client-phone"
+                    autoComplete="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -732,6 +741,9 @@ export function AppointmentBookingForm() {
                   <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
+                    name="organization"
+                    id="booking-client-company"
+                    autoComplete="organization"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g. Apex Global Ltd."

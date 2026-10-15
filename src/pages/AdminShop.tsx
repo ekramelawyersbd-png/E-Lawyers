@@ -25,7 +25,9 @@ import {
   X,
   Scale,
   LogOut,
-  Lock
+  Lock,
+  Link2,
+  FileDown
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
@@ -97,6 +99,8 @@ export function AdminShop() {
   const [pagesOrFiles, setPagesOrFiles] = useState('6 Pages • 2 File Formats');
   const [governingLaw, setGoverningLaw] = useState('Contract Act, 1872 & Arbitration Act, 2001 (Bangladesh)');
   const [authorOrVettedBy, setAuthorOrVettedBy] = useState('Adv. Ekram Hossain, Advocate, Supreme Court of Bangladesh');
+  const [brochureUrl, setBrochureUrl] = useState('');
+  const [requiresPurchaseToAccess, setRequiresPurchaseToAccess] = useState(false);
   const [shortDescription, setShortDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
   const [features, setFeatures] = useState<string[]>([
@@ -135,6 +139,8 @@ export function AdminShop() {
     setPagesOrFiles('8 Pages • 2 File Formats (.docx, .pdf)');
     setGoverningLaw('Contract Act, 1872 (Bangladesh)');
     setAuthorOrVettedBy('Adv. Ekram Hossain, Advocate, Supreme Court of Bangladesh');
+    setBrochureUrl('');
+    setRequiresPurchaseToAccess(false);
     setShortDescription('');
     setFullDescription('');
     setFeatures([
@@ -164,6 +170,8 @@ export function AdminShop() {
     setPagesOrFiles(prod.pagesOrFiles);
     setGoverningLaw(prod.governingLaw || '');
     setAuthorOrVettedBy(prod.authorOrVettedBy);
+    setBrochureUrl(prod.brochureUrl || '');
+    setRequiresPurchaseToAccess(!!prod.requiresPurchaseToAccess);
     setShortDescription(prod.shortDescription);
     setFullDescription(prod.fullDescription);
     setFeatures(prod.features && prod.features.length > 0 ? prod.features : ['Standard compliance clauses']);
@@ -233,7 +241,9 @@ export function AdminShop() {
       features: features.length > 0 ? features : ['Complete document and guidelines included'],
       samplePreviewSnippet: samplePreviewSnippet.trim() || undefined,
       imageUrl: imageUrl.trim() || IMAGE_PRESETS[0].url,
-      authorOrVettedBy: authorOrVettedBy.trim() || 'Adv. Ekram Hossain, Advocate Supreme Court of Bangladesh'
+      authorOrVettedBy: authorOrVettedBy.trim() || 'Adv. Ekram Hossain, Advocate Supreme Court of Bangladesh',
+      brochureUrl: brochureUrl.trim() || undefined,
+      requiresPurchaseToAccess: requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))
     };
 
     setIsSubmitting(true);
@@ -629,10 +639,13 @@ export function AdminShop() {
 
                   {/* 3. File & Legal Specs */}
                   <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-emerald-600" />
-                      <span>3. Format, Pages & Vetting Authority</span>
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                        <Scale className="w-4 h-4 text-emerald-600" />
+                        <span>3. Format, Pages, Vetting Authority & Brochure</span>
+                      </h3>
+                      <span className="text-[11px] text-slate-500 font-medium">Specs & Assets</span>
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -685,6 +698,99 @@ export function AdminShop() {
                           placeholder="e.g. Adv. Ekram Hossain, Advocate Supreme Court of Bangladesh"
                           className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none"
                         />
+                      </div>
+
+                      {/* Product Brochure Link Field */}
+                      <div className={`sm:col-span-2 p-4 rounded-2xl border shadow-2xs space-y-3 transition-all ${
+                        requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))
+                          ? 'bg-gradient-to-br from-amber-50/80 via-emerald-50/40 to-teal-50/50 border-amber-300 ring-2 ring-amber-500/10'
+                          : 'bg-gradient-to-br from-emerald-50/70 to-teal-50/40 border-emerald-200/80'
+                      }`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <label htmlFor="product-brochure-link" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <FileDown className="w-4 h-4 text-emerald-600" />
+                            <span>Brochure / Internal App Resource Link</span>
+                            <span className="text-[10px] font-normal text-slate-500">(External URL or Internal Route)</span>
+                          </label>
+
+                          <div className="flex items-center gap-2">
+                            {(requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))) && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                <Lock className="w-3 h-3 text-amber-700" />
+                                <span>Gated: Purchase Required</span>
+                              </span>
+                            )}
+                            {brochureUrl && (
+                              <a
+                                href={brochureUrl}
+                                target={brochureUrl.startsWith('/') ? undefined : '_blank'}
+                                rel={brochureUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
+                                className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 hover:underline"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>Preview Link</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <Link2 className="h-4 w-4" />
+                          </div>
+                          <input
+                            type="text"
+                            id="product-brochure-link"
+                            name="brochureUrl"
+                            autoComplete="url"
+                            value={brochureUrl}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setBrochureUrl(val);
+                              // Auto-enable gated access if link is an internal app route
+                              if (val.trim().startsWith('/') || (val.includes(window.location.host) && val.startsWith('http'))) {
+                                setRequiresPurchaseToAccess(true);
+                              }
+                            }}
+                            placeholder="/tax-refund-guide or https://drive.google.com/file.pdf"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 focus:border-emerald-500 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-900 shadow-2xs transition-all"
+                          />
+                        </div>
+
+                        {/* Gated Access Enforcer for internal app links */}
+                        <div className="pt-2 border-t border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                          <label className="flex items-start sm:items-center gap-2 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              checked={requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))}
+                              onChange={(e) => setRequiresPurchaseToAccess(e.target.checked)}
+                              className="mt-0.5 sm:mt-0 w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                            />
+                            <div className="text-xs">
+                              <span className="font-bold text-slate-800">
+                                Restrict to Completed Purchases
+                              </span>
+                              <span className="text-slate-500 block text-[11px] leading-tight">
+                                Users cannot enter or use this internal link without completing the shop purchase.
+                              </span>
+                            </div>
+                          </label>
+
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 bg-white/80 px-2.5 py-1 rounded-lg border border-slate-200/60 shrink-0">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span>Enforced by Shop Checkout Barrier</span>
+                          </div>
+                        </div>
+
+                        {/* Informational notice when internal route is gated */}
+                        {(requiresPurchaseToAccess || (brochureUrl.trim().startsWith('/') || (brochureUrl.includes(window.location.host) && brochureUrl.startsWith('http')))) && (
+                          <div className="p-2.5 bg-amber-50/90 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2">
+                            <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                            <div className="leading-snug">
+                              <strong>Internal App Route Protection Active:</strong> Visitors attempting to access this link from the product page will be blocked until their shop order is completed and verified.
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

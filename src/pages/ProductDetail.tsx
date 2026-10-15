@@ -18,11 +18,14 @@ import {
   Award, 
   HelpCircle, 
   Zap, 
-  Lock
+  Lock,
+  FileDown,
+  ExternalLink
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
+import { usePurchases } from '../contexts/PurchaseContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { CartDrawer } from '../components/shop/CartDrawer';
 import { CheckoutModal } from '../components/shop/CheckoutModal';
@@ -37,6 +40,20 @@ export function ProductDetail() {
 
   const product = slug ? getProductBySlug(slug) : undefined;
   const isDraft = product?.status === 'draft';
+
+  // Purchases context & access gate enforcer
+  const { isPurchased, simulateInstantPurchase } = usePurchases();
+  const hasPurchased = product ? isPurchased(product.id) : false;
+  const [gatedAlert, setGatedAlert] = useState<string | null>(null);
+
+  const isInternalLink = (url?: string) => {
+    if (!url) return false;
+    const clean = url.trim();
+    return clean.startsWith('/') || (clean.includes(window.location.host) && clean.startsWith('http'));
+  };
+
+  const isGatedInternalLink = !!(product?.requiresPurchaseToAccess || (product?.brochureUrl && isInternalLink(product.brochureUrl)));
+  const isLinkUnlocked = !isGatedInternalLink || hasPurchased;
 
   // Checkout modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -54,6 +71,7 @@ export function ProductDetail() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setQuantity(1);
     setIsAdded(false);
+    setGatedAlert(null);
   }, [slug]);
 
   const handleAddToCart = () => {
@@ -381,7 +399,121 @@ export function ProductDetail() {
                   <span className="text-slate-500 font-medium w-36 shrink-0">Delivery Method</span>
                   <span className="font-semibold text-slate-900 text-right">Immediate Email + Screen Link</span>
                 </div>
+                {product.brochureUrl && (
+                  <div className="py-2.5 flex items-start justify-between gap-4">
+                    <span className="text-slate-500 font-medium w-36 shrink-0">
+                      {isGatedInternalLink ? 'Protected App Link' : 'Official Brochure'}
+                    </span>
+                    {!isLinkUnlocked ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGatedAlert("Access Restricted: You must complete the shop purchase process for this item before you can enter and use this internal application tool/link.");
+                          handleBuyNow();
+                        }}
+                        className="inline-flex items-center gap-1.5 font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-300 text-xs transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Locked • Requires Purchase</span>
+                      </button>
+                    ) : (
+                      <a
+                        href={product.brochureUrl}
+                        target={product.brochureUrl.startsWith('/') ? undefined : '_blank'}
+                        rel={product.brochureUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
+                        className="inline-flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
+                      >
+                        <FileDown className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{isGatedInternalLink ? 'Enter Unlocked Link' : 'Download Brochure'}</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Gated Access Alert Banner */}
+              {gatedAlert && (
+                <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-300 text-xs text-amber-900 flex items-start gap-2 shadow-sm animate-in fade-in duration-200">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                  <div className="flex-1 leading-relaxed">
+                    <p className="font-bold">{gatedAlert}</p>
+                    <p className="text-[11px] text-amber-800 mt-0.5">Please proceed to checkout below to unlock full access.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Card for Brochure / Protected Link */}
+              {product.brochureUrl && (
+                !isLinkUnlocked ? (
+                  /* GATED / LOCKED STATE */
+                  <div className="mt-3 p-3.5 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white rounded-xl border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                        <Lock className="w-4.5 h-4.5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                          <span>Internal App Tool Protected</span>
+                          <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 border border-amber-300">
+                            Checkout Required
+                          </span>
+                        </p>
+                        <p className="text-[11px] text-amber-800 leading-snug">
+                          Without completing the shop process, users cannot enter or use this internal link.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleBuyNow}
+                        className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
+                      >
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>Unlock via Shop (৳{product.price.toLocaleString()})</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (product) simulateInstantPurchase(product);
+                        }}
+                        title="Simulate instant purchase for live verification"
+                        className="px-2.5 py-2 bg-white hover:bg-slate-100 text-slate-600 text-[10px] font-semibold rounded-xl border border-slate-200 cursor-pointer"
+                      >
+                        <span>Demo Unlock</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* UNLOCKED STATE */
+                  <div className="mt-3 p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50/50 rounded-xl border border-emerald-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
+                          <span>{isGatedInternalLink ? 'Internal App Resource Unlocked' : 'Official Catalog Brochure Available'}</span>
+                          <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Verified Access
+                          </span>
+                        </p>
+                        <p className="text-[11px] text-emerald-700">Detailed specifications, terms and interactive access ready</p>
+                      </div>
+                    </div>
+                    <a
+                      href={product.brochureUrl}
+                      target={product.brochureUrl.startsWith('/') ? undefined : '_blank'}
+                      rel={product.brochureUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm shrink-0"
+                    >
+                      <span>Enter &amp; Use Link</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                )
+              )}
             </div>
 
             {/* 3. Document Excerpt Preview */}

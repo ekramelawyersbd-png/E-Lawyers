@@ -943,6 +943,9 @@ export function Contact() {
                       </label>
                       <input
                         type="text"
+                        name="given-name"
+                        id="contact-first-name"
+                        autoComplete="given-name"
                         required
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
@@ -956,6 +959,9 @@ export function Contact() {
                       </label>
                       <input
                         type="text"
+                        name="family-name"
+                        id="contact-last-name"
+                        autoComplete="family-name"
                         required
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
@@ -972,6 +978,9 @@ export function Contact() {
                       </label>
                       <input
                         type="email"
+                        name="email"
+                        id="contact-email"
+                        autoComplete="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -985,6 +994,9 @@ export function Contact() {
                       </label>
                       <input
                         type="tel"
+                        name="tel"
+                        id="contact-phone"
+                        autoComplete="tel"
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}

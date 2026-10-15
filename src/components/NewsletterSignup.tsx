@@ -247,6 +247,8 @@ export function NewsletterSignup({
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   id="sidebar-newsletter-email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   required
                   value={email}
@@ -397,6 +399,9 @@ export function NewsletterSignup({
 
             <div className="flex flex-col sm:flex-row gap-2">
               <input
+                id="footer-newsletter-email"
+                name="email"
+                autoComplete="email"
                 type="email"
                 required
                 value={email}

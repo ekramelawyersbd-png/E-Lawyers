@@ -587,6 +587,9 @@ Note: This is a system-generated computer invoice and serves as official proof o
                 </div>
                 <input
                   type="text"
+                  name="name"
+                  id="profile-name"
+                  autoComplete="name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
@@ -606,6 +609,9 @@ Note: This is a system-generated computer invoice and serves as official proof o
                 </div>
                 <input
                   type="email"
+                  name="email"
+                  id="profile-email"
+                  autoComplete="email"
                   disabled
                   value={user.email || ''}
                   className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-100 text-slate-500 py-2.5 text-sm cursor-not-allowed select-none"
@@ -624,6 +630,9 @@ Note: This is a system-generated computer invoice and serves as official proof o
                 </div>
                 <input
                   type="tel"
+                  name="tel"
+                  id="profile-phone"
+                  autoComplete="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
@@ -643,10 +652,13 @@ Note: This is a system-generated computer invoice and serves as official proof o
                 </div>
                 <input
                   type="text"
+                  name="organization"
+                  id="profile-organization"
+                  autoComplete="organization"
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
                   className="pl-10 pr-3 block w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs transition-all"
-                  placeholder="e.g. E-Lawyers &amp; Associates"
+                  placeholder="e.g. E-Lawyers & Associates"
                 />
               </div>
             </div>

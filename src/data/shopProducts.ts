@@ -29,6 +29,8 @@ export interface ShopProduct {
   imageUrl: string;
   authorOrVettedBy: string;
   status?: 'published' | 'draft';
+  brochureUrl?: string;
+  requiresPurchaseToAccess?: boolean;
 }
 
 export function inferProductType(product: Partial<ShopProduct>): ProductType {

@@ -143,6 +143,9 @@ export function CustomerCareApplicationModal({ isOpen, onClose }: CustomerCareAp
                   <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
                   <input
                     type="text"
+                    name="name"
+                    id="customercare-fullname"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -155,7 +158,10 @@ export function CustomerCareApplicationModal({ isOpen, onClose }: CustomerCareAp
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">Contact Number *</label>
                     <input
-                      type="text"
+                      type="tel"
+                      name="tel"
+                      id="customercare-phone"
+                      autoComplete="tel"
                       required
                       value={contactNumber}
                       onChange={(e) => setContactNumber(e.target.value)}
@@ -167,6 +173,9 @@ export function CustomerCareApplicationModal({ isOpen, onClose }: CustomerCareAp
                     <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
                     <input
                       type="email"
+                      name="email"
+                      id="customercare-email"
+                      autoComplete="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}

@@ -144,6 +144,9 @@ export function BookConsultationModal({
               </label>
               <input
                 type="text"
+                name="name"
+                id="consultation-name"
+                autoComplete="name"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="e.g. Tanvir Ahmed"
@@ -157,6 +160,9 @@ export function BookConsultationModal({
               </label>
               <input
                 type="tel"
+                name="tel"
+                id="consultation-phone"
+                autoComplete="tel"
                 value={clientPhone}
                 onChange={(e) => setClientPhone(e.target.value)}
                 placeholder="+880 1712-345678"
@@ -171,6 +177,9 @@ export function BookConsultationModal({
             </label>
             <input
               type="email"
+              name="email"
+              id="consultation-email"
+              autoComplete="email"
               value={clientEmail}
               onChange={(e) => setClientEmail(e.target.value)}
               placeholder="tanvir@company.com.bd"
