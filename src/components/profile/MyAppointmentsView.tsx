@@ -731,8 +731,16 @@ export function MyAppointmentsView() {
                     <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
                       {booking.practiceArea}
                     </h3>
+                    {booking.expertiseArea && (
+                      <div className="mt-1">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/80">
+                          <span>Focus:</span>
+                          <span className="font-bold">{booking.expertiseArea}</span>
+                        </span>
+                      </div>
+                    )}
                     {booking.notes && (
-                      <p className="text-xs sm:text-sm text-slate-600 mt-1 line-clamp-2 leading-relaxed bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
                         <span className="font-semibold text-slate-700">Agenda / Notes: </span>
                         {booking.notes}
                       </p>

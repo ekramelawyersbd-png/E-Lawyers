@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Mail, 
   Phone, 
@@ -34,10 +34,16 @@ import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { AppointmentBookingForm } from '../components/AppointmentBookingForm';
 
 export function Contact() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [activeTab, setActiveTab] = useState<'inquiry' | 'appointment'>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.toLowerCase();
       if (hash.includes('appointment') || hash.includes('book')) {
+        return 'appointment';
+      }
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'appointment' || params.get('area') || params.get('practice')) {
         return 'appointment';
       }
     }
@@ -69,6 +75,14 @@ export function Contact() {
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const areaParam = searchParams.get('area') || searchParams.get('practice');
+    if (tabParam === 'appointment' || areaParam) {
+      setActiveTab('appointment');
+    }
+  }, [searchParams]);
 
   const scrollToFormSection = () => {
     const section = document.getElementById('inquiry-form-section');
@@ -848,6 +862,11 @@ export function Contact() {
                 type="button"
                 onClick={() => {
                   setActiveTab('appointment');
+                  setSearchParams(prev => {
+                    const next = new URLSearchParams(prev);
+                    next.set('tab', 'appointment');
+                    return next;
+                  }, { replace: true });
                   if (typeof window !== 'undefined') {
                     window.history.replaceState(null, '', '#appointment');
                   }
@@ -871,6 +890,11 @@ export function Contact() {
                 type="button"
                 onClick={() => {
                   setActiveTab('inquiry');
+                  setSearchParams(prev => {
+                    const next = new URLSearchParams(prev);
+                    next.set('tab', 'inquiry');
+                    return next;
+                  }, { replace: true });
                   if (typeof window !== 'undefined') {
                     window.history.replaceState(null, '', '#inquiry');
                   }

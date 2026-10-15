@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 
-export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Cancelled';
+export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 
 export interface AppointmentRating {
   rating: number; // 1 to 5 stars
@@ -31,6 +31,14 @@ export interface Appointment {
   id: string;
   referenceId: string;
   practiceArea: string;
+  practiceAreaId?: string;
+  expertiseArea?: string;
+  assignedPartner?: {
+    name: string;
+    title: string;
+    chamber?: string;
+    division?: string;
+  };
   division?: string;
   mode: 'virtual' | 'in_person';
   date: string; // YYYY-MM-DD
@@ -71,7 +79,10 @@ const SHARED_BOOKED_KEY = 'accounticca_booked_appointments';
 
 export const PRACTICE_DIVISIONS: Record<string, string> = {
   'Income Tax & Corporate Assessment': 'Accounticca Advisory',
+  'Income Tax Assessment & NBR Defense': 'Accounticca Advisory',
+  'VAT & SD Act Compliance & Reconciliations': 'Accounticca Advisory',
   'VAT & Customs Dispute Management': 'Accounticca Advisory',
+  'Corporate Law & Commercial Litigation': 'E-Lawyers Chambers',
   'Corporate Law & Litigation Advisory': 'E-Lawyers Chambers',
   'RJSC Company Incorporation & Secretarial': 'E-Lawyers Chambers',
   'Statutory Financial Audit & Assurance': 'Accounticca Advisory',
@@ -267,6 +278,9 @@ export async function fetchUserAppointments(userId: string, userEmail?: string):
             id: docSnap.id,
             referenceId: data.referenceId || `APT-${docSnap.id.slice(0, 8).toUpperCase()}`,
             practiceArea: data.practiceArea || 'General Compliance Advisory',
+            practiceAreaId: data.practiceAreaId,
+            expertiseArea: data.expertiseArea,
+            assignedPartner: data.assignedPartner,
             division: data.division || PRACTICE_DIVISIONS[data.practiceArea] || 'Accounticca Advisory',
             mode: data.mode === 'in_person' ? 'in_person' : 'virtual',
             date: data.date || '',
@@ -309,6 +323,9 @@ export async function fetchUserAppointments(userId: string, userEmail?: string):
               id: docSnap.id,
               referenceId: data.referenceId || `APT-${docSnap.id.slice(0, 8).toUpperCase()}`,
               practiceArea: data.practiceArea || 'General Compliance Advisory',
+              practiceAreaId: data.practiceAreaId,
+              expertiseArea: data.expertiseArea,
+              assignedPartner: data.assignedPartner,
               division: data.division || PRACTICE_DIVISIONS[data.practiceArea] || 'Accounticca Advisory',
               mode: data.mode === 'in_person' ? 'in_person' : 'virtual',
               date: data.date || '',
@@ -360,6 +377,9 @@ export async function fetchUserAppointments(userId: string, userEmail?: string):
               id: localItem.id || refKey,
               referenceId: localItem.referenceId || refKey,
               practiceArea: localItem.practiceArea || 'Tax & Corporate Advisory',
+              practiceAreaId: localItem.practiceAreaId,
+              expertiseArea: localItem.expertiseArea,
+              assignedPartner: localItem.assignedPartner,
               division: PRACTICE_DIVISIONS[localItem.practiceArea] || 'Accounticca Advisory',
               mode: localItem.mode === 'in_person' ? 'in_person' : 'virtual',
               date: localItem.date,

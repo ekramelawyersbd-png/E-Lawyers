@@ -3,7 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+
+function AppointmentPracticeRedirect() {
+  const { practiceArea } = useParams<{ practiceArea: string }>();
+  return <Navigate to={`/contact?tab=appointment&area=${encodeURIComponent(practiceArea || '')}`} replace />;
+}
 import { Layout } from './components/layout/Layout';
 import { Home } from './pages/Home';
 import { Category } from './pages/Category';
@@ -36,6 +41,7 @@ import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
 import { JobOpenings } from './pages/JobOpenings';
+import { ClientPortalPage } from './pages/ClientPortalPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ShopAuthProvider } from './contexts/ShopAuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -102,9 +108,19 @@ export default function App() {
                 <Route path="tds-guide" element={<TdsReference />} />
                 <Route path="tds-reference" element={<Navigate to="/tds-guide" replace />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="appointment" element={<Navigate to="/contact?tab=appointment" replace />} />
+                <Route path="appointment/:practiceArea" element={<AppointmentPracticeRedirect />} />
+                <Route path="schedule" element={<Navigate to="/contact?tab=appointment" replace />} />
+                <Route path="schedule/:practiceArea" element={<AppointmentPracticeRedirect />} />
+                <Route path="book-consultation" element={<Navigate to="/contact?tab=appointment" replace />} />
+                <Route path="book-consultation/:practiceArea" element={<AppointmentPracticeRedirect />} />
+                <Route path="consultation" element={<Navigate to="/contact?tab=appointment" replace />} />
+                <Route path="consultation/:practiceArea" element={<AppointmentPracticeRedirect />} />
                 <Route path="workspace" element={<ShopAdminRouteGuard><WorkspaceHub /></ShopAdminRouteGuard>} />
                 <Route path="auth" element={<Auth />} />
                 <Route path="profile" element={<ProfilePage />} />
+                <Route path="portal" element={<ClientPortalPage />} />
+                <Route path="client-portal" element={<ClientPortalPage />} />
                 <Route path="settings" element={<Navigate to="/profile" replace />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsConditions />} />
