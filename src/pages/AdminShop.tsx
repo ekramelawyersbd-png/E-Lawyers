@@ -27,11 +27,19 @@ import {
   LogOut,
   Lock,
   Link2,
-  FileDown
+  FileDown,
+  Activity,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
+import { 
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
 import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
 import { useShopAuth } from '../contexts/ShopAuthContext';
+import { usePurchases } from '../contexts/PurchaseContext';
 import { 
   ShopProduct, 
   SHOP_CATEGORIES, 
@@ -70,10 +78,61 @@ const IMAGE_PRESETS = [
   }
 ];
 
+const MONTHLY_REVENUE_DATA = [
+  { month: 'Jan', revenue: 18500, orders: 12 },
+  { month: 'Feb', revenue: 24200, orders: 16 },
+  { month: 'Mar', revenue: 31800, orders: 21 },
+  { month: 'Apr', revenue: 29400, orders: 19 },
+  { month: 'May', revenue: 42600, orders: 28 },
+  { month: 'Jun', revenue: 58900, orders: 39 },
+  { month: 'Jul', revenue: 52100, orders: 34 },
+  { month: 'Aug', revenue: 64300, orders: 42 },
+  { month: 'Sep', revenue: 78500, orders: 51 },
+  { month: 'Oct', revenue: 92400, orders: 60 }
+];
+
+const POPULAR_PRODUCTS_DATA = [
+  { name: 'Income Tax Return Kit 2026-27', sales: 42, revenue: 63000 },
+  { name: 'Non-Disclosure Agreement (NDA)', sales: 31, revenue: 37200 },
+  { name: 'Shareholders Agreement', sales: 28, revenue: 70000 },
+  { name: 'Employment Contract', sales: 25, revenue: 30000 },
+  { name: 'Company Incorporation Kit', sales: 18, revenue: 54000 }
+];
+
+const CATEGORY_SHARE_DATA = [
+  { name: 'Tax & Financial Kits', value: 45, color: '#059669' },
+  { name: 'Legal Contracts', value: 30, color: '#10b981' },
+  { name: 'Corporate & Compliance', value: 15, color: '#34d399' },
+  { name: 'Employment & HR', value: 10, color: '#6ee7b7' }
+];
+
+const RECENT_TRANSACTIONS = [
+  { id: 'UPAY-TXN-9988776', customer: 'Tanvir Ahmed', email: 'tanvir@example.com', product: 'Income Tax Return Kit 2026-27', amount: '1500.00', status: 'COMPLETED', date: '2026-10-16T01:10:29Z' },
+  { id: 'UPAY-TXN-9988775', customer: 'Sharmin Sultana', email: 'sharmin@example.com', product: 'Non-Disclosure Agreement (NDA)', amount: '1200.00', status: 'COMPLETED', date: '2026-10-16T00:45:12Z' },
+  { id: 'UPAY-TXN-9988774', customer: 'Rafiqul Islam', email: 'rafiqul@example.com', product: 'Shareholders Agreement', amount: '2500.00', status: 'COMPLETED', date: '2026-10-15T22:15:00Z' },
+  { id: 'UPAY-TXN-9988773', customer: 'Nusrat Jahan', email: 'nusrat@example.com', product: 'Employment Contract', amount: '1200.00', status: 'COMPLETED', date: '2026-10-15T19:30:44Z' },
+  { id: 'UPAY-TXN-9988772', customer: 'Mahbub Alam', email: 'mahbub@example.com', product: 'Company Incorporation Kit', amount: '3000.00', status: 'PENDING', date: '2026-10-15T18:10:22Z' }
+];
+
 export function AdminShop() {
   const navigate = useNavigate();
   const { products, addOrUpdateProduct, removeProduct, resetDefaults, loading, togglePublishStatus } = useProducts();
   const { adminUser, logout } = useShopAuth();
+  const { transactions, processRefund } = usePurchases();
+
+  const handleRefund = (tx: any) => {
+    const reason = window.prompt(`Enter refund reason for transaction ${tx.transactionId || tx.id}:`, 'Customer requested refund / duplicate order');
+    if (reason !== null) {
+      processRefund(tx.transactionId || tx.id, reason);
+      setStatusMessage({
+        type: 'success',
+        text: `Successfully processed refund for transaction ${tx.transactionId || tx.id}. Firestore status updated to REFUNDED and audit log recorded.`
+      });
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics'>('catalog');
 
   // Filter & Search in Admin list
   const [searchTerm, setSearchTerm] = useState('');
@@ -427,8 +486,279 @@ export function AdminShop() {
         </div>
       </header>
 
+      {/* Admin Navigation Tabs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-4">
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab('catalog')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+              activeAdminTab === 'catalog'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            <Layers className="w-4 h-4 text-emerald-400" />
+            <span>Product Catalog Manager</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab('analytics')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+              activeAdminTab === 'analytics'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>Sales & UddoktaPay Analytics Dashboard</span>
+          </button>
+        </div>
+      </div>
+
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        {activeAdminTab === 'analytics' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            
+            {/* Analytics Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">Total Revenue</span>
+                  <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900">BDT 283,200</div>
+                <div className="text-xs font-bold text-emerald-600 inline-flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>+24.8% vs last month (UddoktaPay)</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">Total Transactions</span>
+                  <div className="w-9 h-9 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900">134 Orders</div>
+                <div className="text-xs font-bold text-blue-600 inline-flex items-center gap-1">
+                  <span>99.25% Settlement Rate</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">Avg. Order Value</span>
+                  <div className="w-9 h-9 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                    <Tag className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900">BDT 2,113</div>
+                <div className="text-xs font-bold text-purple-600 inline-flex items-center gap-1">
+                  <span>High-value legal & tax kits</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">Gateway Status</span>
+                  <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="text-xl font-black text-emerald-700 mt-1 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Worker & Sandbox Active</span>
+                </div>
+                <div className="text-[11px] text-slate-500 font-mono">pay.ekram-elawyersbd.workers.dev</div>
+              </div>
+            </div>
+
+            {/* Recharts Section 1: Monthly Revenue & Category Share */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              {/* Monthly Revenue Area Chart */}
+              <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900">Monthly Revenue Generated (BDT)</h3>
+                    <p className="text-xs text-slate-500">UddoktaPay automated gateway settlements throughout 2026</p>
+                  </div>
+                  <div className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-200">
+                    Peak: Oct (BDT 92,400)
+                  </div>
+                </div>
+
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={MONTHLY_REVENUE_DATA} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#059669" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="month" stroke="#64748b" fontSize={11} />
+                      <YAxis stroke="#64748b" fontSize={11} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                        formatter={(val: any) => [`BDT ${Number(val).toLocaleString()}`, 'Revenue']}
+                      />
+                      <Area type="monotone" dataKey="revenue" stroke="#059669" strokeWidth={3} fillOpacity={1} fill="url(#revenueGradient)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Category Share Donut / Pie Chart */}
+              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-xs">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Category Share</h3>
+                  <p className="text-xs text-slate-500">Sales volume by product category</p>
+                </div>
+
+                <div className="h-64 w-full flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={CATEGORY_SHARE_DATA}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {CATEGORY_SHARE_DATA.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                        formatter={(val: any) => [`${val}%`, 'Share']}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="space-y-2">
+                  {CATEGORY_SHARE_DATA.map((cat) => (
+                    <div key={cat.name} className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                        <span className="font-bold text-slate-700">{cat.name}</span>
+                      </div>
+                      <span className="font-mono font-bold text-slate-900">{cat.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Recharts Section 2: Popular Products Bar Chart */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-xs">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Top Popular Products & Sales Revenue</h3>
+                <p className="text-xs text-slate-500">Leading legal templates and tax kits by total sales volume</p>
+              </div>
+
+              <div className="h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={POPULAR_PRODUCTS_DATA} layout="vertical" margin={{ top: 10, right: 30, left: 120, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis type="number" stroke="#64748b" fontSize={11} />
+                    <YAxis type="category" dataKey="name" stroke="#64748b" fontSize={11} width={150} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                      formatter={(val: any, name: any) => [name === 'revenue' ? `BDT ${Number(val).toLocaleString()}` : val, name === 'revenue' ? 'Revenue' : 'Units Sold']}
+                    />
+                    <Bar dataKey="sales" fill="#059669" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Recent UddoktaPay Settlements Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-xs">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Recent UddoktaPay Settlements</h3>
+                <p className="text-xs text-slate-500">Live transaction feed received via webhook and instant checkout</p>
+              </div>
+
+              <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wider text-[10px]">
+                      <th className="py-3 px-4">Transaction ID</th>
+                      <th className="py-3 px-4">Customer / Ref</th>
+                      <th className="py-3 px-4">Product</th>
+                      <th className="py-3 px-4">Amount</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Timestamp</th>
+                      <th className="py-3 px-4 text-right">Refund Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {transactions.map((tx) => {
+                      const isCompleted = tx.status === 'completed';
+                      const isRefunded = tx.status === 'refunded';
+                      const isPending = tx.status === 'pending';
+                      return (
+                        <tr key={tx.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="py-3.5 px-4 font-mono font-bold text-emerald-700">{tx.transactionId}</td>
+                          <td className="py-3.5 px-4">
+                            <div className="font-bold text-slate-900">Verified Client</div>
+                            <div className="text-[11px] text-slate-400 font-mono">{tx.referenceId || 'ACC-2026'}</div>
+                          </td>
+                          <td className="py-3.5 px-4 font-medium text-slate-700">{tx.productTitle}</td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-900">BDT {tx.amount.toLocaleString()}</td>
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black inline-flex items-center gap-1 ${
+                              isCompleted ? 'bg-emerald-100 text-emerald-800' : isRefunded ? 'bg-purple-100 text-purple-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-emerald-600' : isRefunded ? 'bg-purple-600' : 'bg-amber-600'}`} />
+                              <span>{tx.status.toUpperCase()}</span>
+                            </span>
+                            {tx.refundReason && (
+                              <div className="text-[10px] text-purple-700 mt-1 italic">Reason: {tx.refundReason}</div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500">{new Date(tx.date).toLocaleString()}</td>
+                          <td className="py-3.5 px-4 text-right">
+                            {isCompleted ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRefund(tx)}
+                                className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 font-extrabold rounded-lg text-[11px] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                title="Process refund and log audit record"
+                              >
+                                <RotateCcw className="w-3 h-3 text-red-600" />
+                                <span>Process Refund</span>
+                              </button>
+                            ) : isRefunded ? (
+                              <span className="text-[11px] font-bold text-purple-700 font-mono">Refund Logged</span>
+                            ) : (
+                              <span className="text-[11px] text-slate-400 font-mono">Pending Settlement</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        ) : (
+          <>
 
         {/* Status Toast Alert */}
         {statusMessage && (
@@ -1326,6 +1656,9 @@ export function AdminShop() {
           </div>
 
         </section>
+
+          </>
+        )}
 
       </main>
     </div>

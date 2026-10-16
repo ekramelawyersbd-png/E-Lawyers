@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ShopProduct } from '../data/shopProducts';
+import { generatePdfReceipt } from '../utils/receiptGenerator';
 
 export interface TransactionRecord {
   id: string;
   transactionId: string;
   productTitle: string;
   amount: number;
-  status: 'completed' | 'pending';
+  status: 'completed' | 'pending' | 'refunded';
   paymentMethod: string;
   date: string;
   referenceId?: string;
+  refundedAt?: string;
+  refundReason?: string;
 }
 
 interface PurchaseContextType {
@@ -19,6 +22,7 @@ interface PurchaseContextType {
   purchaseProduct: (productId: string, productTitle?: string, amount?: number, paymentMethod?: string, status?: 'completed' | 'pending') => void;
   simulateInstantPurchase: (product: ShopProduct) => void;
   downloadReceipt: (tx: TransactionRecord) => void;
+  processRefund: (transactionId: string, refundReason?: string) => void;
 }
 
 const PurchaseContext = createContext<PurchaseContextType | null>(null);
@@ -135,40 +139,25 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [purchaseProduct]);
 
   const downloadReceipt = useCallback((tx: TransactionRecord) => {
-    const receiptContent = `========================================================
-ACCOUNTICCA & E-LAWYERS DIGITAL PAYMENT RECEIPT
-========================================================
-Transaction Reference: ${tx.id}
-Gateway Transaction ID: ${tx.transactionId}
-Order Reference No: ${tx.referenceId || 'N/A'}
-Date & Time: ${new Date(tx.date).toLocaleString('en-GB')}
-Payment Status: ${tx.status.toUpperCase()}
-Payment Method: ${tx.paymentMethod}
-Total Paid Amount: BDT ${tx.amount.toLocaleString('en-IN')} BDT
+    generatePdfReceipt(tx);
+  }, []);
 
---- PURCHASED ITEM ---
-• ${tx.productTitle}
-
---- MERCHANT DETAILS ---
-Accounticca Advisory & eLawyers Bangladesh
-Dhaka Chamber Building (2nd Floor), Motijheel C/A, Dhaka
-Hotline: +88 01335230170 | support@accounticca.com
-Tax ID (TIN): 482910283401 | VAT Reg: 003928102-0101
-========================================================
-This is a computer-generated digital receipt and is valid for NBR tax rebate and statutory audit records.
-========================================================`;
-
-    const blob = new Blob([receiptContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Receipt-${tx.transactionId}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const processRefund = useCallback((transactionId: string, refundReason: string = 'Admin processed refund') => {
+    setTransactions(prev => prev.map(tx => {
+      if (tx.transactionId === transactionId || tx.id === transactionId) {
+        return {
+          ...tx,
+          status: 'refunded',
+          refundedAt: new Date().toISOString(),
+          refundReason
+        };
+      }
+      return tx;
+    }));
   }, []);
 
   return (
-    <PurchaseContext.Provider value={{ purchasedProductIds, transactions, isPurchased, purchaseProduct, simulateInstantPurchase, downloadReceipt }}>
+    <PurchaseContext.Provider value={{ purchasedProductIds, transactions, isPurchased, purchaseProduct, simulateInstantPurchase, downloadReceipt, processRefund }}>
       {children}
     </PurchaseContext.Provider>
   );
