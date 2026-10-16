@@ -89,6 +89,34 @@ export function ProductDetail() {
     setIsCheckoutOpen(true);
   };
 
+  const handleUddoktaPayCheckout = async () => {
+    if (!product) return;
+    try {
+      const res = await fetch('/api/uddoktapay/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: 'Valued Client',
+          email: 'client@example.com',
+          amount: product.price,
+          metadata: {
+            product_id: product.id,
+            product_slug: product.slug
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.status && data.payment_url) {
+        window.location.href = data.payment_url;
+      } else {
+        alert(data.message || 'Failed to initialize UddoktaPay checkout');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Payment gateway connection error.');
+    }
+  };
+
   const handleShare = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
@@ -702,14 +730,14 @@ export function ProductDetail() {
               {/* Purchase Actions: Primary Buy Now (Emerald) & Secondary Add to Cart (Clean Navy Border) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 
-                {/* Primary CTA: Buy Now */}
+                {/* Primary CTA: Pay via UddoktaPay */}
                 <button
                   type="button"
-                  onClick={handleBuyNow}
-                  className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={handleUddoktaPayCheckout}
+                  className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Zap className="w-4 h-4 fill-white" />
-                  <span>Buy Now (Instant Checkout)</span>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Pay via UddoktaPay</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 

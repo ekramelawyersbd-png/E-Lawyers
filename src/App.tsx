@@ -98,7 +98,7 @@ export default function App() {
                 <Route path="search" element={<Search />} />
                 <Route path="glossary" element={<Glossary />} />
                 <Route path="faq" element={<FaqPage />} />
-                <Route path="tax-calculator" element={<TaxCalculator />} />
+                <Route path="tax-calculator" element={<Navigate to="/shop/income-tax-calculator-2026-27" replace />} />
                 <Route path="tax-planner" element={<TaxPlanner />} />
                 <Route path="corporate-planner" element={<CorporateTaxPlanner />} />
                 <Route path="corporate-tax-planner" element={<Navigate to="/corporate-planner" replace />} />

@@ -34,6 +34,7 @@ import {
 import { Link, useSearchParams } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { generateConsultationChecklistPDF } from '../utils/consultationChecklistPdfGenerator';
 
 export interface ExpertiseItem {
   id: string;
@@ -881,6 +882,50 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
                 <span>Confirmation dispatched to: <strong>{confirmedBooking.email}</strong></span>
                 <span className="font-mono text-[11px] text-emerald-700 font-bold">Chamber Partner Brief Prepared</span>
+              </div>
+            </div>
+
+            {/* Collapsible Document Preparation Checklist Box */}
+            <div className="bg-white p-6 rounded-2xl border border-emerald-200/90 text-left max-w-xl mx-auto shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                    ✓
+                  </div>
+                  <h4 className="text-sm font-black text-slate-900">
+                    Required Preparation Checklist ({activePractice.shortTitle})
+                  </h4>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => generateConsultationChecklistPDF(confirmedBooking, activePractice.preparationChecklist)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer"
+                  title="Download PDF Preparation Checklist"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Checklist PDF</span>
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-500 leading-relaxed">
+                To maximize the productivity of your 45-minute consultation with <strong>{confirmedBooking.assignedPartner?.name || activePractice.leadPartner.name}</strong>, please have the following records available:
+              </p>
+
+              <ul className="space-y-2 pt-1">
+                {activePractice.preparationChecklist.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700">
+                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="leading-snug font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-2 text-[11px] text-slate-500 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>You can also upload these files directly in your Client Portal prior to the session.</span>
               </div>
             </div>
 

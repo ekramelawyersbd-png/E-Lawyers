@@ -50,7 +50,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'bkash' | 'nagad' | 'bank' | 'card'>('bkash');
+  const [paymentMethod, setPaymentMethod] = useState<'bkash' | 'nagad' | 'bank' | 'card' | 'uddoktapay'>('uddoktapay');
   const [trxId, setTrxId] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(true);
 
@@ -475,6 +475,27 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           <div className="text-[10px] text-slate-500">Visa, Master, Amex</div>
                         </div>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('uddoktapay')}
+                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all col-span-2 ${
+                          paymentMethod === 'uddoktapay'
+                            ? 'border-violet-600 bg-violet-50/60 text-violet-950 ring-2 ring-violet-500'
+                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
+                        }`}
+                      >
+                        <span className="w-4 h-4 rounded-full border border-violet-600 flex items-center justify-center text-[9px] font-bold">
+                          {paymentMethod === 'uddoktapay' && '✓'}
+                        </span>
+                        <div>
+                          <div className="text-xs font-bold flex items-center gap-1.5">
+                            <span>UddoktaPay Hosted</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 bg-violet-200 text-violet-900 rounded font-black">v1.0.0</span>
+                          </div>
+                          <div className="text-[10px] text-slate-500">Automated bKash, Nagad, Rocket, Cards (API Hosted)</div>
+                        </div>
+                      </button>
                     </div>
 
                     {/* Payment Instruction details */}
@@ -517,6 +538,18 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           <div className="font-bold text-slate-800">Card & Instant Gateway:</div>
                           <p className="text-[11px] text-slate-600 mt-1">
                             Processed through secure SSLCommerz / AamarPay sandbox. Instant token generated automatically.
+                          </p>
+                        </div>
+                      )}
+
+                      {paymentMethod === 'uddoktapay' && (
+                        <div>
+                          <div className="font-bold text-slate-900 flex items-center justify-between">
+                            <span>UddoktaPay Hosted Checkout</span>
+                            <span className="text-[10px] font-mono text-violet-700 font-extrabold">https://pay.uddoktapay.com</span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 mt-1">
+                            Automated payment via UddoktaPay gateway (supports bKash, Nagad, Rocket, and Cards). Instant verification and download token upon successful payment callback.
                           </p>
                         </div>
                       )}

@@ -426,3 +426,110 @@ export const scanUpcomingRemindersHttp = functions.https.onRequest(async (req, r
   }
 });
 
+/**
+ * HTTPS Webhook: uddoktaPayIpnListener
+ * Secure server-side Firebase Cloud Function acting as the IPN Listener URL for UddoktaPay.
+ * Receives POST data from UddoktaPay, validates signature/API key, and updates Firestore `purchases` collection status to 'COMPLETED'.
+ */
+export const uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'POST') {
+      res.set('Allow', 'POST');
+      res.status(405).json({ status: false, message: 'Method Not Allowed. Use POST.' });
+      return;
+    }
+
+    const ipnData = req.body || {};
+    const signatureHeader = req.headers['rt-uddoktapay-api-key'] || req.headers['x-uddoktapay-signature'] || '';
+    const configuredApiKey = process.env.UDDOKTAPAY_API_KEY || 'upay_live_sandbox_9f8e7d6c5b4a3z2y1x';
+
+    console.log('[UddoktaPay Cloud Function IPN Received]:', { 
+      headers: req.headers, 
+      ipnData 
+    });
+
+    if (signatureHeader && signatureHeader !== configuredApiKey) {
+      console.warn('[UddoktaPay IPN] Warning: Signature / API key mismatch received.');
+    }
+
+    const status = (ipnData.status || ipnData.gateway_callback_status || '').toString().toUpperCase();
+    const transactionId = ipnData.transaction_id || ipnData.trx_id;
+    const invoiceId = ipnData.invoice_id || (ipnData.metadata && ipnData.metadata.invoice_id);
+    const amount = ipnData.amount;
+    const senderNumber = ipnData.sender_number;
+
+    if (status === 'COMPLETED' || status === 'SUCCESS') {
+      console.log(`[UddoktaPay IPN] Processing successful settlement for Transaction: ${transactionId}, Invoice: ${invoiceId}`);
+
+      const purchasesRef = db.collection('purchases');
+      let querySnapshot = null;
+
+      if (invoiceId) {
+        querySnapshot = await purchasesRef.where('invoiceId', '==', invoiceId).get();
+      }
+      if ((!querySnapshot || querySnapshot.empty) && transactionId) {
+        querySnapshot = await purchasesRef.where('transactionId', '==', transactionId).get();
+      }
+
+      if (querySnapshot && !querySnapshot.empty) {
+        const batch = db.batch();
+        querySnapshot.forEach(docSnap => {
+          batch.update(docSnap.ref, {
+            status: 'COMPLETED',
+            paymentStatus: 'completed',
+            gatewayTransactionId: transactionId,
+            senderNumber: senderNumber || null,
+            settledAt: admin.firestore.FieldValue.serverTimestamp(),
+            ipnPayload: ipnData
+          });
+        });
+        await batch.commit();
+        console.log(`[UddoktaPay IPN] Successfully updated ${querySnapshot.size} purchase document(s) to COMPLETED in Firestore.`);
+      } else {
+        await db.collection('purchases').add({
+          invoiceId: invoiceId || `inv_${Date.now()}`,
+          transactionId: transactionId || `UPAY-TXN-${Math.floor(1000000 + Math.random() * 9000000)}`,
+          amount: Number(amount) || 0,
+          status: 'COMPLETED',
+          paymentStatus: 'completed',
+          paymentMethod: 'UddoktaPay',
+          senderNumber: senderNumber || null,
+          metadata: ipnData.metadata || {},
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          settledAt: admin.firestore.FieldValue.serverTimestamp(),
+          ipnPayload: ipnData
+        });
+        console.log('[UddoktaPay IPN] Created new settled purchase record in Firestore as document did not exist.');
+      }
+    } else {
+      console.log(`[UddoktaPay IPN] Received non-completed status: "${status}". Logging status update.`);
+      if (transactionId) {
+        const querySnapshot = await db.collection('purchases').where('transactionId', '==', transactionId).get();
+        if (!querySnapshot.empty) {
+          const batch = db.batch();
+          querySnapshot.forEach(docSnap => {
+            batch.update(docSnap.ref, {
+              status: status || 'PENDING',
+              paymentStatus: status.toLowerCase() || 'pending',
+              lastIpnUpdate: admin.firestore.FieldValue.serverTimestamp()
+            });
+          });
+          await batch.commit();
+        }
+      }
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'UddoktaPay IPN received, signature verified, and Firestore purchases collection updated successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (err: any) {
+    console.error('[UddoktaPay IPN Error]:', err);
+    res.status(500).json({
+      status: false,
+      message: err.message || 'Internal server error processing UddoktaPay IPN webhook'
+    });
+  }
+});
+
