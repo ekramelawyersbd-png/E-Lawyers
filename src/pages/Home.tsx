@@ -843,16 +843,16 @@ export function Home() {
       </section>
 
       {/* 6. Popular Articles & 7. Expert Advice Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-200">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Popular Articles */}
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8">Popular Articles</h2>
-            <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Popular Articles</h2>
+            <div className="space-y-4">
               {popularArticles.map(article => (
-                <Link key={article.id} to={`/article/${article.id}`} className="group flex gap-6 items-start p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0">
+                <Link key={article.id} to={`/article/${article.id}`} className="group flex gap-4 items-start p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
                     <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div>
@@ -860,8 +860,8 @@ export function Home() {
                       <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">{article.category}</span>
                       <span className="text-[10px] text-slate-400 flex items-center gap-1"><Clock className="w-3 h-3"/> {calculateReadingTime(article.content)} min read</span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors mb-2 leading-tight">{article.title}</h3>
-                    <p className="text-sm text-slate-500 line-clamp-2">{article.excerpt}</p>
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors mb-1 leading-tight">{article.title}</h3>
+                    <p className="text-xs text-slate-500 line-clamp-2">{article.excerpt}</p>
                   </div>
                 </Link>
               ))}
@@ -870,30 +870,30 @@ export function Home() {
 
           {/* Expert Advice */}
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8">Expert Advice</h2>
-            <div className="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 relative">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Expert Advice</h2>
+            <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 relative">
               <div className="absolute top-4 right-4 text-emerald-200">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" opacity="0.5"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.5"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {popularArticles.slice(0, 2).map((article, idx) => (
-                  <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <div className="mb-4">
+                  <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                    <div className="mb-2">
                       <div>
-                        <h4 className="font-bold text-slate-900">{article.author.name}</h4>
-                        <p className="text-xs text-emerald-700 font-medium uppercase tracking-wider">{article.author.role || 'Corporate Lawyer'}</p>
+                        <h4 className="font-bold text-slate-900 text-sm">{article.author.name}</h4>
+                        <p className="text-[10px] text-emerald-700 font-medium uppercase tracking-wider">{article.author.role || 'Corporate Lawyer'}</p>
                       </div>
                     </div>
                     <Link to={`/article/${article.id}`} className="block">
-                      <h3 className="text-lg font-bold text-slate-800 hover:text-emerald-700 transition-colors mb-2">{article.title}</h3>
-                      <p className="text-sm text-slate-600 line-clamp-2">{article.excerpt}</p>
+                      <h3 className="text-base font-bold text-slate-800 hover:text-emerald-700 transition-colors mb-1">{article.title}</h3>
+                      <p className="text-xs text-slate-600 line-clamp-2">{article.excerpt}</p>
                     </Link>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 text-center">
-                <Link to="/team" className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 transition-colors">
-                  Meet Our Experts <ArrowRight className="w-4 h-4" />
+              <div className="mt-4 text-center">
+                <Link to="/team" className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-xs hover:text-emerald-800 transition-colors">
+                  Meet Our Experts <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

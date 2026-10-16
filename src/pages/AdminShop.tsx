@@ -40,6 +40,7 @@ import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { usePurchases } from '../contexts/PurchaseContext';
+import { generateUddoktaPayZip } from '../utils/uddoktaPayExtension';
 import { 
   ShopProduct, 
   SHOP_CATEGORIES, 
@@ -132,7 +133,37 @@ export function AdminShop() {
     }
   };
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics'>('catalog');
+  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'uddoktapay-extension'>('catalog');
+  const [isDownloadingExtension, setIsDownloadingExtension] = useState(false);
+
+  const handleDownloadExtension = async () => {
+    try {
+      setIsDownloadingExtension(true);
+      const blob = await generateUddoktaPayZip();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'uddoktapay-paymenter-extension.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      setStatusMessage({
+        type: 'success',
+        text: 'UddoktaPay Paymenter extension ZIP downloaded successfully!'
+      });
+      setTimeout(() => setStatusMessage(null), 4000);
+    } catch (err) {
+      console.error(err);
+      setStatusMessage({
+        type: 'error',
+        text: 'Failed to generate extension ZIP package.'
+      });
+      setTimeout(() => setStatusMessage(null), 4000);
+    } finally {
+      setIsDownloadingExtension(false);
+    }
+  };
 
   // Filter & Search in Admin list
   const [searchTerm, setSearchTerm] = useState('');
@@ -513,13 +544,146 @@ export function AdminShop() {
             <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
             <span>Sales & UddoktaPay Analytics Dashboard</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab('uddoktapay-extension')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+              activeAdminTab === 'uddoktapay-extension'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Paymenter Gateways & UddoktaPay Extension</span>
+          </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {activeAdminTab === 'analytics' ? (
+        {activeAdminTab === 'uddoktapay-extension' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {/* Paymenter & UddoktaPay Integration Card */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold mb-2">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Official Paymenter Gateway Extension</span>
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900">UddoktaPay Hosted Gateway for Paymenter</h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Instantly package and integrate UddoktaPay mobile financial services & card gateway into your Paymenter billing system.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadExtension}
+                  disabled={isDownloadingExtension}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-black transition-all shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                >
+                  <FileDown className="w-5 h-5" />
+                  <span>{isDownloadingExtension ? 'Generating ZIP Package...' : 'Download UddoktaPay Extension ZIP'}</span>
+                </button>
+              </div>
+
+              {/* Step-by-Step Instructions */}
+              <div className="space-y-4">
+                <h3 className="text-base font-black text-slate-900">Installation & Setup Guide</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200/80 space-y-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xs">1</div>
+                    <h4 className="font-bold text-slate-900 text-sm">Upload to Extensions Directory</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Download the extension ZIP package above and upload the extracted <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-emerald-700 font-mono text-[11px]">uddoktapay</code> folder to <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-emerald-700 font-mono text-[11px]">extensions/Gateways/</code> in your Paymenter root.
+                    </p>
+                  </div>
+                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200/80 space-y-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xs">2</div>
+                    <h4 className="font-bold text-slate-900 text-sm">Configure in Paymenter Admin Panel</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Open your Paymenter Admin Panel, navigate to <strong>Gateways &gt; Add New</strong>, select <strong>"UddoktaPay Hosted"</strong>, and fill in your API credentials.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gateway Configuration & Credentials Reference */}
+              <div className="bg-slate-900 rounded-2xl p-6 text-white space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-sm font-black text-emerald-400">Gateway Credentials & Endpoints Reference</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Use these pre-configured values for your sandbox & live deployment.</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    Active Sandbox Ready
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-mono">
+                  <div className="space-y-2">
+                    <label className="text-slate-400 font-sans block font-bold">API Key (RT-UDDOKTAPAY-API-KEY)</label>
+                    <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-emerald-300 select-all flex items-center justify-between">
+                      <span>upay_live_sandbox_9f8e7d6c5b4a3z2y1x</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText('upay_live_sandbox_9f8e7d6c5b4a3z2y1x');
+                          setStatusMessage({ type: 'success', text: 'API Key copied to clipboard!' });
+                          setTimeout(() => setStatusMessage(null), 3000);
+                        }}
+                        className="text-slate-400 hover:text-white cursor-pointer"
+                        title="Copy API Key"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-slate-400 font-sans block font-bold">Hosted Gateway URL</label>
+                    <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-emerald-300 select-all flex items-center justify-between">
+                      <span>https://pay.ekram-elawyersbd.workers.dev/</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText('https://pay.ekram-elawyersbd.workers.dev/');
+                          setStatusMessage({ type: 'success', text: 'Hosted URL copied to clipboard!' });
+                          setTimeout(() => setStatusMessage(null), 3000);
+                        }}
+                        className="text-slate-400 hover:text-white cursor-pointer"
+                        title="Copy Hosted URL"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 font-mono">
+                  <label className="text-slate-400 font-sans block font-bold">IPN Listener Webhook URL (Server-to-Server Callback)</label>
+                  <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-emerald-300 select-all flex items-center justify-between">
+                    <span>https://blog.accounticca.com/gateway/uddoktapay/ipn</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText('https://blog.accounticca.com/gateway/uddoktapay/ipn');
+                        setStatusMessage({ type: 'success', text: 'IPN URL copied to clipboard!' });
+                        setTimeout(() => setStatusMessage(null), 3000);
+                      }}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                      title="Copy IPN URL"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        ) : activeAdminTab === 'analytics' ? (
           <div className="space-y-8 animate-in fade-in duration-300">
             
             {/* Analytics Summary Cards */}

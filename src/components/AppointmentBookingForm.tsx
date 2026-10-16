@@ -997,7 +997,7 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
                   <Filter className="w-3 h-3" />
                   <span>Filter:</span>
                 </span>
-                {['All', 'Tax & VAT', 'Corporate & Legal', 'Finance & Assurance'].map((cat) => (
+                {['All', 'Tax & VAT'].map((cat) => (
                   <button
                     key={cat}
                     type="button"
