@@ -152,6 +152,36 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     requiresPurchaseToAccess: true
   },
   {
+    id: 'personal-income-tax-return-filing-training',
+    title: 'Personal Income Tax Return Filing, Tax Law, Calculation & E-Return Training',
+    slug: 'personal-income-tax-return-filing-tax-law-calculation-e-return-training',
+    category: 'Tax & VAT Toolkits',
+    productType: 'Templates',
+    price: 1950,
+    originalPrice: 3500,
+    rating: 4.99,
+    reviewsCount: 245,
+    format: 'Video Masterclass + Excel Workbook + E-Return Guide',
+    badge: 'Bestseller',
+    shortDescription: 'Complete masterclass on personal income tax calculation under Income Tax Act 2023, Finance Act 2026, Section 78 rebates, IT-10B net wealth statement, and NBR e-Return portal filing.',
+    fullDescription: 'The definitive training program and practical toolkit for filing individual income tax returns in Bangladesh. Designed by Supreme Court tax advocates and senior chartered accountants. Covers all 10 heads of income, agricultural deemed 60% expenses, capital gains calculation, tax-free allowances, investment rebate optimization, Form IT-11GA, Form IT-10B net wealth statement, and step-by-step video walkthrough of the NBR online e-Return portal.',
+    governingLaw: 'Income Tax Act, 2023 & Finance Act, 2026 (Bangladesh)',
+    pagesOrFiles: '6 Video Modules • Master Excel Return Workbook • PDF E-Return Guide',
+    features: [
+      'Comprehensive breakdown of all 10 heads of income under Income Tax Act 2023',
+      'AY 2026–27 progressive tax slab calculations & exemption limits',
+      'Section 78 investment tax rebate optimization (lowest of 3%, 10%, Tk. 7.5L)',
+      'Form IT-10B Statement of Assets, Liabilities & Net Wealth Surcharge rules',
+      'Step-by-step video walkthrough for submitting returns on the NBR e-Return portal',
+      'Sample completed tax returns and downloadable Excel calculation templates'
+    ],
+    samplePreviewSnippet: 'Module 1: Overview of Direct Tax Framework under Income Tax Act 2023 and Finance Act 2026. Determining resident vs non-resident status and mandatory return submission triggers...',
+    imageUrl: 'https://ibb.co.com/VYcVtN9y',
+    authorOrVettedBy: 'Adv. Ekram Hossain & Accounticca Tax Practice Division',
+    brochureUrl: '/course/personal-income-tax',
+    requiresPurchaseToAccess: false
+  },
+  {
     id: 'employment-contract-hr-handbook',
     title: 'Employment Contract & HR Policy Manual (Labour Act 2006)',
     slug: 'employment-contract-hr-handbook',

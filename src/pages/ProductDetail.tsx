@@ -30,6 +30,7 @@ import { useShopAuth } from '../contexts/ShopAuthContext';
 import { CartDrawer } from '../components/shop/CartDrawer';
 import { CheckoutModal } from '../components/shop/CheckoutModal';
 import { ShopProduct, inferProductType } from '../data/shopProducts';
+import { QRCodeWidget } from '../components/QRCodeWidget';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -75,46 +76,15 @@ export function ProductDetail() {
   }, [slug]);
 
   const handleAddToCart = () => {
-    if (!product) return;
-    addToCart(product, quantity);
-    setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
+    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
   };
 
   const handleBuyNow = () => {
-    if (!product) return;
-    setInstantCheckoutProduct(product);
-    setIsCheckoutOpen(true);
+    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
   };
 
-  const handleUddoktaPayCheckout = async () => {
-    if (!product) return;
-    try {
-      const res = await fetch('/api/uddoktapay/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: 'Valued Client',
-          email: 'client@example.com',
-          amount: product.price,
-          metadata: {
-            product_id: product.id,
-            product_slug: product.slug
-          }
-        })
-      });
-      const data = await res.json();
-      if (data.status && data.payment_url) {
-        window.location.href = data.payment_url;
-      } else {
-        alert(data.message || 'Failed to initialize UddoktaPay checkout');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Payment gateway connection error.');
-    }
+  const handleUddoktaPayCheckout = () => {
+    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
   };
 
   const handleShare = () => {
@@ -737,7 +707,7 @@ export function ProductDetail() {
                   className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Pay via UddoktaPay</span>
+                  <span>Pay Now</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -758,8 +728,8 @@ export function ProductDetail() {
                     </>
                   ) : (
                     <>
-                      <ShoppingBag className="w-4 h-4 text-slate-700" />
-                      <span>Add to Cart</span>
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span>Pay Now</span>
                     </>
                   )}
                 </button>
@@ -784,6 +754,15 @@ export function ProductDetail() {
                   <Scale className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>Advocate Vetted</span>
                 </div>
+              </div>
+
+              {/* Dynamic QR Code for Mobile Banking & MFS Quick Scan */}
+              <div className="pt-2">
+                <QRCodeWidget 
+                  value="https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U" 
+                  title="Scan to Pay via Mobile Banking / MFS QR" 
+                  subtitle="Open bKash, Nagad, Rocket, or any banking app and scan to pay instantly"
+                />
               </div>
 
             </div>

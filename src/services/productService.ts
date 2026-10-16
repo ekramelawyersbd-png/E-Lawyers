@@ -19,20 +19,51 @@ const PRODUCTS_UPDATE_EVENT = 'accounticca:products-updated';
 export function getLocalProducts(): ShopProduct[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+    let parsed: any[] = [];
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        const existingKeys = new Set(parsed.map((p: any) => p.slug || p.id));
-        SHOP_PRODUCTS.forEach(sp => {
-          if (!existingKeys.has(sp.slug) && !existingKeys.has(sp.id)) {
-            parsed.push(sp);
-          }
-        });
-        return parsed.map((p: any) => ({
-          ...p,
-          productType: p.productType || inferProductType(p)
-        }));
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        parsed = [];
       }
+    }
+
+    const existingMap = new Map<string, any>();
+    if (Array.isArray(parsed)) {
+      parsed.forEach(p => {
+        if (p) {
+          if (p.id) existingMap.set(p.id, p);
+          if (p.slug) existingMap.set(p.slug, p);
+        }
+      });
+    }
+
+    let modified = false;
+    SHOP_PRODUCTS.forEach(sp => {
+      if (!existingMap.has(sp.id) && !existingMap.has(sp.slug)) {
+        parsed.push(sp);
+        existingMap.set(sp.id, sp);
+        existingMap.set(sp.slug, sp);
+        modified = true;
+      } else {
+        const found = existingMap.get(sp.id) || existingMap.get(sp.slug);
+        if (found && sp.brochureUrl && !found.brochureUrl) {
+          found.brochureUrl = sp.brochureUrl;
+          found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
+          modified = true;
+        }
+      }
+    });
+
+    if (parsed.length > 0) {
+      const normalized = parsed.map((p: any) => ({
+        ...p,
+        productType: p.productType || inferProductType(p)
+      }));
+      if (modified) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      }
+      return normalized;
     }
   } catch (err) {
     console.warn('Could not read products from localStorage:', err);

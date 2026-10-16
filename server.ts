@@ -112,19 +112,46 @@ function saveAdminSessions(map: Map<string, AdminSession>) {
 }
 
 function loadServerProducts(): ShopProduct[] {
+  let products: ShopProduct[] = [...SHOP_PRODUCTS];
   try {
     if (fs.existsSync(PRODUCTS_STORAGE_FILE)) {
       const data = JSON.parse(fs.readFileSync(PRODUCTS_STORAGE_FILE, "utf-8"));
       if (Array.isArray(data) && data.length > 0) {
-        return data;
+        products = data;
       }
     }
   } catch (err) {
     console.warn("[Shop Products] Notice reading products storage:", err);
   }
-  // Initialize with default SHOP_PRODUCTS
-  saveServerProducts(SHOP_PRODUCTS);
-  return [...SHOP_PRODUCTS];
+
+  const existingMap = new Map<string, any>();
+  products.forEach(p => {
+    if (p.id) existingMap.set(p.id, p);
+    if (p.slug) existingMap.set(p.slug, p);
+  });
+
+  let modified = false;
+  SHOP_PRODUCTS.forEach(sp => {
+    if (!existingMap.has(sp.id) && !existingMap.has(sp.slug)) {
+      products.push(sp);
+      existingMap.set(sp.id, sp);
+      existingMap.set(sp.slug, sp);
+      modified = true;
+    } else {
+      const found = existingMap.get(sp.id) || existingMap.get(sp.slug);
+      if (found && sp.brochureUrl && !found.brochureUrl) {
+        found.brochureUrl = sp.brochureUrl;
+        found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
+        modified = true;
+      }
+    }
+  });
+
+  if (modified) {
+    saveServerProducts(products);
+  }
+
+  return products;
 }
 
 function saveServerProducts(products: ShopProduct[]) {

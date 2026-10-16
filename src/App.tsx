@@ -51,6 +51,7 @@ import { PurchaseProvider } from './contexts/PurchaseContext';
 import { BookmarkNotificationToast } from './components/BookmarkNotificationToast';
 import { ScrollManager } from './components/layout/ScrollManager';
 import { NotFound } from './pages/NotFound';
+import { PersonalIncomeTaxCourse } from './pages/PersonalIncomeTaxCourse';
 
 export default function App() {
   return (
@@ -95,6 +96,8 @@ export default function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="tools" element={<ToolsHub />} />
                 <Route path="training" element={<TrainingHub />} />
+                <Route path="course/personal-income-tax" element={<PersonalIncomeTaxCourse />} />
+                <Route path="income-tax-training" element={<Navigate to="/course/personal-income-tax" replace />} />
                 <Route path="search" element={<Search />} />
                 <Route path="glossary" element={<Glossary />} />
                 <Route path="faq" element={<FaqPage />} />

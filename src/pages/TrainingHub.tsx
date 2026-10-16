@@ -85,7 +85,7 @@ export function TrainingHub() {
               key={article.id}
               className={`group bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center gap-4 ${colorClass.split(' ').find(c => c.startsWith('hover:'))}`}
             >
-              <Link to={`/article/${article.id}`} className="contents">
+              <Link to={article.id === '401' ? '/course/personal-income-tax' : `/article/${article.id}`} className="contents">
                 <div className={`p-5 rounded-3xl shrink-0 ${colorClass.split(' ').slice(0, 2).join(' ')}`}>
                   {icon}
                 </div>
@@ -99,6 +99,14 @@ export function TrainingHub() {
                 </div>
               </Link>
               <div className="w-full mt-auto flex flex-col gap-2">
+                {article.id === '401' && (
+                  <Link
+                    to="/course/personal-income-tax"
+                    className="w-full py-2.5 px-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1.5"
+                  >
+                    <span>View Course Landing Page</span>
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     setSelectedCourse({ id: article.id, title: article.title, description: article.excerpt, price });

@@ -585,9 +585,12 @@ Contact & Advisory: https://blog.accounticca.com/contact
                       {checkoutItems.map((item) => (
                         <div key={item.product.id} className="flex items-center gap-2.5 text-xs">
                           <img
-                            src={item.product.imageUrl}
+                            src="https://ibb.co.com/VYcVtN9y"
                             alt={item.product.title}
                             className="w-10 h-10 rounded-lg object-cover shrink-0 border border-slate-200"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = item.product.imageUrl;
+                            }}
                           />
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-slate-800 truncate">{item.product.title}</div>
