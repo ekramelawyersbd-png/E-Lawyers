@@ -30,7 +30,8 @@ import {
   FileDown,
   Activity,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  CreditCard
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
@@ -41,6 +42,7 @@ import { useProducts } from '../hooks/useProducts';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { usePurchases } from '../contexts/PurchaseContext';
 import { generateUddoktaPayZip } from '../utils/uddoktaPayExtension';
+import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
 import { 
   ShopProduct, 
   SHOP_CATEGORIES, 
@@ -133,7 +135,7 @@ export function AdminShop() {
     }
   };
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'uddoktapay-extension'>('catalog');
+  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'uddoktapay-extension' | 'payments'>('catalog');
   const [isDownloadingExtension, setIsDownloadingExtension] = useState(false);
 
   const handleDownloadExtension = async () => {
@@ -556,13 +558,29 @@ export function AdminShop() {
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Paymenter Gateways & UddoktaPay Extension</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveAdminTab('payments')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+              activeAdminTab === 'payments'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            <CreditCard className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>Payment Status & Link Tracker</span>
+          </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {activeAdminTab === 'uddoktapay-extension' ? (
+        {activeAdminTab === 'payments' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <PaymentStatusWidget />
+          </div>
+        ) : activeAdminTab === 'uddoktapay-extension' ? (
           <div className="space-y-8 animate-in fade-in duration-300">
             {/* Paymenter & UddoktaPay Integration Card */}
             <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">

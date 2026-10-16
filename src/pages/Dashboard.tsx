@@ -26,11 +26,13 @@ import {
   User,
   Briefcase,
   Calendar,
-  ExternalLink
+  ExternalLink,
+  CreditCard
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
 import { UserProfile } from '../components/profile/UserProfile';
+import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
@@ -53,8 +55,8 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications'>(
-    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments'>(
+    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -110,12 +112,14 @@ export function Dashboard() {
       setActiveTab('profile');
     } else if (tabParam === 'applications') {
       setActiveTab('applications');
+    } else if (tabParam === 'payments') {
+      setActiveTab('payments');
     } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
       setActiveTab('saved');
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -330,6 +334,24 @@ export function Dashboard() {
             </button>
 
             <button 
+              id="dashboard-tab-payments"
+              onClick={() => switchTab('payments')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'payments' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <CreditCard className="w-5 h-5 text-emerald-600 animate-pulse" />
+                <span>Payment Status Tracker</span>
+              </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                Live
+              </span>
+            </button>
+
+            <button 
               id="dashboard-tab-profile"
               onClick={() => switchTab('profile')} 
               className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
@@ -419,6 +441,8 @@ export function Dashboard() {
       <main className="flex-1 space-y-8">
         {activeTab === 'profile' ? (
           <UserProfile />
+        ) : activeTab === 'payments' ? (
+          <PaymentStatusWidget />
         ) : (
           <>
             <ComplianceCalendar />
