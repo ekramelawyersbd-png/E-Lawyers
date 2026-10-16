@@ -10895,18 +10895,375 @@ Taxpayers should maintain accurate income records and consult tax professionals 
   },
   {
     id: "401",
-    title: "Income Tax Training",
-    excerpt: "**Suggested Title:** Income Tax Training Program: Curriculum, Outcomes, and Careers  ...",
-    content: "**Suggested Title:** Income Tax Training Program: Curriculum, Outcomes, and Careers  \n**Meta Description:** Discover a 5-week Income Tax course (per Income Tax Act 2023) covering tax law changes, calculations, audit handling, and career paths.  \n**Target Keywords:** Income Tax training, tax law course Bangladesh, tax compliance training, Income Tax certification, NBR tax course.  \n\n**Outline (H1–H4):**  \n- H1: Income Tax Training  \n- H2: Executive Summary  \n- H2: Target Audience & Prerequisites  \n- H2: Syllabus & Modules (with hours)  \n  - H3: Module 1: Introduction & Tax Basics (e.g. public finance principles)  \n  - H3: Module 2: Salient Features of Income Tax Act 2023  \n  - H3: Module 3: Employment, Rental & Capital Gains Income  \n  - H3: Module 4: Business, Agriculture & Financial Income  \n  - H3: Module 5: Other Sources, Firm Income, Rebates & Calculation  \n- H2: Learning Outcomes & Competencies  \n- H2: Recommended Study Materials & Sources  \n- H2: Practical Exercises & Case Scenarios  \n- H2: Assessment & Certification  \n- H2: Career Outcomes & Job Roles  \n- H2: Delivery Formats & Pricing\n\nIncome tax training imparts knowledge of the Bangladesh Income Tax Act and its practical application. A typical course spans **4–5 weeks** (e.g. five full-day sessions) covering all relevant tax provisions. For instance, DCCI’s “Income Tax Management” program is a 5-week course (30 hours total) focused on the **new Income Tax Act, 2023**, taught by NBR officers and experts. The curriculum is often organized by income categories and procedural topics.\n\n## Executive Summary  \nThis intensive program helps individuals understand the aims and details of Bangladesh’s income tax laws. It covers the scope of taxation, computation for different income streams, allowable deductions, tax credits, and the assessment/audit process. One description explains: *“Over the course of 10 days, the training will cover topics such as the objectives of taxation, tax calculations for different types of income, tax deductions, assessments, audits, appeals, and double taxation agreements”*. By mastering these areas, participants can reduce liabilities, avoid penalties, and handle audits more effectively.\n\n## Target Audience & Prerequisites  \n**Who Should Attend:** Business owners, accountants, finance professionals, tax practitioners, suppliers/manufacturers, and anyone responsible for tax compliance. Particularly relevant for individuals dealing with corporate finance, government accounting, or personal tax planning. Essential prerequisite is usually a basic understanding of accounting or commerce concepts; many programs require at least completion of college (12th grade) or a bachelor’s in commerce/finance. Familiarity with the previous tax laws is helpful but not required, as the course introduces new provisions.\n\n## Syllabus & Modules (estimated hours)  \nA representative 5-day (6h/day) course might be structured as follows:  \n\n- **Module 1: Introduction & Tax Principles (6h)** – Public finance concepts, types of taxes, canons of taxation, historical overview of Bangladesh income tax. Also covers important definitions (e.g. *assessee*, residential status).  \n- **Module 2: Salient Features of Income Tax Act 2023 (6h)** – Key changes in the new law, structure of tax rates, new sections (including minimum tax, surcharge, withholding tax changes).  \n- **Module 3: Income from Employment, Rental & Capital Gains (6h)** – Tax treatment of salaries, allowances, bonuses; property rental income; treatment of capital gains from asset sales.  \n- **Module 4: Income from Agriculture, Business & Financial Sources (6h)** – Profits from agriculture/plantation, business income (with examples), income from interest, dividends, and other financial assets.  \n- **Module 5: Other Income, Firm Income, Rebates & Computation (6h)** – Income from “other sources” (gifts, lottery, etc.), partnership firm taxation, rebates and tax credits, and comprehensive tax calculation problems.  \n\nTypically, each module includes lectures on statutory provisions and worked examples (e.g. filling out Form-IT). The DCCI outline lists five content modules (as above), and resource persons from NBR provide insights on audits and appeals.\n\n## Learning Outcomes & Competencies  \nAfter completing the course, participants will be able to:  \n- Explain the objectives and structure of Bangladesh’s income tax system.  \n- Compute taxable income for individuals and companies across categories (employment, property, business, etc.), applying deductions and tax rates correctly.  \n- Prepare tax returns (Form-IT) and understand withholding (TDS) obligations.  \n- Navigate the audit and appeal process: respond to NBR inquiries, claim refunds, and avoid penalties through proper documentation.  \n- Stay updated on tax treaties (DTAs) and how they affect cross-border income.  \n\nIn essence, the training develops both conceptual grasp and problem-solving skills (e.g. solving tax return scenarios), enabling professionals to manage tax compliance independently.\n\n## Recommended Study Materials & Sources  \nKey references include:  \n- **Income Tax Act, 2023** and related rules (official text on NBR website). The Act itself is crucial, especially as Bangladesh replaced the 1984 Ordinance with the 2023 Act.  \n- **Income Tax Manuals and Finance Act summaries** – The NBR publishes an Income Tax Manual and yearly Finance Act bulletins explaining amendments. For example, DCCI provides course materials aligned to the new Act.  \n- **Government publications** – Official SROs (tax circulars), gazettes of amendments, and NBR guidelines (e.g. *Circular No. 01/2024* summarizing changes).  \n- **Professional textbooks** – Reputable books by tax experts (e.g. by Dr. Md. Abdur Rouf or CA-firms) covering practical calculation methods.  \n- **Case law compendiums** – Summaries of relevant tax court decisions and Board of Internal Revenue orders help in understanding dispute outcomes.  \n\nPriority is on official sources: the Act itself, NBR’s publications and the Finance Act of the budget. The training provider’s manuals (often prepared by the instructors) supplement with examples.\n\n## Practical Exercises & Case Scenarios  \nHands-on practice is vital. Typical exercises include: calculating tax for sample individuals and companies, applying the new provisions (e.g. one-time assessment under Transitional rules of 2023 Act), and mock responses to audit notices. Instructors often use real case studies (e.g. calculating excess surcharge due on a year’s income, or reconciling company accounts to a tax return). Group discussions on minimizing tax liability within legal bounds reinforce learning. Participants might prepare an actual tax return for a fictitious business and review it.\n\n## Assessment & Certification  \nCourses often conclude with a written exam or project. Passing earns a certificate of completion (e.g. “Professional Income Tax Management” certificate) from the institute or chamber. Note: like VAT, there is no separate government license for private taxpayers, but certification demonstrates one’s competence. Some programs may offer continuing education credits for chartered accountants or lawyers. DCCI’s course, for instance, awards a certificate on completion, validating participants’ knowledge of the updated tax law.\n\n## Career & Skill Outcomes  \nIncome tax expertise opens doors in finance and tax roles. Graduates can become in-house tax officers, tax consultants, accountants, or work in audit firms. Skilled tax professionals are sought by businesses for planning and compliance, and by the government itself. The course helps even entrepreneurs or executives “protect their businesses from future troubles” by managing taxes proactively. Ultimately, candidates strengthen their financial acumen, contributing to sound fiscal management in organizations.\n\n## Delivery Formats & Pricing  \nIncome tax courses are commonly offered in **classroom workshops, online webinars, or hybrid formats**. For example, the DCCI program ran on Fridays for five weeks. Courses may also use evening or intensive schedules. Pricing is moderate given the short duration: the DCCI 5-week program costs **BDT 15,000** (≈USD 150). Generally, week-long intensive courses range **BDT 10,000–20,000**. Students or members often get discounts (the DCCI program offered 10–15% off). Many employers subsidize such training for staff.  \n\n**Sources:** DCCI course outline, NBR references to Income Tax Act, and training descriptions.",
+    title: "Personal Income Tax Return Filing Training",
+    excerpt: "Comprehensive training program on Personal Income Tax Return Filing by E-Lawyers Academy, taking learners from fundamental tax concepts to practical case studies and online e-Return submission.",
+    content: `# Learn Personal Income Tax Return Filing: From Law to Practical Application
+
+Income tax compliance is becoming increasingly important in Bangladesh. Employees, business owners, entrepreneurs, freelancers, professionals, and other individuals earning taxable income need to understand how to calculate their tax liability and prepare their returns correctly.
+
+However, understanding tax law and actually preparing an accurate tax return are two different things. A practitioner must know how to identify different sources of income, determine taxable income, calculate tax rebates, adjust withholding tax, prepare statements of assets and liabilities, and finally submit the return online.
+
+To address these practical needs, **E-Lawyers Academy** offers a comprehensive training program on **Personal Income Tax Return Filing**. The program takes learners from fundamental tax concepts to practical case studies and complete online e-Return submission.
+
+---
+
+# Why Learn Personal Income Tax Return Filing?
+
+A tax return is more than simply completing a form. Income, investments, assets, liabilities, and expenses must be properly organized and reconciled to determine the correct tax liability.
+
+To prepare a proper return, you need to understand:
+
+- Who is considered a taxpayer and who is required to file a return
+- Which income is taxable and which income is exempt
+- How to calculate income from different sources
+- Tax-free thresholds and applicable tax rates
+- Minimum tax and surcharge
+- Tax rebate and qualifying investments
+- Withholding tax and advance tax adjustments
+- Asset and liability statements
+- Online e-Return filing procedures
+
+Learning these areas through practical examples can help you manage your own tax compliance and develop valuable professional skills.
+
+---
+
+# Complete Training in 10 Classes
+
+The program is structured progressively so that each class builds on the knowledge gained in the previous one.
+
+### Class 01: Introduction to Income Tax & Taxpayer Basics
+
+Learn the fundamentals of tax and income tax, taxpayer categories, resident and non-resident taxpayers, income year, assessment year, TIN, and the role of tax authorities.
+
+**Practical Session:** Identify taxpayer categories and return requirements through practical examples.
+
+### Class 02: Income Tax Return Fundamentals
+
+Understand what a tax return is, who must file, filing deadlines, late returns, and the self-assessment system.
+
+**Practical Session:** Analyze different taxpayer situations and determine return filing requirements.
+
+### Class 03: Return Forms & Filing Techniques
+
+Learn about individual income tax return forms, one-page returns, required schedules, and how to complete different sections correctly.
+
+**Practical Session:** Complete a sample return using a taxpayer case.
+
+### Class 04: Income from Employment, Business & Profession
+
+Learn how to calculate employment income, including salary, allowances, and perquisites. The class also covers business and professional income, allowable expenses, and non-allowable expenses.
+
+**Practical Session:** Calculate taxable income for an employee and a business owner.
+
+### Class 05: House Property, Agriculture & Other Sources
+
+Understand income from house property, annual rental value, allowable expenses, agricultural income, and income from other sources.
+
+**Practical Session:** Calculate house property and agricultural income using practical cases.
+
+### Class 06: Capital Gains & Financial Assets
+
+Learn the principles of capital income, transfer of assets, financial assets, interest, dividends, and relevant allowable expenses.
+
+**Practical Session:** Calculate income from asset transfers, bank interest, and dividends.
+
+### Class 07: Total Income & Tax Calculation
+
+Learn how to combine income from different heads, determine total and taxable income, apply tax-free thresholds and tax slabs, and calculate minimum tax.
+
+**Practical Session:** Complete a full individual tax calculation case study.
+
+### Class 08: Tax Rebate, Withholding Tax & Advance Tax
+
+Understand tax rebate on qualifying investments, withholding tax, tax credit, and advance tax adjustment.
+
+**Practical Session:** Calculate investment rebate and adjust withholding and advance tax to determine final tax liability.
+
+### Class 09: Surcharge, Wealth Statement & Complete Return Preparation
+
+Learn about surcharge, assets and liabilities, expense statements, and the information required to prepare a complete individual tax return.
+
+**Practical Session:** Prepare a complete tax return based on a realistic taxpayer case.
+
+### Class 10: Online e-Return Filing
+
+Learn the complete online filing process through the National Board of Revenue's e-Return system, including registration, data entry, income and tax information, asset statements, verification, and submission.
+
+**Practical Session:** Complete an end-to-end online e-Return filing simulation.
+
+---
+
+# What Is Included in Every Class?
+
+Every class comes with a complete learning package:
+
+**🎥 Video Lectures**  
+Step-by-step recorded lessons explaining each topic clearly.
+
+**📖 Downloadable Notes**  
+Structured notes for quick review and reference during return preparation.
+
+**📊 PowerPoint Slides**  
+Visual explanations of important tax rules, concepts, and calculations.
+
+**📝 Online Quiz**  
+A class-wise assessment to test your understanding.
+
+You will also receive **practical case studies, sample tax returns, calculation worksheets, and e-Return filing demonstrations.**
+
+---
+
+# What Will You Be Able to Do After the Course?
+
+After completing the program, you will be able to:
+
+- Identify and calculate income from different sources.
+- Determine taxable income.
+- Prepare individual income tax returns.
+- Calculate income from employment, business, profession, house property, agriculture, and other sources.
+- Determine capital and financial asset income.
+- Calculate tax rebate and minimum tax.
+- Adjust withholding tax and advance tax.
+- Prepare asset and liability statements.
+- Prepare returns for sole proprietorship and partnership businesses.
+- Submit individual e-Returns online.
+- Professionally manage different types of taxpayer files.
+
+---
+
+# Who Should Enroll?
+
+This program is suitable for:
+
+**Students | Accountants | Finance Professionals | Tax Practitioners | Business Owners | Entrepreneurs | Freelancers | Lawyers | Company Executives**
+
+It is also suitable for individuals who want to learn how to prepare and manage their own income tax returns.
+
+---
+
+# Turn Tax Knowledge into Professional Skills
+
+Practical income tax knowledge can be applied across several professional areas.
+
+### Professional Tax Services
+Develop the skills required to assist individual taxpayers with return preparation and filing.
+
+### Freelance Tax Services
+Provide return preparation and tax-related services to individuals and small businesses during tax season.
+
+### Corporate Career
+Add practical taxation skills to your accounting, finance, legal, or compliance career.
+
+### Personal Tax Management
+Manage your own income tax, assets, liabilities, and tax documentation more effectively.
+
+---
+
+# Certificate & Professional Recognition
+
+Upon successful completion of the training and required online activities, you will receive a **Verifiable Certificate of Completion** from **E-Lawyers Academy**.
+
+The certificate can be added to your CV and professional profile to demonstrate your training and practical knowledge in personal income tax return preparation.
+
+---
+
+# From Tax Law to Real-World Practice
+
+The goal of this program is not simply to teach tax laws and definitions. It is designed to help you understand how a complete tax return is actually prepared, calculated, and submitted.
+
+**Income Identification → Taxable Income → Tax Calculation → Tax Rebate → Withholding Tax → Assets & Liabilities → Return Preparation → Online e-Return Filing**
+
+Through this structured approach, **E-Lawyers Academy's Personal Income Tax Return Filing Training** helps you move from theoretical understanding to practical tax return preparation and online filing.
+
+---
+বাংলা
+
+# ব্যক্তি আয়কর রিটার্ন দাখিল শিখুন: আইন থেকে বাস্তব প্রয়োগ
+
+বাংলাদেশে আয়কর ব্যবস্থার পরিধি দিন দিন বাড়ছে। চাকরিজীবী, ব্যবসায়ী, উদ্যোক্তা, মুক্তপেশাজীবী কিংবা বিভিন্ন ধরনের আয়ের সঙ্গে যুক্ত ব্যক্তিদের জন্য সঠিকভাবে কর নির্ধারণ ও রিটার্ন দাখিল করা গুরুত্বপূর্ণ।
+
+কিন্তু আয়কর আইন জানা এবং বাস্তবে একটি সঠিক রিটার্ন প্রস্তুত করা এক বিষয় নয়। আয়ের বিভিন্ন খাত চিহ্নিত করা, করযোগ্য আয় নির্ধারণ, কর রেয়াত হিসাব, উৎসে কর সমন্বয়, সম্পদ ও দায় বিবরণী তৈরি এবং সর্বশেষে অনলাইনে রিটার্ন দাখিল—পুরো প্রক্রিয়াটি জানা প্রয়োজন।
+
+এই প্রয়োজনকে সামনে রেখে **ই-লইয়ার্স একাডেমি** নিয়ে এসেছে ব্যক্তি আয়কর রিটার্ন দাখিলের একটি ব্যবহারিক প্রশিক্ষণ কর্মসূচি। এখানে মৌলিক ধারণা থেকে শুরু করে বাস্তব কেস স্টাডি ও অনলাইন রিটার্ন দাখিল পর্যন্ত বিষয়গুলো ধাপে ধাপে শেখানো হবে।
+
+---
+
+# কেন ব্যক্তি আয়কর রিটার্ন শেখা জরুরি?
+
+আয়কর রিটার্ন শুধু একটি ফরম পূরণের বিষয় নয়। একজন করদাতার আয়, বিনিয়োগ, সম্পদ, দায় ও ব্যয়ের মধ্যে সঠিক সামঞ্জস্য রেখে কর হিসাব করতে হয়।
+
+একটি সঠিক রিটার্ন প্রস্তুতের জন্য জানতে হয়—
+
+- কে করদাতা এবং কার রিটার্ন দাখিলের বাধ্যবাধকতা রয়েছে
+- কোন আয় করযোগ্য এবং কোন আয় অব্যাহতি প্রাপ্ত
+- বিভিন্ন খাতের আয় কীভাবে হিসাব করতে হয়
+- করমুক্ত সীমা ও প্রযোজ্য করহার
+- ন্যূনতম কর ও সারচার্জ
+- কর রেয়াত ও যোগ্য বিনিয়োগ
+- উৎসে কর ও অগ্রিম করের সমন্বয়
+- সম্পদ ও দায়ের সঠিক বিবরণ
+- অনলাইনে ই-রিটার্ন দাখিলের প্রক্রিয়া
+
+এই বিষয়গুলো হাতে-কলমে শেখার ফলে নিজের কর ব্যবস্থাপনার পাশাপাশি পেশাগতভাবেও দক্ষতা তৈরি করা সম্ভব।
+
+---
+
+# ১০টি ক্লাসে পূর্ণাঙ্গ প্রশিক্ষণ
+
+প্রশিক্ষণটি এমনভাবে সাজানো হয়েছে, যাতে প্রতিটি ক্লাস আগের ক্লাসের জ্ঞানকে ব্যবহার করে পরবর্তী ধাপে নিয়ে যায়।
+
+### ক্লাস ১: আয়কর ও করদাতার মৌলিক বিষয়
+
+কর, আয়কর, করদাতা, নিবাসী ও অনিবাসী, আয়বর্ষ, করবর্ষ, TIN এবং আয়কর কর্তৃপক্ষ সম্পর্কে মৌলিক ধারণা দেওয়া হবে।
+
+**ব্যবহারিক অনুশীলন:** বিভিন্ন পরিস্থিতিতে করদাতার ধরন ও রিটার্নের প্রয়োজনীয়তা নির্ধারণ।
+
+### ক্লাস ২: আয়কর রিটার্নের মৌলিক বিষয়
+
+রিটার্ন কী, কারা রিটার্ন দাখিল করবেন, রিটার্ন দাখিলের সময়সীমা, বিলম্বিত রিটার্ন এবং স্বনির্ধারণ পদ্ধতি সম্পর্কে শেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** বিভিন্ন করদাতার ক্ষেত্রে রিটার্ন দাখিলের বাধ্যবাধকতা নির্ধারণ।
+
+### ক্লাস ৩: রিটার্ন ফরম ও পূরণের কৌশল
+
+ব্যক্তি আয়কর রিটার্ন ফরম, একপাতার রিটার্ন, প্রয়োজনীয় সংযুক্তি এবং ফরমের বিভিন্ন অংশ সঠিকভাবে পূরণের পদ্ধতি আলোচনা করা হবে।
+
+**ব্যবহারিক অনুশীলন:** একটি নমুনা করদাতার তথ্য দিয়ে রিটার্ন ফরম পূরণ।
+
+### ক্লাস ৪: চাকরি, ব্যবসা ও পেশা থেকে আয়
+
+বেতন, ভাতা, পারকুইজিটসহ চাকরি থেকে আয় এবং ব্যবসা ও পেশাগত আয়ের হিসাব শেখানো হবে। অনুমোদনযোগ্য ও অননুমোদনযোগ্য ব্যয়ের বিষয়ও থাকবে।
+
+**ব্যবহারিক অনুশীলন:** চাকরিজীবী ও ব্যবসায়ীর করযোগ্য আয় নির্ধারণ।
+
+### ক্লাস ৫: বাড়ি ভাড়া, কৃষি ও অন্যান্য উৎসের আয়
+
+বাড়ি ভাড়া থেকে আয়, বার্ষিক ভাড়ামূল্য, অনুমোদনযোগ্য ব্যয়, কৃষি আয় এবং অন্যান্য উৎসের আয় নির্ধারণের পদ্ধতি শেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** বাড়ি ভাড়া ও কৃষি আয়ের নমুনা হিসাব।
+
+### ক্লাস ৬: মূলধনী ও আর্থিক সম্পদ থেকে আয়
+
+মূলধনী আয়, সম্পদ হস্তান্তর, আর্থিক সম্পদ, সুদ, লভ্যাংশ এবং সংশ্লিষ্ট অনুমোদনযোগ্য ব্যয় সম্পর্কে আলোচনা করা হবে।
+
+**ব্যবহারিক অনুশীলন:** সম্পদ বিক্রয়, ব্যাংক সুদ ও লভ্যাংশ থেকে আয় নির্ধারণ।
+
+### ক্লাস ৭: মোট আয় ও কর হিসাব
+
+বিভিন্ন খাতের আয় একত্র করে মোট আয় ও করযোগ্য আয় নির্ধারণ, করমুক্ত সীমা, করহার, করের ধাপ এবং ন্যূনতম করের হিসাব শেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** একটি পূর্ণাঙ্গ কর হিসাবের কেস স্টাডি।
+
+### ক্লাস ৮: কর রেয়াত, উৎসে কর ও অগ্রিম কর
+
+যোগ্য বিনিয়োগের ওপর কর রেয়াত, উৎসে কর্তিত কর, কর-সমন্বয় এবং অগ্রিম করের হিসাব ও প্রয়োগ শেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** বিনিয়োগের ভিত্তিতে রেয়াত এবং উৎসে কর সমন্বয় করে চূড়ান্ত কর নির্ধারণ।
+
+### ক্লাস ৯: সারচার্জ, সম্পদ বিবরণী ও সম্পূর্ণ রিটার্ন
+
+সারচার্জ, সম্পদ ও দায়, ব্যয়ের বিবরণী এবং রিটার্নের সঙ্গে প্রয়োজনীয় তথ্য সংযুক্ত করার পদ্ধতি শেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** একটি সম্পূর্ণ করদাতা কেসের রিটার্ন প্রস্তুত।
+
+### ক্লাস ১০: অনলাইন ই-রিটার্ন দাখিল
+
+জাতীয় রাজস্ব বোর্ডের অনলাইন ব্যবস্থায় নিবন্ধন, তথ্য প্রদান, আয় ও করের তথ্য সংযোজন, সম্পদ বিবরণী, যাচাই এবং রিটার্ন দাখিলের সম্পূর্ণ প্রক্রিয়া দেখানো হবে।
+
+**ব্যবহারিক অনুশীলন:** শুরু থেকে শেষ পর্যন্ত একটি পূর্ণাঙ্গ ই-রিটার্ন দাখিলের অনুশীলন।
+
+---
+
+# প্রতিটি ক্লাসে যা যা থাকছে
+
+প্রশিক্ষণকে আরও কার্যকর করার জন্য প্রতিটি ক্লাসের সঙ্গে থাকবে—
+
+**🎥 ভিডিও পাঠ**  
+ধাপে ধাপে বিষয় ব্যাখ্যা করা রেকর্ডকৃত ক্লাস।
+
+**📖 ডাউনলোডযোগ্য নোট**  
+গুরুত্বপূর্ণ বিষয় দ্রুত পড়া ও পুনরালোচনার জন্য সাজানো নোট।
+
+**📊 উপস্থাপনা স্লাইড**  
+আইন, নিয়ম ও হিসাব সহজে বোঝার জন্য তথ্যসমৃদ্ধ স্লাইড।
+
+**📝 অনলাইন পরীক্ষা**  
+প্রতিটি ক্লাসের শেখা বিষয় যাচাই করার জন্য অধ্যায়ভিত্তিক পরীক্ষা।
+
+এর পাশাপাশি থাকবে **ব্যবহারিক কেস স্টাডি, নমুনা রিটার্ন, হিসাবের কার্যপত্র এবং অনলাইন ই-রিটার্ন দাখিলের প্রদর্শনী।**
+
+---
+
+# প্রশিক্ষণ শেষে আপনার দক্ষতা
+
+কোর্সটি সম্পন্ন করার পর আপনি—
+
+- বিভিন্ন উৎসের আয় শনাক্ত ও হিসাব করতে পারবেন।
+- করযোগ্য আয় নির্ধারণ করতে পারবেন।
+- ব্যক্তি আয়কর রিটার্ন প্রস্তুত করতে পারবেন।
+- চাকরি, ব্যবসা, পেশা, বাড়ি ভাড়া, কৃষি ও অন্যান্য আয়ের হিসাব করতে পারবেন।
+- মূলধনী ও আর্থিক সম্পদ থেকে আয় নির্ধারণ করতে পারবেন।
+- কর রেয়াত ও ন্যূনতম কর হিসাব করতে পারবেন।
+- উৎসে কর ও অগ্রিম কর সমন্বয় করতে পারবেন।
+- সম্পদ ও দায় বিবরণী প্রস্তুত করতে পারবেন।
+- একক মালিকানাধীন ও অংশীদারি ব্যবসার রিটার্ন প্রস্তুত করতে পারবেন।
+- অনলাইনে ই-রিটার্ন দাখিল করতে পারবেন।
+- বিভিন্ন করদাতার নথি পেশাগতভাবে পরিচালনা করতে পারবেন।
+
+---
+
+# কারা এই কোর্সে ভর্তি হতে পারেন?
+
+এই প্রশিক্ষণটি উপযোগী—
+
+**শিক্ষার্থী | হিসাবরক্ষক | অর্থ ও হিসাব পেশাজীবী | কর পেশাজীবী | ব্যবসায়ী | উদ্যোক্তা | মুক্তপেশাজীবী | আইনজীবী | প্রতিষ্ঠানের নির্বাহী**
+
+এছাড়াও যারা নিজের আয়কর রিটার্ন নিজে প্রস্তুত করতে চান, তাদের জন্যও এই প্রশিক্ষণ কার্যকর।
+
+---
+
+# আয়কর দক্ষতা থেকে পেশাগত সুযোগ
+
+ব্যবহারিক আয়কর জ্ঞান বিভিন্ন পেশাগত ক্ষেত্রে কাজে লাগানো যায়।
+
+### নিজস্ব করসেবা
+ব্যক্তি করদাতাদের রিটার্ন প্রস্তুতি ও দাখিলে সহায়তা করার দক্ষতা অর্জন।
+
+### স্বাধীন পেশা
+কর মৌসুমে ব্যক্তি ও ছোট ব্যবসায়ীদের জন্য রিটার্ন ও করসংক্রান্ত সেবা প্রদান।
+
+### করপোরেট কর্মক্ষেত্র
+হিসাব, অর্থ, কর ও আইনসংক্রান্ত চাকরিতে অতিরিক্ত ব্যবহারিক দক্ষতা হিসেবে আয়কর জ্ঞান কাজে লাগানো।
+
+### ব্যক্তিগত কর ব্যবস্থাপনা
+নিজের আয়কর, সম্পদ ও করসংক্রান্ত নথি সঠিকভাবে পরিচালনা করা।
+
+---
+
+# সনদ ও পেশাগত স্বীকৃতি
+
+প্রশিক্ষণ এবং নির্ধারিত অনলাইন কার্যক্রম সফলভাবে সম্পন্ন করলে **ই-লইয়ার্স একাডেমি** থেকে **যাচাইযোগ্য প্রশিক্ষণ সমাপ্তির সনদ** প্রদান করা হবে।
+
+সনদটি আপনার জীবনবৃত্তান্ত ও পেশাগত পরিচিতিতে যুক্ত করে অর্জিত দক্ষতা তুলে ধরতে পারবেন।
+
+---
+
+# এক প্রশিক্ষণে তত্ত্ব থেকে বাস্তব কাজ
+
+ব্যক্তি আয়কর শেখার মূল লক্ষ্য শুধু আইন ও সংজ্ঞা জানা নয়। বাস্তবে একটি রিটার্ন কীভাবে প্রস্তুত করতে হয়, কীভাবে কর হিসাব করতে হয় এবং কীভাবে অনলাইনে তা দাখিল করতে হয়—সেটিই এই প্রশিক্ষণের প্রধান লক্ষ্য।
+
+**আয় শনাক্তকরণ → করযোগ্য আয় নির্ধারণ → কর হিসাব → কর রেয়াত → উৎসে কর → সম্পদ ও দায় → রিটার্ন প্রস্তুতি → ই-রিটার্ন দাখিল**
+
+**Join Now**`,
     categoryId: "tax",
     category: "Income Tax",
     author: mockAuthors.a1,
     publishedAt: new Date(Date.now() - 91400000).toISOString(),
-    readTime: 6,
-    imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800",
-    tags: ["Training", "Course"],
-    likes: Math.floor(Math.random() * 200) + 10,
-    comments: Math.floor(Math.random() * 30) + 2,
+    readTime: 12,
+    imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800",
+    tags: ["Training", "Course", "Income Tax", "Tax Return"],
+    likes: 245,
+    comments: 32,
   },
   {
     id: "402",
