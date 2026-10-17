@@ -166,7 +166,7 @@ export const generatePdfReceipt = (tx: TransactionRecord) => {
   doc.text('Dhaka Chamber Building (2nd Floor), Motijheel C/A, Dhaka-1000', 26, merchantY + 15);
   doc.text('Hotline: +88 01335230170 | Email: support@accounticca.com', 26, merchantY + 22);
   doc.text('Tax Identification Number (TIN): 482910283401 | VAT Reg No: 003928102-0101', 26, merchantY + 29);
-  doc.text('Gateway Integration: UddoktaPay Secure Payment Gateway API', 26, merchantY + 36);
+  doc.text('Gateway Integration: SSL Secure Payment Gateway API', 26, merchantY + 36);
 
   // Footer seal notice
   doc.setFont('helvetica', 'italic');

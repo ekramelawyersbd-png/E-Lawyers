@@ -1,25 +1,37 @@
-import { Calculator, Calendar, ClipboardCheck, X, RefreshCcw, Download, FileText, ArrowRight, Coins, FolderDown, Wheat, Building2, Scale, Sparkles, Lightbulb, Gem, ShieldCheck } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { RJSCFeeEstimator } from '../components/RJSCFeeEstimator';
-import { WealthSurchargeVisualizer } from '../components/tax/WealthSurchargeVisualizer';
-import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
-import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalculator';
-import { MinimumTurnoverTaxCalculator } from '../components/tax/MinimumTurnoverTaxCalculator';
-import { InvestmentBasedTaxRebateCalculator } from '../components/tax/InvestmentBasedTaxRebateCalculator';
-import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
-import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
-import { DvcVerificationWidget } from '../components/DvcVerificationWidget';
-import { RequirePurchase } from '../components/shop/RequirePurchase';
+import { 
+  Calculator, 
+  Calendar, 
+  ClipboardCheck, 
+  X, 
+  RefreshCcw, 
+  Download, 
+  FileText, 
+  ArrowRight, 
+  Coins, 
+  FolderDown, 
+  Wheat, 
+  Building2, 
+  Scale, 
+  Sparkles, 
+  Lightbulb, 
+  Gem, 
+  ShieldCheck, 
+  BookOpen, 
+  Lock, 
+  CheckCircle2, 
+  Layers
+} from 'lucide-react';
 import { SHOP_PRODUCTS } from '../data/shopProducts';
+import { usePurchases } from '../contexts/PurchaseContext';
 import { QuickComplianceTipsSidebar } from '../components/tools/QuickComplianceTipsSidebar';
 import { Gallery } from '../components/Gallery';
-import { ResourceLibrary } from '../components/tools/ResourceLibrary';
 import { ServiceSEO } from '../components/SEO';
 
 export function ToolsHub() {
   const [hiddenTools, setHiddenTools] = useState<string[]>([]);
-  const [compareFlatRate, setCompareFlatRate] = useState<boolean>(true);
+  const { isPurchased } = usePurchases();
 
   useEffect(() => {
     const savedPrefs = localStorage.getItem('toolsPreferences');
@@ -47,120 +59,145 @@ export function ToolsHub() {
 
   const tools = [
     {
-      name: 'Tax Calculator',
-      description: 'Calculate your individual or corporate tax liability for the 2026-27 assessment year.',
-      tooltip: 'Quickly compute income tax, corporate tax, and understand your tax brackets.',
-      icon: <Calculator className="w-8 h-8" />,
-      path: '/tax-calculator',
-      color: 'bg-emerald-100 text-emerald-700',
-    },
-    {
-      name: 'Capital Gains Tax Calculator',
-      description: 'Calculate capital gains tax on land, real estate, personal valuables, and shares under Finance Act 2026.',
-      tooltip: 'Holding period rules (>5 yrs 15% flat, ≤5 yrs slab rates), 3-year installment facility, and 5% valuables rate.',
-      icon: <Scale className="w-8 h-8" />,
-      path: '#capital-gains-tax-tool',
-      color: 'bg-teal-100 text-teal-800',
-    },
-    {
-      name: 'Agricultural Tax Calculator',
-      description: 'Calculate net agricultural income, apply Section 43 deemed 60% expenses, Clause 20 exemption, and tax slabs.',
-      tooltip: 'Under Sections 40–44 of Income Tax Act 2023 with FY 2026-27 statutory slabs.',
-      icon: <Wheat className="w-8 h-8" />,
-      path: '#agri-tax-tool',
-      color: 'bg-emerald-100 text-emerald-800',
-    },
-    {
-      name: 'Minimum Turnover Tax Calculator',
-      description: 'Calculate applicable turnover tax based on the 0% (up to 2 crore), 0.5% (2-4 crore), and 1% (above 4 crore) slabs.',
-      tooltip: 'NBR restructured minimum turnover slabs under Income Tax Act with loss-making business insulation.',
-      icon: <Building2 className="w-8 h-8" />,
-      path: '#minimum-turnover-tax-tool',
-      color: 'bg-indigo-100 text-indigo-800',
-    },
-    {
-      name: 'Investment-Based Tax Rebate Calculator',
-      description: 'Calculate maximum tax credit by taking the lowest of 3% taxable income, 10% eligible investment, and Tk. 7,50,000 ceiling.',
-      tooltip: 'Under Bangladesh Finance Act 2026 & Section 78 with real-time 3-limit evaluation.',
-      icon: <Sparkles className="w-8 h-8" />,
-      path: '#investment-rebate-calculator-tool',
-      color: 'bg-emerald-100 text-emerald-800',
-    },
-    {
-      name: 'Compliance Calendar',
-      description: 'Track key tax deadlines and statutory requirements for the fiscal year.',
-      tooltip: 'View all upcoming tax return and VAT submission deadlines based on your entity type.',
-      icon: <Calendar className="w-8 h-8" />,
-      path: '/dashboard',
-      color: 'bg-blue-100 text-blue-700',
-    },
-    {
-      name: 'Corporate Checklist',
-      description: 'Ensure you meet all corporate tax and VAT compliance obligations.',
-      tooltip: 'Step-by-step compliance checklist to ensure all your statutory filings are complete.',
-      icon: <ClipboardCheck className="w-8 h-8" />,
-      path: '/dashboard',
-      color: 'bg-purple-100 text-purple-700',
-    },
-    {
-      name: 'Wealth Surcharge Visualizer',
-      description: 'Explore progressive net wealth surcharge brackets (0% to 35%) and special luxury triggers.',
-      tooltip: 'Visualize where your net wealth sits among statutory surcharge brackets under Section 2(86B).',
-      icon: <Coins className="w-8 h-8" />,
-      path: '#wealth-surcharge-tool',
-      color: 'bg-teal-100 text-teal-800',
-    },
-    {
-      name: 'Early Filing Incentive',
-      description: 'Calculate your potential 5% tax rebate for filing between July 1 and September 30.',
-      tooltip: 'Estimate your savings from the 5% early filing incentive, up to BDT 25,000.',
-      icon: <Calendar className="w-8 h-8" />,
-      path: '#early-filing-tool',
-      color: 'bg-amber-100 text-amber-800',
-    },
-    {
-      name: 'Resource Library',
-      description: 'Download PDF templates for NDAs, service agreements, and tax return checklists.',
-      tooltip: 'Access official legal and tax document drafts with one-click PDF generation.',
-      icon: <FolderDown className="w-8 h-8" />,
-      path: '#resource-library',
-      color: 'bg-indigo-100 text-indigo-800',
-    },
-    {
-      name: 'RJSC Fee Estimator',
-      description: 'Estimate government incorporation fees and stamp duties based on authorized capital.',
+      id: 'rjsc-fee-calculator-tool',
+      name: 'RJSC Fee Calculator',
+      category: 'Corporate & RJSC',
+      description: 'Estimate government incorporation fees, non-judicial stamp duties, and capital bands under Companies Act 1994.',
       tooltip: 'Statutory fees under Companies Act 1994 and Stamp Act Schedule 1.',
-      icon: <Building2 className="w-8 h-8" />,
-      path: '#rjsc-fee-estimator-tool',
+      icon: <Building2 className="w-7 h-7" />,
+      path: '/tools/rjsc-fee-calculator',
       color: 'bg-blue-100 text-blue-800',
     },
     {
-      name: 'Corporate Tax Calculator (FY 2026-27)',
-      description: 'Calculate corporate taxes for listed vs non-listed entities, evaluate 2.5% banking penalties, and project IPO savings.',
-      tooltip: 'Compare non-listed (27.5%), listed >10% IPO (20%), and listed ≤10% IPO (25%) rates under the NBR 5-year roadmap.',
-      icon: <Building2 className="w-8 h-8" />,
-      path: '#corporate-tax-tool',
+      id: 'post-registration-checklist-tool',
+      name: 'Post-Registration Checklist',
+      category: 'Corporate & RJSC',
+      description: 'Mandatory post-incorporation roadmap: entity portal account, certified copies, e-TIN, BIN, trade license, and banking.',
+      tooltip: 'Guided statutory checklist for newly registered Bangladesh companies.',
+      icon: <ShieldCheck className="w-7 h-7" />,
+      path: '/tools/post-registration-checklist',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'rjsc-functions-explorer-tool',
+      name: 'RJSC Statutory Lifecycle Guide',
+      category: 'Corporate & RJSC',
+      description: 'Interactive guide covering name clearance, statutory returns (Schedule X/Form XII), certified copies, and winding-up.',
+      tooltip: 'Explore RJSC registry functions under Companies Act 1994, Partnership Act 1932, and Societies Act 1860.',
+      icon: <BookOpen className="w-7 h-7" />,
+      path: '/tools/rjsc-functions-explorer',
       color: 'bg-indigo-100 text-indigo-900',
     },
     {
-      name: 'ICAB DVC Verification Portal',
-      description: 'Verify audited financial statements and income computation certificates under Income Tax Act Section 73 & ICAB standards.',
-      tooltip: 'Simulated secure API validation of Document Verification Codes (DVC) against Bangladesh regulatory standards.',
-      icon: <ShieldCheck className="w-8 h-8" />,
-      path: '#dvc-verification-tool',
+      id: 'rjsc-returns-filing-guide-tool',
+      name: 'RJSC Returns Filing Guide',
+      category: 'Corporate & RJSC',
+      description: 'Practical guide to annual returns (Schedule X/Balance Sheet) vs event-based forms with interactive deadline calculator.',
+      tooltip: 'Calculate exact statutory deadlines based on AGM date or corporate event date.',
+      icon: <FileText className="w-7 h-7" />,
+      path: '/tools/rjsc-returns-filing-guide',
+      color: 'bg-amber-100 text-amber-900',
+    },
+    {
+      id: 'capital-gains-tax-tool',
+      name: 'Capital Gains Tax Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate capital gains tax on land, real estate, personal valuables, and shares under Finance Act 2026.',
+      tooltip: 'Holding period rules (>5 yrs 15% flat, ≤5 yrs slab rates), 3-year installment facility, and 5% valuables rate.',
+      icon: <Scale className="w-7 h-7" />,
+      path: '/tools/capital-gains-tax',
+      color: 'bg-teal-100 text-teal-800',
+    },
+    {
+      id: 'corporate-tax-tool',
+      name: 'Corporate Tax Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate corporate taxes for listed vs non-listed entities, evaluate 2.5% banking penalties, and project IPO savings.',
+      tooltip: 'Compare non-listed (27.5%), listed >10% IPO (20%), and listed ≤10% IPO (25%) rates under NBR roadmap.',
+      icon: <Building2 className="w-7 h-7" />,
+      path: '/tools/corporate-tax',
+      color: 'bg-indigo-100 text-indigo-900',
+    },
+    {
+      id: 'wealth-surcharge-tool',
+      name: 'Wealth Surcharge Visualizer',
+      category: 'Tax & VAT Toolkits',
+      description: 'Explore progressive net wealth surcharge brackets (0% to 35%) and special luxury triggers under Section 2(86B).',
+      tooltip: 'Visualize where your net wealth sits among statutory surcharge brackets.',
+      icon: <Coins className="w-7 h-7" />,
+      path: '/tools/wealth-surcharge',
+      color: 'bg-teal-100 text-teal-800',
+    },
+    {
+      id: 'investment-rebate-calculator-tool',
+      name: 'Investment Tax Rebate Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate maximum tax credit taking the lowest of 3% taxable income, 15% eligible investment, and Tk. 10 Lakh ceiling.',
+      tooltip: 'Under Bangladesh Finance Act 2026 & Section 78 with real-time 3-limit evaluation.',
+      icon: <Sparkles className="w-7 h-7" />,
+      path: '/tools/investment-rebate',
       color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'agricultural-tax-tool',
+      name: 'Agricultural Tax Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate net agricultural income, apply Section 43 deemed 60% expenses, Clause 20 exemption, and tax slabs.',
+      tooltip: 'Under Sections 40–44 of Income Tax Act 2023 with FY 2026-27 statutory slabs.',
+      icon: <Wheat className="w-7 h-7" />,
+      path: '/tools/agricultural-tax',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'minimum-turnover-tax-tool',
+      name: 'Minimum Turnover Tax Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate applicable turnover tax based on Section 163 gross receipts rules and loss-making business insulation.',
+      tooltip: 'NBR restructured minimum turnover slabs under Income Tax Act.',
+      icon: <Building2 className="w-7 h-7" />,
+      path: '/tools/minimum-turnover-tax',
+      color: 'bg-indigo-100 text-indigo-800',
+    },
+    {
+      id: 'dvc-verification-tool',
+      name: 'ICAB DVC Verification Portal',
+      category: 'Verification & Audit',
+      description: 'Verify audited financial statements and income computation certificates under Income Tax Act Section 73 & ICAB standards.',
+      tooltip: 'Simulated secure API validation of Document Verification Codes (DVC).',
+      icon: <ShieldCheck className="w-7 h-7" />,
+      path: '/tools/dvc-verification',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'resource-library-tool',
+      name: 'Legal & Tax Resource Library',
+      category: 'Resources',
+      description: 'Download PDF templates for NDAs, service agreements, AY 2026-27 tax return Excel workbooks, and tax checklists.',
+      tooltip: 'Access official legal and tax document drafts with one-click download.',
+      icon: <FolderDown className="w-7 h-7" />,
+      path: '/tools/resource-library',
+      color: 'bg-indigo-100 text-indigo-800',
+    },
+    {
+      id: 'early-filing-incentive-tool',
+      name: 'Early Filing 5% Rebate Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Calculate your potential 5% tax rebate for filing returns between July 1 and September 30.',
+      tooltip: 'Estimate your savings from the 5% early filing incentive, up to BDT 25,000.',
+      icon: <Calendar className="w-7 h-7" />,
+      path: '/tools/early-filing-incentive',
+      color: 'bg-amber-100 text-amber-800',
     }
   ];
+
   const visibleTools = tools.filter(t => !hiddenTools.includes(t.name));
 
-  
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       <ServiceSEO
-        title="Business & Tax Compliance Tools | Accounticca & E-Lawyers"
-        description="Access interactive tools for income tax calculation, RJSC fee estimation, wealth surcharge visualizers, and downloadable legal agreements."
-        serviceType="Compliance & Financial Advisory Tools"
+        title="Business & Tax Compliance Tools Directory | Accounticca & E-Lawyers"
+        description="Access interactive dedicated tools for income tax calculation, RJSC fee estimation, wealth surcharge visualizers, and legal agreements."
+        serviceType="Compliance & Financial Advisory Tools Directory"
         canonicalUrl="/tools"
         keywords={['Tax Calculator Bangladesh', 'RJSC Fee Estimator', 'Wealth Surcharge', 'Compliance Calendar', 'Legal Templates Bangladesh']}
         breadcrumbs={[
@@ -168,206 +205,133 @@ export function ToolsHub() {
           { name: 'Tools Hub', url: '/tools' }
         ]}
       />
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Tools Hub</h1>
-        <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-          Access a comprehensive suite of tools designed to help you calculate, plan, and stay compliant with the latest tax policies.
+
+      {/* Hero Title Section */}
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
+          <Layers className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Standalone Tools Directory</span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Legal, Tax & RJSC Compliance Tools Hub
+        </h1>
+        <p className="text-slate-600 text-base max-w-2xl mx-auto leading-relaxed">
+          Select any interactive tool below to launch its dedicated, shop-protected standalone workspace page.
         </p>
       </div>
 
-      {/* Featured Resources: PDF Downloads */}
-      <div className="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income Tax Guidelines Card */}
-        <div className="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-3xl p-8 sm:p-10 shadow-lg text-white relative overflow-hidden flex flex-col h-full">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 text-indigo-800/30">
-            <FileText className="w-64 h-64 rotate-12" />
-          </div>
-          
-          <div className="relative z-10 flex flex-col h-full">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-800/50 text-indigo-300 border border-indigo-700/50 rounded-full text-xs font-bold uppercase tracking-wider mb-4 self-start">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Official Guide
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
-              আয়কর নির্দেশিকা<br />২০২৬-২০২৭
-            </h2>
-            <p className="text-indigo-300 font-medium mb-4">NBR Income Tax Guide</p>
-            <p className="text-indigo-100/80 leading-relaxed mb-8 flex-1">
-              Complete, step-by-step practical guide on income tax return filing, tax calculations, and e-Return for individual taxpayers.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 mt-auto">
-              <a 
-                href="https://pub-1d8caf41922f46e1952565fc23269fb3.r2.dev/%E0%A6%86%E0%A7%9F%E0%A6%95%E0%A6%B0%20%E0%A6%A8%E0%A6%BF%E0%A6%B0%E0%A7%8D%E0%A6%A6%E0%A7%87%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A6%BE%20%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AC-%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AD.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-emerald-500/20"
-              >
-                <Download className="w-5 h-5" />
-                Download PDF
-              </a>
-              <Link
-                to="/article/income-tax-guidelines-2026-2027-pdf-download"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all border border-white/10 hover:border-white/20"
-              >
-                Summary
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
+      {/* Compliance Tips Toggle Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+        <div className="space-y-0.5">
+          <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Browse All Interactive Compliance Tools</span>
+            <span className="text-[10px] font-black bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">
+              {visibleTools.length} Tools
+            </span>
+          </h2>
+          <p className="text-xs text-slate-500">
+            Each tool opens on a separate dedicated page with breadcrumbs, quick-switch menu, and related tools sidebar.
+          </p>
         </div>
 
-        {/* Income Tax Circular Card */}
-        <div className="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-3xl p-8 sm:p-10 shadow-lg text-white relative overflow-hidden flex flex-col h-full">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 text-indigo-900/40">
-            <ClipboardCheck className="w-64 h-64 rotate-[-12deg]" />
-          </div>
-          
-          <div className="relative z-10 flex flex-col h-full">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-800/50 text-indigo-300 border border-indigo-700/50 rounded-full text-xs font-bold uppercase tracking-wider mb-4 self-start">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-              Legal Circular
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
-              আয়কর পরিপত্র<br />২০২৬-২০২৭
-            </h2>
-            <p className="text-indigo-300 font-medium mb-4">Income Tax Circular 2026-2027</p>
-            <p className="text-indigo-100/80 leading-relaxed mb-8 flex-1">
-              Official legal interpretation detailing Finance Act 2026 amendments, updated tax rates, TDS changes, and new compliance structures.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 mt-auto">
-              <a 
-                href="https://pub-1d8caf41922f46e1952565fc23269fb3.r2.dev/%E0%A6%86%E0%A7%9F%E0%A6%95%E0%A6%B0_%E0%A6%AA%E0%A6%B0%E0%A6%BF%E0%A6%AA%E0%A6%A4%E0%A7%8D%E0%A6%B0_%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AC-%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AD.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-xl transition-all shadow-sm hover:shadow-amber-500/20"
-              >
-                <Download className="w-5 h-5" />
-                Download PDF
-              </a>
-              <Link
-                to="/article/income-tax-circular-2026-2027-pdf-download"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all border border-white/10 hover:border-white/20"
-              >
-                Summary
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent('toggle-compliance-tips'))}
+          className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl border border-emerald-300 text-xs font-bold transition-all shadow-2xs hover:scale-102 cursor-pointer shrink-0"
+        >
+          <Lightbulb className="w-4 h-4 text-amber-500 fill-amber-400" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Quick Compliance Tips</span>
+          <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-1.5 py-0.5 rounded font-black uppercase">Live</span>
+        </button>
       </div>
 
-      {/* DVC Verification Widget */}
-      <div id="dvc-verification-tool" className="mb-16 scroll-mt-24">
-        <RequirePurchase product={SHOP_PRODUCTS[1]} toolTitle="ICAB Document Verification Code (DVC) Checker & Audit Validator">
-          <DvcVerificationWidget />
-        </RequirePurchase>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold text-slate-800">Interactive Utilities</h2>
-          <div className="h-px bg-slate-200 w-16 sm:w-28 hidden sm:block"></div>
-        </div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent('toggle-compliance-tips'))}
-            className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl border border-emerald-300 font-bold transition-all shadow-2xs hover:scale-102 cursor-pointer"
-            title="Click to toggle the Quick Compliance Tips sidebar"
-          >
-            <Lightbulb className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Quick Compliance Tips</span>
-            <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-1.5 py-0.5 rounded-md font-extrabold uppercase">Live</span>
-          </button>
-        </div>
-      </div>
-      
-      <div className="tools-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Tools Directory Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visibleTools.map((tool) => {
-          const isAnchor = tool.path.startsWith('#');
-          const commonClasses = "relative group bg-white rounded-[2rem] border border-slate-200/60 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 hover:border-emerald-200 overflow-hidden flex flex-col items-center text-center gap-5 z-10 cursor-pointer";
-          const innerContent = (
-            <>
-              {/* Background glow effect on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              
+          const matchingProduct = SHOP_PRODUCTS.find(p => p.id === tool.id || p.slug === tool.id);
+          const unlocked = matchingProduct ? isPurchased(matchingProduct.id) : true;
+
+          return (
+            <div 
+              key={tool.id}
+              className="relative group bg-white rounded-3xl border border-slate-200/80 p-6 shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 hover:border-emerald-300 flex flex-col justify-between gap-5"
+            >
+              {/* Hide Button */}
               <button 
+                type="button"
                 onClick={(e) => hideTool(e, tool.name)}
-                className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
+                className="absolute top-4 right-4 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer"
                 title="Hide this tool"
               >
                 <X className="w-4 h-4" />
               </button>
-              
-              <div className={`relative p-5 rounded-[1.5rem] shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-inner ${tool.color}`}>
-                {/* Inner subtle ring */}
-                <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/5" />
-                {tool.icon}
-              </div>
-              
-              <div className="relative z-10 mt-2">
-                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">
-                  {tool.name}
-                </h3>
-                <p className="text-slate-500 leading-relaxed text-sm group-hover:text-slate-700 transition-colors">
-                  {tool.description}
-                </p>
-              </div>
-              
-              {/* Bottom accent line */}
-              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-full group-hover:translate-y-0" />
-            </>
-          );
 
-          if (isAnchor) {
-            return (
-              <a
-                key={tool.name}
-                href={tool.path}
-                title={tool.tooltip}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(tool.path.substring(1))?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={commonClasses}
-              >
-                {innerContent}
-              </a>
-            );
-          }
+              <div className="space-y-4">
+                {/* Header Row: Icon & Status Badge */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`p-3.5 rounded-2xl shrink-0 shadow-xs ${tool.color}`}>
+                    {tool.icon}
+                  </div>
 
-          return (
-            <Link 
-              key={tool.name}
-              to={tool.path}
-              title={tool.tooltip}
-              className={commonClasses}
-            >
-              {innerContent}
-            </Link>
+                  {unlocked ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Unlocked</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-amber-900 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0">
+                      <Lock className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Shop Protected</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Title & Description */}
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    {tool.category}
+                  </span>
+                  <h3 className="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    {tool.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                    {tool.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Button to Open Standalone Tool Page */}
+              <div className="pt-2 border-t border-slate-100">
+                <Link
+                  to={tool.path}
+                  className="w-full inline-flex items-center justify-between px-4 py-2.5 bg-slate-900 group-hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition-all shadow-2xs"
+                >
+                  <span>Launch Standalone Tool</span>
+                  <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                </Link>
+              </div>
+            </div>
           );
         })}
       </div>
-      
+
+      {/* Hidden Tools Preferences Reset */}
       {hiddenTools.length > 0 && (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <button
+            type="button"
             onClick={clearPreferences}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             <RefreshCcw className="w-4 h-4" />
-            Clear All Saved Preferences
+            <span>Reset Hidden Tools Preferences ({hiddenTools.length})</span>
           </button>
         </div>
       )}
 
-      {/* Resource Library Section */}
-      <div id="resource-library" className="mt-16 scroll-mt-24">
-        <ResourceLibrary />
-      </div>
-
-      <div className="mt-16">
+      {/* Infographics Gallery */}
+      <div className="pt-6">
         <Gallery 
           items={[
             {
@@ -392,95 +356,10 @@ export function ToolsHub() {
         />
       </div>
 
-      <div id="wealth-surcharge-tool" className="mt-16 scroll-mt-8">
-        <WealthSurchargeVisualizer 
-          initialPayableTax={500000}
-          showCardWrapper={true}
-        />
-      </div>
-
-      <div id="early-filing-tool" className="mt-16 scroll-mt-8">
-        <EarlyFilingIncentive initialPayableTax={500000} />
-      </div>
-
-      <div id="agri-tax-tool" className="mt-16 scroll-mt-8">
-        <AgriculturalTaxCalculator />
-      </div>
-
-      <div id="minimum-turnover-tax-tool" className="mt-16 scroll-mt-8 space-y-4">
-        <span id="turnover-tax-tool" className="sr-only">Turnover Tax Calculator</span>
-        
-        {/* Tax Comparison Quick Toggle Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-indigo-200/80 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-100 text-indigo-800 shrink-0">
-              <Scale className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base text-slate-900">
-                  Minimum Turnover Tax & Savings Calculator
-                </h3>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  NBR Slabs
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Toggle the 1% flat rate comparison to evaluate cash flow savings under the revised 3-tier structure.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 self-start sm:self-center bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shrink-0">
-            <span className="text-xs font-bold text-slate-700">Tax Comparison:</span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={compareFlatRate}
-              onClick={() => setCompareFlatRate(!compareFlatRate)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                compareFlatRate ? 'bg-indigo-600' : 'bg-slate-300'
-              }`}
-              title="Toggle comparison against 1% flat rate"
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                  compareFlatRate ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-            <span className={`text-xs font-extrabold ${compareFlatRate ? 'text-indigo-700' : 'text-slate-400'}`}>
-              {compareFlatRate ? '1% Flat vs Slabs' : 'Slabs Only'}
-            </span>
-          </div>
-        </div>
-
-        <MinimumTurnoverTaxCalculator 
-          initialShowComparison={compareFlatRate} 
-          key={String(compareFlatRate)} 
-          onComparisonToggle={(enabled) => setCompareFlatRate(enabled)}
-        />
-      </div>
-
-      <div id="capital-gains-tax-tool" className="mt-16 scroll-mt-8">
-        <CapitalGainsTaxCalculator />
-      </div>
-
-      <div id="investment-rebate-calculator-tool" className="mt-16 scroll-mt-8">
-        <InvestmentBasedTaxRebateCalculator />
-      </div>
-
-      <div id="rjsc-fee-estimator-tool" className="mt-16 scroll-mt-8">
-        <RJSCFeeEstimator />
-      </div>
-
-      <div id="corporate-tax-tool" className="mt-16 scroll-mt-8">
-        <CorporateTaxRateCalculator />
-      </div>
-
-      {/* Context-Aware Quick Compliance Tips Sidebar */}
+      {/* Quick Compliance Tips Sidebar Drawer */}
       <QuickComplianceTipsSidebar />
     </div>
   );
 }
 
+export default ToolsHub;

@@ -22,6 +22,8 @@ import { totalIncomeCalculationArticle } from './totalIncomeCalculationArticle';
 import { otherSourcesTaxArticle } from './otherSourcesTaxArticle';
 import { tdsLotteryGiftsFreelanceArticle } from './tdsLotteryGiftsFreelanceArticle';
 import { taxableNonTaxableIncomeArticle } from './taxableNonTaxableIncomeArticle';
+import { businessRegistrationComplianceArticle } from './businessRegistrationComplianceArticle';
+import { companyRegistrationMoaAoaArticle } from './companyRegistrationMoaAoaArticle';
 
 import { teamMembers } from './teamData';
 
@@ -71,6 +73,8 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  companyRegistrationMoaAoaArticle,
+  businessRegistrationComplianceArticle,
   taxableNonTaxableIncomeArticle,
   tdsLotteryGiftsFreelanceArticle,
   otherSourcesTaxArticle,

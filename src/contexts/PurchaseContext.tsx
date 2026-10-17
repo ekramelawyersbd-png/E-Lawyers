@@ -33,11 +33,11 @@ const TRANSACTIONS_KEY = 'accounticca_payment_history';
 const INITIAL_TRANSACTIONS: TransactionRecord[] = [
   {
     id: 'TXN-2026-101',
-    transactionId: 'UPAY-TXN-9988776',
+    transactionId: 'PAY-TXN-9988776',
     productTitle: 'Income Tax Return & Assessment Workbook (2026-27)',
     amount: 1500,
     status: 'completed',
-    paymentMethod: 'UddoktaPay (Sandbox)',
+    paymentMethod: 'SSL Secure Gateway',
     date: '2026-10-15T14:30:00.000Z',
     referenceId: 'ACC-2026-849201'
   },
@@ -71,6 +71,21 @@ export const usePurchases = () => {
   return context;
 };
 
+const deduplicateAndEnsureUniqueIds = (txs: TransactionRecord[]): TransactionRecord[] => {
+  const seenIds = new Set<string>();
+  return txs.map((tx, index) => {
+    let id = tx.id;
+    if (!id || seenIds.has(id)) {
+      id = `${id || 'TXN'}-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`;
+    }
+    seenIds.add(id);
+    return {
+      ...tx,
+      id
+    };
+  });
+};
+
 export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [purchasedProductIds, setPurchasedProductIds] = useState<string[]>(() => {
     try {
@@ -85,7 +100,12 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [transactions, setTransactions] = useState<TransactionRecord[]>(() => {
     try {
       const saved = localStorage.getItem(TRANSACTIONS_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return deduplicateAndEnsureUniqueIds(parsed);
+        }
+      }
       return INITIAL_TRANSACTIONS;
     } catch {
       return INITIAL_TRANSACTIONS;
@@ -112,7 +132,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     productId: string, 
     productTitle: string = 'Digital Compliance Product', 
     amount: number = 1500, 
-    paymentMethod: string = 'UddoktaPay', 
+    paymentMethod: string = 'SSL Secure Gateway', 
     status: 'completed' | 'pending' = 'completed'
   ) => {
     setPurchasedProductIds(prev => {
@@ -120,9 +140,10 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return [...prev, productId];
     });
 
+    const uniqueEntropy = `${Math.floor(1000 + Math.random() * 9000)}-${Math.random().toString(36).slice(2, 7)}`;
     const newTx: TransactionRecord = {
-      id: `TXN-${Date.now()}`,
-      transactionId: `UPAY-TXN-${Math.floor(1000000 + Math.random() * 9000000)}`,
+      id: `TXN-${Date.now()}-${uniqueEntropy}`,
+      transactionId: `PAY-TXN-${Math.floor(1000000 + Math.random() * 9000000)}`,
       productTitle,
       amount,
       status,
@@ -135,7 +156,7 @@ export const PurchaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const simulateInstantPurchase = useCallback((product: ShopProduct) => {
-    purchaseProduct(product.id, product.title, product.price, 'UddoktaPay', 'completed');
+    purchaseProduct(product.id, product.title, product.price, 'SSL Secure Gateway', 'completed');
   }, [purchaseProduct]);
 
   const downloadReceipt = useCallback((tx: TransactionRecord) => {

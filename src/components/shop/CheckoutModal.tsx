@@ -50,8 +50,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'bkash' | 'nagad' | 'bank' | 'card' | 'uddoktapay'>('uddoktapay');
+  const [paymentMethod] = useState<'bkash'>('bkash');
   const [trxId, setTrxId] = useState('');
+  const [copiedBkash, setCopiedBkash] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,12 +60,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [purchasedProducts, setPurchasedProducts] = useState<ShopProduct[]>([]);
 
+  const handleCopyBkash = () => {
+    navigator.clipboard.writeText('01744883636');
+    setCopiedBkash(true);
+    setTimeout(() => setCopiedBkash(false), 2000);
+  };
+
   if (!isOpen) return null;
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !phone) {
       alert('Please complete your name, email, and phone number.');
+      return;
+    }
+    if (!trxId.trim()) {
+      alert('Please enter your bKash Transaction ID (TrxID) to confirm your payment.');
       return;
     }
 
@@ -75,7 +86,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCompletedOrderNumber(orderNum);
       const prods = checkoutItems.map(i => i.product);
       setPurchasedProducts(prods);
-      prods.forEach(p => purchaseProduct(p.id));
+      const methodLabel = 'bKash Personal';
+      prods.forEach(p => purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed'));
       setIsSubmitting(false);
       setIsOrderComplete(true);
       if (!singleProduct) {
@@ -396,178 +408,92 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     </div>
                   </div>
 
-                  {/* Payment Method Selector */}
+                  {/* Payment Method Selector (Only bKash Personal) */}
                   <div className="pt-2">
                     <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">2</span>
-                      <span>Payment Method (Bangladesh)</span>
+                      <span>Payment Instructions (bKash Personal)</span>
                     </h4>
 
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('bkash')}
-                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all ${
-                          paymentMethod === 'bkash'
-                            ? 'border-pink-500 bg-pink-50/50 text-pink-900 ring-2 ring-pink-500'
-                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full border border-pink-500 flex items-center justify-center text-[9px] font-bold">
-                          {paymentMethod === 'bkash' && '✓'}
-                        </span>
-                        <div>
-                          <div className="text-xs font-bold">bKash</div>
-                          <div className="text-[10px] text-slate-500">Merchant / Personal</div>
+                    {/* Single bKash Payment Method Option */}
+                    <div className="p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-50/70 text-pink-950 ring-2 ring-pink-500/20 flex items-center justify-between shadow-2xs">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-pink-600 text-white flex items-center justify-center font-black text-sm shadow-xs shrink-0">
+                          bK
                         </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('nagad')}
-                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all ${
-                          paymentMethod === 'nagad'
-                            ? 'border-orange-500 bg-orange-50/50 text-orange-900 ring-2 ring-orange-500'
-                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full border border-orange-500 flex items-center justify-center text-[9px] font-bold">
-                          {paymentMethod === 'nagad' && '✓'}
-                        </span>
                         <div>
-                          <div className="text-xs font-bold">Nagad</div>
-                          <div className="text-[10px] text-slate-500">Fast Mobile Pay</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('bank')}
-                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all ${
-                          paymentMethod === 'bank'
-                            ? 'border-indigo-500 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500'
-                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full border border-indigo-500 flex items-center justify-center text-[9px] font-bold">
-                          {paymentMethod === 'bank' && '✓'}
-                        </span>
-                        <div>
-                          <div className="text-xs font-bold">Bank Transfer</div>
-                          <div className="text-[10px] text-slate-500">BEFTN / NPSB</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('card')}
-                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all ${
-                          paymentMethod === 'card'
-                            ? 'border-emerald-500 bg-emerald-50/50 text-emerald-900 ring-2 ring-emerald-500'
-                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full border border-emerald-500 flex items-center justify-center text-[9px] font-bold">
-                          {paymentMethod === 'card' && '✓'}
-                        </span>
-                        <div>
-                          <div className="text-xs font-bold">Card / Gateway</div>
-                          <div className="text-[10px] text-slate-500">Visa, Master, Amex</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('uddoktapay')}
-                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all col-span-2 ${
-                          paymentMethod === 'uddoktapay'
-                            ? 'border-violet-600 bg-violet-50/60 text-violet-950 ring-2 ring-violet-500'
-                            : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full border border-violet-600 flex items-center justify-center text-[9px] font-bold">
-                          {paymentMethod === 'uddoktapay' && '✓'}
-                        </span>
-                        <div>
-                          <div className="text-xs font-bold flex items-center gap-1.5">
-                            <span>UddoktaPay Hosted</span>
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 bg-violet-200 text-violet-900 rounded font-black">v1.0.0</span>
+                          <div className="text-xs font-black text-slate-900 flex items-center gap-2">
+                            <span>bKash Personal</span>
+                            <span className="text-[10px] bg-pink-100 text-pink-800 font-extrabold px-2 py-0.5 rounded-full border border-pink-200">
+                              Send Money
+                            </span>
                           </div>
-                          <div className="text-[10px] text-slate-500">Automated bKash, Nagad, Rocket, Cards (API Hosted)</div>
+                          <div className="text-[11px] text-slate-500 font-medium">Direct bKash Personal Payment Channel</div>
                         </div>
-                      </button>
+                      </div>
+                      <span className="w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                        ✓
+                      </span>
                     </div>
 
                     {/* Payment Instruction details */}
-                    <div className="mt-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2">
-                      {paymentMethod === 'bkash' && (
-                        <div>
-                          <div className="font-bold text-slate-800">
-                            bKash Payment Number: <span className="font-mono text-pink-700 text-sm font-extrabold">+880 1335 230170</span>
-                          </div>
-                          <p className="text-[11px] text-slate-600 mt-1">
-                            Send BDT <strong>{orderTotal.toLocaleString('en-IN')}</strong> to the bKash number above with reference "Shop", then enter the Transaction ID below:
-                          </p>
-                        </div>
-                      )}
+                    <div className="mt-3.5 p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-3.5">
+                      <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                        To complete your payment via <strong>bKash Personal</strong>, please send the exact payment amount specified below to the provided bKash number.
+                      </p>
 
-                      {paymentMethod === 'nagad' && (
-                        <div>
-                          <div className="font-bold text-slate-800">
-                            Nagad Account: <span className="font-mono text-orange-700 text-sm font-extrabold">+880 1335 230170</span>
-                          </div>
-                          <p className="text-[11px] text-slate-600 mt-1">
-                            Send BDT <strong>{orderTotal.toLocaleString('en-IN')}</strong> via Nagad Cash Out / Send Money, then input the TrxID below:
-                          </p>
-                        </div>
-                      )}
-
-                      {paymentMethod === 'bank' && (
-                        <div>
-                          <div className="font-bold text-slate-800">Accounticca Corporate Bank Account:</div>
-                          <div className="text-[11px] text-slate-600 space-y-0.5 mt-1 font-mono">
-                            <div>Bank: City Bank PLC (Principal Branch, Dhaka)</div>
-                            <div>A/C Name: Accounticca Consultancy</div>
-                            <div>A/C No: 1102948572001 | Routing: 225272635</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                            Payment Amount
+                          </span>
+                          <div className="text-base font-black text-slate-900">
+                            BDT {orderTotal.toLocaleString('en-IN')}
                           </div>
                         </div>
-                      )}
 
-                      {paymentMethod === 'card' && (
-                        <div>
-                          <div className="font-bold text-slate-800">Card & Instant Gateway:</div>
-                          <p className="text-[11px] text-slate-600 mt-1">
-                            Processed through secure SSLCommerz / AamarPay sandbox. Instant token generated automatically.
-                          </p>
-                        </div>
-                      )}
-
-                      {paymentMethod === 'uddoktapay' && (
-                        <div>
-                          <div className="font-bold text-slate-900 flex items-center justify-between">
-                            <span>UddoktaPay Hosted Checkout</span>
-                            <span className="text-[10px] font-mono text-violet-700 font-extrabold">https://pay.uddoktapay.com</span>
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                            bKash Personal Number
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-pink-700 text-base font-black tracking-wide">
+                              01744883636
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleCopyBkash}
+                              className="px-2.5 py-1 text-[11px] font-bold text-pink-700 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
+                              title="Copy bKash Number"
+                            >
+                              {copiedBkash ? 'Copied!' : 'Copy'}
+                            </button>
                           </div>
-                          <p className="text-[11px] text-slate-600 mt-1">
-                            Automated payment via UddoktaPay gateway (supports bKash, Nagad, Rocket, and Cards). Instant verification and download token upon successful payment callback.
-                          </p>
                         </div>
-                      )}
+                      </div>
 
-                      {(paymentMethod === 'bkash' || paymentMethod === 'nagad' || paymentMethod === 'bank') && (
-                        <div className="pt-1.5">
-                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                            Transaction ID / Reference Number:
-                          </label>
-                          <input
-                            type="text"
-                            value={trxId}
-                            onChange={(e) => setTrxId(e.target.value)}
-                            placeholder="e.g. 9J4K2L8X1M"
-                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                          />
-                        </div>
-                      )}
+                      <div className="p-3.5 bg-pink-50/80 border border-pink-200 rounded-xl text-[11px] text-pink-950 leading-relaxed font-medium">
+                        Please select the <strong>Send Money</strong> option and complete the transaction. After payment, enter your Transaction ID (TrxID) in the field below to confirm your payment.
+                      </div>
+
+                      <div className="pt-1 space-y-1.5">
+                        <label htmlFor="checkout-trxid" className="block text-xs font-bold text-slate-800">
+                          Transaction ID (TrxID): *
+                        </label>
+                        <input
+                          type="text"
+                          id="checkout-trxid"
+                          name="trxId"
+                          required
+                          value={trxId}
+                          onChange={(e) => setTrxId(e.target.value)}
+                          placeholder="[Enter Your Transaction ID]"
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 shadow-2xs"
+                        />
+                        <span className="text-[11px] text-slate-500 block">
+                          Enter the 10-character TrxID received in your bKash confirmation SMS or transaction statement.
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

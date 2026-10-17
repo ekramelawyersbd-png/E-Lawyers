@@ -21,6 +21,19 @@ import { TaxCalculator } from './pages/TaxCalculator';
 import { CorporateTaxPlanner } from './pages/CorporateTaxPlanner';
 import { TaxPolicyAnalysis } from './pages/TaxPolicyAnalysis';
 import { ToolsHub } from './pages/ToolsHub';
+import { RJscFeeCalculatorPage } from './pages/tools/RJscFeeCalculatorPage';
+import { PostRegistrationChecklistPage } from './pages/tools/PostRegistrationChecklistPage';
+import { RjscFunctionsExplorerPage } from './pages/tools/RjscFunctionsExplorerPage';
+import { RjscReturnsFilingGuidePage } from './pages/tools/RjscReturnsFilingGuidePage';
+import { CapitalGainsTaxPage } from './pages/tools/CapitalGainsTaxPage';
+import { CorporateTaxRatePage } from './pages/tools/CorporateTaxRatePage';
+import { WealthSurchargePage } from './pages/tools/WealthSurchargePage';
+import { InvestmentRebatePage } from './pages/tools/InvestmentRebatePage';
+import { AgriculturalTaxPage } from './pages/tools/AgriculturalTaxPage';
+import { MinimumTurnoverTaxPage } from './pages/tools/MinimumTurnoverTaxPage';
+import { DvcVerificationPage } from './pages/tools/DvcVerificationPage';
+import { ResourceLibraryPage as StandaloneResourceLibraryPage } from './pages/tools/ResourceLibraryPage';
+import { EarlyFilingIncentivePage } from './pages/tools/EarlyFilingIncentivePage';
 import { TrainingHub } from './pages/TrainingHub';
 import { Team } from './pages/Team';
 import { VatGuide } from './pages/VatGuide';
@@ -95,6 +108,19 @@ export default function App() {
                 <Route path="discussions" element={<Community initialTab="discussions" />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="tools" element={<ToolsHub />} />
+                <Route path="tools/rjsc-fee-calculator" element={<RJscFeeCalculatorPage />} />
+                <Route path="tools/post-registration-checklist" element={<PostRegistrationChecklistPage />} />
+                <Route path="tools/rjsc-functions-explorer" element={<RjscFunctionsExplorerPage />} />
+                <Route path="tools/rjsc-returns-filing-guide" element={<RjscReturnsFilingGuidePage />} />
+                <Route path="tools/capital-gains-tax" element={<CapitalGainsTaxPage />} />
+                <Route path="tools/corporate-tax" element={<CorporateTaxRatePage />} />
+                <Route path="tools/wealth-surcharge" element={<WealthSurchargePage />} />
+                <Route path="tools/investment-rebate" element={<InvestmentRebatePage />} />
+                <Route path="tools/agricultural-tax" element={<AgriculturalTaxPage />} />
+                <Route path="tools/minimum-turnover-tax" element={<MinimumTurnoverTaxPage />} />
+                <Route path="tools/dvc-verification" element={<DvcVerificationPage />} />
+                <Route path="tools/resource-library" element={<StandaloneResourceLibraryPage />} />
+                <Route path="tools/early-filing-incentive" element={<EarlyFilingIncentivePage />} />
                 <Route path="training" element={<TrainingHub />} />
                 <Route path="course/personal-income-tax" element={<PersonalIncomeTaxCourse />} />
                 <Route path="income-tax-training" element={<Navigate to="/course/personal-income-tax" replace />} />
@@ -127,9 +153,13 @@ export default function App() {
                 <Route path="settings" element={<Navigate to="/profile" replace />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsConditions />} />
-                <Route path="company-reg" element={<Navigate to="/article/company-reg" replace />} />
+                <Route path="company-reg" element={<Navigate to="/article/company-registration-rjsc-moa-aoa-guide-bangladesh" replace />} />
+                <Route path="moa-aoa-guide" element={<Navigate to="/article/company-registration-rjsc-moa-aoa-guide-bangladesh" replace />} />
+                <Route path="moa-aoa-bangladesh" element={<Navigate to="/article/company-registration-rjsc-moa-aoa-guide-bangladesh" replace />} />
                 <Route path="tax-return-guide" element={<Navigate to="/article/tax-return-guide" replace />} />
-                <Route path="rjsc-guide" element={<Navigate to="/article/rjsc-guide" replace />} />
+                <Route path="rjsc-guide" element={<Navigate to="/article/business-registration-compliance-bangladesh-rjsc-guide" replace />} />
+                <Route path="business-registration-compliance-bangladesh" element={<Navigate to="/article/business-registration-compliance-bangladesh-rjsc-guide" replace />} />
+                <Route path="rjsc-business-registration" element={<Navigate to="/article/business-registration-compliance-bangladesh-rjsc-guide" replace />} />
                 <Route path="startup-legal-checklist" element={<Navigate to="/article/startup-legal-checklist" replace />} />
                 <Route path="outsourced-business-support-accounticca" element={<Navigate to="/article/outsourced-business-support-accounticca" replace />} />
                 <Route path="sales-marketing-consultancy-accounticca" element={<Navigate to="/article/sales-marketing-consultancy-accounticca" replace />} />

@@ -1219,8 +1219,8 @@ Note: This is a system-generated computer invoice and serves as official proof o
             </div>
           ) : (
             <div className="space-y-4">
-              {transactions.map(tx => (
-                <div key={tx.id} className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              {transactions.map((tx, idx) => (
+                <div key={`${tx.id || tx.transactionId || 'user-tx'}-${idx}`} className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-mono font-bold text-slate-500">Ref: {tx.id}</span>

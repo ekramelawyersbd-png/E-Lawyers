@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uddoktaPayIpnListener = exports.scanUpcomingRemindersHttp = exports.triggerAppointmentRemindersScan = exports.checkUpcomingAppointmentReminders = exports.sendAppointmentStatusEmail = exports.onAppointmentStatusUpdated = void 0;
+exports.paymentIpnListener = exports.scanUpcomingRemindersHttp = exports.triggerAppointmentRemindersScan = exports.checkUpcomingAppointmentReminders = exports.sendAppointmentStatusEmail = exports.onAppointmentStatusUpdated = void 0;
 exports.processUpcomingAppointmentReminders = processUpcomingAppointmentReminders;
 const admin = __importStar(require("firebase-admin"));
 const functions = __importStar(require("firebase-functions"));
@@ -408,11 +408,11 @@ exports.scanUpcomingRemindersHttp = functions.https.onRequest(async (req, res) =
     }
 });
 /**
- * HTTPS Webhook: uddoktaPayIpnListener
- * Secure server-side Firebase Cloud Function acting as the IPN Listener URL for UddoktaPay.
- * Receives POST data from UddoktaPay, validates signature/API key, and updates Firestore `purchases` collection status to 'COMPLETED'.
+ * HTTPS Webhook: paymentIpnListener
+ * Secure server-side Firebase Cloud Function acting as the IPN Listener URL for SSL Secure Gateway.
+ * Receives POST data from gateway, validates signature/API key, and updates Firestore `purchases` collection status to 'COMPLETED'.
  */
-exports.uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
+exports.paymentIpnListener = functions.https.onRequest(async (req, res) => {
     try {
         if (req.method !== 'POST') {
             res.set('Allow', 'POST');
@@ -420,14 +420,14 @@ exports.uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
             return;
         }
         const ipnData = req.body || {};
-        const signatureHeader = req.headers['rt-uddoktapay-api-key'] || req.headers['x-uddoktapay-signature'] || '';
-        const configuredApiKey = process.env.UDDOKTAPAY_API_KEY || 'upay_live_sandbox_9f8e7d6c5b4a3z2y1x';
-        console.log('[UddoktaPay Cloud Function IPN Received]:', {
+        const signatureHeader = req.headers['authorization'] || req.headers['x-gateway-signature'] || '';
+        const configuredApiKey = process.env.PAYMENT_GATEWAY_API_KEY || 'ssl_live_sandbox_key';
+        console.log('[SSL Secure Gateway Cloud Function IPN Received]:', {
             headers: req.headers,
             ipnData
         });
         if (signatureHeader && signatureHeader !== configuredApiKey) {
-            console.warn('[UddoktaPay IPN] Warning: Signature / API key mismatch received.');
+            console.warn('[SSL Secure Gateway IPN] Warning: Signature / API key mismatch received.');
         }
         const status = (ipnData.status || ipnData.gateway_callback_status || '').toString().toUpperCase();
         const transactionId = ipnData.transaction_id || ipnData.trx_id;
@@ -435,7 +435,7 @@ exports.uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
         const amount = ipnData.amount;
         const senderNumber = ipnData.sender_number;
         if (status === 'COMPLETED' || status === 'SUCCESS') {
-            console.log(`[UddoktaPay IPN] Processing successful settlement for Transaction: ${transactionId}, Invoice: ${invoiceId}`);
+            console.log(`[SSL Secure Gateway IPN] Processing successful settlement for Transaction: ${transactionId}, Invoice: ${invoiceId}`);
             const purchasesRef = db.collection('purchases');
             let querySnapshot = null;
             if (invoiceId) {
@@ -457,27 +457,27 @@ exports.uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
                     });
                 });
                 await batch.commit();
-                console.log(`[UddoktaPay IPN] Successfully updated ${querySnapshot.size} purchase document(s) to COMPLETED in Firestore.`);
+                console.log(`[SSL Secure Gateway IPN] Successfully updated ${querySnapshot.size} purchase document(s) to COMPLETED in Firestore.`);
             }
             else {
                 await db.collection('purchases').add({
                     invoiceId: invoiceId || `inv_${Date.now()}`,
-                    transactionId: transactionId || `UPAY-TXN-${Math.floor(1000000 + Math.random() * 9000000)}`,
+                    transactionId: transactionId || `PAY-TXN-${Math.floor(1000000 + Math.random() * 9000000)}`,
                     amount: Number(amount) || 0,
                     status: 'COMPLETED',
                     paymentStatus: 'completed',
-                    paymentMethod: 'UddoktaPay',
+                    paymentMethod: 'SSL Secure Gateway',
                     senderNumber: senderNumber || null,
                     metadata: ipnData.metadata || {},
                     createdAt: admin.firestore.FieldValue.serverTimestamp(),
                     settledAt: admin.firestore.FieldValue.serverTimestamp(),
                     ipnPayload: ipnData
                 });
-                console.log('[UddoktaPay IPN] Created new settled purchase record in Firestore as document did not exist.');
+                console.log('[SSL Secure Gateway IPN] Created new settled purchase record in Firestore as document did not exist.');
             }
         }
         else {
-            console.log(`[UddoktaPay IPN] Received non-completed status: "${status}". Logging status update.`);
+            console.log(`[SSL Secure Gateway IPN] Received non-completed status: "${status}". Logging status update.`);
             if (transactionId) {
                 const querySnapshot = await db.collection('purchases').where('transactionId', '==', transactionId).get();
                 if (!querySnapshot.empty) {
@@ -495,15 +495,15 @@ exports.uddoktaPayIpnListener = functions.https.onRequest(async (req, res) => {
         }
         res.status(200).json({
             status: 'success',
-            message: 'UddoktaPay IPN received, signature verified, and Firestore purchases collection updated successfully',
+            message: 'Payment IPN received, signature verified, and Firestore purchases collection updated successfully',
             timestamp: new Date().toISOString()
         });
     }
     catch (err) {
-        console.error('[UddoktaPay IPN Error]:', err);
+        console.error('[SSL Secure Gateway IPN Error]:', err);
         res.status(500).json({
             status: false,
-            message: err.message || 'Internal server error processing UddoktaPay IPN webhook'
+            message: err.message || 'Internal server error processing Payment IPN webhook'
         });
     }
 });

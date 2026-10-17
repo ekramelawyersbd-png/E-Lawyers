@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { CheckSquare, Square, FileText, CheckCircle2, AlertCircle, Camera, Loader2 } from 'lucide-react';
+import { addClientActivity } from '../../services/clientActivityService';
 
 interface ChecklistItem {
   id: string;
@@ -78,10 +79,31 @@ export function ComplianceChecklist() {
   }, [checkedItems]);
 
   const toggleItem = (id: string) => {
-    setCheckedItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setCheckedItems(prev => {
+      const willBeChecked = !prev[id];
+      if (willBeChecked) {
+        const item = CHECKLIST_ITEMS.find(it => it.id === id);
+        if (item) {
+          addClientActivity({
+            type: 'task_completion',
+            title: `Completed ${item.label}`,
+            description: item.description || `Verified compliance item: ${item.label}`,
+            clientName: 'Active Client Account',
+            clientCompany: 'Corporate Tax Compliance Docket',
+            clientEmail: 'compliance@accounticca.com',
+            status: 'completed',
+            practiceArea: 'Corporate Tax & Compliance',
+            referenceId: `TSK-${Date.now().toString().slice(-4)}`,
+            sourceChannel: 'Compliance Checklist Task Flow',
+            notes: 'Completed and verified via Dashboard Corporate Tax Checklist.'
+          });
+        }
+      }
+      return {
+        ...prev,
+        [id]: willBeChecked
+      };
+    });
   };
 
   const handleScanClick = () => {

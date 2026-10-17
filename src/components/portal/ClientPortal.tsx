@@ -35,10 +35,15 @@ import {
   ChevronRight,
   BadgeCheck,
   RefreshCw,
-  FolderOpen
+  FolderOpen,
+  CreditCard,
+  BellRing,
+  CalendarDays
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePurchases } from '../../contexts/PurchaseContext';
+import { getStoredPortalNotifications, ClientPortalNotification } from '../../services/invoiceReminderService';
 import { Appointment, fetchUserAppointments, getGoogleCalendarUrl, downloadIcsFile } from '../../services/appointmentService';
 import { 
   ClientDocument, 
@@ -47,16 +52,20 @@ import {
 } from '../../services/clientDocumentService';
 import { DocumentViewerModal } from './DocumentViewerModal';
 import { UploadDocumentModal } from './UploadDocumentModal';
+import { PaymentHistory } from './PaymentHistory';
+import { SharedClientCalendar } from './SharedClientCalendar';
 
 export const ClientPortal: React.FC = () => {
   const { user, authUser, signInWithGoogle, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Active sub-tab state (overview | consultations | documents | chambers)
+  // Active sub-tab state (overview | consultations | documents | payments | calendar | chambers)
   const tabParam = searchParams.get('tab');
-  const [activePortalTab, setActivePortalTab] = useState<'overview' | 'consultations' | 'documents' | 'chambers'>(() => {
+  const [activePortalTab, setActivePortalTab] = useState<'overview' | 'consultations' | 'documents' | 'payments' | 'calendar' | 'chambers'>(() => {
     if (tabParam === 'consultations' || tabParam === 'appointments') return 'consultations';
     if (tabParam === 'documents' || tabParam === 'vault') return 'documents';
+    if (tabParam === 'payments' || tabParam === 'billing' || tabParam === 'receipts' || tabParam === 'invoices') return 'payments';
+    if (tabParam === 'calendar' || tabParam === 'schedule' || tabParam === 'deadlines') return 'calendar';
     if (tabParam === 'chambers') return 'chambers';
     return 'overview';
   });
@@ -67,12 +76,16 @@ export const ClientPortal: React.FC = () => {
       setActivePortalTab('consultations');
     } else if (tabParam === 'documents' || tabParam === 'vault') {
       setActivePortalTab('documents');
+    } else if (tabParam === 'payments' || tabParam === 'billing' || tabParam === 'receipts' || tabParam === 'invoices') {
+      setActivePortalTab('payments');
+    } else if (tabParam === 'calendar' || tabParam === 'schedule' || tabParam === 'deadlines') {
+      setActivePortalTab('calendar');
     } else if (tabParam === 'chambers') {
       setActivePortalTab('chambers');
     }
   }, [tabParam]);
 
-  const handleSelectTab = (tab: 'overview' | 'consultations' | 'documents' | 'chambers') => {
+  const handleSelectTab = (tab: 'overview' | 'consultations' | 'documents' | 'payments' | 'calendar' | 'chambers') => {
     setActivePortalTab(tab);
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
@@ -80,6 +93,8 @@ export const ClientPortal: React.FC = () => {
       return next;
     }, { replace: true });
   };
+
+  const { transactions } = usePurchases();
 
   // Demo mode toggle if user is unauthenticated
   const [demoMode, setDemoMode] = useState(false);
@@ -147,6 +162,27 @@ export const ClientPortal: React.FC = () => {
         setIsLoadingDocuments(false);
       });
   }, [activeUser]);
+
+  // Invoice Reminder Portal Notifications
+  const [portalNotifications, setPortalNotifications] = useState<ClientPortalNotification[]>(() => getStoredPortalNotifications());
+
+  useEffect(() => {
+    const handleNotifs = () => {
+      setPortalNotifications(getStoredPortalNotifications());
+    };
+    window.addEventListener('accounticca_portal_notifications_updated', handleNotifs);
+    return () => window.removeEventListener('accounticca_portal_notifications_updated', handleNotifs);
+  }, []);
+
+  const handleDismissNotification = (id: string) => {
+    setPortalNotifications(prev => {
+      const updated = prev.filter(n => n.id !== id);
+      try {
+        localStorage.setItem('accounticca_client_portal_notifications', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
 
   // Filtered consultations
   const filteredAppointments = useMemo(() => {
@@ -421,6 +457,42 @@ export const ClientPortal: React.FC = () => {
 
         <button
           type="button"
+          onClick={() => handleSelectTab('payments')}
+          className={`flex-1 min-w-[160px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activePortalTab === 'payments'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <CreditCard className="w-4 h-4 text-emerald-400" />
+          <span>Payment History</span>
+          <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+            activePortalTab === 'payments' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+          }`}>
+            {transactions.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSelectTab('calendar')}
+          className={`flex-1 min-w-[160px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activePortalTab === 'calendar'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <CalendarDays className="w-4 h-4 text-emerald-400" />
+          <span>Shared Calendar</span>
+          <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+            activePortalTab === 'calendar' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+          }`}>
+            Live
+          </span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => handleSelectTab('chambers')}
           className={`flex-1 min-w-[150px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalTab === 'chambers'
@@ -436,6 +508,62 @@ export const ClientPortal: React.FC = () => {
       {/* TAB 1: OVERVIEW */}
       {activePortalTab === 'overview' && (
         <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Client Portal Notifications from Invoice Reminder Engine */}
+          {portalNotifications.length > 0 && (
+            <div className="bg-amber-50/90 border border-amber-300 rounded-3xl p-5 sm:p-6 shadow-xs space-y-3.5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <BellRing className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+                        Portal Notice · Pending Invoice Approaching Due Date
+                      </span>
+                      <span className="text-[10px] font-bold bg-amber-200 text-amber-950 px-2 py-0.5 rounded-full">
+                        Action Required
+                      </span>
+                    </div>
+                    <h4 className="text-base font-extrabold text-slate-900 mt-0.5">
+                      {portalNotifications[0].title}
+                    </h4>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleDismissNotification(portalNotifications[0].id)}
+                  className="text-amber-800 hover:text-amber-950 text-xs font-bold cursor-pointer"
+                  title="Dismiss notification"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <p className="text-xs text-slate-700 leading-relaxed">
+                {portalNotifications[0].message}
+              </p>
+
+              {/* bKash instructions highlight */}
+              <div className="bg-white p-3.5 rounded-2xl border border-pink-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="text-xs text-slate-800 space-y-0.5">
+                  <span className="font-bold text-pink-700 block text-xs">Payment Instructions (Only bKash Personal):</span>
+                  <span className="text-slate-600 block">
+                    Please Send Money of exact amount <strong>BDT {portalNotifications[0].amount.toLocaleString()}</strong> to bKash Personal: <strong className="text-pink-700 font-mono text-xs">{portalNotifications[0].bKashNumber}</strong>.
+                  </span>
+                  <span className="text-[11px] text-slate-500 block">
+                    After transaction, enter your Transaction ID (TrxID) in Payment History to confirm clearance.
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleSelectTab('payments')}
+                  className="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs transition-colors"
+                >
+                  Go to Payments &amp; Enter TrxID
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Active / Next Consultation Highlight Banner */}
           {nextConsultation ? (
             <div className="bg-white rounded-3xl p-6 border border-emerald-300 shadow-sm space-y-4">
@@ -637,6 +765,49 @@ export const ClientPortal: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Shared Compliance & Meeting Calendar Section */}
+          <div className="pt-2">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 sm:p-7 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-sm">
+                  <CalendarDays className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+                      Active Profile Calendar Sync
+                    </span>
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                      Live
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-black text-white mt-0.5">
+                    Upcoming Tax Filing Deadlines &amp; Scheduled Meetings
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                    Unified calendar tracking statutory tax filing milestones, monthly VAT 9.1 schedules, and direct chamber video consultations synced with your corporate profile.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('calendar')}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  <span>Open Full Shared Calendar</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment History & Digital Receipts Section */}
+          <div className="pt-2">
+            <PaymentHistory compact limit={3} onViewAll={() => handleSelectTab('payments')} />
           </div>
         </div>
       )}
@@ -1154,6 +1325,24 @@ export const ClientPortal: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* TAB 4: PAYMENT HISTORY & DIGITAL RECEIPTS */}
+      {activePortalTab === 'payments' && (
+        <div className="animate-in fade-in duration-150">
+          <PaymentHistory />
+        </div>
+      )}
+
+      {/* TAB 5: SHARED COMPLIANCE & MEETING CALENDAR */}
+      {activePortalTab === 'calendar' && (
+        <div className="animate-in fade-in duration-150">
+          <SharedClientCalendar
+            appointments={appointments}
+            activeUser={activeUser}
+            onScheduleConsultation={() => handleSelectTab('consultations')}
+          />
         </div>
       )}
 

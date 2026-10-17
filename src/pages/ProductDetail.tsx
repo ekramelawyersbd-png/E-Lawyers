@@ -30,7 +30,6 @@ import { useShopAuth } from '../contexts/ShopAuthContext';
 import { CartDrawer } from '../components/shop/CartDrawer';
 import { CheckoutModal } from '../components/shop/CheckoutModal';
 import { ShopProduct, inferProductType } from '../data/shopProducts';
-import { QRCodeWidget } from '../components/QRCodeWidget';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -76,15 +75,22 @@ export function ProductDetail() {
   }, [slug]);
 
   const handleAddToCart = () => {
-    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
+    if (!product) return;
+    addToCart(product, quantity);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
+    if (!product) return;
+    setInstantCheckoutProduct(product);
+    setIsCheckoutOpen(true);
   };
 
-  const handleUddoktaPayCheckout = () => {
-    window.location.href = 'https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U';
+  const handlePayNow = () => {
+    if (!product) return;
+    setInstantCheckoutProduct(product);
+    setIsCheckoutOpen(true);
   };
 
   const handleShare = () => {
@@ -700,10 +706,10 @@ export function ProductDetail() {
               {/* Purchase Actions: Primary Buy Now (Emerald) & Secondary Add to Cart (Clean Navy Border) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 
-                {/* Primary CTA: Pay via UddoktaPay */}
+                {/* Primary CTA: Pay Now via Secure Gateway */}
                 <button
                   type="button"
-                  onClick={handleUddoktaPayCheckout}
+                  onClick={handlePayNow}
                   className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="w-4 h-4" />
@@ -728,8 +734,8 @@ export function ProductDetail() {
                     </>
                   ) : (
                     <>
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      <span>Pay Now</span>
+                      <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                      <span>Add to Cart</span>
                     </>
                   )}
                 </button>
@@ -756,14 +762,6 @@ export function ProductDetail() {
                 </div>
               </div>
 
-              {/* Dynamic QR Code for Mobile Banking & MFS Quick Scan */}
-              <div className="pt-2">
-                <QRCodeWidget 
-                  value="https://elawyers.paymently.io/paymentlink/pay/o9ZKzkrjjTj1vUbxJ37HdPZf4lijbJUSyBMKdL3U" 
-                  title="Scan to Pay via Mobile Banking / MFS QR" 
-                  subtitle="Open bKash, Nagad, Rocket, or any banking app and scan to pay instantly"
-                />
-              </div>
 
             </div>
 

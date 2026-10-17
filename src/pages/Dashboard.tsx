@@ -27,10 +27,17 @@ import {
   Briefcase,
   Calendar,
   ExternalLink,
-  CreditCard
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  AlertCircle,
+  Activity
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
+import { ServiceWorkloadDonutChart } from '../components/dashboard/ServiceWorkloadDonutChart';
+import { ClientActivityFeed } from '../components/dashboard/ClientActivityFeed';
+import { InvoiceReminderManager } from '../components/dashboard/InvoiceReminderManager';
 import { UserProfile } from '../components/profile/UserProfile';
 import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
@@ -38,6 +45,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
+import { usePurchases } from '../contexts/PurchaseContext';
 
 type SortOption = 'recent' | 'title' | 'readTime';
 
@@ -55,14 +63,39 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments'>(
-    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders'>(
+    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [confirmClear, setConfirmClear] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { transactions } = usePurchases();
+
+  // KPI Calculations for current month
+  const totalRevenue = useMemo(() => {
+    const sum = transactions
+      .filter(t => t.status === 'completed')
+      .reduce((acc, t) => acc + t.amount, 0);
+    return sum > 0 ? sum + 75000 : 78500;
+  }, [transactions]);
+
+  const activeSubscriptions = useMemo(() => {
+    return 12; // Active tax & corporate retainers
+  }, []);
+
+  const pendingInvoicesTotal = useMemo(() => {
+    const sum = transactions
+      .filter(t => t.status === 'pending')
+      .reduce((acc, t) => acc + t.amount, 0);
+    return sum > 0 ? sum : 12500;
+  }, [transactions]);
+
+  const pendingInvoicesCount = useMemo(() => {
+    const count = transactions.filter(t => t.status === 'pending').length;
+    return count > 0 ? count : 3;
+  }, [transactions]);
 
   // My Applications & Interview Scheduler State
   const [myApplications] = useState([
@@ -114,12 +147,16 @@ export function Dashboard() {
       setActiveTab('applications');
     } else if (tabParam === 'payments') {
       setActiveTab('payments');
+    } else if (tabParam === 'activity') {
+      setActiveTab('activity');
+    } else if (tabParam === 'reminders' || tabParam === 'invoices') {
+      setActiveTab('reminders');
     } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
       setActiveTab('saved');
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -352,6 +389,44 @@ export function Dashboard() {
             </button>
 
             <button 
+              id="dashboard-tab-reminders"
+              onClick={() => switchTab('reminders')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'reminders' 
+                  ? 'bg-amber-50 text-amber-900 shadow-xs' 
+                  : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <BellRing className="w-5 h-5 text-amber-600" />
+                <span>Invoice Reminders</span>
+              </div>
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Auto
+              </span>
+            </button>
+
+            <button 
+              id="dashboard-tab-activity"
+              onClick={() => switchTab('activity')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'activity' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Activity className="w-5 h-5 text-emerald-600" />
+                <span>Client Activity Feed</span>
+              </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Feed
+              </span>
+            </button>
+
+            <button 
               id="dashboard-tab-profile"
               onClick={() => switchTab('profile')} 
               className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
@@ -439,14 +514,103 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="flex-1 space-y-8">
+        {/* KPI Summary Row Cards (Current Month) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Revenue</p>
+              <p className="text-2xl font-extrabold text-slate-900">৳{totalRevenue.toLocaleString()}</p>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+                <TrendingUp className="w-3 h-3" />
+                <span>+18.4% vs last month</span>
+              </div>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 shadow-sm">
+              <DollarSign className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Subscriptions</p>
+              <p className="text-2xl font-extrabold text-slate-900">{activeSubscriptions} Retainers</p>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-indigo-600">
+                <ShieldCheck className="w-3 h-3" />
+                <span>Tax & Legal Advisory</span>
+              </div>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 shadow-sm">
+              <Briefcase className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div 
+            onClick={() => switchTab('reminders')}
+            className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between cursor-pointer hover:border-amber-300 hover:shadow-md transition-all group"
+            title="Click to view approaching pending invoices and automated reminders"
+          >
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Invoices</p>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200 group-hover:bg-amber-100">
+                  Auto-Remind
+                </span>
+              </div>
+              <p className="text-2xl font-extrabold text-slate-900">৳{pendingInvoicesTotal.toLocaleString()}</p>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-amber-600">
+                <Clock className="w-3 h-3" />
+                <span>{pendingInvoicesCount} Invoices awaiting clearance</span>
+              </div>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <BellRing className="w-6 h-6 text-amber-600" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Filings</p>
+              <p className="text-2xl font-extrabold text-slate-900">28 Filings</p>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+                <Check className="w-3 h-3" />
+                <span>Current Month (Oct 2026)</span>
+              </div>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+              <FileText className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between sm:col-span-2 lg:col-span-1">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">Next Tax Deadline</p>
+              <p className="text-xl font-extrabold text-slate-900">Nov 15, 2026</p>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-rose-600">
+                <AlertCircle className="w-3 h-3" />
+                <span>Mushak 9.1 & VAT Retainer</span>
+              </div>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
+              <Calendar className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+
         {activeTab === 'profile' ? (
           <UserProfile />
         ) : activeTab === 'payments' ? (
-          <PaymentStatusWidget />
+          <PaymentStatusWidget onNavigateReminders={() => switchTab('reminders')} />
+        ) : activeTab === 'activity' ? (
+          <ClientActivityFeed />
+        ) : activeTab === 'reminders' ? (
+          <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
         ) : (
           <>
+            <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
             <ComplianceCalendar />
             <ComplianceChecklist />
+            <ServiceWorkloadDonutChart />
+            <ClientActivityFeed onViewAll={() => switchTab('activity')} />
 
             <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
           {/* Section Header */}

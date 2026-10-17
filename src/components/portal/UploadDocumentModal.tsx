@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { ClientDocument, saveClientDocument } from '../../services/clientDocumentService';
 import { Appointment } from '../../services/appointmentService';
+import { addClientActivity } from '../../services/clientActivityService';
 
 interface UploadDocumentModalProps {
   isOpen: boolean;
@@ -108,6 +109,26 @@ Protected under advocate-client legal privilege.`,
         uploadedByClient: true,
         clientNotes: clientNotes.trim(),
         verificationCode: `CLT-${Math.floor(10000 + Math.random() * 90000)}`
+      });
+
+      // Stream to Client Activity Feed
+      addClientActivity({
+        type: 'document_upload',
+        title: `Uploaded ${title.trim()}`,
+        description: clientNotes.trim() || `Client uploaded ${title.trim()} (${fileSize || '1.2 MB'}) for review.`,
+        clientName: userName || 'Client Partner',
+        clientCompany: 'Corporate Client Portal',
+        clientEmail: userEmail || 'client@accounticca.com',
+        status: 'in_review',
+        practiceArea: category === 'Tax Filings & NBR' ? 'Corporate Tax & NBR' : category === 'VAT & Customs' ? 'VAT & Customs' : 'Corporate Law',
+        referenceId: consultationRef || `DOC-${Date.now().toString().slice(-4)}`,
+        fileInfo: {
+          fileName: fileName || `${title.replace(/\s+/g, '_')}.${fileType}`,
+          fileSize: fileSize || '1.2 MB',
+          fileType: fileType
+        },
+        sourceChannel: 'Client Portal (Web SSL)',
+        notes: clientNotes.trim() || 'Uploaded via client portal document vault.'
       });
 
       onDocumentUploaded(newDoc);
