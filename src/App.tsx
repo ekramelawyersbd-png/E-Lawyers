@@ -53,7 +53,6 @@ import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
-import { JobOpenings } from './pages/JobOpenings';
 import { ClientPortalPage } from './pages/ClientPortalPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ShopAuthProvider } from './contexts/ShopAuthContext';
@@ -98,8 +97,8 @@ export default function App() {
                     <Route path="products" element={<Navigate to="/shop" replace />} />
                     <Route path="resource-library" element={<ResourceLibraryPage />} />
                     <Route path="resources" element={<Navigate to="/resource-library" replace />} />
-                    <Route path="careers" element={<JobOpenings />} />
-                    <Route path="jobs" element={<Navigate to="/careers" replace />} />
+                    <Route path="careers" element={<Navigate to="/contact" replace />} />
+                    <Route path="jobs" element={<Navigate to="/contact" replace />} />
                   <Route path="category/:id" element={<Category />} />
                 <Route path="article/:id" element={<Article />} />
                 <Route path="tax-refund-guide" element={<TaxRefundGuide />} />

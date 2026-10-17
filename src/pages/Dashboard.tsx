@@ -31,13 +31,15 @@ import {
   DollarSign,
   TrendingUp,
   AlertCircle,
-  Activity
+  Activity,
+  BarChart2
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
 import { ServiceWorkloadDonutChart } from '../components/dashboard/ServiceWorkloadDonutChart';
 import { ClientActivityFeed } from '../components/dashboard/ClientActivityFeed';
 import { InvoiceReminderManager } from '../components/dashboard/InvoiceReminderManager';
+import { UserActivityDashboard } from '../components/dashboard/UserActivityDashboard';
 import { UserProfile } from '../components/profile/UserProfile';
 import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
@@ -63,8 +65,8 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders'>(
-    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics'>(
+    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -149,6 +151,8 @@ export function Dashboard() {
       setActiveTab('payments');
     } else if (tabParam === 'activity') {
       setActiveTab('activity');
+    } else if (tabParam === 'analytics' || tabParam === 'charts') {
+      setActiveTab('analytics');
     } else if (tabParam === 'reminders' || tabParam === 'invoices') {
       setActiveTab('reminders');
     } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
@@ -156,7 +160,7 @@ export function Dashboard() {
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -427,6 +431,25 @@ export function Dashboard() {
             </button>
 
             <button 
+              id="dashboard-tab-analytics"
+              onClick={() => switchTab('analytics')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'analytics' 
+                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <BarChart2 className="w-5 h-5 text-emerald-600" />
+                <span>User Activity Analytics</span>
+              </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-emerald-600" />
+                Charts
+              </span>
+            </button>
+
+            <button 
               id="dashboard-tab-profile"
               onClick={() => switchTab('profile')} 
               className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
@@ -602,10 +625,13 @@ export function Dashboard() {
           <PaymentStatusWidget onNavigateReminders={() => switchTab('reminders')} />
         ) : activeTab === 'activity' ? (
           <ClientActivityFeed />
+        ) : activeTab === 'analytics' ? (
+          <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
         ) : activeTab === 'reminders' ? (
           <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
         ) : (
           <>
+            <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
             <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
             <ComplianceCalendar />
             <ComplianceChecklist />
@@ -759,10 +785,10 @@ export function Dashboard() {
                   </p>
                 </div>
                 <Link
-                  to="/careers"
+                  to="/contact"
                   className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shrink-0 shadow-sm"
                 >
-                  Browse Career Openings
+                  Contact Practice Desk
                 </Link>
               </div>
 

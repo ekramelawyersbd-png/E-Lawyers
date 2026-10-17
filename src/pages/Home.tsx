@@ -11,6 +11,7 @@ import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
 import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
+import { Testimonials } from '../components/Testimonials';
 import { SEO } from '../components/SEO';
 
 export function Home() {
@@ -926,6 +927,13 @@ export function Home() {
           ))}
         </div>
       </section>
+
+      {/* Customer Testimonial Carousel */}
+      <Testimonials 
+        variant="carousel"
+        title="Client Trust & Verified Success Stories"
+        subtitle="See how leading Bangladeshi enterprises, startups, and CFOs rely on Accounticca and E-Lawyers for corporate governance, RJSC filings, and NBR tax strategy."
+      />
 
       {/* 9. Consultation CTA Banner */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">

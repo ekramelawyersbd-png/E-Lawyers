@@ -33,7 +33,6 @@ export function Footer() {
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Quick Links</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li><Link to="/team" className="hover:text-emerald-400 transition-colors">Our Professional Team</Link></li>
-              <li><Link to="/careers" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Career Openings & Jobs</Link></li>
               <li>
                 <a 
                   href={buildAppointmentUrl({ service: 'Legal Advisory & Litigation', source: 'Footer Legal Services' })} 
