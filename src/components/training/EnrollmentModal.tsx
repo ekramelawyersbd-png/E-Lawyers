@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { X, CheckCircle2, ExternalLink, Calendar } from 'lucide-react';
 import { redirectToAppointment, buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
 
@@ -63,7 +64,17 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900">Course Enrollment</h2>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Course Enrollment</h2>
+            <Link 
+              to={`/enrollment?course=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`}
+              onClick={onClose}
+              className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1 mt-0.5"
+            >
+              <span>Open in Separate Page</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
             <X className="w-5 h-5" />
           </button>

@@ -65,6 +65,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setCopiedBkash(true);
     setTimeout(() => setCopiedBkash(false), 2000);
   };
+  const isFree = orderTotal === 0;
 
   if (!isOpen) return null;
 
@@ -74,7 +75,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       alert('Please complete your name, email, and phone number.');
       return;
     }
-    if (!trxId.trim()) {
+    if (!isFree && !trxId.trim()) {
       alert('Please enter your bKash Transaction ID (TrxID) to confirm your payment.');
       return;
     }
@@ -86,7 +87,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCompletedOrderNumber(orderNum);
       const prods = checkoutItems.map(i => i.product);
       setPurchasedProducts(prods);
-      const methodLabel = 'bKash Personal';
+      const methodLabel = isFree ? 'Free Digital Access (BDT 0)' : 'bKash Personal';
       prods.forEach(p => purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed'));
       setIsSubmitting(false);
       setIsOrderComplete(true);
@@ -173,9 +174,20 @@ Contact & Advisory: https://blog.accounticca.com/contact
               </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800">
-              <Lock className="w-3.5 h-3.5" />
-              <span>256-bit Encrypted</span>
+            <div className="hidden sm:flex items-center gap-2">
+              <Link
+                to={singleProduct ? `/checkout?product=${encodeURIComponent(singleProduct.slug)}` : `/checkout`}
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/20"
+                title="Open checkout form in a full separate page"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Open in Separate Page</span>
+              </Link>
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800">
+                <Lock className="w-3.5 h-3.5" />
+                <span>256-bit Encrypted</span>
+              </div>
             </div>
           </div>
 
@@ -408,94 +420,109 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     </div>
                   </div>
 
-                  {/* Payment Method Selector (Only bKash Personal) */}
-                  <div className="pt-2">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">2</span>
-                      <span>Payment Instructions (bKash Personal)</span>
-                    </h4>
+                  {/* Payment Method Selector (Only shown if Total Due > 0) */}
+                  {!isFree ? (
+                    <div className="pt-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">2</span>
+                        <span>Payment Instructions (bKash Personal)</span>
+                      </h4>
 
-                    {/* Single bKash Payment Method Option */}
-                    <div className="p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-50/70 text-pink-950 ring-2 ring-pink-500/20 flex items-center justify-between shadow-2xs">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-pink-600 text-white flex items-center justify-center font-black text-sm shadow-xs shrink-0">
-                          bK
-                        </div>
-                        <div>
-                          <div className="text-xs font-black text-slate-900 flex items-center gap-2">
-                            <span>bKash Personal</span>
-                            <span className="text-[10px] bg-pink-100 text-pink-800 font-extrabold px-2 py-0.5 rounded-full border border-pink-200">
-                              Send Money
-                            </span>
+                      {/* Single bKash Payment Method Option */}
+                      <div className="p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-50/70 text-pink-950 ring-2 ring-pink-500/20 flex items-center justify-between shadow-2xs">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-pink-600 text-white flex items-center justify-center font-black text-sm shadow-xs shrink-0">
+                            bK
                           </div>
-                          <div className="text-[11px] text-slate-500 font-medium">Direct bKash Personal Payment Channel</div>
-                        </div>
-                      </div>
-                      <span className="w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                        ✓
-                      </span>
-                    </div>
-
-                    {/* Payment Instruction details */}
-                    <div className="mt-3.5 p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-3.5">
-                      <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                        To complete your payment via <strong>bKash Personal</strong>, please send the exact payment amount specified below to the provided bKash number.
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                        <div className="space-y-0.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                            Payment Amount
-                          </span>
-                          <div className="text-base font-black text-slate-900">
-                            BDT {orderTotal.toLocaleString('en-IN')}
+                          <div>
+                            <div className="text-xs font-black text-slate-900 flex items-center gap-2">
+                              <span>bKash Personal</span>
+                              <span className="text-[10px] bg-pink-100 text-pink-800 font-extrabold px-2 py-0.5 rounded-full border border-pink-200">
+                                Send Money
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 font-medium">Direct bKash Personal Payment Channel</div>
                           </div>
                         </div>
-
-                        <div className="space-y-0.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                            bKash Personal Number
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-pink-700 text-base font-black tracking-wide">
-                              01744883636
-                            </span>
-                            <button
-                              type="button"
-                              onClick={handleCopyBkash}
-                              className="px-2.5 py-1 text-[11px] font-bold text-pink-700 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
-                              title="Copy bKash Number"
-                            >
-                              {copiedBkash ? 'Copied!' : 'Copy'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-3.5 bg-pink-50/80 border border-pink-200 rounded-xl text-[11px] text-pink-950 leading-relaxed font-medium">
-                        Please select the <strong>Send Money</strong> option and complete the transaction. After payment, enter your Transaction ID (TrxID) in the field below to confirm your payment.
-                      </div>
-
-                      <div className="pt-1 space-y-1.5">
-                        <label htmlFor="checkout-trxid" className="block text-xs font-bold text-slate-800">
-                          Transaction ID (TrxID): *
-                        </label>
-                        <input
-                          type="text"
-                          id="checkout-trxid"
-                          name="trxId"
-                          required
-                          value={trxId}
-                          onChange={(e) => setTrxId(e.target.value)}
-                          placeholder="[Enter Your Transaction ID]"
-                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 shadow-2xs"
-                        />
-                        <span className="text-[11px] text-slate-500 block">
-                          Enter the 10-character TrxID received in your bKash confirmation SMS or transaction statement.
+                        <span className="w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                          ✓
                         </span>
                       </div>
+
+                      {/* Payment Instruction details */}
+                      <div className="mt-3.5 p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-3.5">
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                          To complete your payment via <strong>bKash Personal</strong>, please send the exact payment amount specified below to the provided bKash number.
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                              Payment Amount
+                            </span>
+                            <div className="text-base font-black text-slate-900">
+                              BDT {orderTotal.toLocaleString('en-IN')}
+                            </div>
+                          </div>
+
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                              bKash Personal Number
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-pink-700 text-base font-black tracking-wide">
+                                01744883636
+                              </span>
+                              <button
+                                type="button"
+                                onClick={handleCopyBkash}
+                                className="px-2.5 py-1 text-[11px] font-bold text-pink-700 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
+                                title="Copy bKash Number"
+                              >
+                                {copiedBkash ? 'Copied!' : 'Copy'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 bg-pink-50/80 border border-pink-200 rounded-xl text-[11px] text-pink-950 leading-relaxed font-medium">
+                          Please select the <strong>Send Money</strong> option and complete the transaction. After payment, enter your Transaction ID (TrxID) in the field below to confirm your payment.
+                        </div>
+
+                        <div className="pt-1 space-y-1.5">
+                          <label htmlFor="checkout-trxid" className="block text-xs font-bold text-slate-800">
+                            Transaction ID (TrxID): *
+                          </label>
+                          <input
+                            type="text"
+                            id="checkout-trxid"
+                            name="trxId"
+                            required
+                            value={trxId}
+                            onChange={(e) => setTrxId(e.target.value)}
+                            placeholder="[Enter Your Transaction ID]"
+                            className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 shadow-2xs"
+                          />
+                          <span className="text-[11px] text-slate-500 block">
+                            Enter the 10-character TrxID received in your bKash confirmation SMS or transaction statement.
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Hidden Payment Method Banner when Total Due = 0 */
+                    <div className="pt-2">
+                      <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                        <div>
+                          <h5 className="font-extrabold text-sm text-emerald-900">Total Due: BDT 0 (Free Access)</h5>
+                          <p className="text-emerald-800 mt-1 leading-relaxed">
+                            Payment method is hidden because the total due amount is <strong>BDT 0</strong>. No payment details or transaction ID required. Enter your delivery contact details above to receive instant file access.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: Order Summary Box (5 cols) */}
@@ -574,7 +601,11 @@ Contact & Advisory: https://blog.accounticca.com/contact
                       ) : (
                         <>
                           <Lock className="w-3.5 h-3.5" />
-                          <span>Confirm Order • BDT {orderTotal.toLocaleString('en-IN')}</span>
+                          <span>
+                            {isFree 
+                              ? 'Confirm Order • Free (BDT 0)' 
+                              : `Confirm Order • BDT ${orderTotal.toLocaleString('en-IN')}`}
+                          </span>
                         </>
                       )}
                     </button>

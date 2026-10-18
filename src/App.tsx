@@ -49,6 +49,8 @@ import { TaxPlanner } from './pages/TaxPlanner';
 import { TaxRefundGuide } from './pages/TaxRefundGuide';
 import { Shop } from './pages/Shop';
 import { ProductDetail } from './pages/ProductDetail';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { EnrollmentPage } from './pages/EnrollmentPage';
 import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
@@ -87,6 +89,8 @@ export default function App() {
                     <Route path="shop" element={<Shop />} />
                     <Route path="shop/:slug" element={<ProductDetail />} />
                     <Route path="shop/product/:slug" element={<ProductDetail />} />
+                    <Route path="checkout" element={<CheckoutPage />} />
+                    <Route path="enrollment" element={<EnrollmentPage />} />
                     
                     {/* Admin Shop Catalog Desk (Protected by Authorized Credentials: hmekram@gmail.com) */}
                     <Route path="admin/shop" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />

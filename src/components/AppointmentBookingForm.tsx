@@ -553,6 +553,53 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
   const [companyName, setCompanyName] = useState(() => searchParams.get('company') || '');
   const [notes, setNotes] = useState(() => searchParams.get('notes') || searchParams.get('message') || '');
 
+  // Real-time Form Validation State
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [formAttempted, setFormAttempted] = useState(false);
+
+  const getFieldError = (name: string, value: string): string | null => {
+    switch (name) {
+      case 'clientName':
+        if (!value.trim()) return 'Full name is required.';
+        if (value.trim().length < 2) return 'Full name must be at least 2 characters.';
+        return null;
+      case 'email':
+        if (!value.trim()) return 'Corporate email is required.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'Please enter a valid corporate email address.';
+        return null;
+      case 'phone':
+        if (!value.trim()) return 'Phone or WhatsApp number is required.';
+        if (!/^[\d\+\-\s\(\)]{8,20}$/.test(value.trim())) return 'Please enter a valid phone number (at least 8 digits).';
+        return null;
+      case 'companyName':
+        if (value.trim() && value.trim().length < 2) return 'Company name must be at least 2 characters if provided.';
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const validationErrors = useMemo(() => {
+    const errs: Record<string, string> = {};
+    const nameErr = getFieldError('clientName', clientName);
+    if (nameErr) errs.clientName = nameErr;
+
+    const emailErr = getFieldError('email', email);
+    if (emailErr) errs.email = emailErr;
+
+    const phoneErr = getFieldError('phone', phone);
+    if (phoneErr) errs.phone = phoneErr;
+
+    const compErr = getFieldError('companyName', companyName);
+    if (compErr) errs.companyName = compErr;
+
+    return errs;
+  }, [clientName, email, phone, companyName]);
+
+  const handleBlurField = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<AppointmentRecord | null>(null);
@@ -616,6 +663,13 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
 
   const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormAttempted(true);
+    setTouched({ clientName: true, email: true, phone: true, companyName: true });
+
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     const refNumber = Math.floor(10000 + Math.random() * 90000);
@@ -1355,9 +1409,16 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Full Name *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="booking-client-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Full Name *
+                  </label>
+                  {touched.clientName && !validationErrors.clientName && (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
@@ -1365,19 +1426,41 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
                     name="name"
                     id="booking-client-name"
                     autoComplete="name"
-                    required
                     value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
+                    onChange={(e) => {
+                      setClientName(e.target.value);
+                      if (!touched.clientName) setTouched(prev => ({ ...prev, clientName: true }));
+                    }}
+                    onBlur={() => handleBlurField('clientName')}
                     placeholder="e.g. Mahfuzur Rahman"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                    className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${
+                      (touched.clientName || formAttempted) && validationErrors.clientName
+                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20'
+                        : touched.clientName && !validationErrors.clientName
+                        ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10'
+                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
                 </div>
+                {(touched.clientName || formAttempted) && validationErrors.clientName && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>{validationErrors.clientName}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Corporate Email *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="booking-client-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Corporate Email *
+                  </label>
+                  {touched.email && !validationErrors.email && (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
@@ -1385,21 +1468,43 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
                     name="email"
                     id="booking-client-email"
                     autoComplete="email"
-                    required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (!touched.email) setTouched(prev => ({ ...prev, email: true }));
+                    }}
+                    onBlur={() => handleBlurField('email')}
                     placeholder="name@company.com"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                    className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${
+                      (touched.email || formAttempted) && validationErrors.email
+                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20'
+                        : touched.email && !validationErrors.email
+                        ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10'
+                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
                 </div>
+                {(touched.email || formAttempted) && validationErrors.email && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>{validationErrors.email}</span>
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Phone / WhatsApp *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="booking-client-phone" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Phone / WhatsApp *
+                  </label>
+                  {touched.phone && !validationErrors.phone && (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
@@ -1407,19 +1512,41 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
                     name="tel"
                     id="booking-client-phone"
                     autoComplete="tel"
-                    required
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (!touched.phone) setTouched(prev => ({ ...prev, phone: true }));
+                    }}
+                    onBlur={() => handleBlurField('phone')}
                     placeholder="+880 1712-XXXXXX"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 font-mono"
+                    className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 font-mono ${
+                      (touched.phone || formAttempted) && validationErrors.phone
+                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20'
+                        : touched.phone && !validationErrors.phone
+                        ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10'
+                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
                 </div>
+                {(touched.phone || formAttempted) && validationErrors.phone && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>{validationErrors.phone}</span>
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Company / Organization Name
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="booking-client-company" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Company / Organization Name
+                  </label>
+                  {companyName.trim() && touched.companyName && !validationErrors.companyName && (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
@@ -1428,11 +1555,27 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
                     id="booking-client-company"
                     autoComplete="organization"
                     value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
+                    onChange={(e) => {
+                      setCompanyName(e.target.value);
+                      if (!touched.companyName) setTouched(prev => ({ ...prev, companyName: true }));
+                    }}
+                    onBlur={() => handleBlurField('companyName')}
                     placeholder="e.g. Apex Global Ltd."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                    className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${
+                      (touched.companyName || formAttempted) && validationErrors.companyName
+                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20'
+                        : companyName.trim() && touched.companyName && !validationErrors.companyName
+                        ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10'
+                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
                 </div>
+                {(touched.companyName || formAttempted) && validationErrors.companyName && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>{validationErrors.companyName}</span>
+                  </p>
+                )}
               </div>
             </div>
 

@@ -32,7 +32,8 @@ import {
   TrendingUp,
   AlertCircle,
   Activity,
-  BarChart2
+  BarChart2,
+  MessageSquarePlus
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
@@ -40,8 +41,14 @@ import { ServiceWorkloadDonutChart } from '../components/dashboard/ServiceWorklo
 import { ClientActivityFeed } from '../components/dashboard/ClientActivityFeed';
 import { InvoiceReminderManager } from '../components/dashboard/InvoiceReminderManager';
 import { UserActivityDashboard } from '../components/dashboard/UserActivityDashboard';
+import { DailyGoalTracker } from '../components/dashboard/DailyGoalTracker';
+import { GoalReminderToast } from '../components/dashboard/GoalReminderToast';
+import { UserBadgesSection } from '../components/dashboard/UserBadgesSection';
+import { SocialStreakShareWidget } from '../components/dashboard/SocialStreakShareWidget';
+import { PurchaseHistorySection } from '../components/dashboard/PurchaseHistorySection';
 import { UserProfile } from '../components/profile/UserProfile';
 import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
+import { QuickFeedbackWidget } from '../components/dashboard/QuickFeedbackWidget';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
@@ -65,8 +72,8 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics'>(
-    tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback'>(
+    tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review' ? 'feedback' : tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history' ? 'purchases' : tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -141,7 +148,11 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    if (tabParam === 'articles') {
+    if (tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review') {
+      setActiveTab('feedback');
+    } else if (tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history') {
+      setActiveTab('purchases');
+    } else if (tabParam === 'articles') {
       setActiveTab('articles');
     } else if (tabParam === 'profile' || tabParam === 'settings') {
       setActiveTab('profile');
@@ -160,7 +171,7 @@ export function Dashboard() {
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -450,6 +461,24 @@ export function Dashboard() {
             </button>
 
             <button 
+              id="dashboard-tab-feedback"
+              onClick={() => switchTab('feedback')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'feedback' 
+                  ? 'bg-amber-50 text-amber-900 shadow-xs' 
+                  : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquarePlus className="w-5 h-5 text-amber-600" />
+                <span>Quick Feedback</span>
+              </div>
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                Rate
+              </span>
+            </button>
+
+            <button 
               id="dashboard-tab-profile"
               onClick={() => switchTab('profile')} 
               className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
@@ -629,9 +658,19 @@ export function Dashboard() {
           <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
         ) : activeTab === 'reminders' ? (
           <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
+        ) : activeTab === 'purchases' ? (
+          <PurchaseHistorySection />
+        ) : activeTab === 'feedback' ? (
+          <QuickFeedbackWidget />
         ) : (
           <>
+            <GoalReminderToast />
+            <DailyGoalTracker />
+            <UserBadgesSection />
+            <SocialStreakShareWidget />
+            <QuickFeedbackWidget />
             <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
+            <PurchaseHistorySection />
             <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
             <ComplianceCalendar />
             <ComplianceChecklist />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Mail, 
@@ -13,6 +13,7 @@ import {
   Scale, 
   TrendingUp, 
   CheckCircle2, 
+  AlertCircle, 
   Copy, 
   Check, 
   Globe, 
@@ -111,9 +112,81 @@ export function Contact() {
     }
   };
 
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [formAttempted, setFormAttempted] = useState(false);
+
+  const getFieldError = (name: string, value: string): string | null => {
+    switch (name) {
+      case 'firstName':
+        if (!value.trim()) return 'First name is required.';
+        if (value.trim().length < 2) return 'First name must be at least 2 characters.';
+        return null;
+      case 'lastName':
+        if (!value.trim()) return 'Last name is required.';
+        if (value.trim().length < 2) return 'Last name must be at least 2 characters.';
+        return null;
+      case 'email':
+        if (!value.trim()) return 'Corporate email is required.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'Please enter a valid corporate email (e.g. name@company.com).';
+        return null;
+      case 'phone':
+        if (!value.trim()) return 'Phone or WhatsApp number is required.';
+        if (!/^[\d\+\-\s\(\)]{8,20}$/.test(value.trim())) return 'Please enter a valid phone number (at least 8 digits, e.g. +880 1712-345678).';
+        return null;
+      case 'companyName':
+        if (value.trim() && value.trim().length < 2) return 'Company name must be at least 2 characters if provided.';
+        return null;
+      case 'message':
+        if (!value.trim()) return 'Matter description or legal brief is required.';
+        if (value.trim().length < 15) return ;
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const errors = useMemo(() => {
+    const errs: Record<string, string> = {};
+    const fnErr = getFieldError('firstName', firstName);
+    if (fnErr) errs.firstName = fnErr;
+
+    const lnErr = getFieldError('lastName', lastName);
+    if (lnErr) errs.lastName = lnErr;
+
+    const emailErr = getFieldError('email', email);
+    if (emailErr) errs.email = emailErr;
+
+    const phoneErr = getFieldError('phone', phone);
+    if (phoneErr) errs.phone = phoneErr;
+
+    const compErr = getFieldError('companyName', companyName);
+    if (compErr) errs.companyName = compErr;
+
+    const msgErr = getFieldError('message', message);
+    if (msgErr) errs.message = msgErr;
+
+    return errs;
+  }, [firstName, lastName, email, phone, companyName, message]);
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setFormAttempted(true);
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      companyName: true,
+      message: true,
+    });
+
+    if (Object.keys(errors).length === 0) {
+      setSubmitted(true);
+    }
   };
 
   return (
@@ -851,11 +924,9 @@ export function Contact() {
         </div>
       </section>
 
-      {/* Main Dual Columns: Inquiry Form & Practice Capabilities */}
+      {/* Main Column: Inquiry Form & Appointment Booking */}
       <section id="inquiry-form-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Form / Appointment Column (7 cols) */}
-          <div className="lg:col-span-7 space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4">
             {/* Tab Toggle Navigation */}
             <div className="bg-slate-200/80 p-1.5 rounded-2xl flex items-center gap-1.5 border border-slate-200 shadow-2xs">
               <button
@@ -959,90 +1030,175 @@ export function Contact() {
                     </div>
                   </div>
                 ) : (
-                <form onSubmit={handleFormSubmit} className="space-y-4">
+                <form onSubmit={handleFormSubmit} className="space-y-4" noValidate>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        First Name *
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="contact-first-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          First Name *
+                        </label>
+                        {touched.firstName && !errors.firstName && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
                         name="given-name"
                         id="contact-first-name"
                         autoComplete="given-name"
-                        required
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                        onChange={(e) => {
+                          setFirstName(e.target.value);
+                          if (!touched.firstName) setTouched(prev => ({ ...prev, firstName: true }));
+                        }}
+                        onBlur={() => handleBlur('firstName')}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.firstName || formAttempted) && errors.firstName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.firstName && !errors.firstName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
                         placeholder="e.g. Mahfuz"
                       />
+                      {(touched.firstName || formAttempted) && errors.firstName && (
+                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{errors.firstName}</span>
+                        </p>
+                      )}
                     </div>
+
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Last Name *
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="contact-last-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Last Name *
+                        </label>
+                        {touched.lastName && !errors.lastName && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
                         name="family-name"
                         id="contact-last-name"
                         autoComplete="family-name"
-                        required
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                        onChange={(e) => {
+                          setLastName(e.target.value);
+                          if (!touched.lastName) setTouched(prev => ({ ...prev, lastName: true }));
+                        }}
+                        onBlur={() => handleBlur('lastName')}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.lastName || formAttempted) && errors.lastName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.lastName && !errors.lastName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
                         placeholder="e.g. Rahman"
                       />
+                      {(touched.lastName || formAttempted) && errors.lastName && (
+                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{errors.lastName}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Corporate Email *
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="contact-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Corporate Email *
+                        </label>
+                        {touched.email && !errors.email && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="email"
                         name="email"
                         id="contact-email"
                         autoComplete="email"
-                        required
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (!touched.email) setTouched(prev => ({ ...prev, email: true }));
+                        }}
+                        onBlur={() => handleBlur('email')}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.email || formAttempted) && errors.email ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.email && !errors.email ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
                         placeholder="name@company.com"
                       />
+                      {(touched.email || formAttempted) && errors.email && (
+                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{errors.email}</span>
+                        </p>
+                      )}
                     </div>
+
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Phone / WhatsApp *
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="contact-phone" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Phone / WhatsApp *
+                        </label>
+                        {touched.phone && !errors.phone && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="tel"
                         name="tel"
                         id="contact-phone"
                         autoComplete="tel"
-                        required
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 font-mono"
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                          if (!touched.phone) setTouched(prev => ({ ...prev, phone: true }));
+                        }}
+                        onBlur={() => handleBlur('phone')}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 font-mono ${(touched.phone || formAttempted) && errors.phone ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.phone && !errors.phone ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
                         placeholder="+880 1712-XXXXXX"
                       />
+                      {(touched.phone || formAttempted) && errors.phone && (
+                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{errors.phone}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Company / Entity Name
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="contact-company-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Company / Entity Name
+                        </label>
+                        {companyName.trim() && touched.companyName && !errors.companyName && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
+                        id="contact-company-name"
                         value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                        onChange={(e) => {
+                          setCompanyName(e.target.value);
+                          if (!touched.companyName) setTouched(prev => ({ ...prev, companyName: true }));
+                        }}
+                        onBlur={() => handleBlur('companyName')}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.companyName || formAttempted) && errors.companyName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : companyName.trim() && touched.companyName && !errors.companyName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
                         placeholder="Company or Venture Ltd."
                       />
+                      {(touched.companyName || formAttempted) && errors.companyName && (
+                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{errors.companyName}</span>
+                        </p>
+                      )}
                     </div>
+
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                         Practice Service Area *
@@ -1064,18 +1220,57 @@ export function Contact() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                      Matter Description / Legal Brief *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label htmlFor="contact-message" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Matter Description / Legal Brief *
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[11px] font-bold ${message.trim().length >= 15 ? "text-emerald-600" : "text-slate-400"}`}>
+                          {message.trim().length}/15 chars min
+                        </span>
+                        {touched.message && !errors.message && (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Ready
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <textarea
+                      id="contact-message"
                       rows={4}
-                      required
                       value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 resize-none leading-relaxed"
+                      onChange={(e) => {
+                        setMessage(e.target.value);
+                        if (!touched.message) setTouched(prev => ({ ...prev, message: true }));
+                      }}
+                      onBlur={() => handleBlur('message')}
+                      className={`w-full bg-slate-50 border rounded-xl p-3.5 text-sm focus:outline-none transition-all text-slate-900 resize-none leading-relaxed ${(touched.message || formAttempted) && errors.message ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20' : touched.message && !errors.message ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10' : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'}`}
                       placeholder="Outline your requirements (e.g. corporate structuring, tax notice defense, contract review, or audit planning)..."
                     />
+                    {(touched.message || formAttempted) && errors.message && (
+                      <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                        <span>{errors.message}</span>
+                      </p>
+                    )}
                   </div>
+
+                  {/* Validation Summary Notification Bar */}
+                  {(formAttempted || Object.keys(touched).length > 0) && (
+                    <div className="animate-in fade-in duration-200">
+                      {Object.keys(errors).length > 0 ? (
+                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                          <span>Please fix {Object.keys(errors).length} field{Object.keys(errors).length > 1 ? 's' : ''} with validation errors before submitting.</span>
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>All required inputs verified cleanly. Ready to submit to Senior Advisory Desk.</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <button
                     type="submit"
@@ -1098,132 +1293,10 @@ export function Contact() {
                 )}
               </div>
             )}
-          </div>
-
-          {/* Practice Sidebar (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* Quick Practice Highlights */}
-            <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Why Dual-Firm Advisory?</h3>
-                  <p className="text-xs text-slate-400">One Retainer. Zero Disconnect.</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 text-xs sm:text-sm text-slate-300">
-                <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
-                  <h4 className="font-bold text-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Synchronized Tax &amp; Legal Stance
-                  </h4>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    Contractual provisions drafted with direct respect for withholding tax (TDS), VAT compliance, and allowable expense deductions.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
-                  <h4 className="font-bold text-teal-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Fractional CFO + Corporate Secretarial
-                  </h4>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    Statutory filings at RJSC aligned seamlessly with multi-year financial forecasts, cap tables, and investor reporting.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
-                  <h4 className="font-bold text-blue-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    BIDA &amp; FDI Foreign Investor Desks
-                  </h4>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    Turnkey inward investment facilitation, outward dividend remittance, and expatriate work-permit processing.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span>Chambers: Panthapath, Dhaka</span>
-                <span className="text-emerald-400 font-bold">Bangladeshi Jurisdictions</span>
-              </div>
-            </div>
-
-            {/* Direct Dial Banner */}
-            <div className="bg-gradient-to-br from-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-7 shadow-md border border-emerald-700/60 flex items-center justify-between gap-4">
-              <div>
-                <span className="text-[11px] font-bold text-emerald-200 uppercase tracking-widest block mb-1">
-                  Need Immediate Assistance?
-                </span>
-                <h4 className="text-base sm:text-lg font-bold text-white mb-1">
-                  Speak to Our Direct Desk
-                </h4>
-                <p className="text-xs text-emerald-100">
-                  Direct hunting line +880 1335-230170 (Lines 70–81)
-                </p>
-              </div>
-
-              <a
-                href={`tel:${rawTelNumber}`}
-                className="w-12 h-12 rounded-2xl bg-white text-emerald-800 flex items-center justify-center shrink-0 hover:scale-105 transition-transform shadow-md"
-                aria-label="Call direct hunting line"
-              >
-                <Phone className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Closing Value Prompt (Action Step: Friction-Reducing Closing CTA instead of repetition) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border border-emerald-900/60 p-8 sm:p-12 text-center text-white shadow-xl">
-          <div className="max-w-2xl mx-auto space-y-4">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
-              Ready to elevate your business operations?
-            </h2>
-            <p className="text-sm sm:text-base text-emerald-100/90 leading-relaxed font-normal">
-              Schedule an introductory consultation with our senior partners to discuss your legal, fiscal, and corporate objectives. Our advisory desks guarantee prompt review and dedicated partner oversight.
-            </p>
-            
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('appointment');
-                  scrollToFormSection();
-                  if (typeof window !== 'undefined') {
-                    window.history.replaceState(null, '', '#appointment');
-                  }
-                }}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg transition-all duration-200 group cursor-pointer"
-              >
-                <Calendar className="w-4 h-4 text-slate-950 group-hover:scale-110 transition-transform" />
-                <span>Book Consultation (Meet / Chamber)</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <a
-                href={`tel:${rawTelNumber}`}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-800 text-white font-bold text-sm px-6 py-4 rounded-xl border border-slate-700 transition-all duration-200"
-              >
-                <Phone className="w-4 h-4 text-emerald-400" />
-                <span>Call +880 1335-230170</span>
-              </a>
-            </div>
-
-            <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
-              <span>✓ Guaranteed Response Window</span>
-              <span>✓ Confidential Briefings</span>
-              <span>✓ Partner-Level Consultation</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Floating Real-Time Business Support Live Chat Widget */}
+      <OfficeLocationMap />
       <FloatingLiveChat />
     </div>
   );
