@@ -166,6 +166,18 @@ export function Navbar() {
 
   const resourceLinks = [
     { 
+      name: 'Student Learning Portal (LMS)', 
+      path: '/student/dashboard', 
+      description: '10-Class curriculum, video lessons, notes, PPT, quizzes & final exam',
+      icon: GraduationCap 
+    },
+    { 
+      name: 'Certificate Verification', 
+      path: '/verify-certificate', 
+      description: 'Public registry to verify official course certificates',
+      icon: Award 
+    },
+    { 
       name: 'Tools Hub', 
       path: '/tools', 
       description: 'Calculators, compliance checklists & utilities',

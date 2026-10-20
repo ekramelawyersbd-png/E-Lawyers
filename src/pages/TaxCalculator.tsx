@@ -26,7 +26,6 @@ import { IndividualTaxSlabsCard } from '../components/tax/IndividualTaxSlabsCard
 import { useAuth } from '../contexts/AuthContext';
 import { usePurchases } from '../contexts/PurchaseContext';
 import { SHOP_PRODUCTS, ShopProduct } from '../data/shopProducts';
-import { CheckoutModal } from '../components/shop/CheckoutModal';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { parseTaxCalculatorFromUrl } from '../utils/taxShareUtils';
@@ -38,7 +37,6 @@ type LocationCategory = 'dhaka_ctg' | 'other_city' | 'other';
 export function TaxCalculator() {
   const { isPurchased, simulateInstantPurchase } = usePurchases();
   const isCalculatorUnlocked = isPurchased('income-tax-calculator-2026-27');
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const calculatorProduct: ShopProduct = useMemo(() => {
     return (
@@ -419,14 +417,13 @@ export function TaxCalculator() {
 
             <div className="pt-2 border-t border-amber-200/70 flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsCheckoutOpen(true)}
+                <Link
+                  to="/shop/income-tax-calculator-2026-27"
                   className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer transform hover:scale-[1.02] active:scale-95"
                 >
                   <Lock className="w-4 h-4" />
                   <span>Unlock Access via Shop (৳850)</span>
-                </button>
+                </Link>
 
                 <Link
                   to="/shop/income-tax-calculator-2026-27"
@@ -847,15 +844,6 @@ export function TaxCalculator() {
             finalLiability: calculation.netTax,
             netPayable: calculation.netTax
           }}
-        />
-      )}
-
-      {/* Instant Checkout Modal for /shop/income-tax-calculator-2026-27 */}
-      {isCheckoutOpen && calculatorProduct && (
-        <CheckoutModal
-          isOpen={isCheckoutOpen}
-          onClose={() => setIsCheckoutOpen(false)}
-          singleProduct={calculatorProduct}
         />
       )}
     </div>

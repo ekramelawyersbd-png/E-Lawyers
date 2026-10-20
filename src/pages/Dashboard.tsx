@@ -363,21 +363,21 @@ export function Dashboard() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="space-y-2 mb-6">
+          <nav className="space-y-2 mb-6 text-left">
             <button 
               id="dashboard-tab-bookmarks"
               onClick={() => switchTab('saved')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'saved' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <BookMarked className="w-5 h-5 text-emerald-600" />
-                <span>Saved Articles</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <BookMarked className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">Saved Articles</span>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold shrink-0 ${
                 activeTab === 'saved' ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'
               }`}>
                 {savedItems.length}
@@ -387,17 +387,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-applications"
               onClick={() => switchTab('applications')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'applications' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Briefcase className="w-5 h-5 text-emerald-600" />
-                <span>My Applications & Interviews</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <Briefcase className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">My Applications & Interviews</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
                 2
               </span>
             </button>
@@ -405,17 +405,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-payments"
               onClick={() => switchTab('payments')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'payments' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-emerald-600 animate-pulse" />
-                <span>Payment Status Tracker</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <CreditCard className="w-5 h-5 text-emerald-600 animate-pulse shrink-0" />
+                <span className="text-left leading-snug">Payment Status Tracker</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
                 Live
               </span>
             </button>
@@ -423,17 +423,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-reminders"
               onClick={() => switchTab('reminders')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'reminders' 
                   ? 'bg-amber-50 text-amber-900 shadow-xs' 
                   : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <BellRing className="w-5 h-5 text-amber-600" />
-                <span>Invoice Reminders</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <BellRing className="w-5 h-5 text-amber-600 shrink-0" />
+                <span className="text-left leading-snug">Invoice Reminders</span>
               </div>
-              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                 Auto
               </span>
@@ -442,17 +442,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-activity"
               onClick={() => switchTab('activity')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'activity' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Activity className="w-5 h-5 text-emerald-600" />
-                <span>Client Activity Feed</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <Activity className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">Client Activity Feed</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Feed
               </span>
@@ -461,17 +461,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-analytics"
               onClick={() => switchTab('analytics')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'analytics' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <BarChart2 className="w-5 h-5 text-emerald-600" />
-                <span>User Activity Analytics</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <BarChart2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">User Activity Analytics</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 <Sparkles className="w-3 h-3 text-emerald-600" />
                 Charts
               </span>
@@ -480,17 +480,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-deadlines"
               onClick={() => switchTab('deadlines')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'deadlines' 
                   ? 'bg-emerald-50 text-emerald-800 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-emerald-600" />
-                <span>Deadlines Calendar</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <Calendar className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">Deadlines Calendar</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 Timeline
               </span>
             </button>
@@ -498,17 +498,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-feedback"
               onClick={() => switchTab('feedback')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'feedback' 
                   ? 'bg-amber-50 text-amber-900 shadow-xs' 
                   : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <MessageSquarePlus className="w-5 h-5 text-amber-600" />
-                <span>Quick Feedback</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <MessageSquarePlus className="w-5 h-5 text-amber-600 shrink-0" />
+                <span className="text-left leading-snug">Quick Feedback</span>
               </div>
-              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 Rate
               </span>
             </button>
@@ -516,17 +516,17 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-achievements"
               onClick={() => switchTab('achievements')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'achievements' 
                   ? 'bg-amber-50 text-amber-900 shadow-xs' 
                   : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Trophy className="w-5 h-5 text-amber-500" />
-                <span>Achievements & Badges</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <Trophy className="w-5 h-5 text-amber-500 shrink-0" />
+                <span className="text-left leading-snug">Achievements & Badges</span>
               </div>
-              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 Badges
               </span>
             </button>
@@ -534,18 +534,18 @@ export function Dashboard() {
             <button 
               id="dashboard-tab-profile"
               onClick={() => switchTab('profile')} 
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
                 activeTab === 'profile' 
                   ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-emerald-600" /> 
-                <span>Account Profile</span>
+              <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                <User className="w-5 h-5 text-emerald-600 shrink-0" /> 
+                <span className="text-left leading-snug">Account Profile</span>
               </div>
               {user && (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
                   Active
                 </span>
               )}
@@ -556,19 +556,19 @@ export function Dashboard() {
                 <button
                   id="dashboard-logout-btn"
                   onClick={logout}
-                  className="w-full flex items-center gap-3 px-3.5 py-2 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors rounded-xl font-semibold text-xs cursor-pointer"
+                  className="w-full flex items-center justify-start gap-3 text-left px-3.5 py-2 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors rounded-xl font-semibold text-xs cursor-pointer"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
+                  <LogOut className="w-4 h-4 shrink-0" />
+                  <span className="text-left">Sign Out</span>
                 </button>
               ) : (
                 <button
                   id="dashboard-signin-btn"
                   onClick={signInWithGoogle}
-                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
+                  className="w-full flex items-center justify-start gap-3 text-left px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
                 >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Sign In with Google</span>
+                  <LogIn className="w-4 h-4 shrink-0" />
+                  <span className="text-left">Sign In with Google</span>
                 </button>
               )}
             </div>

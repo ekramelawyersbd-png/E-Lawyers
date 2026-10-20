@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 // Firebase configuration
@@ -30,9 +31,10 @@ export const fallbackApp = initializeApp(fallbackFirebaseConfig, 'fallbackApp');
 // Initialize Firestore with specific database ID
 export const db = getFirestore(app, "ai-studio-accounticcainsig-89414606-29ba-4643-944b-e0ac41725d03");
 
-// Initialize Auth
+// Initialize Auth & Cloud Functions
 export const auth = getAuth(app);
 export const fallbackAuth = getAuth(fallbackApp);
+export const functions = getFunctions(app);
 
 // Authentication Providers
 export const googleProvider = new GoogleAuthProvider();

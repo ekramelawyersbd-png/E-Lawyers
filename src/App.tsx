@@ -57,6 +57,7 @@ import { EnrollmentPage } from './pages/EnrollmentPage';
 import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
+import { LmsRouteGuard } from './components/auth/LmsRouteGuard';
 import { ResourceLibraryPage } from './pages/ResourceLibraryPage';
 import { ClientPortalPage } from './pages/ClientPortalPage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -65,10 +66,16 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { BookmarkProvider } from './contexts/BookmarkContext';
 import { CartProvider } from './contexts/CartContext';
 import { PurchaseProvider } from './contexts/PurchaseContext';
+import { LmsProvider } from './contexts/LmsContext';
+import { FocusModeProvider } from './contexts/FocusModeContext';
 import { BookmarkNotificationToast } from './components/BookmarkNotificationToast';
 import { ScrollManager } from './components/layout/ScrollManager';
 import { NotFound } from './pages/NotFound';
 import { PersonalIncomeTaxCourse } from './pages/PersonalIncomeTaxCourse';
+import { StudentLearningPortalPage } from './pages/StudentLearningPortalPage';
+import { ClassLearningPage } from './pages/ClassLearningPage';
+import { PublicCertificateVerifyPage } from './pages/PublicCertificateVerifyPage';
+import { AdminLmsDashboardPage } from './pages/AdminLmsDashboardPage';
 
 export default function App() {
   return (
@@ -78,12 +85,122 @@ export default function App() {
           <BookmarkProvider>
             <CartProvider>
               <PurchaseProvider>
-                <BrowserRouter>
+                <LmsProvider>
+                  <FocusModeProvider>
+                    <BrowserRouter>
                 <ScrollManager />
                 <Routes>
                   <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
                     
+                    {/* Online Learning Management System (LMS) — Student Learning Portal (Protected by LmsRouteGuard) */}
+                    <Route
+                      path="student"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/dashboard"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId/video"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage initialModeOverride="video" />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId/notes"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage initialModeOverride="notes" />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId/ppt"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage initialModeOverride="ppt" />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId/quiz"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage initialModeOverride="quiz" />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/lesson/:lessonId/:mode"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/quiz/:quizId"
+                      element={
+                        <LmsRouteGuard>
+                          <ClassLearningPage initialModeOverride="quiz" />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/course/:courseId/exam"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage autoOpenExam />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/certificates/:certificateId"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route path="lms" element={<Navigate to="/student/dashboard" replace />} />
+
+                    {/* Public Certificate Verification Registry (No Login Required) */}
+                    <Route path="verify-certificate" element={<PublicCertificateVerifyPage />} />
+
+                    {/* Admin LMS Console & Course Editor */}
+                    <Route path="admin/dashboard" element={<AdminLmsDashboardPage initialTab="editor" />} />
+                    <Route path="admin/courses/:courseId/edit" element={<AdminLmsDashboardPage initialTab="editor" />} />
+                    <Route path="admin/assessments" element={<AdminLmsDashboardPage initialTab="assessments" />} />
+                    <Route path="admin/certificates" element={<AdminLmsDashboardPage initialTab="certificates" />} />
+
                     {/* Admin Authentication Login Pages */}
                     <Route path="admin/login" element={<ShopAdminLogin />} />
                     <Route path="shop/login" element={<Navigate to="/admin/login" replace />} />
@@ -209,6 +326,8 @@ export default function App() {
             </Routes>
             <BookmarkNotificationToast />
           </BrowserRouter>
+          </FocusModeProvider>
+          </LmsProvider>
           </PurchaseProvider>
           </CartProvider>
         </BookmarkProvider>

@@ -330,20 +330,27 @@ export function PersonalIncomeTaxCourse() {
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 pt-2">
+                <Link
+                  to="/student/course/personal-income-tax"
+                  className="px-8 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all shadow-xl shadow-emerald-950/50 flex items-center justify-center gap-3 cursor-pointer"
+                >
+                  <span>Enter Student Learning Portal</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
                 <button
                   onClick={() => setIsEnrollModalOpen(true)}
-                  className="px-9 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all shadow-xl shadow-emerald-950/50 flex items-center justify-center gap-3 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="px-7 py-4 rounded-2xl font-bold text-sm bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Enroll Now</span>
-                  <ArrowRight className="w-5 h-5" />
                 </button>
-                <a
-                  href="#curriculum"
-                  className="px-8 py-4 rounded-2xl font-bold text-sm bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition-all text-center flex items-center justify-center gap-2 shadow-sm"
+                <Link
+                  to="/verify-certificate"
+                  className="px-6 py-4 rounded-2xl font-bold text-sm bg-slate-900/90 hover:bg-slate-800 text-emerald-300 border border-slate-700/80 transition-all text-center flex items-center justify-center gap-2"
                 >
-                  <span>View Course Curriculum</span>
-                </a>
+                  <Award className="w-4 h-4" />
+                  <span>Verify Certificate</span>
+                </Link>
               </div>
 
               {/* Trust Line */}
@@ -583,6 +590,43 @@ export function PersonalIncomeTaxCourse() {
                           <p className="text-xs text-slate-200 leading-relaxed font-medium">
                             {cls.practical}
                           </p>
+                        </div>
+                      </div>
+
+                      {/* Direct Class Learning Page Links (Video, Notes, PPT, Quiz) */}
+                      <div className="pt-3 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
+                        <span className="text-xs text-slate-400 font-medium">
+                          Open Class {cls.num} Learning Materials on Dedicated Page:
+                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link
+                            to={`/student/course/personal-income-tax/lesson/cls_${cls.num}/video`}
+                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+                          >
+                            <Video className="w-3.5 h-3.5" />
+                            <span>Watch Video</span>
+                          </Link>
+                          <Link
+                            to={`/student/course/personal-income-tax/lesson/cls_${cls.num}/notes`}
+                            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Read Notes</span>
+                          </Link>
+                          <Link
+                            to={`/student/course/personal-income-tax/lesson/cls_${cls.num}/ppt`}
+                            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                          >
+                            <Presentation className="w-3.5 h-3.5 text-amber-400" />
+                            <span>View PPT</span>
+                          </Link>
+                          <Link
+                            to={`/student/course/personal-income-tax/lesson/cls_${cls.num}/quiz`}
+                            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Take Quiz</span>
+                          </Link>
                         </div>
                       </div>
                     </div>

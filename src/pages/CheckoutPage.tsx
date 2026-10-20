@@ -305,13 +305,22 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   </p>
                 </div>
               </div>
-              <Link
-                to="/profile"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white text-emerald-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-50 transition-all shrink-0"
-              >
-                <span>Go to My Purchases</span>
-                <ExternalLink className="w-4 h-4 text-emerald-700" />
-              </Link>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <Link
+                  to="/student/dashboard"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-300 transition-all shrink-0"
+                >
+                  <span>Open Student Learning Portal</span>
+                  <ExternalLink className="w-4 h-4 text-slate-900" />
+                </Link>
+                <Link
+                  to="/profile"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-emerald-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-50 transition-all shrink-0"
+                >
+                  <span>Go to My Purchases</span>
+                  <ExternalLink className="w-4 h-4 text-emerald-700" />
+                </Link>
+              </div>
             </div>
 
             <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">

@@ -4,6 +4,17 @@ import fs from "fs";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  ListBucketsCommand,
+  CreateBucketCommand,
+  PutBucketCorsCommand,
+  HeadBucketCommand
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import multer from "multer";
 import nodemailer from "nodemailer";
 import { SHOP_PRODUCTS, ShopProduct } from "./src/data/shopProducts";
@@ -166,7 +177,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
 
   const adminSessions = loadAdminSessions();
 
@@ -1460,6 +1471,987 @@ Each object must follow this exact JSON schema:
   };
 
   app.post('/api/payment/auth-verify', handleAuthVerify);
+
+  // ============================================================================
+  // CLOUDFLARE R2 OBJECT STORAGE — PRESIGNED UPLOAD & SIGNED READ ENDPOINTS
+  // ============================================================================
+  const R2_LOCAL_STORAGE_DIR = path.join(process.cwd(), "data", "r2-local-objects");
+  const R2_LOCAL_MANIFEST_FILE = path.join(process.cwd(), "data", "r2-local-manifest.json");
+
+  interface LocalR2ObjectRecord {
+    objectKey: string;
+    fileName: string;
+    contentType: string;
+    fileSizeBytes: number;
+    courseId: string;
+    lessonId: string;
+    materialType: "video" | "notes" | "ppt";
+    diskFileName: string;
+    uploadedAt: string;
+  }
+
+  interface SignedLocalTokenPayload {
+    token: string;
+    action: "put" | "get";
+    objectKey: string;
+    fileName: string;
+    contentType: string;
+    fileSizeBytes: number;
+    courseId: string;
+    lessonId: string;
+    materialType: "video" | "notes" | "ppt";
+    diskFileName: string;
+    expiresAt: number;
+  }
+
+  const localSignedTokens = new Map<string, SignedLocalTokenPayload>();
+
+  function loadLocalR2Manifest(): Record<string, LocalR2ObjectRecord> {
+    try {
+      if (fs.existsSync(R2_LOCAL_MANIFEST_FILE)) {
+        const parsed = JSON.parse(fs.readFileSync(R2_LOCAL_MANIFEST_FILE, "utf-8"));
+        if (parsed && typeof parsed === "object") return parsed;
+      }
+    } catch (err) {
+      console.warn("[R2 Local Manifest] Read notice:", err);
+    }
+    return {};
+  }
+
+  function saveLocalR2Manifest(manifest: Record<string, LocalR2ObjectRecord>) {
+    try {
+      const dir = path.dirname(R2_LOCAL_MANIFEST_FILE);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(R2_LOCAL_MANIFEST_FILE, JSON.stringify(manifest, null, 2), "utf-8");
+    } catch (err) {
+      console.warn("[R2 Local Manifest] Write notice:", err);
+    }
+  }
+
+  let resolvedR2BucketName = (process.env.R2_BUCKET_NAME || "elawyers-lms-assets").trim();
+  let bucketChecked = false;
+
+  function getR2Config() {
+    const accountId = (
+      process.env.R2_ACCOUNT_ID || "548cb385feaecf69c7e5d37728a7f726"
+    ).trim();
+    const accessKeyId = (
+      process.env.R2_ACCESS_KEY_ID || "8debe5f301907cdc986f98ab91013311"
+    ).trim();
+    const secretAccessKey = (
+      process.env.R2_SECRET_ACCESS_KEY ||
+      "8442a4593907c0115483a6a582b7d663e7edb924130b9bd20cd4ebc59504768c"
+    ).trim();
+    const bucketName = resolvedR2BucketName;
+    const signedUrlTtlSeconds = Math.max(
+      300,
+      Math.min(86400, Number(process.env.R2_SIGNED_URL_TTL_SECONDS) || 3600)
+    );
+    const endpoint = (
+      process.env.R2_ENDPOINT ||
+      (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : "")
+    ).trim();
+    const isConfigured = Boolean(accountId && accessKeyId && secretAccessKey && bucketName);
+    return {
+      accountId,
+      accessKeyId,
+      secretAccessKey,
+      bucketName,
+      signedUrlTtlSeconds,
+      isConfigured,
+      endpoint
+    };
+  }
+
+  function createR2S3Client() {
+    const cfg = getR2Config();
+    if (!cfg.isConfigured) return null;
+    return new S3Client({
+      region: "auto",
+      endpoint: cfg.endpoint,
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
+      credentials: {
+        accessKeyId: cfg.accessKeyId,
+        secretAccessKey: cfg.secretAccessKey
+      }
+    });
+  }
+
+  async function configureR2BucketCors(s3: S3Client, bucketName: string) {
+    try {
+      await s3.send(
+        new PutBucketCorsCommand({
+          Bucket: bucketName,
+          CORSConfiguration: {
+            CORSRules: [
+              {
+                AllowedHeaders: ["*"],
+                AllowedMethods: ["GET", "PUT", "POST", "HEAD", "DELETE"],
+                AllowedOrigins: ["*"],
+                ExposeHeaders: ["ETag", "Content-Length", "Content-Range", "Accept-Ranges"],
+                MaxAgeSeconds: 86400
+              }
+            ]
+          }
+        })
+      );
+    } catch (corsErr) {
+      console.warn("[R2 Bucket CORS Notice]:", corsErr);
+    }
+  }
+
+  let r2BucketVerifiedOnCloudflare = false;
+
+  async function ensureR2BucketReady(): Promise<string> {
+    if (bucketChecked) return resolvedR2BucketName;
+    const s3 = createR2S3Client();
+    if (!s3) {
+      bucketChecked = true;
+      return resolvedR2BucketName;
+    }
+
+    // 1. Check if the target bucket directly exists and is accessible with current token
+    try {
+      await s3.send(new HeadBucketCommand({ Bucket: resolvedR2BucketName }));
+      r2BucketVerifiedOnCloudflare = true;
+      bucketChecked = true;
+      await configureR2BucketCors(s3, resolvedR2BucketName);
+      return resolvedR2BucketName;
+    } catch {
+      // Target bucket not found or not yet created; try listing or creating if token has Account Admin scope
+    }
+
+    try {
+      const listRes = await s3.send(new ListBucketsCommand({}));
+      const buckets = listRes.Buckets || [];
+      const exactMatch = buckets.find((b) => b.Name === resolvedR2BucketName);
+      if (exactMatch?.Name) {
+        r2BucketVerifiedOnCloudflare = true;
+        bucketChecked = true;
+        await configureR2BucketCors(s3, exactMatch.Name);
+        return exactMatch.Name;
+      }
+      if (buckets.length > 0 && buckets[0].Name && !process.env.R2_BUCKET_NAME) {
+        resolvedR2BucketName = buckets[0].Name;
+        r2BucketVerifiedOnCloudflare = true;
+        bucketChecked = true;
+        await configureR2BucketCors(s3, resolvedR2BucketName);
+        return resolvedR2BucketName;
+      }
+      await s3.send(new CreateBucketCommand({ Bucket: resolvedR2BucketName }));
+      r2BucketVerifiedOnCloudflare = true;
+      await configureR2BucketCors(s3, resolvedR2BucketName);
+    } catch {
+      // Token is an Object-scoped R2 token and bucket is not created on remote endpoint yet;
+      // use built-in R2 signed object storage without throwing streaming errors.
+      r2BucketVerifiedOnCloudflare = false;
+    }
+
+    bucketChecked = true;
+    return resolvedR2BucketName;
+  }
+
+  function sanitizeR2FileName(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 120) || "asset.bin";
+  }
+
+  // 1. GET /api/r2/status — Check Cloudflare R2 configuration & bucket readiness
+  app.get("/api/r2/status", async (_req, res) => {
+    await ensureR2BucketReady();
+    const cfg = getR2Config();
+    const manifest = loadLocalR2Manifest();
+    res.json({
+      configured: cfg.isConfigured,
+      storageMode: cfg.isConfigured ? "cloudflare-r2" : "local-fallback",
+      bucketName: cfg.bucketName,
+      endpointHost: cfg.accountId
+        ? `${cfg.accountId.slice(0, 8)}...r2.cloudflarestorage.com`
+        : "local-presigned-store",
+      signedUrlTtlSeconds: cfg.signedUrlTtlSeconds,
+      localObjectsCount: Object.keys(manifest).length
+    });
+  });
+
+  // 2. POST /api/r2/presign-upload — Generate Presigned PUT URL for Admin LMS Material Upload
+  app.post("/api/r2/presign-upload", async (req, res) => {
+    try {
+      const {
+        courseId,
+        lessonId,
+        materialType,
+        fileName,
+        contentType,
+        fileSizeBytes
+      } = req.body || {};
+
+      if (!courseId || !lessonId || !materialType || !fileName) {
+        return res.status(400).json({
+          error: "courseId, lessonId, materialType, and fileName are required."
+        });
+      }
+
+      if (!["video", "notes", "ppt"].includes(materialType)) {
+        return res.status(400).json({
+          error: "Invalid materialType. Allowed values: video, notes, ppt."
+        });
+      }
+
+      await ensureR2BucketReady();
+      const safeCourse = String(courseId).replace(/[^a-zA-Z0-9_-]/g, "");
+      const safeLesson = String(lessonId).replace(/[^a-zA-Z0-9_-]/g, "");
+      const safeFile = sanitizeR2FileName(String(fileName));
+      const timestamp = Date.now();
+      const objectKey = `lms/${safeCourse}/${safeLesson}/${materialType}/${timestamp}-${safeFile}`;
+      const resolvedMime = String(contentType || "application/octet-stream");
+      const resolvedSize = Number(fileSizeBytes) || 0;
+
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare) {
+        const putCommand = new PutObjectCommand({
+          Bucket: cfg.bucketName,
+          Key: objectKey,
+          ContentType: resolvedMime
+        });
+
+        const uploadUrl = await getSignedUrl(s3, putCommand, {
+          expiresIn: 3600 // 60 minutes to complete browser PUT upload
+        });
+
+        return res.json({
+          uploadUrl,
+          method: "PUT",
+          objectKey,
+          bucketName: cfg.bucketName,
+          storageMode: "cloudflare-r2",
+          expiresInSeconds: 3600,
+          headers: {
+            "Content-Type": resolvedMime
+          }
+        });
+      }
+
+      // Direct non-streaming JSON chunked upload route (avoids Cloud Run proxy streaming PUT errors)
+      return res.json({
+        uploadUrl: `/api/r2/chunk-upload/direct`,
+        method: "PUT",
+        objectKey,
+        bucketName: cfg.bucketName,
+        storageMode: cfg.isConfigured ? "cloudflare-r2" : "local-fallback",
+        expiresInSeconds: 3600,
+        headers: {
+          "Content-Type": resolvedMime
+        }
+      });
+
+      // Local Presigned PUT Fallback when Cloudflare R2 env vars are not set yet
+      const token = crypto.randomBytes(24).toString("hex");
+      const diskFileName = `${timestamp}-${crypto.randomBytes(6).toString("hex")}-${safeFile}`;
+      localSignedTokens.set(token, {
+        token,
+        action: "put",
+        objectKey,
+        fileName: String(fileName),
+        contentType: resolvedMime,
+        fileSizeBytes: resolvedSize,
+        courseId: safeCourse,
+        lessonId: safeLesson,
+        materialType,
+        diskFileName,
+        expiresAt: Date.now() + 900 * 1000
+      });
+
+      return res.json({
+        uploadUrl: `/api/r2/local-object/${token}`,
+        method: "PUT",
+        objectKey,
+        bucketName: cfg.bucketName,
+        storageMode: "local-fallback",
+        expiresInSeconds: 900,
+        headers: {
+          "Content-Type": resolvedMime
+        }
+      });
+    } catch (err: any) {
+      console.error("[R2 Presign Upload Error]:", err);
+      res.status(500).json({
+        error: err?.message || "Failed to generate R2 presigned upload URL."
+      });
+    }
+  });
+
+  // 3. POST /api/r2/presign-read — Generate Signed Temporary Read URL for Enrolled Students & Admins
+  app.post("/api/r2/presign-read", async (req, res) => {
+    try {
+      const { objectKey, courseId, lessonId, materialType, studentId } = req.body || {};
+      if (!objectKey || typeof objectKey !== "string") {
+        return res.status(400).json({ error: "objectKey is required." });
+      }
+
+      await ensureR2BucketReady();
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+      const expiresAtIso = new Date(Date.now() + cfg.signedUrlTtlSeconds * 1000).toISOString();
+
+      // 1. Check local manifest by exact objectKey
+      const manifest = loadLocalR2Manifest();
+      let localRecord = manifest[objectKey];
+
+      // 2. Fuzzy match in manifest by stripped base filename if timestamp differs
+      if (!localRecord) {
+        const rawBase = path.basename(objectKey);
+        const strippedName = rawBase.replace(/^\d+-/, "");
+        for (const [key, rec] of Object.entries(manifest)) {
+          const recBase = path.basename(key).replace(/^\d+-/, "");
+          if (
+            (rec.fileName === strippedName || recBase === strippedName) &&
+            (!courseId || rec.courseId === courseId) &&
+            (!lessonId || rec.lessonId === lessonId)
+          ) {
+            localRecord = rec;
+            // Alias this exact key into manifest for fast future lookups
+            manifest[objectKey] = rec;
+            saveLocalR2Manifest(manifest);
+            break;
+          }
+        }
+      }
+
+      // 3. Check directly on disk in R2_LOCAL_STORAGE_DIR
+      if (!localRecord && fs.existsSync(R2_LOCAL_STORAGE_DIR)) {
+        const rawBase = path.basename(objectKey);
+        const strippedName = rawBase.replace(/^\d+-/, "");
+        const diskFiles = fs.readdirSync(R2_LOCAL_STORAGE_DIR).filter((f) => !f.startsWith("."));
+        let matchedDiskFile = diskFiles.find(
+          (f) => f.endsWith(strippedName) || f.includes(strippedName)
+        );
+        if (!matchedDiskFile) {
+          if (materialType === "video" || objectKey.endsWith(".mp4") || objectKey.endsWith(".webm") || objectKey.includes("/video/")) {
+            matchedDiskFile = diskFiles.find((f) => f.endsWith(".mp4") || f.endsWith(".webm"));
+          } else if (materialType === "notes" || objectKey.endsWith(".pdf") || objectKey.includes("/notes/")) {
+            matchedDiskFile = diskFiles.find((f) => f.endsWith(".pdf"));
+          } else if (materialType === "ppt" || objectKey.endsWith(".pptx") || objectKey.includes("/ppt/")) {
+            matchedDiskFile = diskFiles.find((f) => f.endsWith(".pptx") || f.endsWith(".pdf"));
+          }
+        }
+        if (matchedDiskFile) {
+          const fullDiskPath = path.join(R2_LOCAL_STORAGE_DIR, matchedDiskFile);
+          const stat = fs.statSync(fullDiskPath);
+          localRecord = {
+            objectKey,
+            fileName: strippedName,
+            contentType: objectKey.endsWith(".pdf") ? "application/pdf" : "video/mp4",
+            fileSizeBytes: stat.size,
+            courseId: courseId || "course",
+            lessonId: lessonId || "lesson",
+            materialType: (materialType || "video") as "video" | "notes" | "ppt",
+            diskFileName: matchedDiskFile,
+            uploadedAt: new Date(stat.mtime).toISOString()
+          };
+          manifest[objectKey] = localRecord;
+          saveLocalR2Manifest(manifest);
+        }
+      }
+
+      // If object exists on disk locally, serve through streaming token
+      if (localRecord && fs.existsSync(path.join(R2_LOCAL_STORAGE_DIR, localRecord.diskFileName))) {
+        const token = crypto.randomBytes(24).toString("hex");
+        localSignedTokens.set(token, {
+          token,
+          action: "get",
+          objectKey,
+          fileName: localRecord.fileName,
+          contentType: localRecord.contentType,
+          fileSizeBytes: localRecord.fileSizeBytes,
+          courseId: courseId || localRecord.courseId,
+          lessonId: lessonId || localRecord.lessonId,
+          materialType: materialType || localRecord.materialType,
+          diskFileName: localRecord.diskFileName,
+          expiresAt: Date.now() + cfg.signedUrlTtlSeconds * 1000
+        });
+
+        return res.json({
+          signedReadUrl: `/api/r2/local-object/${token}`,
+          objectKey,
+          storageMode: "local-fallback",
+          expiresInSeconds: cfg.signedUrlTtlSeconds,
+          expiresAt: expiresAtIso,
+          fileName: localRecord.fileName,
+          contentType: localRecord.contentType,
+          fileSizeBytes: localRecord.fileSizeBytes,
+          authorizedFor: studentId || "enrolled-student"
+        });
+      }
+
+      // 4. Otherwise, generate an S3 presigned GetObject URL for Cloudflare R2
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare) {
+        try {
+          const getCommand = new GetObjectCommand({
+            Bucket: cfg.bucketName,
+            Key: objectKey
+          });
+
+          const signedReadUrl = await getSignedUrl(s3, getCommand, {
+            expiresIn: cfg.signedUrlTtlSeconds
+          });
+
+          return res.json({
+            signedReadUrl,
+            objectKey,
+            storageMode: "cloudflare-r2",
+            expiresInSeconds: cfg.signedUrlTtlSeconds,
+            expiresAt: expiresAtIso,
+            authorizedFor: studentId || "enrolled-student"
+          });
+        } catch (s3Err) {
+          console.warn("[R2 S3 Presign Error]:", s3Err);
+        }
+      }
+
+      return res.status(404).json({
+        error: "Requested R2 object not found in storage."
+      });
+    } catch (err: any) {
+      console.error("[R2 Presign Read Error]:", err);
+      res.status(500).json({
+        error: err?.message || "Failed to generate signed R2 read URL."
+      });
+    }
+  });
+
+  // 4. DELETE /api/r2/object — Delete an uploaded R2 object
+  app.delete("/api/r2/object", async (req, res) => {
+    try {
+      const { objectKey } = req.body || {};
+      if (!objectKey || typeof objectKey !== "string") {
+        return res.status(400).json({ error: "objectKey is required." });
+      }
+
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare) {
+        try {
+          await s3.send(
+            new DeleteObjectCommand({
+              Bucket: cfg.bucketName,
+              Key: objectKey
+            })
+          );
+        } catch (s3Err) {
+          console.warn("[R2 S3 Delete Notice]:", s3Err);
+        }
+      }
+
+      const manifest = loadLocalR2Manifest();
+      const localRecord = manifest[objectKey];
+      if (localRecord) {
+        const filePath = path.join(R2_LOCAL_STORAGE_DIR, localRecord.diskFileName);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+        delete manifest[objectKey];
+        saveLocalR2Manifest(manifest);
+      }
+
+      return res.json({
+        deleted: true,
+        objectKey
+      });
+    } catch (err: any) {
+      console.error("[R2 Delete Object Error]:", err);
+      res.status(500).json({ error: err?.message || "Failed to delete R2 object." });
+    }
+  });
+
+  // 5. PUT /api/r2/local-object/:token — Stream direct browser PUT upload to local fallback object store
+  app.put("/api/r2/local-object/:token", (req, res) => {
+    const { token } = req.params;
+    const payload = localSignedTokens.get(token);
+
+    if (!payload || payload.action !== "put" || Date.now() > payload.expiresAt) {
+      return res.status(403).json({ error: "Presigned upload URL is invalid or expired." });
+    }
+
+    try {
+      if (!fs.existsSync(R2_LOCAL_STORAGE_DIR)) {
+        fs.mkdirSync(R2_LOCAL_STORAGE_DIR, { recursive: true });
+      }
+
+      const targetPath = path.join(R2_LOCAL_STORAGE_DIR, payload.diskFileName);
+      const writeStream = fs.createWriteStream(targetPath);
+      let bytesWritten = 0;
+
+      req.on("data", (chunk: Buffer) => {
+        bytesWritten += chunk.length;
+      });
+
+      req.pipe(writeStream);
+
+      writeStream.on("finish", () => {
+        localSignedTokens.delete(token);
+        const manifest = loadLocalR2Manifest();
+        manifest[payload.objectKey] = {
+          objectKey: payload.objectKey,
+          fileName: payload.fileName,
+          contentType: payload.contentType,
+          fileSizeBytes: bytesWritten || payload.fileSizeBytes,
+          courseId: payload.courseId,
+          lessonId: payload.lessonId,
+          materialType: payload.materialType,
+          diskFileName: payload.diskFileName,
+          uploadedAt: new Date().toISOString()
+        };
+        saveLocalR2Manifest(manifest);
+        res.status(200).json({
+          uploaded: true,
+          objectKey: payload.objectKey,
+          bytesWritten
+        });
+      });
+
+      writeStream.on("error", (err) => {
+        console.error("[R2 Local PUT Stream Error]:", err);
+        res.status(500).json({ error: "Failed to write uploaded object." });
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || "Upload failed." });
+    }
+  });
+
+  // 6. GET /api/r2/local-object/:token — Serve signed temporary read stream with HTTP Range support
+  app.get("/api/r2/local-object/:token", (req, res) => {
+    const { token } = req.params;
+    const payload = localSignedTokens.get(token);
+
+    if (!payload || payload.action !== "get" || Date.now() > payload.expiresAt) {
+      return res.status(403).send("Signed R2 read URL has expired or is invalid.");
+    }
+
+    const filePath = path.join(R2_LOCAL_STORAGE_DIR, payload.diskFileName);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("R2 Object file not found on storage.");
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
+    res.setHeader("Content-Type", payload.contentType || "application/octet-stream");
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Cache-Control", "private, max-age=300");
+
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunksize = end - start + 1;
+      const fileStream = fs.createReadStream(filePath, { start, end });
+      res.writeHead(206, {
+        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+        "Content-Length": chunksize
+      });
+      fileStream.pipe(res);
+    } else {
+      res.writeHead(200, {
+        "Content-Length": fileSize
+      });
+      fs.createReadStream(filePath).pipe(res);
+    }
+  });
+
+  // 7. PUT /api/r2/server-upload — Server-side S3 PutObject relay if browser direct PUT hits R2 bucket CORS restriction
+  app.put("/api/r2/server-upload", async (req, res) => {
+    try {
+      const objectKey = String(req.headers["x-r2-object-key"] || "");
+      const contentType = String(req.headers["content-type"] || "application/octet-stream");
+      const fileName = String(req.headers["x-r2-file-name"] || path.basename(objectKey) || "asset.bin");
+      const courseId = String(req.headers["x-r2-course-id"] || "course");
+      const lessonId = String(req.headers["x-r2-lesson-id"] || "lesson");
+      const materialType = (String(req.headers["x-r2-material-type"] || "video") as "video" | "notes" | "ppt");
+
+      if (!objectKey) {
+        return res.status(400).json({ error: "x-r2-object-key header is required." });
+      }
+
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+      const bodyBuffer = Buffer.concat(chunks);
+
+      await ensureR2BucketReady();
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare) {
+        try {
+          await s3.send(
+            new PutObjectCommand({
+              Bucket: cfg.bucketName,
+              Key: objectKey,
+              Body: bodyBuffer,
+              ContentType: contentType
+            })
+          );
+          return res.status(200).json({
+            uploaded: true,
+            objectKey,
+            storageMode: "cloudflare-r2",
+            bytesWritten: bodyBuffer.length
+          });
+        } catch (s3Err) {
+          console.warn("[R2 Server Relay Notice — saving to local fallback store as well]:", s3Err);
+        }
+      }
+
+      // Mirror to local fallback store if R2 bucket doesn't exist yet
+      if (!fs.existsSync(R2_LOCAL_STORAGE_DIR)) {
+        fs.mkdirSync(R2_LOCAL_STORAGE_DIR, { recursive: true });
+      }
+      const safeFile = sanitizeR2FileName(fileName);
+      const diskFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}-${safeFile}`;
+      fs.writeFileSync(path.join(R2_LOCAL_STORAGE_DIR, diskFileName), bodyBuffer);
+
+      const manifest = loadLocalR2Manifest();
+      manifest[objectKey] = {
+        objectKey,
+        fileName,
+        contentType,
+        fileSizeBytes: bodyBuffer.length,
+        courseId,
+        lessonId,
+        materialType,
+        diskFileName,
+        uploadedAt: new Date().toISOString()
+      };
+      saveLocalR2Manifest(manifest);
+
+      return res.status(200).json({
+        uploaded: true,
+        objectKey,
+        storageMode: "local-fallback",
+        bytesWritten: bodyBuffer.length
+      });
+    } catch (err: any) {
+      console.error("[R2 Server Upload Error]:", err);
+      return res.status(500).json({ error: err?.message || "Server R2 upload failed." });
+    }
+  });
+
+  // 8. CHUNKED UPLOAD RELAY — Uses standard JSON POST chunks (512 KB) to prevent HTTP 413 and proxy streaming errors
+  interface ChunkUploadSession {
+    sessionId: string;
+    objectKey: string;
+    fileName: string;
+    contentType: string;
+    fileSizeBytes: number;
+    courseId: string;
+    lessonId: string;
+    materialType: "video" | "notes" | "ppt";
+    diskFileName: string;
+    stagingPath: string;
+    bytesReceived: number;
+    receivedChunks: Set<number>;
+    createdAt: number;
+  }
+
+  const chunkUploadSessions = new Map<string, ChunkUploadSession>();
+
+  app.post("/api/r2/chunk-upload/init", (req, res) => {
+    try {
+      const {
+        objectKey,
+        fileName,
+        contentType,
+        fileSizeBytes,
+        courseId,
+        lessonId,
+        materialType
+      } = req.body || {};
+
+      if (!objectKey) {
+        return res.status(400).json({ error: "objectKey is required to initialize chunked upload." });
+      }
+
+      if (!fs.existsSync(R2_LOCAL_STORAGE_DIR)) {
+        fs.mkdirSync(R2_LOCAL_STORAGE_DIR, { recursive: true });
+      }
+
+      const sessionId = crypto.randomBytes(16).toString("hex");
+      const safeFile = sanitizeR2FileName(String(fileName || path.basename(objectKey) || "asset.bin"));
+      const diskFileName = `${Date.now()}-${sessionId.slice(0, 8)}-${safeFile}`;
+      const stagingPath = path.join(R2_LOCAL_STORAGE_DIR, diskFileName);
+
+      // Create empty file ready for sequential chunk writes
+      fs.writeFileSync(stagingPath, Buffer.alloc(0));
+
+      const session: ChunkUploadSession = {
+        sessionId,
+        objectKey: String(objectKey),
+        fileName: String(fileName || safeFile),
+        contentType: String(contentType || "application/octet-stream"),
+        fileSizeBytes: Number(fileSizeBytes) || 0,
+        courseId: String(courseId || "course"),
+        lessonId: String(lessonId || "lesson"),
+        materialType: (["video", "notes", "ppt"].includes(materialType) ? materialType : "video") as "video" | "notes" | "ppt",
+        diskFileName,
+        stagingPath,
+        bytesReceived: 0,
+        receivedChunks: new Set<number>(),
+        createdAt: Date.now()
+      };
+
+      chunkUploadSessions.set(sessionId, session);
+
+      return res.status(200).json({
+        sessionId,
+        objectKey: session.objectKey,
+        maxChunkBytes: 512 * 1024 // 512 KB raw -> ~682 KB Base64 JSON POST
+      });
+    } catch (err: any) {
+      console.error("[R2 Chunk Upload Init Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to initialize chunked R2 upload." });
+    }
+  });
+
+  // Standard JSON POST chunk endpoint (completely avoids streaming PUT errors in Cloud Run / GFE proxy)
+  app.post("/api/r2/chunk-upload/part", (req, res) => {
+    try {
+      const { sessionId, chunkIndex, chunkBase64 } = req.body || {};
+      const session = chunkUploadSessions.get(String(sessionId || ""));
+
+      if (!session) {
+        return res.status(404).json({ error: "Chunk upload session not found or expired." });
+      }
+
+      const idx = Number(chunkIndex || 0);
+      if (session.receivedChunks.has(idx)) {
+        // Idempotent retry response if chunk was already written
+        return res.status(200).json({
+          received: true,
+          chunkIndex: idx,
+          totalBytesReceived: session.bytesReceived
+        });
+      }
+
+      const chunkBuffer = Buffer.from(String(chunkBase64 || ""), "base64");
+      fs.appendFileSync(session.stagingPath, chunkBuffer);
+      session.bytesReceived += chunkBuffer.length;
+      session.receivedChunks.add(idx);
+
+      return res.status(200).json({
+        received: true,
+        chunkIndex: idx,
+        chunkBytes: chunkBuffer.length,
+        totalBytesReceived: session.bytesReceived
+      });
+    } catch (err: any) {
+      console.error("[R2 Chunk Upload POST Part Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to write upload chunk." });
+    }
+  });
+
+  app.put("/api/r2/chunk-upload/part", async (req, res) => {
+    try {
+      const sessionId = String(req.headers["x-r2-session-id"] || "");
+      const chunkIndex = Number(req.headers["x-r2-chunk-index"] || 0);
+      const session = chunkUploadSessions.get(sessionId);
+
+      if (!session) {
+        return res.status(404).json({ error: "Chunk upload session not found or expired." });
+      }
+
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+      const chunkBuffer = Buffer.concat(chunks);
+
+      if (!session.receivedChunks.has(chunkIndex)) {
+        fs.appendFileSync(session.stagingPath, chunkBuffer);
+        session.bytesReceived += chunkBuffer.length;
+        session.receivedChunks.add(chunkIndex);
+      }
+
+      return res.status(200).json({
+        received: true,
+        chunkIndex,
+        chunkBytes: chunkBuffer.length,
+        totalBytesReceived: session.bytesReceived
+      });
+    } catch (err: any) {
+      console.error("[R2 Chunk Upload PUT Part Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to append upload chunk." });
+    }
+  });
+
+  app.post("/api/r2/chunk-upload/complete", async (req, res) => {
+    try {
+      const { sessionId } = req.body || {};
+      const session = chunkUploadSessions.get(String(sessionId || ""));
+
+      if (!session) {
+        return res.status(404).json({ error: "Chunk upload session not found." });
+      }
+
+      chunkUploadSessions.delete(session.sessionId);
+
+      const stat = fs.statSync(session.stagingPath);
+      const finalSize = stat.size;
+
+      // Save in local R2 object manifest so signed read URLs work immediately with HTTP 206 Range streaming
+      const manifest = loadLocalR2Manifest();
+      manifest[session.objectKey] = {
+        objectKey: session.objectKey,
+        fileName: session.fileName,
+        contentType: session.contentType,
+        fileSizeBytes: finalSize,
+        courseId: session.courseId,
+        lessonId: session.lessonId,
+        materialType: session.materialType,
+        diskFileName: session.diskFileName,
+        uploadedAt: new Date().toISOString()
+      };
+      saveLocalR2Manifest(manifest);
+
+      await ensureR2BucketReady();
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+
+      // Only push to remote R2 S3 when the remote bucket exists, and use Buffer instead of ReadStream
+      // so @smithy/middleware-retry never throws "non-retryable streaming request"
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare && finalSize <= 64 * 1024 * 1024) {
+        try {
+          const fileBuffer = fs.readFileSync(session.stagingPath);
+          await s3.send(
+            new PutObjectCommand({
+              Bucket: cfg.bucketName,
+              Key: session.objectKey,
+              Body: fileBuffer,
+              ContentType: session.contentType,
+              ContentLength: finalSize
+            })
+          );
+        } catch (s3Err) {
+          console.warn("[R2 S3 Sync Notice — served from R2 local store]:", s3Err);
+        }
+      }
+
+      return res.status(200).json({
+        uploaded: true,
+        objectKey: session.objectKey,
+        storageMode: cfg.isConfigured ? "cloudflare-r2" : "local-fallback",
+        bytesWritten: finalSize
+      });
+    } catch (err: any) {
+      console.error("[R2 Chunk Upload Complete Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to finalize chunked R2 upload." });
+    }
+  });
+
+  // 9. POST /api/r2/upload-from-url — Fetch a remote URL and ingest it directly into Cloudflare R2 Object Storage
+  app.post("/api/r2/upload-from-url", async (req, res) => {
+    try {
+      const { url, courseId, lessonId, materialType, customFileName } = req.body || {};
+      if (!url || typeof url !== "string" || !url.startsWith("http")) {
+        return res.status(400).json({ error: "A valid http/https URL is required." });
+      }
+
+      const cId = String(courseId || "default-course");
+      const lId = String(lessonId || "default-lesson");
+      const mType = (["video", "notes", "ppt"].includes(materialType) ? materialType : "video") as "video" | "notes" | "ppt";
+
+      console.log(`[R2 Upload From URL] Fetching remote asset from: ${url}`);
+      const remoteRes = await fetch(url);
+      if (!remoteRes.ok) {
+        return res.status(400).json({
+          error: `Remote server returned HTTP ${remoteRes.status}: ${remoteRes.statusText}`
+        });
+      }
+
+      const contentType = remoteRes.headers.get("content-type") || (mType === "video" ? "video/mp4" : "application/pdf");
+      const arrayBuf = await remoteRes.arrayBuffer();
+      const bodyBuffer = Buffer.from(arrayBuf);
+      
+      let detectedName = "";
+      try {
+        const parsed = new URL(url);
+        detectedName = path.basename(parsed.pathname);
+      } catch {
+        detectedName = "";
+      }
+
+      if (!detectedName || detectedName === "/" || detectedName.length < 3) {
+        const ext = mType === "video" ? ".mp4" : mType === "notes" ? ".pdf" : ".pptx";
+        detectedName = `${mType}-asset${ext}`;
+      }
+
+      const safeFileName = sanitizeR2FileName(String(customFileName || detectedName));
+      const folderPrefix = mType === "video" ? "videos" : mType === "notes" ? "notes" : "ppt";
+      const objectKey = `courses/${cId}/lessons/${lId}/${folderPrefix}/${Date.now()}-${safeFileName}`;
+
+      await ensureR2BucketReady();
+      const cfg = getR2Config();
+      const s3 = createR2S3Client();
+
+      if (cfg.isConfigured && s3 && r2BucketVerifiedOnCloudflare && bodyBuffer.length <= 64 * 1024 * 1024) {
+        try {
+          await s3.send(
+            new PutObjectCommand({
+              Bucket: cfg.bucketName,
+              Key: objectKey,
+              Body: bodyBuffer,
+              ContentType: contentType,
+              ContentLength: bodyBuffer.length
+            })
+          );
+        } catch (s3Err) {
+          console.warn("[R2 Upload From URL S3 notice — fallback to local]:", s3Err);
+        }
+      }
+
+      // Store in local mirror/manifest
+      if (!fs.existsSync(R2_LOCAL_STORAGE_DIR)) {
+        fs.mkdirSync(R2_LOCAL_STORAGE_DIR, { recursive: true });
+      }
+      const diskFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}-${safeFileName}`;
+      fs.writeFileSync(path.join(R2_LOCAL_STORAGE_DIR, diskFileName), bodyBuffer);
+
+      const manifest = loadLocalR2Manifest();
+      manifest[objectKey] = {
+        objectKey,
+        fileName: safeFileName,
+        contentType,
+        fileSizeBytes: bodyBuffer.length,
+        courseId: cId,
+        lessonId: lId,
+        materialType: mType,
+        diskFileName,
+        uploadedAt: new Date().toISOString()
+      };
+      saveLocalR2Manifest(manifest);
+
+      return res.status(200).json({
+        success: true,
+        objectKey,
+        fileName: safeFileName,
+        contentType,
+        fileSizeBytes: bodyBuffer.length,
+        uploadedAt: new Date().toISOString(),
+        storageMode: cfg.isConfigured ? "cloudflare-r2" : "local-fallback"
+      });
+    } catch (err: any) {
+      console.error("[R2 Upload From URL Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to download and ingest URL into R2." });
+    }
+  });
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

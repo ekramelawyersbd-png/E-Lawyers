@@ -1,6 +1,14 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import nodemailer from 'nodemailer';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  PutBucketCorsCommand
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { 
   generateAppointmentEmailHtml, 
   generateAppointmentReminderEmailHtml, 
@@ -532,4 +540,721 @@ export const paymentIpnListener = functions.https.onRequest(async (req, res) => 
     });
   }
 });
+
+// ============================================================================
+// CLOUDFLARE R2 OBJECT STORAGE — FIREBASE CLOUD FUNCTIONS FOR LMS MATERIALS
+// ============================================================================
+
+const ADMIN_EMAIL_ALLOWLIST = new Set([
+  'admin@admin.com',
+  'hmekram@gmail.com',
+  'hmekram@mail.com',
+  'ekram.elawyersbd@gmail.com',
+  'ekram@elawyersbd.com',
+  'admin@erpforu.com'
+]);
+
+function getR2CloudFunctionConfig() {
+  const accountId = (
+    process.env.R2_ACCOUNT_ID || '548cb385feaecf69c7e5d37728a7f726'
+  ).trim();
+  const accessKeyId = (
+    process.env.R2_ACCESS_KEY_ID || '8debe5f301907cdc986f98ab91013311'
+  ).trim();
+  const secretAccessKey = (
+    process.env.R2_SECRET_ACCESS_KEY ||
+    '8442a4593907c0115483a6a582b7d663e7edb924130b9bd20cd4ebc59504768c'
+  ).trim();
+  const bucketName = (
+    process.env.R2_BUCKET_NAME || 'elawyers-lms-assets'
+  ).trim();
+  const endpoint = (
+    process.env.R2_ENDPOINT ||
+    `https://${accountId}.r2.cloudflarestorage.com`
+  ).trim();
+  const signedUrlTtlSeconds = Math.max(
+    300,
+    Math.min(86400, Number(process.env.R2_SIGNED_URL_TTL_SECONDS) || 3600)
+  );
+
+  return {
+    accountId,
+    accessKeyId,
+    secretAccessKey,
+    bucketName,
+    endpoint,
+    signedUrlTtlSeconds,
+    isConfigured: Boolean(accountId && accessKeyId && secretAccessKey && bucketName)
+  };
+}
+
+function getR2S3Client(): S3Client {
+  const cfg = getR2CloudFunctionConfig();
+  return new S3Client({
+    region: 'auto',
+    endpoint: cfg.endpoint,
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
+    credentials: {
+      accessKeyId: cfg.accessKeyId,
+      secretAccessKey: cfg.secretAccessKey
+    }
+  });
+}
+
+let r2BucketCorsConfigured = false;
+async function ensureR2BucketCorsConfigured(s3: S3Client, bucketName: string): Promise<void> {
+  if (r2BucketCorsConfigured) return;
+  try {
+    await s3.send(
+      new PutBucketCorsCommand({
+        Bucket: bucketName,
+        CORSConfiguration: {
+          CORSRules: [
+            {
+              AllowedHeaders: ['*'],
+              AllowedMethods: ['GET', 'PUT', 'POST', 'HEAD', 'DELETE'],
+              AllowedOrigins: ['*'],
+              ExposeHeaders: ['ETag', 'Content-Length', 'Content-Range', 'Accept-Ranges'],
+              MaxAgeSeconds: 86400
+            }
+          ]
+        }
+      })
+    );
+    r2BucketCorsConfigured = true;
+  } catch (err) {
+    console.warn('[R2 Cloud Function CORS Setup Notice]:', err);
+  }
+}
+
+function sanitizeR2FileName(name: string): string {
+  return (
+    name
+      .replace(/[^a-zA-Z0-9._-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 120) || 'material.bin'
+  );
+}
+
+/**
+ * Helper: Verify whether the authenticated caller is an admin or instructor
+ */
+async function isUserAdminOrInstructor(
+  uid: string,
+  email?: string,
+  tokenClaims?: Record<string, any>
+): Promise<boolean> {
+  if (email && ADMIN_EMAIL_ALLOWLIST.has(email.toLowerCase())) {
+    return true;
+  }
+  if (tokenClaims?.role === 'admin' || tokenClaims?.admin === true) {
+    return true;
+  }
+  try {
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      const role = (userData?.role || '').toString().toLowerCase();
+      if (role === 'admin' || role === 'instructor' || role === 'superadmin') {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('[R2 Auth Check] Error checking user role document:', err);
+  }
+  return false;
+}
+
+/**
+ * Helper: Verify whether the authenticated user has an active enrollment for the target course
+ */
+async function verifyStudentCourseEnrollment(
+  uid: string,
+  email: string | undefined,
+  courseId: string
+): Promise<boolean> {
+  // Admins and instructors always have read access to course materials
+  const isAdmin = await isUserAdminOrInstructor(uid, email);
+  if (isAdmin) return true;
+
+  try {
+    // 1. Check `lms_enrollments` collection (primary LMS collection)
+    const lmsEnrollmentDoc = await db.collection('lms_enrollments').doc(uid).get();
+    if (lmsEnrollmentDoc.exists) {
+      const data = lmsEnrollmentDoc.data();
+      if (
+        Array.isArray(data?.enrolledCourseIds) &&
+        data.enrolledCourseIds.includes(courseId)
+      ) {
+        return true;
+      }
+    }
+
+    // 2. Check `enrollments` collection by userId/studentId + courseId
+    const directEnrollmentDoc = await db
+      .collection('enrollments')
+      .doc(`${uid}_${courseId}`)
+      .get();
+    if (directEnrollmentDoc.exists) {
+      const data = directEnrollmentDoc.data();
+      const status = (data?.status || 'active').toString().toLowerCase();
+      if (status === 'active' || status === 'completed' || status === 'enrolled') {
+        return true;
+      }
+    }
+
+    const enrollmentByUidSnap = await db
+      .collection('enrollments')
+      .where('userId', '==', uid)
+      .get();
+    for (const docSnap of enrollmentByUidSnap.docs) {
+      const d = docSnap.data();
+      if (
+        (d.courseId === courseId || d.courseSlug === courseId) &&
+        ['active', 'completed', 'enrolled'].includes(
+          (d.status || 'active').toString().toLowerCase()
+        )
+      ) {
+        return true;
+      }
+    }
+
+    // 2. Check `lmsEnrollments` or `studentProgress` collection
+    const lmsProgressDoc = await db.collection('lmsProgress').doc(uid).get();
+    if (lmsProgressDoc.exists) {
+      const progressData = lmsProgressDoc.data();
+      if (
+        progressData?.enrolledCourses?.includes(courseId) ||
+        progressData?.courses?.[courseId]
+      ) {
+        return true;
+      }
+    }
+
+    // 3. Check `purchases` collection for completed course purchase
+    const purchasesByUidSnap = await db
+      .collection('purchases')
+      .where('userId', '==', uid)
+      .get();
+    for (const docSnap of purchasesByUidSnap.docs) {
+      const p = docSnap.data();
+      const status = (p.status || p.paymentStatus || '').toString().toUpperCase();
+      if (
+        (status === 'COMPLETED' || status === 'SUCCESS' || status === 'PAID') &&
+        (p.courseId === courseId ||
+          p.productId === courseId ||
+          p.metadata?.courseId === courseId)
+      ) {
+        return true;
+      }
+    }
+
+    // 4. Check `users/{uid}` profile for enrolledCourses array
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      const u = userDoc.data();
+      if (
+        Array.isArray(u?.enrolledCourses) &&
+        u.enrolledCourses.includes(courseId)
+      ) {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('[R2 Enrollment Check] Error querying Firestore enrollment records:', err);
+  }
+
+  return false;
+}
+
+/**
+ * Callable Cloud Function: generateR2PresignedUploadUrl
+ * Generates a secure Cloudflare R2 presigned PUT URL for uploading LMS course materials
+ * (Video lessons, PDF reading notes, PPT slide decks).
+ */
+export const generateR2PresignedUploadUrl = functions.https.onCall(
+  async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        'You must be signed in to request an R2 upload presigned URL.'
+      );
+    }
+
+    const uid = context.auth.uid;
+    const email = context.auth.token.email;
+    const isAuthorized = await isUserAdminOrInstructor(uid, email, context.auth.token);
+
+    if (!isAuthorized) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        'Only authorized administrators or instructors can upload LMS course materials to R2.'
+      );
+    }
+
+    const {
+      courseId,
+      lessonId,
+      materialType,
+      fileName,
+      contentType,
+      fileSizeBytes
+    } = data || {};
+
+    if (!courseId || !lessonId || !materialType || !fileName) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'courseId, lessonId, materialType, and fileName are required.'
+      );
+    }
+
+    if (!['video', 'notes', 'ppt'].includes(materialType)) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Invalid materialType. Allowed values: video, notes, ppt.'
+      );
+    }
+
+    const safeCourse = String(courseId).replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeLesson = String(lessonId).replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeFile = sanitizeR2FileName(String(fileName));
+    const timestamp = Date.now();
+    const objectKey = `lms/${safeCourse}/${safeLesson}/${materialType}/${timestamp}-${safeFile}`;
+    const resolvedMime = String(contentType || 'application/octet-stream');
+    const resolvedSize = Number(fileSizeBytes) || 0;
+
+    const cfg = getR2CloudFunctionConfig();
+    const s3 = getR2S3Client();
+
+    try {
+      await ensureR2BucketCorsConfigured(s3, cfg.bucketName);
+
+      const putCommand = new PutObjectCommand({
+        Bucket: cfg.bucketName,
+        Key: objectKey,
+        ContentType: resolvedMime
+      });
+
+      const expiresInSeconds = 3600; // 60 minutes for direct browser PUT upload
+      const uploadUrl = await getSignedUrl(s3, putCommand, {
+        expiresIn: expiresInSeconds
+      });
+
+      // Record upload audit trail in Firestore
+      await db.collection('r2MaterialUploads').add({
+        objectKey,
+        bucketName: cfg.bucketName,
+        courseId: safeCourse,
+        lessonId: safeLesson,
+        materialType,
+        fileName: String(fileName),
+        contentType: resolvedMime,
+        fileSizeBytes: resolvedSize,
+        uploadedByUid: uid,
+        uploadedByEmail: email || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        expiresInSeconds
+      });
+
+      return {
+        uploadUrl,
+        method: 'PUT' as const,
+        objectKey,
+        bucketName: cfg.bucketName,
+        storageMode: 'cloudflare-r2' as const,
+        expiresInSeconds,
+        headers: {
+          'Content-Type': resolvedMime
+        }
+      };
+    } catch (err: any) {
+      console.error('[R2 Cloud Function Presign Upload Error]:', err);
+      throw new functions.https.HttpsError(
+        'internal',
+        err?.message || 'Failed to generate Cloudflare R2 presigned upload URL.'
+      );
+    }
+  }
+);
+
+/**
+ * Callable Cloud Function: generateR2TemporaryReadUrl
+ * Verifies user authentication and active course enrollment in Firestore,
+ * then generates a temporary signed R2 GetObject read URL for streaming video,
+ * reading PDF notes, or viewing PPT slides.
+ */
+export const generateR2TemporaryReadUrl = functions.https.onCall(
+  async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        'Authentication is required to access protected LMS course materials.'
+      );
+    }
+
+    const uid = context.auth.uid;
+    const email = context.auth.token.email;
+    const { objectKey, courseId, lessonId, materialType } = data || {};
+
+    if (!objectKey || typeof objectKey !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'A valid R2 objectKey is required.'
+      );
+    }
+
+    if (!courseId || typeof courseId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'courseId is required to verify course enrollment.'
+      );
+    }
+
+    // Verify that the student is enrolled in the course (or is an admin/instructor)
+    const isEnrolled = await verifyStudentCourseEnrollment(uid, email, courseId);
+    if (!isEnrolled) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        'Active course enrollment is required to access this learning material.'
+      );
+    }
+
+    const cfg = getR2CloudFunctionConfig();
+    const s3 = getR2S3Client();
+
+    try {
+      const getCommand = new GetObjectCommand({
+        Bucket: cfg.bucketName,
+        Key: objectKey
+      });
+
+      const signedReadUrl = await getSignedUrl(s3, getCommand, {
+        expiresIn: cfg.signedUrlTtlSeconds
+      });
+
+      const expiresAt = new Date(
+        Date.now() + cfg.signedUrlTtlSeconds * 1000
+      ).toISOString();
+
+      // Log read access audit event in Firestore (non-blocking)
+      try {
+        await db.collection('r2MaterialAccessLogs').add({
+          objectKey,
+          courseId,
+          lessonId: lessonId || null,
+          materialType: materialType || null,
+          studentUid: uid,
+          studentEmail: email || null,
+          expiresAt,
+          accessedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.warn('[R2 Access Log Notice]:', logErr);
+      }
+
+      return {
+        signedReadUrl,
+        objectKey,
+        storageMode: 'cloudflare-r2' as const,
+        expiresInSeconds: cfg.signedUrlTtlSeconds,
+        expiresAt,
+        authorizedFor: email || uid
+      };
+    } catch (err: any) {
+      console.error('[R2 Cloud Function Temporary Read URL Error]:', err);
+      throw new functions.https.HttpsError(
+        'internal',
+        err?.message || 'Failed to generate temporary R2 read URL.'
+      );
+    }
+  }
+);
+
+/**
+ * Callable Cloud Function: deleteR2CourseMaterialObject
+ * Allows authorized admins or instructors to delete an R2 object from the bucket.
+ */
+export const deleteR2CourseMaterialObject = functions.https.onCall(
+  async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        'Authentication is required to delete R2 course materials.'
+      );
+    }
+
+    const uid = context.auth.uid;
+    const email = context.auth.token.email;
+    const isAuthorized = await isUserAdminOrInstructor(uid, email, context.auth.token);
+
+    if (!isAuthorized) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        'Only administrators or instructors can delete R2 course materials.'
+      );
+    }
+
+    const { objectKey } = data || {};
+    if (!objectKey || typeof objectKey !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'objectKey is required.'
+      );
+    }
+
+    const cfg = getR2CloudFunctionConfig();
+    const s3 = getR2S3Client();
+
+    try {
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: cfg.bucketName,
+          Key: objectKey
+        })
+      );
+
+      return {
+        deleted: true,
+        objectKey
+      };
+    } catch (err: any) {
+      console.error('[R2 Cloud Function Delete Error]:', err);
+      throw new functions.https.HttpsError(
+        'internal',
+        err?.message || 'Failed to delete R2 object.'
+      );
+    }
+  }
+);
+
+/**
+ * Helper: Extract and verify Firebase Auth Bearer token from HTTPS Request headers
+ */
+async function verifyBearerTokenFromRequest(
+  req: functions.https.Request
+): Promise<admin.auth.DecodedIdToken> {
+  const authHeader = req.headers.authorization || '';
+  if (!authHeader.startsWith('Bearer ')) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'Missing or invalid Authorization Bearer token header.'
+    );
+  }
+  const idToken = authHeader.slice('Bearer '.length).trim();
+  if (!idToken) {
+    throw new functions.https.HttpsError('unauthenticated', 'Empty Bearer token.');
+  }
+  return await admin.auth().verifyIdToken(idToken);
+}
+
+/**
+ * HTTPS Endpoint Cloud Function: r2PresignUploadEndpoint
+ * POST endpoint that authenticates the caller via Firebase ID token, verifies admin/instructor role,
+ * and returns a presigned Cloudflare R2 PUT URL for uploading course materials.
+ */
+export const r2PresignUploadEndpoint = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+    return;
+  }
+
+  try {
+    const decodedToken = await verifyBearerTokenFromRequest(req);
+    const isAuthorized = await isUserAdminOrInstructor(
+      decodedToken.uid,
+      decodedToken.email,
+      decodedToken
+    );
+
+    if (!isAuthorized) {
+      res.status(403).json({
+        error: 'Only authorized administrators or instructors can upload LMS course materials.'
+      });
+      return;
+    }
+
+    const {
+      courseId,
+      lessonId,
+      materialType,
+      fileName,
+      contentType,
+      fileSizeBytes
+    } = req.body || {};
+
+    if (!courseId || !lessonId || !materialType || !fileName) {
+      res.status(400).json({
+        error: 'courseId, lessonId, materialType, and fileName are required.'
+      });
+      return;
+    }
+
+    if (!['video', 'notes', 'ppt'].includes(materialType)) {
+      res.status(400).json({
+        error: 'Invalid materialType. Allowed values: video, notes, ppt.'
+      });
+      return;
+    }
+
+    const safeCourse = String(courseId).replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeLesson = String(lessonId).replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeFile = sanitizeR2FileName(String(fileName));
+    const timestamp = Date.now();
+    const objectKey = `lms/${safeCourse}/${safeLesson}/${materialType}/${timestamp}-${safeFile}`;
+    const resolvedMime = String(contentType || 'application/octet-stream');
+    const resolvedSize = Number(fileSizeBytes) || 0;
+
+    const cfg = getR2CloudFunctionConfig();
+    const s3 = getR2S3Client();
+
+    await ensureR2BucketCorsConfigured(s3, cfg.bucketName);
+
+    const putCommand = new PutObjectCommand({
+      Bucket: cfg.bucketName,
+      Key: objectKey,
+      ContentType: resolvedMime
+    });
+
+    const expiresInSeconds = 3600;
+    const uploadUrl = await getSignedUrl(s3, putCommand, {
+      expiresIn: expiresInSeconds
+    });
+
+    await db.collection('r2MaterialUploads').add({
+      objectKey,
+      bucketName: cfg.bucketName,
+      courseId: safeCourse,
+      lessonId: safeLesson,
+      materialType,
+      fileName: String(fileName),
+      contentType: resolvedMime,
+      fileSizeBytes: resolvedSize,
+      uploadedByUid: decodedToken.uid,
+      uploadedByEmail: decodedToken.email || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresInSeconds
+    });
+
+    res.status(200).json({
+      uploadUrl,
+      method: 'PUT',
+      objectKey,
+      bucketName: cfg.bucketName,
+      storageMode: 'cloudflare-r2',
+      expiresInSeconds,
+      headers: {
+        'Content-Type': resolvedMime
+      }
+    });
+  } catch (err: any) {
+    console.error('[r2PresignUploadEndpoint Error]:', err);
+    const status = err?.code === 'unauthenticated' ? 401 : 500;
+    res.status(status).json({
+      error: err?.message || 'Failed to generate R2 presigned upload URL.'
+    });
+  }
+});
+
+/**
+ * HTTPS Endpoint Cloud Function: r2TemporaryReadUrlEndpoint
+ * POST endpoint that authenticates the student via Firebase ID token, checks Firestore enrollment,
+ * and returns a temporary signed R2 GetObject read URL for the course material.
+ */
+export const r2TemporaryReadUrlEndpoint = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+    return;
+  }
+
+  try {
+    const decodedToken = await verifyBearerTokenFromRequest(req);
+    const { objectKey, courseId, lessonId, materialType } = req.body || {};
+
+    if (!objectKey || typeof objectKey !== 'string') {
+      res.status(400).json({ error: 'A valid R2 objectKey is required.' });
+      return;
+    }
+
+    if (!courseId || typeof courseId !== 'string') {
+      res.status(400).json({ error: 'courseId is required to verify course enrollment.' });
+      return;
+    }
+
+    const isEnrolled = await verifyStudentCourseEnrollment(
+      decodedToken.uid,
+      decodedToken.email,
+      courseId
+    );
+
+    if (!isEnrolled) {
+      res.status(403).json({
+        error: 'Active course enrollment is required to access this learning material.'
+      });
+      return;
+    }
+
+    const cfg = getR2CloudFunctionConfig();
+    const s3 = getR2S3Client();
+
+    const getCommand = new GetObjectCommand({
+      Bucket: cfg.bucketName,
+      Key: objectKey
+    });
+
+    const signedReadUrl = await getSignedUrl(s3, getCommand, {
+      expiresIn: cfg.signedUrlTtlSeconds
+    });
+
+    const expiresAt = new Date(
+      Date.now() + cfg.signedUrlTtlSeconds * 1000
+    ).toISOString();
+
+    await db.collection('r2MaterialAccessLogs').add({
+      objectKey,
+      courseId,
+      lessonId: lessonId || null,
+      materialType: materialType || null,
+      studentUid: decodedToken.uid,
+      studentEmail: decodedToken.email || null,
+      expiresAt,
+      accessedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    res.status(200).json({
+      signedReadUrl,
+      objectKey,
+      storageMode: 'cloudflare-r2',
+      expiresInSeconds: cfg.signedUrlTtlSeconds,
+      expiresAt,
+      authorizedFor: decodedToken.email || decodedToken.uid
+    });
+  } catch (err: any) {
+    console.error('[r2TemporaryReadUrlEndpoint Error]:', err);
+    const status = err?.code === 'unauthenticated' ? 401 : 500;
+    res.status(status).json({
+      error: err?.message || 'Failed to generate temporary R2 read URL.'
+    });
+  }
+});
+
 

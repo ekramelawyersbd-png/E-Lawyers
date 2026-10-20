@@ -59,18 +59,26 @@ export function TrainingHub() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
-            to="/article/professional-training-academy-bangladesh"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
-          >
-            <BookOpen className="w-4 h-4 text-emerald-400" />
-            <span>Read Academy Overview & Curriculum</span>
-          </Link>
-          <a
-            href="tel:+8801335230170"
+            to="/student/dashboard"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-sm"
           >
-            <span>Direct Enrollment Helpline: +88 01335230170</span>
-          </a>
+            <MonitorPlay className="w-4 h-4 text-emerald-200" />
+            <span>Open Student Learning Portal (LMS)</span>
+          </Link>
+          <Link
+            to="/verify-certificate"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
+          >
+            <Award className="w-4 h-4 text-emerald-400" />
+            <span>Public Certificate Verification</span>
+          </Link>
+          <Link
+            to="/admin/dashboard"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 transition-colors shadow-sm"
+          >
+            <BookOpen className="w-4 h-4 text-emerald-600" />
+            <span>Admin LMS Course Editor</span>
+          </Link>
         </div>
       </div>
       

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { BookOpen, Clock, CheckCircle2, Bookmark, ArrowUp, Sparkles } from 'lucide-react';
+import { BookOpen, Clock, CheckCircle2, Bookmark, ArrowUp, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
 import { ReadAloudButton } from './ReadAloudButton';
 
 interface ArticleReadingProgressProps {
@@ -10,6 +10,8 @@ interface ArticleReadingProgressProps {
   rawContent?: string;
   isSaved?: boolean;
   onToggleSave?: () => void;
+  isFocusMode?: boolean;
+  onToggleFocusMode?: () => void;
 }
 
 export function ArticleReadingProgress({
@@ -20,6 +22,8 @@ export function ArticleReadingProgress({
   rawContent,
   isSaved = false,
   onToggleSave,
+  isFocusMode = false,
+  onToggleFocusMode,
 }: ArticleReadingProgressProps) {
   const [progress, setProgress] = useState(0);
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -164,6 +168,25 @@ export function ArticleReadingProgress({
                   aria-label="Bookmark article"
                 >
                   <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+                </button>
+              )}
+
+              {onToggleFocusMode && (
+                <button
+                  type="button"
+                  onClick={onToggleFocusMode}
+                  className={`p-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isFocusMode
+                      ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200'
+                  }`}
+                  title={isFocusMode ? 'Exit Focus Mode (Esc)' : 'Enter Focus Mode (Distraction-free reading)'}
+                  aria-label="Toggle Focus Mode"
+                >
+                  {isFocusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                  <span className="hidden lg:inline text-xs font-semibold">
+                    {isFocusMode ? 'Exit Focus' : 'Focus'}
+                  </span>
                 </button>
               )}
 

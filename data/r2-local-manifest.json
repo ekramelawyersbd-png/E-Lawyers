@@ -1,0 +1,24 @@
+{
+  "lms/personal-income-tax/cls_01/video/1792511380058-video1236082108.mp4": {
+    "objectKey": "lms/personal-income-tax/cls_01/video/1792511380058-video1236082108.mp4",
+    "fileName": "video1236082108.mp4",
+    "contentType": "video/mp4",
+    "fileSizeBytes": 121868153,
+    "courseId": "personal-income-tax",
+    "lessonId": "cls_01",
+    "materialType": "video",
+    "diskFileName": "1792511380177-9244612d-video1236082108.mp4",
+    "uploadedAt": "2026-10-20T15:51:27.155Z"
+  },
+  "lms/personal-income-tax/cls_01/video/1792511831634-video1236082108.mp4": {
+    "objectKey": "lms/personal-income-tax/cls_01/video/1792511380058-video1236082108.mp4",
+    "fileName": "video1236082108.mp4",
+    "contentType": "video/mp4",
+    "fileSizeBytes": 121868153,
+    "courseId": "personal-income-tax",
+    "lessonId": "cls_01",
+    "materialType": "video",
+    "diskFileName": "1792511380177-9244612d-video1236082108.mp4",
+    "uploadedAt": "2026-10-20T15:51:27.155Z"
+  }
+}

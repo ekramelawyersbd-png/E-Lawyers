@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck } from 'lucide-react';
+import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck, Maximize2, Minimize2 } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,6 +17,8 @@ import { ChecklistExporter } from '../components/ChecklistExporter';
 import { SocialShareButtons } from '../components/SocialShareButtons';
 import { useAuth } from '../contexts/AuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
+import { useFocusMode } from '../contexts/FocusModeContext';
+import { FocusModeReaderBar } from '../components/article/FocusModeReaderBar';
 
 import { ComplianceChecklist } from '../components/ComplianceChecklist';
 import { ImageCarousel } from '../components/ImageCarousel';
@@ -87,6 +89,100 @@ export function Article() {
   }, [article]);
   const popularArticles = mockArticles.slice(0, 4);
   const { isLoaded: isFeaturedLoaded, hasError: hasFeaturedError } = useImageLoader(article?.imageUrl);
+
+  const { isFocusMode, toggleFocusMode, readerTheme, readerFontSize } = useFocusMode();
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Scroll-based progress tracker for Focus Mode reader bar
+  useEffect(() => {
+    let animationFrameId: number;
+    const calculateProgress = () => {
+      const targetElement = document.getElementById('article-content-body');
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      if (targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const startOffset = 180;
+        const elementTop = rect.top;
+        const elementHeight = rect.height;
+        if (elementTop > startOffset) {
+          setScrollProgress(0);
+        } else {
+          const scrollableDistance = Math.max(1, elementHeight - viewportHeight * 0.6);
+          const scrolledPastStart = startOffset - elementTop;
+          const currentPct = Math.min(100, Math.max(0, Math.round((scrolledPastStart / scrollableDistance) * 100)));
+          setScrollProgress(currentPct);
+        }
+      } else {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight > 0) {
+          setScrollProgress(Math.min(100, Math.max(0, Math.round((scrollY / docHeight) * 100))));
+        }
+      }
+    };
+
+    const handleScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(calculateProgress);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    calculateProgress();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [article?.id]);
+
+  // Keyboard shortcut listener: 'Esc' exits Focus Mode, 'F' toggles Focus Mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === 'Escape' && isFocusMode) {
+        toggleFocusMode();
+      } else if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        toggleFocusMode();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFocusMode, toggleFocusMode]);
+
+  const headingColorClass = !isFocusMode || readerTheme === 'light'
+    ? 'text-slate-900'
+    : readerTheme === 'sepia'
+    ? 'text-[#2d2216]'
+    : 'text-white';
+
+  const excerptColorClass = !isFocusMode || readerTheme === 'light'
+    ? 'text-slate-600'
+    : readerTheme === 'sepia'
+    ? 'text-[#5c4a36]'
+    : 'text-slate-300';
+
+  const proseThemeClass = !isFocusMode
+    ? 'prose-slate prose-headings:text-slate-900 prose-a:text-emerald-600'
+    : readerTheme === 'sepia'
+    ? 'prose-amber text-[#3c2f1f] prose-headings:text-[#2d2216] prose-p:text-[#3c2f1f] prose-strong:text-[#2d2216] prose-a:text-[#a0522d]'
+    : readerTheme === 'dark'
+    ? 'prose-invert text-slate-200 prose-headings:text-white prose-p:text-slate-300 prose-strong:text-white prose-a:text-emerald-400'
+    : 'prose-slate prose-headings:text-slate-900 prose-a:text-emerald-600';
+
+  const proseSizeClass = !isFocusMode
+    ? 'prose-lg'
+    : readerFontSize === 'sm'
+    ? 'prose-base'
+    : readerFontSize === 'lg'
+    ? 'prose-xl'
+    : readerFontSize === 'xl'
+    ? 'prose-2xl'
+    : 'prose-lg';
 
 
 
@@ -446,28 +542,61 @@ export function Article() {
         canonicalUrl={canonicalUrl}
         customSchema={articleCustomSchema} 
       />
-      {!isLongForm && <ReadProgress />}
+      {!isFocusMode && !isLongForm && <ReadProgress />}
 
-      {/* Floating Left Social Share Rail for Desktop */}
-      <SocialShareButtons 
-        url={`/article/${article.id}`}
-        title={article.title} 
-        summary={article.excerpt} 
-        variant="floating-rail" 
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <Breadcrumbs 
-          items={[
-            { label: article.category, path: `/category/${article.categoryId}` },
-            { label: article.title }
-          ]} 
+      {/* Dedicated Focus Mode Reading Bar at Top of Viewport */}
+      {isFocusMode && (
+        <FocusModeReaderBar 
+          articleTitle={article.title}
+          category={article.category}
+          readTime={readingTimeMinutes}
+          progressPercent={scrollProgress}
+          content={localizedContent}
+          isSaved={isSaved}
+          onToggleSave={toggleSave}
         />
+      )}
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      {/* Floating Left Social Share Rail for Desktop (Hidden in Focus Mode) */}
+      {!isFocusMode && (
+        <SocialShareButtons 
+          url={`/article/${article.id}`}
+          title={article.title} 
+          summary={article.excerpt} 
+          variant="floating-rail" 
+        />
+      )}
+
+      <div className={isFocusMode ? "max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12 transition-all duration-300" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12"}>
+        {!isFocusMode && (
+          <Breadcrumbs 
+            items={[
+              { label: article.category, path: `/category/${article.categoryId}` },
+              { label: article.title }
+            ]} 
+          />
+        )}
+
+        {isFocusMode && (
+          <div className="mb-8 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between gap-3 text-xs animate-in fade-in">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span><strong>Focus Mode:</strong> Distraction-free reading experience. Navigation and sidebars are hidden. Press <kbd className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-[10px]">Esc</kbd> or <kbd className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-[10px]">F</kbd> to toggle.</span>
+            </div>
+            <button
+              type="button"
+              onClick={toggleFocusMode}
+              className="text-emerald-700 dark:text-emerald-400 font-bold hover:underline shrink-0 cursor-pointer"
+            >
+              Exit Focus (Esc)
+            </button>
+          </div>
+        )}
+
+        <div className={`mt-8 ${isFocusMode ? 'space-y-8' : 'grid grid-cols-1 lg:grid-cols-12 gap-12'}`}>
           
           {/* Main Content Area */}
-          <div className="lg:col-span-8 leading-[25px] w-full min-w-0">
+          <div className={`${isFocusMode ? 'w-full' : 'lg:col-span-8'} leading-[25px] w-full min-w-0`}>
             
             {article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && (
               <LegalAlertBanner />
@@ -482,7 +611,7 @@ export function Article() {
                 <EstimatedReadingTime content={localizedContent} variant="badge" />
               </div>
               
-              <h1 className="text-[25px] leading-[33px] font-bold text-slate-900 mb-4">
+              <h1 className={`text-[25px] leading-[33px] font-bold ${headingColorClass} mb-4 transition-colors duration-200`}>
                 {article.title}
               </h1>
 
@@ -491,30 +620,61 @@ export function Article() {
                 <EstimatedReadingTime content={localizedContent} variant="sub-header" />
               </div>
 
-              <p className="text-[15px] leading-[25px] text-justify text-slate-600 mb-8">
+              <p className={`text-[15px] leading-[25px] text-justify ${excerptColorClass} mb-8 transition-colors duration-200`}>
                 {article.excerpt}
               </p>
               
-              <div className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-4">
                   <img src={article.author.avatarUrl} alt={article.author.name} className="w-12 h-12 rounded-full border border-slate-200 object-cover" />
                   <div>
-                    <p className="font-bold text-slate-900">{article.author.name}</p>
+                    <p className={`font-bold ${headingColorClass}`}>{article.author.name}</p>
                     <div className="flex items-center gap-3 text-sm text-slate-500">
                       <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {format(new Date(article.publishedAt), 'MMM d, yyyy')}</span>
                       <span>&bull;</span>
                       <EstimatedReadingTime content={localizedContent} variant="inline" />
-                      <span>&bull;</span>
-                      <a href="#professional-comments-section" className="flex items-center gap-1 text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
-                        <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Discussion</span>
-                      </a>
+                      {!isFocusMode && (
+                        <>
+                          <span>&bull;</span>
+                          <a href="#professional-comments-section" className="flex items-center gap-1 text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
+                            <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Discussion</span>
+                          </a>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Text-to-Speech (TTS) Reader Button */}
+                    <ReadAloudButton
+                      content={localizedContent}
+                      title={article.title}
+                      variant="pill"
+                      showSecurityBadge={true}
+                    />
+
+                    {/* Focus Mode Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={toggleFocusMode}
+                      title={isFocusMode ? "Exit Focus Mode (Esc)" : "Enter Focus Mode: Hide navigation and sidebars for clean, distraction-free reading"}
+                      aria-label="Toggle Focus Mode"
+                      className={`px-3.5 py-2.5 rounded-xl border font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs ${
+                        isFocusMode 
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm' 
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300'
+                      }`}
+                    >
+                      {isFocusMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4 text-emerald-600" />}
+                      <span className="text-sm font-semibold">{isFocusMode ? "Exit Focus" : "Focus Mode"}</span>
+                      <kbd className="hidden sm:inline-block text-[10px] bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">
+                        F
+                      </kbd>
+                    </button>
+
                     <button 
                       id="article-bookmark-btn"
                       onClick={toggleSave} 
@@ -543,15 +703,17 @@ export function Article() {
                 </div>
               </div>
 
-              {/* Top Social Sharing Bar (LinkedIn, Facebook, WhatsApp, Copy Link) */}
-              <div className="pt-6">
-                <SocialShareButtons 
-                  url={`/article/${article.id}`}
-                  title={article.title} 
-                  summary={article.excerpt} 
-                  variant="top-bar" 
-                />
-              </div>
+              {/* Top Social Sharing Bar (Hidden in Focus Mode) */}
+              {!isFocusMode && (
+                <div className="pt-6">
+                  <SocialShareButtons 
+                    url={`/article/${article.id}`}
+                    title={article.title} 
+                    summary={article.excerpt} 
+                    variant="top-bar" 
+                  />
+                </div>
+              )}
             </header>
 
             {/* Featured Article Cover Photo with Category Theming, Dynamic Fallback, and Lightbox Zoom */}
@@ -567,6 +729,8 @@ export function Article() {
                 rawContent={localizedContent}
                 isSaved={isSaved}
                 onToggleSave={toggleSave}
+                isFocusMode={isFocusMode}
+                onToggleFocusMode={toggleFocusMode}
               />
             )}
 
@@ -611,7 +775,10 @@ export function Article() {
             )}
 
             {/* 2-7. Article Content Area (Markdown) */}
-            <div id="article-content-body" className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:font-semibold hover:prose-a:text-emerald-700 mb-16">
+            <div 
+              id="article-content-body" 
+              className={`prose ${proseThemeClass} ${proseSizeClass} max-w-none prose-headings:font-bold prose-headings:scroll-mt-28 prose-a:font-semibold hover:prose-a:underline mb-16 transition-colors duration-200`}
+            >
               <Markdown 
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
@@ -838,27 +1005,68 @@ export function Article() {
               </div>
             </div>
 
-            {/* 9. Professional Comments & Peer Discussion Section */}
-            <div id="professional-comments-section" className="mb-12 scroll-mt-24">
-              <CommentSection 
-                articleId={article.id} 
-                articleTitle={article.title}
-                articleCategory={article.category}
-              />
-            </div>
+            {/* 9. Professional Comments & Peer Discussion Section (Hidden in Focus Mode) */}
+            {!isFocusMode && (
+              <div id="professional-comments-section" className="mb-12 scroll-mt-24">
+                <CommentSection 
+                  articleId={article.id} 
+                  articleTitle={article.title}
+                  articleCategory={article.category}
+                />
+              </div>
+            )}
 
-            <BlogDisclaimer topic={article.category} />
+            {!isFocusMode && <BlogDisclaimer topic={article.category} />}
 
-            <RelatedResources currentCategory={article.category} />
+            {!isFocusMode && <RelatedResources currentCategory={article.category} />}
 
-            <ContactELawyers />
+            {!isFocusMode && <ContactELawyers />}
 
-            <ChecklistExporter articleId={article.id} />
+            {!isFocusMode && <ChecklistExporter articleId={article.id} />}
+
+            {/* In Focus Mode: Clean End of Article Completion Card */}
+            {isFocusMode && (
+              <div className={`my-12 p-8 rounded-3xl border text-center space-y-4 transition-colors duration-200 ${
+                readerTheme === 'sepia'
+                  ? 'bg-[#f4ebd8] border-[#e2d5be] text-[#3c2f1f]'
+                  : readerTheme === 'dark'
+                  ? 'bg-slate-900 border-slate-800 text-slate-100'
+                  : 'bg-emerald-500/5 border-emerald-500/20 text-slate-800'
+              }`}>
+                <div className="inline-flex p-3 rounded-2xl bg-emerald-600 text-white shadow-xs">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h3 className={`text-xl font-bold ${headingColorClass}`}>
+                  You have finished reading this guide
+                </h3>
+                <p className={`text-sm max-w-md mx-auto ${excerptColorClass}`}>
+                  Focus Mode provides an ad-free, distraction-free reading experience. You can exit anytime to explore peer discussions, related insights, or professional consultation services.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={toggleFocusMode}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    <Minimize2 className="w-4 h-4" />
+                    <span>Exit Focus Mode</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-black/5 dark:hover:bg-white/5 font-semibold text-xs transition-colors cursor-pointer"
+                  >
+                    Scroll to Top
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
 
-          {/* 12. Sidebar Content (Desktop) */}
-          <div className="lg:col-span-4 relative">
+          {/* 12. Sidebar Content (Desktop) - Hidden in Focus Mode */}
+          {!isFocusMode && (
+            <div className="lg:col-span-4 relative">
             <div className="sticky top-24 max-h-[calc(100vh-6.5rem)] overflow-y-auto space-y-8 pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
               
               {/* Search Box */}
@@ -986,12 +1194,13 @@ export function Article() {
 
             </div>
           </div>
+          )}
 
         </div>
       </div>
 
-      {/* 9. Related Articles (Suggests 3-4 other relevant articles based on categories) */}
-      <RelatedArticles currentArticle={article} maxItems={4} />
+      {/* 9. Related Articles (Hidden in Focus Mode) */}
+      {!isFocusMode && <RelatedArticles currentArticle={article} maxItems={4} />}
     </>
   );
 }
