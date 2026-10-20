@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Download, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
 import { BookmarkSectionButton } from '../components/BookmarkSectionButton';
 import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
-import { FAQ } from '../components/FAQ';
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { Testimonials } from '../components/Testimonials';
 import { SEO } from '../components/SEO';
@@ -19,6 +18,20 @@ export function Home() {
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
   const [isLoadingGuides, setIsLoadingGuides] = useState(true);
   const [heroArticleIndex, setHeroArticleIndex] = useState(0);
+  const [copiedShareLink, setCopiedShareLink] = useState(false);
+
+  const handleCopyShareLink = async () => {
+    try {
+      const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://accounticca.com';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+      setCopiedShareLink(true);
+      setTimeout(() => setCopiedShareLink(false), 2400);
+    } catch {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     // Initial loading state to provide visual skeleton feedback on load
@@ -50,115 +63,6 @@ export function Home() {
   const popularArticles = mockArticles.slice(2, 5); // Just using different slice for mockup
   const legalUpdates = mockArticles.filter(a => a.categoryId === 'updates' || a.categoryId === 'corporate').slice(0, 4);
 
-  const mainCategories = [
-    {
-      id: 'corporate',
-      icon: <Landmark className="w-6 h-6 text-emerald-600" />,
-      title: 'Corporate Law',
-      imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'Company Registration', icon: <Building2 className="w-3.5 h-3.5" /> },
-        { label: 'RJSC Compliance', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
-        { label: 'Share Transfer', icon: <LineChart className="w-3.5 h-3.5" /> },
-        { label: "Directors' Responsibilities", icon: <Users className="w-3.5 h-3.5" /> },
-        { label: 'Corporate Governance', icon: <Scale className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'tax',
-      icon: <Calculator className="w-6 h-6 text-emerald-600" />,
-      title: 'Income Tax',
-      imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'Income Tax Return Filing', icon: <FileText className="w-3.5 h-3.5" /> },
-        { label: 'Tax Calculation Guide', icon: <Calculator className="w-3.5 h-3.5" /> },
-        { label: 'Tax Rebate Rules', icon: <ArrowUpRight className="w-3.5 h-3.5" /> },
-        { label: 'TIN & e-TIN Updates', icon: <Sparkles className="w-3.5 h-3.5" /> },
-        { label: 'NBR Tax Circulars', icon: <FileSignature className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'vat',
-      icon: <FileText className="w-6 h-6 text-emerald-600" />,
-      title: 'VAT & Customs',
-      imageUrl: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'VAT Registration', icon: <FileText className="w-3.5 h-3.5" /> },
-        { label: 'VAT Return Filing', icon: <Calculator className="w-3.5 h-3.5" /> },
-        { label: 'VAT Rules & Procedures', icon: <Scale className="w-3.5 h-3.5" /> },
-        { label: 'Customs Compliance', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
-        { label: 'Import-Export Tax Issues', icon: <Briefcase className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'business',
-      icon: <Briefcase className="w-6 h-6 text-emerald-600" />,
-      title: 'Business & Startup',
-      imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'Business Registration', icon: <Briefcase className="w-3.5 h-3.5" /> },
-        { label: 'Trade License', icon: <FileSignature className="w-3.5 h-3.5" /> },
-        { label: 'Partnership Agreements', icon: <Users className="w-3.5 h-3.5" /> },
-        { label: 'Startup Legal Requirements', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
-        { label: 'Business Compliance Checklist', icon: <CheckSquare className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'legal_docs',
-      icon: <FileSignature className="w-6 h-6 text-emerald-600" />,
-      title: 'Legal Documentation',
-      imageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'Agreement Drafting', icon: <FileSignature className="w-3.5 h-3.5" /> },
-        { label: 'Legal Notices', icon: <FileText className="w-3.5 h-3.5" /> },
-        { label: 'Contracts', icon: <ScrollText className="w-3.5 h-3.5" /> },
-        { label: 'Power of Attorney', icon: <Scale className="w-3.5 h-3.5" /> },
-        { label: 'Deeds & Documents', icon: <BookMarked className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'civil_criminal',
-      icon: <Scale className="w-6 h-6 text-emerald-600" />,
-      title: 'Civil & Criminal Law',
-      imageUrl: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=600&h=400',
-      contents: [
-        { label: 'Property Law', icon: <Landmark className="w-3.5 h-3.5" /> },
-        { label: 'Family Law', icon: <Users className="w-3.5 h-3.5" /> },
-        { label: 'Court Procedures', icon: <Scale className="w-3.5 h-3.5" /> },
-        { label: 'Legal Rights', icon: <ShieldCheck className="w-3.5 h-3.5" /> },
-        { label: 'Litigation Process', icon: <Gavel className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'resources',
-      icon: <BookOpen className="w-6 h-6 text-emerald-600" />,
-      title: 'Resources & Tools',
-      imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=600&h=400',
-      path: '/tools',
-      contents: [
-        { label: 'Tax & VAT Calculators', icon: <Calculator className="w-3.5 h-3.5" /> },
-        { label: 'Resource Library & Forms', icon: <BookOpen className="w-3.5 h-3.5" /> },
-        { label: 'Statutory Compliance Checklists', icon: <CheckSquare className="w-3.5 h-3.5" /> },
-        { label: 'Glossary & Guides', icon: <FileText className="w-3.5 h-3.5" /> },
-        { label: 'CPD Masterclasses', icon: <GraduationCap className="w-3.5 h-3.5" /> }
-      ]
-    },
-    {
-      id: 'community',
-      icon: <Users className="w-6 h-6 text-emerald-600" />,
-      title: 'Community & Network',
-      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600&h=400',
-      path: '/community',
-      contents: [
-        { label: 'Verified Experts Directory', icon: <Users className="w-3.5 h-3.5" /> },
-        { label: 'Legal Q&A & Discussions', icon: <MessageSquare className="w-3.5 h-3.5" /> },
-        { label: 'Upcoming Seminars & CPD', icon: <CalendarIcon className="w-3.5 h-3.5" /> },
-        { label: 'Monthly Top Contributors', icon: <Award className="w-3.5 h-3.5" /> },
-        { label: 'Expert Consultations', icon: <UserCheck className="w-3.5 h-3.5" /> }
-      ]
-    }
-  ];
-
   const featuredGuides = [
     { title: 'Investment Tax Rebate in Bangladesh 2026–2027: Eligible Investments, Limits & Calculation', path: '/article/investment-tax-rebate-bangladesh-2026-2027', category: 'Income Tax', readTime: '12 min read' },
     { title: 'Outsourced Business Support: Extended Business Team for Smarter Growth', path: '/article/outsourced-business-support-accounticca', category: 'Business & Startup', readTime: '6 min read' },
@@ -186,14 +90,7 @@ export function Home() {
     { title: 'Legal Checklist for Entrepreneurs', path: '/article/startup-legal-checklist', category: 'Business & Startup', readTime: '5 min read' }
   ];
 
-  const freeResources = [
-    { title: 'Tax Calculator', icon: <Calculator className="w-5 h-5" />, path: '/tax-calculator' },
-    { title: 'VAT Calculator', icon: <Calculator className="w-5 h-5" />, path: '/tools' },
-    { title: 'Legal Forms', icon: <FileSignature className="w-5 h-5" />, path: '/tools' },
-    { title: 'Compliance Checklist', icon: <BookMarked className="w-5 h-5" />, path: '/tools' },
-    { title: 'Sample Agreements', icon: <FileText className="w-5 h-5" />, path: '/tools' },
-    { title: 'Tax Calendar', icon: <CalendarIcon className="w-5 h-5" />, path: '/dashboard' }
-  ];
+
 
   return (
     <div>
@@ -632,82 +529,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* 3. Categories Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Practice Areas & Legal Categories</h2>
-            <p className="text-lg text-slate-600">Explore comprehensive guides, laws, and compliance procedures categorized by practice area.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {mainCategories.map((category, categoryIndex) => (
-              <Link 
-                key={category.id} 
-                to={category.path || `/category/${category.id}`} 
-                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-emerald-300 transition-all group flex flex-col h-full overflow-hidden hover:-translate-y-0.5"
-              >
-                {category.imageUrl && (
-                  <div className="w-full h-36 overflow-hidden relative">
-                    <img 
-                      src={category.imageUrl} 
-                      alt={category.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-                  </div>
-                )}
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      {category.icon}
-                    </div>
-                    <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
-                      {category.title}
-                    </h3>
-                  </div>
-                  <ul 
-                    className="space-y-2 mb-5 flex-1"
-                    style={categoryIndex === 0 ? { fontSize: '14px', lineHeight: '20px', color: '#071173' } : undefined}
-                  >
-                    {category.contents.map((item, idx) => {
-                      const label = typeof item === 'string' ? item : item.label;
-                      const icon = typeof item === 'string' ? (
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                      ) : (
-                        item.icon
-                      );
-                      return (
-                        <li 
-                          key={idx} 
-                          className={`flex items-center gap-2 transition-colors ${
-                            categoryIndex === 0 ? "text-[inherit]" : "text-xs sm:text-sm text-slate-600 group-hover:text-slate-800"
-                          }`}
-                        >
-                          <span className="shrink-0 text-emerald-600/90 group-hover:text-emerald-600 transition-colors">
-                            {icon}
-                          </span>
-                          <span 
-                            className="line-clamp-1 font-medium"
-                            style={categoryIndex === 0 ? { fontSize: '14px', lineHeight: '20px' } : undefined}
-                          >
-                            {label}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="text-emerald-600 font-bold text-xs sm:text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pt-3 border-t border-slate-100">
-                    Explore Hub <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* 4. Featured Guides & 5. Latest Legal Updates */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -843,129 +664,18 @@ export function Home() {
         </div>
       </section>
 
-      {/* 6. Popular Articles & 7. Expert Advice Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-200">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* Popular Articles */}
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Popular Articles</h2>
-            <div className="space-y-4">
-              {popularArticles.map(article => (
-                <Link key={article.id} to={`/article/${article.id}`} className="group flex gap-4 items-start p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                    <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">{article.category}</span>
-                      <span className="text-[10px] text-slate-400 flex items-center gap-1"><Clock className="w-3 h-3"/> {calculateReadingTime(article.content)} min read</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors mb-1 leading-tight">{article.title}</h3>
-                    <p className="text-xs text-slate-500 line-clamp-2">{article.excerpt}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
 
-          {/* Expert Advice */}
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Expert Advice</h2>
-            <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 relative">
-              <div className="absolute top-4 right-4 text-emerald-200">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.5"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-              </div>
-              <div className="space-y-4">
-                {popularArticles.slice(0, 2).map((article, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <div className="mb-2">
-                      <div>
-                        <h4 className="font-bold text-slate-900 text-sm">{article.author.name}</h4>
-                        <p className="text-[10px] text-emerald-700 font-medium uppercase tracking-wider">{article.author.role || 'Corporate Lawyer'}</p>
-                      </div>
-                    </div>
-                    <Link to={`/article/${article.id}`} className="block">
-                      <h3 className="text-base font-bold text-slate-800 hover:text-emerald-700 transition-colors mb-1">{article.title}</h3>
-                      <p className="text-xs text-slate-600 line-clamp-2">{article.excerpt}</p>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 text-center">
-                <Link to="/team" className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-xs hover:text-emerald-800 transition-colors">
-                  Meet Our Experts <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
 
-        </div>
-      </section>
 
-      {/* 8. Free Resources */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Free Resources</h2>
-            <p className="text-lg text-slate-600">Downloadable tools, forms, and calculators for your business.</p>
-          </div>
-          <Link to="/tools" className="inline-flex items-center gap-2 text-emerald-700 font-bold bg-emerald-50 px-5 py-2.5 rounded-full hover:bg-emerald-100 transition-colors">
-            View All Resources
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {freeResources.map((resource, idx) => (
-            <Link key={idx} to={resource.path} className="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex flex-col items-center text-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                {resource.icon}
-              </div>
-              <h3 className="text-sm font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">{resource.title}</h3>
-              <Download className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors mt-auto" />
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* Customer Testimonial Carousel */}
-      <Testimonials 
-        variant="carousel"
-        title="Client Trust & Verified Success Stories"
-        subtitle="See how leading Bangladeshi enterprises, startups, and CFOs rely on Accounticca and E-Lawyers for corporate governance, RJSC filings, and NBR tax strategy."
-      />
-
-      {/* 9. Consultation CTA Banner */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl relative overflow-hidden border border-emerald-700">
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"1\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Need Legal Assistance?</h2>
-            <p className="text-lg md:text-xl text-emerald-100 mb-10 max-w-2xl mx-auto">
-              Our expert team of corporate lawyers, tax consultants, and VAT specialists are ready to help your business grow securely.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <Link 
-                to="/contact" 
-                className="w-full sm:w-auto bg-white text-emerald-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
-              >
-                <span>Book Consultation</span>
-                <ArrowRight className="w-5 h-5 text-emerald-800" />
-              </Link>
-              <Link 
-                to="/contact" 
-                className="w-full sm:w-auto bg-emerald-700 text-white hover:bg-emerald-600 border border-emerald-500 px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-lg inline-flex items-center justify-center gap-2"
-              >
-                <span>Request Callback</span>
-                <ArrowRight className="w-5 h-5 text-emerald-200" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Frequently Asked Legal & Tax Queries */}
-      <FAQ />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <Testimonials 
+          variant="carousel"
+          title="Client Trust & Verified Success Stories"
+          subtitle="See how leading Bangladeshi enterprises, startups, and CFOs rely on Accounticca and E-Lawyers for corporate governance, RJSC filings, and NBR tax strategy."
+        />
+      </div>
     </div>
   );
 }

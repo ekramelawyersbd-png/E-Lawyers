@@ -27,8 +27,6 @@ import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import { usePurchases } from '../contexts/PurchaseContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
-import { CartDrawer } from '../components/shop/CartDrawer';
-import { CheckoutModal } from '../components/shop/CheckoutModal';
 import { ShopProduct, inferProductType } from '../data/shopProducts';
 
 export function ProductDetail() {
@@ -55,10 +53,6 @@ export function ProductDetail() {
   const isGatedInternalLink = !!(product?.requiresPurchaseToAccess || (product?.brochureUrl && isInternalLink(product.brochureUrl)));
   const isLinkUnlocked = !isGatedInternalLink || hasPurchased;
 
-  // Checkout modal state
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [instantCheckoutProduct, setInstantCheckoutProduct] = useState<ShopProduct | null>(null);
-
   // Quantity state & user feedback
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
@@ -83,14 +77,12 @@ export function ProductDetail() {
 
   const handleBuyNow = () => {
     if (!product) return;
-    setInstantCheckoutProduct(product);
-    setIsCheckoutOpen(true);
+    navigate(`/checkout?product=${encodeURIComponent(product.slug)}&qty=${quantity}`);
   };
 
   const handlePayNow = () => {
     if (!product) return;
-    setInstantCheckoutProduct(product);
-    setIsCheckoutOpen(true);
+    navigate(`/checkout?product=${encodeURIComponent(product.slug)}&qty=${quantity}`);
   };
 
   const handleShare = () => {
@@ -1045,24 +1037,6 @@ export function ProductDetail() {
           </button>
         </div>
       )}
-
-      {/* Cart Drawer */}
-      <CartDrawer 
-        onCheckout={() => {
-          setInstantCheckoutProduct(null);
-          setIsCheckoutOpen(true);
-        }} 
-      />
-
-      {/* Instant Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => {
-          setIsCheckoutOpen(false);
-          setInstantCheckoutProduct(null);
-        }}
-        singleProduct={instantCheckoutProduct}
-      />
 
     </div>
   );

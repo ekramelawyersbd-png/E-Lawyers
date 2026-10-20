@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
   Search, 
@@ -46,10 +46,9 @@ import {
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
-import { CartDrawer } from '../components/shop/CartDrawer';
-import { CheckoutModal } from '../components/shop/CheckoutModal';
 
 export function Shop() {
+  const navigate = useNavigate();
   const { products, loading } = useProducts();
   const { addToCart, totalItemsCount, setIsCartOpen } = useCart();
   const { adminUser, isAuthenticated, logout } = useShopAuth();
@@ -67,10 +66,6 @@ export function Shop() {
   );
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState<'bestselling' | 'price_low' | 'price_high' | 'rating'>('bestselling');
-  
-  // Checkout modal state
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [instantCheckoutProduct, setInstantCheckoutProduct] = useState<ShopProduct | null>(null);
 
   // Draft vs Published stats
   const publishedProducts = useMemo(() => products.filter(p => p.status !== 'draft'), [products]);
@@ -124,8 +119,7 @@ export function Shop() {
 
   const handleInstantBuy = (e: React.MouseEvent, product: ShopProduct) => {
     e.stopPropagation();
-    setInstantCheckoutProduct(product);
-    setIsCheckoutOpen(true);
+    navigate(`/checkout?product=${encodeURIComponent(product.slug)}`);
   };
 
   // Reset all filters helper
@@ -929,24 +923,6 @@ export function Shop() {
           </button>
         </div>
       )}
-
-      {/* Cart Drawer Component */}
-      <CartDrawer 
-        onCheckout={() => {
-          setInstantCheckoutProduct(null);
-          setIsCheckoutOpen(true);
-        }} 
-      />
-
-      {/* Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => {
-          setIsCheckoutOpen(false);
-          setInstantCheckoutProduct(null);
-        }}
-        singleProduct={instantCheckoutProduct}
-      />
 
     </div>
   );

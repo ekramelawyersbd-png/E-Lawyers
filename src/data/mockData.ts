@@ -8,6 +8,9 @@ import { capitalGainsTax2026Article } from './capitalGainsTax2026Article';
 import { tradeLicenseArticle } from './tradeLicenseArticle';
 import { ircErcArticle } from './ircErcArticle';
 import { businessProfessionalIncomeArticle } from './businessProfessionalIncomeArticle';
+import { depreciationAmortizationTaxArticle } from './depreciationAmortizationTaxArticle';
+import { inadmissibleDeductionsTaxArticle } from './inadmissibleDeductionsTaxArticle';
+import { deemedBusinessIncomeTaxArticle } from './deemedBusinessIncomeTaxArticle';
 import { shareholderDirectorTaxArticle } from './shareholderDirectorTaxArticle';
 import { pensionTaxArticle } from './pensionTaxArticle';
 import { housePropertyTaxArticle } from './housePropertyTaxArticle';
@@ -24,6 +27,8 @@ import { tdsLotteryGiftsFreelanceArticle } from './tdsLotteryGiftsFreelanceArtic
 import { taxableNonTaxableIncomeArticle } from './taxableNonTaxableIncomeArticle';
 import { businessRegistrationComplianceArticle } from './businessRegistrationComplianceArticle';
 import { companyRegistrationMoaAoaArticle } from './companyRegistrationMoaAoaArticle';
+import { sectoralTaxExemptionsArticle } from './sectoralTaxExemptionsArticle';
+import { lossCarryForwardTaxArticle } from './lossCarryForwardTaxArticle';
 
 import { teamMembers } from './teamData';
 
@@ -73,6 +78,8 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  lossCarryForwardTaxArticle,
+  sectoralTaxExemptionsArticle,
   companyRegistrationMoaAoaArticle,
   businessRegistrationComplianceArticle,
   taxableNonTaxableIncomeArticle,
@@ -92,6 +99,9 @@ export const mockArticles: Article[] = [
   pensionTaxArticle,
   shareholderDirectorTaxArticle,
   businessProfessionalIncomeArticle,
+  depreciationAmortizationTaxArticle,
+  inadmissibleDeductionsTaxArticle,
+  deemedBusinessIncomeTaxArticle,
   ircErcArticle,
   tradeLicenseArticle,
   salaryTdsArticle,

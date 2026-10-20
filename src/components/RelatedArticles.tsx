@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Article } from '../types';
 import { mockArticles } from '../data/mockData';
-import { Clock, ChevronRight, Tag, ArrowUpRight, BookOpen, Calendar, User, Sparkles, Layers } from 'lucide-react';
+import { Clock, ChevronRight, Tag, ArrowUpRight, BookOpen, Calendar, User, Sparkles, Layers, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
 import { BookmarkButton } from './BookmarkButton';
@@ -22,13 +22,13 @@ export interface RecommendedArticleItem {
 }
 
 /**
- * Recommends relevant articles dynamically based on the current article's category
+ * Recommends 3-4 relevant articles dynamically based on category alignment
  * and tag similarity, with intelligent fallback.
  */
 export function getRecommendedArticles(
   currentArticle: Article,
   allArticles: Article[] = mockArticles,
-  limit: number = 3
+  limit: number = 4
 ): RecommendedArticleItem[] {
   if (!currentArticle) return [];
 
@@ -67,34 +67,53 @@ export function getRecommendedArticles(
     return { score, matches: Array.from(new Set(matches)) };
   };
 
-  // 1. Primary pool: articles from the EXACT same category (matching categoryId or category name)
-  const sameCategoryPool = allArticles.filter(a => {
-    if (a.id === currentArticle.id) return false;
-    const candCat = (a.category || '').toLowerCase().trim();
-    const candCatId = (a.categoryId || '').toLowerCase().trim();
+  // 1. Primary candidate pool: filter out current article
+  const candidatePool = allArticles.filter(a => a.id !== currentArticle.id);
 
-    return (
+  // Score each candidate by category priority & tag overlap
+  const scoredCandidates: RecommendedArticleItem[] = candidatePool.map(article => {
+    const candCat = (article.category || '').toLowerCase().trim();
+    const candCatId = (article.categoryId || '').toLowerCase().trim();
+
+    const isExactCategory = Boolean(
       (currentCategoryId && candCatId === currentCategoryId) ||
-      (currentCategory && candCat === currentCategory) ||
-      (currentCategory.includes('tax') && candCat.includes('tax')) ||
-      (currentCategory.includes('vat') && candCat.includes('vat')) ||
-      (currentCategory.includes('corporate') && candCat.includes('corporate')) ||
-      (currentCategory.includes('business') && candCat.includes('business'))
+      (currentCategory && candCat === currentCategory)
     );
-  });
 
-  const scoredSameCategory: RecommendedArticleItem[] = sameCategoryPool.map(article => {
-    const { score, matches } = getOverlapInfo(article);
+    const isRelatedCategory = Boolean(
+      !isExactCategory && (
+        (currentCategory.includes('tax') && (candCat.includes('tax') || candCat.includes('vat') || candCatId === 'tax')) ||
+        (currentCategory.includes('vat') && (candCat.includes('vat') || candCat.includes('tax') || candCatId === 'vat')) ||
+        (currentCategory.includes('corporate') && (candCat.includes('corporate') || candCat.includes('business') || candCatId === 'corporate')) ||
+        (currentCategory.includes('business') && (candCat.includes('business') || candCat.includes('corporate') || candCatId === 'business')) ||
+        (currentCategory.includes('accounting') && (candCat.includes('tax') || candCat.includes('accounting') || candCatId === 'accounting'))
+      )
+    );
+
+    const { score: tagScore, matches } = getOverlapInfo(article);
+
+    // Category weighting: exact same category gets highest base weight (+25),
+    // related practice category gets secondary base weight (+12)
+    let totalScore = tagScore;
+    if (isExactCategory) {
+      totalScore += 25;
+    } else if (isRelatedCategory) {
+      totalScore += 12;
+    }
+
     return {
       article,
-      score,
+      score: totalScore,
       matchingTags: matches,
-      isSameCategory: true
+      isSameCategory: isExactCategory || isRelatedCategory
     };
   });
 
-  // Sort primarily by tag overlap score, then by recency (published date), then popularity
-  scoredSameCategory.sort((a, b) => {
+  // Sort candidates:
+  // 1. Category and tag score (highest first)
+  // 2. Publication date (most recent first)
+  // 3. Reader popularity / likes
+  scoredCandidates.sort((a, b) => {
     if (b.score !== a.score) {
       return b.score - a.score;
     }
@@ -106,63 +125,13 @@ export function getRecommendedArticles(
     return (b.article.likes || 0) - (a.article.likes || 0);
   });
 
-  const recommendations: RecommendedArticleItem[] = [...scoredSameCategory];
-
-  // 2. If the same category has fewer than the requested limit, backfill with top tag-matched articles
-  if (recommendations.length < limit) {
-    const existingIds = new Set([currentArticle.id, ...recommendations.map(r => r.article.id)]);
-    const otherPool = allArticles.filter(a => !existingIds.has(a.id));
-
-    const scoredOthers: RecommendedArticleItem[] = otherPool
-      .map(article => {
-        const { score, matches } = getOverlapInfo(article);
-        return {
-          article,
-          score,
-          matchingTags: matches,
-          isSameCategory: false
-        };
-      })
-      .filter(item => item.score > 0);
-
-    scoredOthers.sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return new Date(b.article.publishedAt).getTime() - new Date(a.article.publishedAt).getTime();
-    });
-
-    for (const item of scoredOthers) {
-      if (recommendations.length >= limit) break;
-      recommendations.push(item);
-      existingIds.add(item.article.id);
-    }
-
-    // 3. Fallback: if still under limit, backfill with most recent general articles
-    if (recommendations.length < limit) {
-      const remaining = allArticles
-        .filter(a => !existingIds.has(a.id))
-        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-
-      for (const article of remaining) {
-        if (recommendations.length >= limit) break;
-        recommendations.push({
-          article,
-          score: 0,
-          matchingTags: [],
-          isSameCategory: false
-        });
-      }
-    }
-  }
-
-  return recommendations.slice(0, limit);
+  return scoredCandidates.slice(0, Math.max(3, limit));
 }
 
 export function RelatedArticles({
   currentArticle,
   articles = mockArticles,
-  maxItems = 3,
+  maxItems = 4,
   className = '',
 }: RelatedArticlesProps) {
   const recommendedItems = useMemo(
@@ -190,10 +159,12 @@ export function RelatedArticles({
   }
 
   const gridColsClass =
-    recommendedItems.length === 3
+    recommendedItems.length === 4
+      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+      : recommendedItems.length === 3
       ? 'grid-cols-1 md:grid-cols-3'
       : recommendedItems.length === 2
-      ? 'grid-cols-1 md:grid-cols-2'
+      ? 'grid-cols-1 sm:grid-cols-2'
       : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
 
   const categoryUrl = currentArticle.categoryId 
@@ -257,7 +228,7 @@ export function RelatedArticles({
 
         {/* Dynamic Articles Cards Grid */}
         <div className={`grid ${gridColsClass} gap-6 sm:gap-8`}>
-          {recommendedItems.map(({ article, matchingTags }, idx) => {
+          {recommendedItems.map(({ article, matchingTags, isSameCategory }, idx) => {
             const readingTime = calculateReadingTime(article.content);
             const displayTag = matchingTags.length > 0 ? matchingTags[0] : (article.tags && article.tags[0]);
             const formattedDate = article.publishedAt 
@@ -286,6 +257,12 @@ export function RelatedArticles({
                     <span className="bg-slate-900/85 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase shadow-xs">
                       {article.category}
                     </span>
+                    {isSameCategory && (
+                      <span className="bg-emerald-700/90 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide shadow-xs flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-emerald-200" />
+                        <span>Related</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Bookmark Button */}

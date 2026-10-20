@@ -159,6 +159,16 @@ export function ToolsHub() {
       color: 'bg-indigo-100 text-indigo-800',
     },
     {
+      id: 'national-rate-finder-tool',
+      name: 'National Rate Finder (VAT, TDS & Customs)',
+      category: 'Tax & VAT Toolkits',
+      description: 'Central directory for searching live VAT rates, Withholding Tax (TDS/VDS) sections, and Customs HS tariffs with total tax incidence calculator.',
+      tooltip: 'Under VAT & SD Act 2012, Income Tax Act 2023, and Customs Tariff 2026-27.',
+      icon: <Scale className="w-7 h-7" />,
+      path: '/tools/rate-finder',
+      color: 'bg-emerald-100 text-emerald-900',
+    },
+    {
       id: 'dvc-verification-tool',
       name: 'ICAB DVC Verification Portal',
       category: 'Verification & Audit',
@@ -187,6 +197,26 @@ export function ToolsHub() {
       icon: <Calendar className="w-7 h-7" />,
       path: '/tools/early-filing-incentive',
       color: 'bg-amber-100 text-amber-800',
+    },
+    {
+      id: 'loss-carry-forward-calculator',
+      name: 'Loss Set-Off & Carry-Forward Calculator',
+      category: 'Tax & VAT Toolkits',
+      description: 'Simulate multi-year business results, unabsorbed depreciation priority rules, and 6-year general vs. 9-year startup sandbox carry-forward limits.',
+      tooltip: 'Sections 70, 71 & Eighth Schedule of Income Tax Act 2023.',
+      icon: <Calculator className="w-7 h-7" />,
+      path: '/tools/loss-carry-forward-calculator',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'tax-slabs-explorer',
+      name: 'Tax Slabs & Rates Hub',
+      category: 'Tax & VAT Toolkits',
+      description: 'Explore multi-year statutory income tax slabs (AY 2025-26 through AY 2030-31) and corporate rates under Finance Act 2026.',
+      tooltip: 'Includes General, Women/Senior, July Warriors 2024, Disabled, and Corporate tiers.',
+      icon: <Scale className="w-7 h-7" />,
+      path: '/tools/tax-slabs-explorer',
+      color: 'bg-teal-100 text-teal-800',
     }
   ];
 

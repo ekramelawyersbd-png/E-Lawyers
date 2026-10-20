@@ -642,6 +642,48 @@ export const termComparisons: TermComparison[] = [
 export const glossaryQuizQuestions: QuizQuestion[] = [
   {
     id: 1,
+    question: 'What corporate tax rate reduction do Bangladeshi corporate entities receive for complying with formal banking channel mandates, and what are the commercial expenditure transfer thresholds?',
+    bengaliQuestion: 'আনুষ্ঠানিক ব্যাংকিং চ্যানেলের শর্তাবলি পরিপালন করলে কর্পোরেট প্রতিষ্ঠানগুলো কত শতাংশ কর হ্রাস পায় এবং ব্যবসায়িক ব্যয়ের ব্যাংক ট্রান্সফার সীমা কত?',
+    options: [
+      '2.5% corporate tax reduction; single transactions > BDT 5 Lakh and annual aggregate non-bank expenses > BDT 36 Lakh must be made via bank transfer (plus 100% of receipts/loans)',
+      '5.0% corporate tax reduction; single transactions > BDT 10 Lakh and annual expenses > BDT 50 Lakh via bank transfer',
+      '1.0% corporate tax reduction; only salary payments require bank transfer',
+      '2.5% corporate tax reduction; no annual cap applies to commercial cash purchases'
+    ],
+    correctAnswer: 0,
+    explanation: 'Corporate entities receive a 2.5% tax rate reduction (e.g., 27.5% vs 30% for non-listed companies; 20% vs 22.5% for listed >10% IPO; 25% vs 27.5% for listed ≤10% IPO) when 100% of receipts/loans and all single commercial expenses > BDT 5,00,000 and annual commercial expenses > BDT 36,00,000 are transacted through formal banking channels.',
+    statutoryReference: 'Seventh Schedule, Income Tax Act, 2023 & Finance Act, 2026'
+  },
+  {
+    id: 2,
+    question: 'Under the amended Section 56(1) / Section 56Ka (effective 1 July 2026), what is the consequence of failing to deduct, collect, or deposit mandatory TDS, and how is the 50% penalty differentiated?',
+    bengaliQuestion: 'সংশোধিত ৫৬(১) / ৫৬ক ধারা অনুযায়ী বাধ্যতামূলক উৎসে কর (TDS) কর্তন বা জমা না করার পরিণতি কী এবং ৫০% জরিমানার পার্থক্য কী?',
+    options: [
+      'Only a BDT 500 flat administrative notice fee is charged',
+      'The taxpayer must pay the unpaid TDS shortfall PLUS an additional 50% penalty on that tax shortfall under Section 56(1)/56Ka (whereas Section 56(2) adds back Section 55 disallowed expenses as business income, and Section 264 increases TDS rate by 50% for missing PSR)',
+      '50% of the entire gross vendor invoice value is confiscated immediately',
+      'The supplier must pay a 5% surcharge to the landlord'
+    ],
+    correctAnswer: 1,
+    explanation: 'Under Section 56(1)(a) / 56Ka (as substituted by Finance Act 2026), failure to deduct or pay required TDS results in liability for the TDS shortfall plus an additional 50% penalty of that shortfall (and under clause (b), 50% on any remaining difference after Section 143 recovery). By contrast, Section 56(2) treats Section 55 inadmissible expenses as business income, while Section 264 increases the withholding rate by 50% if PSR is not furnished.',
+    statutoryReference: 'Income Tax Act, 2023 — Sections 55, 56(1), 56(2) / 56Ka & Section 143 (Finance Act, 2026)'
+  },
+  {
+    id: 3,
+    question: 'What are the specific turnover tax rate, 0% growth-cycle criteria, and loss carry-forward period for NBR-registered startups under the Startup Sandbox (Eighth Schedule, Part 2)?',
+    bengaliQuestion: 'স্টার্টআপ স্যান্ডবক্স (অষ্টম তফসিল, অংশ ২)-এর অধীনে নিবন্ধিত স্টার্টআপের টার্নওভার করহার, ৯ বছরের গ্রোথ সাইকেলে ০% করের শর্ত এবং ক্ষতি জের টানার মেয়াদ কত?',
+    options: [
+      '6-year loss carry-forward and 0.60% standard minimum turnover tax',
+      '9-year loss carry-forward period; 0% turnover tax criteria during qualifying growth years within the 9-year cycle (and 0.1% concessionary sandbox rate) upon NBR registration, return filing, and Section 129.4 Read-Only digital access',
+      '3-year loss carry-forward and 1.00% turnover tax with no digital reporting requirement',
+      'Unlimited loss carry-forward without NBR registration'
+    ],
+    correctAnswer: 1,
+    explanation: 'Under Part 2 of the Eighth Schedule (Startup Sandbox), registered startups can carry forward unadjusted losses for 9 successive assessment years (vs. 6 years under Section 70). Within their 9-year growth cycle, qualifying NBR-registered startups granting Section 129.4 Read-Only digital access and filing regular returns enjoy 0% growth-year turnover tax relief (and the 0.1% sandbox turnover tax rate), plus exemption from Sections 55 and 56 disallowances.',
+    statutoryReference: 'Income Tax Act, 2023 — Eighth Schedule Part 2 (Startup Sandbox) & Section 129.4'
+  },
+  {
+    id: 4,
     question: 'Under the amended Section 118 of the Income Tax Act 2023 (effective 1 July 2026), what is the statutory TDS rate on lottery and game winnings?',
     bengaliQuestion: 'আয়কর আইন ২০২৩ এর সংশোধিত ১১৮ ধারা অনুযায়ী লটারি বা প্রতিযোগিতার পুরস্কারে উৎসে কর কর্তনের হার কত?',
     options: ['10%', '15%', '20%', '25%'],
@@ -650,7 +692,7 @@ export const glossaryQuizQuestions: QuizQuestion[] = [
     statutoryReference: 'Income Tax Act, 2023 — Section 118 (as amended by Finance Act, 2026)'
   },
   {
-    id: 2,
+    id: 5,
     question: 'What is the maximum statutory investment ceiling for claiming an Investment Tax Rebate under Sixth Schedule Part B?',
     bengaliQuestion: 'ষষ্ঠ তফসিল অংশ ২ এর অধীনে বিনিয়োগ কর রেয়াত পাওয়ার সর্বোচ্চ বিনিয়োগ সীমা কত?',
     options: [
@@ -664,7 +706,7 @@ export const glossaryQuizQuestions: QuizQuestion[] = [
     statutoryReference: 'Income Tax Act, 2023 — Sixth Schedule Part B & Section 78'
   },
   {
-    id: 3,
+    id: 6,
     question: 'By which day of the month must a registered VAT entity submit its monthly Mushak-9.1 return to avoid penalties?',
     bengaliQuestion: 'জরিমানা এড়াতে নিবন্ধিত মূসক প্রতিষ্ঠানকে প্রতি মাসের কত তারিখের মধ্যে মূসক-৯.১ দাখিল করতে হয়?',
     options: [
@@ -678,21 +720,7 @@ export const glossaryQuizQuestions: QuizQuestion[] = [
     statutoryReference: 'VAT and Supplementary Duty Act, 2012 — Section 64'
   },
   {
-    id: 4,
-    question: 'What happens if a registered company pays office rent or supplier contracts without deducting mandatory TDS?',
-    bengaliQuestion: 'কোনো কোম্পানি বাধ্যতামূলক উৎসে কর কর্তন (টিডিএস) না করে বাড়িভাড়া বা সাপ্লায়ার পেমেন্ট পরিশোধ করলে কী পরিণতি হবে?',
-    options: [
-      'Only a nominal warning letter is issued by the DCT',
-      'The entire expenditure is disallowed from corporate expenses under Section 55 + 2% monthly interest penalty',
-      'The supplier must pay a 5% surcharge to the landlord',
-      'The payment is automatically converted to tax rebate'
-    ],
-    correctAnswer: 1,
-    explanation: 'Under Section 55(ka) of the Income Tax Act 2023, if a withholding entity fails to deduct or deposit TDS, the entire expenditure is disallowed, directly increasing corporate taxable profits, plus 2% monthly interest penalty under Section 143.',
-    statutoryReference: 'Income Tax Act, 2023 — Section 55(ka) & Section 143'
-  },
-  {
-    id: 5,
+    id: 7,
     question: 'Which statutory VAT document must be issued by a buyer to the supplier within 3 working days after deducting VDS?',
     bengaliQuestion: 'উৎসে মূসক (ভিডিএস) কর্তনের পর ৩ কার্যদিবসের মধ্যে সরবরাহকারীকে কোন চালান বা সনদপত্র প্রদান করতে হয়?',
     options: ['Mushak-6.1', 'Mushak-6.3', 'Mushak-6.6', 'Mushak-9.1'],

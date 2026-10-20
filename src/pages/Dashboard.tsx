@@ -33,7 +33,9 @@ import {
   AlertCircle,
   Activity,
   BarChart2,
-  MessageSquarePlus
+  MessageSquarePlus,
+  FileSpreadsheet,
+  Trophy
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
@@ -49,6 +51,13 @@ import { PurchaseHistorySection } from '../components/dashboard/PurchaseHistoryS
 import { UserProfile } from '../components/profile/UserProfile';
 import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
 import { QuickFeedbackWidget } from '../components/dashboard/QuickFeedbackWidget';
+import ComplianceDeadlineReminder, { ApproachingComplianceToastBanner } from '../components/dashboard/ComplianceDeadlineReminder';
+import { ComplianceDeadlinesCalendarView } from '../components/dashboard/ComplianceDeadlinesCalendarView';
+import { ExportDataModal } from '../components/dashboard/ExportDataModal';
+import { DashboardQuickActions } from '../components/dashboard/DashboardQuickActions';
+import { WeeklyActivityTrendChart } from '../components/dashboard/WeeklyActivityTrendChart';
+import { AnnualActivityHeatmap } from '../components/dashboard/AnnualActivityHeatmap';
+import { checkAndDispatchDeadlineNotifications } from '../services/smartNotificationService';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
 import { Link, useSearchParams } from 'react-router-dom';
 import { mockArticles } from '../data/mockData';
@@ -72,14 +81,15 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback'>(
-    tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review' ? 'feedback' : tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history' ? 'purchases' : tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
+  const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback' | 'achievements' | 'deadlines'>(
+    tabParam === 'deadlines' || tabParam === 'calendar' || tabParam === 'schedule' ? 'deadlines' : tabParam === 'achievements' || tabParam === 'badges' ? 'achievements' : tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review' ? 'feedback' : tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history' ? 'purchases' : tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [confirmClear, setConfirmClear] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
   const { transactions } = usePurchases();
 
   // KPI Calculations for current month
@@ -148,7 +158,11 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    if (tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review') {
+    if (tabParam === 'deadlines' || tabParam === 'calendar' || tabParam === 'schedule') {
+      setActiveTab('deadlines');
+    } else if (tabParam === 'achievements' || tabParam === 'badges') {
+      setActiveTab('achievements');
+    } else if (tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review') {
       setActiveTab('feedback');
     } else if (tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history') {
       setActiveTab('purchases');
@@ -171,7 +185,7 @@ export function Dashboard() {
     }
   }, [tabParam]);
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback' | 'achievements' | 'deadlines') => {
     setActiveTab(tab);
     setSearchParams({ tab }, { preventScrollReset: true });
   };
@@ -225,6 +239,9 @@ export function Dashboard() {
   useEffect(() => {
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
+      if (Notification.permission === 'granted') {
+        checkAndDispatchDeadlineNotifications().catch(() => {});
+      }
     }
   }, []);
 
@@ -461,6 +478,24 @@ export function Dashboard() {
             </button>
 
             <button 
+              id="dashboard-tab-deadlines"
+              onClick={() => switchTab('deadlines')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'deadlines' 
+                  ? 'bg-emerald-50 text-emerald-800 shadow-xs' 
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-emerald-600" />
+                <span>Deadlines Calendar</span>
+              </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                Timeline
+              </span>
+            </button>
+
+            <button 
               id="dashboard-tab-feedback"
               onClick={() => switchTab('feedback')} 
               className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
@@ -475,6 +510,24 @@ export function Dashboard() {
               </div>
               <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                 Rate
+              </span>
+            </button>
+
+            <button 
+              id="dashboard-tab-achievements"
+              onClick={() => switchTab('achievements')} 
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                activeTab === 'achievements' 
+                  ? 'bg-amber-50 text-amber-900 shadow-xs' 
+                  : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <span>Achievements & Badges</span>
+              </div>
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                Badges
               </span>
             </button>
 
@@ -521,7 +574,7 @@ export function Dashboard() {
             </div>
           </nav>
           
-          <div className="border-t border-slate-100 pt-6">
+          <div className="border-t border-slate-100 pt-6 space-y-2.5">
             <button 
               id="download-summary-pdf-btn"
               onClick={generateComplianceSummaryPDF}
@@ -529,6 +582,16 @@ export function Dashboard() {
             >
               <Download className="w-4 h-4" />
               Download Summary PDF
+            </button>
+
+            <button 
+              id="export-dashboard-data-btn"
+              onClick={() => setShowExportModal(true)}
+              className="w-full flex justify-center items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors cursor-pointer shadow-xs"
+              title="Download your activity progress and stored compliance deadlines as a CSV file"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
+              <span>Export Data (CSV)</span>
             </button>
           </div>
         </div>
@@ -561,11 +624,48 @@ export function Dashboard() {
               Test Alert Simulation
             </button>
           )}
+
+          <div className="pt-3 mt-3 border-t border-emerald-800/80 flex items-center justify-between text-[11px]">
+            <span className="text-emerald-300">Smart 3-Day Alerts</span>
+            <button
+              onClick={() => switchTab('profile')}
+              className="font-bold text-amber-300 hover:text-amber-200 underline cursor-pointer"
+            >
+              Configure in Profile &rarr;
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 space-y-8">
+        {/* Dashboard Title & Quick Actions Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl font-bold text-slate-900">Compliance & Advisory Dashboard</h1>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                FY 2026-27 Active
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Monitor daily statutory deadlines, study goals, tax calculators, and client filing workflows.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              id="header-export-data-csv-btn"
+              onClick={() => setShowExportModal(true)}
+              className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-xs transition-colors cursor-pointer"
+              title="Download your activity progress and stored compliance deadlines as a CSV file"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-300" />
+              <span>Export Data (CSV)</span>
+            </button>
+          </div>
+        </div>
+
         {/* KPI Summary Row Cards (Current Month) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
@@ -633,20 +733,31 @@ export function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between sm:col-span-2 lg:col-span-1">
+          <div 
+            id="kpi-next-tax-deadline-card"
+            onClick={() => switchTab('deadlines')}
+            className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between sm:col-span-2 lg:col-span-1 cursor-pointer hover:border-rose-400 hover:shadow-md transition-all group"
+            title="Click to view interactive compliance deadlines calendar"
+          >
             <div className="space-y-1">
               <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">Next Tax Deadline</p>
-              <p className="text-xl font-extrabold text-slate-900">Nov 15, 2026</p>
+              <p className="text-xl font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors">Nov 15, 2026</p>
               <div className="flex items-center gap-1 text-[11px] font-bold text-rose-600">
                 <AlertCircle className="w-3 h-3" />
                 <span>Mushak 9.1 & VAT Retainer</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <Calendar className="w-6 h-6" />
             </div>
           </div>
         </div>
+
+        {/* Workflow Quick Links & Floating Action System */}
+        <DashboardQuickActions 
+          onOpenExportModal={() => setShowExportModal(true)} 
+          onNavigateTab={(tab) => switchTab(tab as any)} 
+        />
 
         {activeTab === 'profile' ? (
           <UserProfile />
@@ -656,18 +767,27 @@ export function Dashboard() {
           <ClientActivityFeed />
         ) : activeTab === 'analytics' ? (
           <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
+        ) : activeTab === 'deadlines' ? (
+          <ComplianceDeadlinesCalendarView />
         ) : activeTab === 'reminders' ? (
           <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
         ) : activeTab === 'purchases' ? (
           <PurchaseHistorySection />
         ) : activeTab === 'feedback' ? (
           <QuickFeedbackWidget />
+        ) : activeTab === 'achievements' ? (
+          <UserBadgesSection />
         ) : (
           <>
+            <ApproachingComplianceToastBanner />
             <GoalReminderToast />
             <DailyGoalTracker />
+            <WeeklyActivityTrendChart />
+            <AnnualActivityHeatmap />
             <UserBadgesSection />
             <SocialStreakShareWidget />
+            <ComplianceDeadlineReminder />
+            <ComplianceDeadlinesCalendarView />
             <QuickFeedbackWidget />
             <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
             <PurchaseHistorySection />
@@ -1130,6 +1250,12 @@ export function Dashboard() {
         </>
         )}
       </main>
+
+      {/* Export Data Modal */}
+      <ExportDataModal 
+        isOpen={showExportModal} 
+        onClose={() => setShowExportModal(false)} 
+      />
     </div>
   );
 }

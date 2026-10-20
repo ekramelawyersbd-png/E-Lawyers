@@ -26,6 +26,8 @@ import { TableOfContents } from '../components/TableOfContents';
 import { LegalAlertBanner } from '../components/LegalAlertBanner';
 import { PenaltyFlowchart } from '../components/PenaltyFlowchart';
 import { Section272Checklist as Section272ComplianceChecklist } from '../components/Section272Checklist';
+import { Section46ReferenceTable } from '../components/Section46ReferenceTable';
+import { Section46ScenarioSelector } from '../components/Section46ScenarioSelector';
 import { RelatedArticles, getRecommendedArticles } from '../components/RelatedArticles';
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { InteractiveChecklistItem } from '../components/InteractiveChecklistItem';
@@ -37,6 +39,7 @@ import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { InvestmentTaxRebateCalculator } from '../components/tax/InvestmentTaxRebateCalculator';
 import { TotalIncomeCalculator } from '../components/tax/TotalIncomeCalculator';
 import { AgriculturalTaxCalculator } from '../components/tax/AgriculturalTaxCalculator';
+import { LossCarryForwardCalculator } from '../components/tax/LossCarryForwardCalculator';
 import { Clause20ExemptionCard } from '../components/tax/Clause20ExemptionCard';
 import { Section66Vs67SummaryCard } from '../components/tax/Section66Vs67SummaryCard';
 import { OtherSourcesDocChecklist } from '../components/tax/OtherSourcesDocChecklist';
@@ -47,6 +50,7 @@ import { TurnoverTaxCalculator } from '../components/tax/TurnoverTaxCalculator';
 import { TurnoverSlabsSummaryCard } from '../components/tax/TurnoverSlabsSummaryCard';
 import { TaxRebateCeilingCard } from '../components/tax/TaxRebateCeilingCard';
 import { CorporateTaxRateCalculator } from '../components/tax/CorporateTaxRateCalculator';
+import { CorporateComplianceMasteryQuiz } from '../components/tax/CorporateComplianceMasteryQuiz';
 import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
 import { TaxReturnChecklist } from '../components/tax/TaxReturnChecklist';
 import { TaxSummaryDashboard } from '../components/tax/TaxSummaryDashboard';
@@ -160,6 +164,8 @@ export function Article() {
     h2: ({ node, children, ...props }: any) => {
       const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const isFlowchartTarget = article.id === 'section-272-income-tax-act-2023-penalty-bangladesh' && id === 'mandatory-hearing-before-imposing-penalty';
+      const isSection46Target = article.id === 'deemed-business-income-section-46-bangladesh-tax-act' && (id === '1-introduction' || id === 'introduction');
+      const isLossTarget = article.id === 'set-off-carry-forward-business-losses-section-70-71-bangladesh-tax' && (id === '1-introduction' || id === 'introduction');
       
       const isSpecificH2 = id === 'required-documents-list-for-employees-income-from-salary-fy-2025-26-ay-2026-27';
       const className = isSpecificH2 
@@ -170,6 +176,13 @@ export function Article() {
         <>
           <h2 id={id} className={className} {...props}>{children}</h2>
           {isFlowchartTarget && <PenaltyFlowchart />}
+          {isLossTarget && <LossCarryForwardCalculator />}
+          {isSection46Target && (
+            <>
+              <Section46ScenarioSelector />
+              <Section46ReferenceTable />
+            </>
+          )}
         </>
       );
     },
@@ -743,8 +756,30 @@ export function Article() {
             )}
 
             {article.id === 'corporate-tax-rates-bangladesh-fy-2026-27' && (
-              <div className="my-12 scroll-mt-24" id="corporate-tax-calculator-tool">
-                <CorporateTaxRateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+              <>
+                <div className="my-12 scroll-mt-24" id="corporate-tax-calculator-tool">
+                  <CorporateTaxRateCalculator className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5" />
+                </div>
+                <div className="my-12 scroll-mt-24" id="corporate-compliance-mastery-quiz">
+                  <CorporateComplianceMasteryQuiz initialTopic="BANKING_2_5" />
+                </div>
+              </>
+            )}
+
+            {(article.id === 'inadmissible-deductions-tax-disallowances-sections-55-56-bangladesh' ||
+              article.id === 'set-off-carry-forward-business-losses-section-70-71-bangladesh-tax' ||
+              article.id === 'minimum-turnover-tax-slabs-bangladesh-2026-2027' ||
+              article.id === 'income-tax-circular-2026-2027-expense-deductions-business-restructuring') && (
+              <div className="my-12 scroll-mt-24" id="corporate-compliance-mastery-quiz">
+                <CorporateComplianceMasteryQuiz
+                  initialTopic={
+                    article.id === 'inadmissible-deductions-tax-disallowances-sections-55-56-bangladesh'
+                      ? 'SEC_56_56KA'
+                      : article.id === 'set-off-carry-forward-business-losses-section-70-71-bangladesh-tax'
+                      ? 'STARTUP_SANDBOX'
+                      : 'ALL'
+                  }
+                />
               </div>
             )}
 
@@ -955,8 +990,8 @@ export function Article() {
         </div>
       </div>
 
-      {/* 9. Related Articles */}
-      <RelatedArticles currentArticle={article} maxItems={3} />
+      {/* 9. Related Articles (Suggests 3-4 other relevant articles based on categories) */}
+      <RelatedArticles currentArticle={article} maxItems={4} />
     </>
   );
 }

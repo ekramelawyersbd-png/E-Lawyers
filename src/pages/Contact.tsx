@@ -1,179 +1,402 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  ExternalLink, 
-  ArrowRight, 
-  ShieldCheck, 
-  Clock, 
-  Building2, 
-  Scale, 
-  TrendingUp, 
-  CheckCircle2, 
-  AlertCircle, 
-  Copy, 
-  Check, 
-  Globe, 
-  Briefcase,
-  Share2,
-  FileText,
-  Home,
+import React, { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  CalendarDays,
+  Check,
+  CheckCircle2,
   ChevronRight,
-  Sparkles,
-  Linkedin,
-  Facebook,
+  Clock3,
+  Copy,
+  ExternalLink,
+  FileText,
+  Globe2,
   Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  Sparkles,
   Youtube,
-  ArrowUpRight
+  Facebook,
+  Scale,
+  type LucideIcon,
 } from 'lucide-react';
-import { Breadcrumbs } from '../components/Breadcrumbs';
-import { OfficeLocationMap } from '../components/OfficeLocationMap';
-import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { AppointmentBookingForm } from '../components/AppointmentBookingForm';
+import { FloatingLiveChat } from '../components/FloatingLiveChat';
+import { OfficeLocationMap } from '../components/OfficeLocationMap';
+
+type ContactTab = 'inquiry' | 'appointment';
+type FormField =
+  | 'firstName'
+  | 'lastName'
+  | 'email'
+  | 'phone'
+  | 'companyName'
+  | 'service'
+  | 'message';
+
+type InquiryFormData = Record<FormField, string>;
+type FieldErrors = Partial<Record<FormField, string>>;
+
+const PRIMARY_PHONE = '+880 1335-230170';
+const RAW_PHONE = '+8801335230170';
+const ACCOUNTICCA_EMAIL = 'info@accounticca.com';
+const ELAWYERS_EMAIL = 'info@elawyersbd.com';
+const MAPS_URL =
+  'https://www.google.com/maps/search/?api=1&query=BTI+Centara+Grand+144+Green+Road+Panthapath+Dhaka+1205';
+
+const INITIAL_FORM: InquiryFormData = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  companyName: '',
+  service: 'Corporate Law & RJSC Compliance',
+  message: '',
+};
+
+const SERVICES = [
+  'Corporate Law & RJSC Compliance',
+  'Corporate Tax, VAT & Statutory Audit',
+  'Fractional CFO & Financial Modeling',
+  'BIDA Approvals & Foreign Direct Investment',
+  'Commercial Contracts & IP Protection',
+  'Business Process Optimization & Automation',
+  'Integrated Joint Ecosystem Consultation',
+];
+
+const LEGAL_SERVICES = new Set([
+  'Corporate Law & RJSC Compliance',
+  'BIDA Approvals & Foreign Direct Investment',
+  'Commercial Contracts & IP Protection',
+]);
+
+function getRequestedTab(search: string, hash: string): ContactTab {
+  const params = new URLSearchParams(search);
+  const requested = params.get('tab');
+
+  if (requested === 'appointment' || requested === 'inquiry') return requested;
+
+  const normalizedHash = hash.toLowerCase();
+  if (normalizedHash.includes('appointment') || normalizedHash.includes('book')) {
+    return 'appointment';
+  }
+  if (normalizedHash.includes('inquiry')) return 'inquiry';
+
+  if (params.has('area') || params.has('practice')) return 'appointment';
+  return 'inquiry';
+}
+
+function validateField(field: FormField, value: string): string | undefined {
+  const trimmed = value.trim();
+
+  switch (field) {
+    case 'firstName':
+    case 'lastName': {
+      const label = field === 'firstName' ? 'First name' : 'Last name';
+      if (!trimmed) return `${label} is required.`;
+      if (trimmed.length < 2) return `${label} must be at least 2 characters.`;
+      if (trimmed.length > 80) return `${label} must be 80 characters or fewer.`;
+      if (!/\p{L}/u.test(trimmed) || !/^[\p{L}\p{M}\s.'-]+$/u.test(trimmed)) {
+        return 'Use letters and common name punctuation only.';
+      }
+      return undefined;
+    }
+    case 'email': {
+      if (!trimmed) return 'Email address is required.';
+      if (trimmed.length > 254 || /\s/.test(trimmed)) return 'Enter a valid email address.';
+      const parts = trimmed.split('@');
+      if (parts.length !== 2) return 'Enter an email address in the format name@company.com.';
+      const [local, domain] = parts;
+      if (
+        !local ||
+        local.length > 64 ||
+        local.startsWith('.') ||
+        local.endsWith('.') ||
+        local.includes('..')
+      ) {
+        return 'Check the username portion of your email address.';
+      }
+      const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+      if (!emailPattern.test(trimmed)) return 'Enter a valid email address, such as name@company.com.';
+      const domainLabels = domain.split('.');
+      if (domainLabels.some((label) => !label)) return 'Check the domain in your email address.';
+      if ((domainLabels.at(-1) ?? '').length < 2) return 'Email domain extension must contain at least 2 characters.';
+      return undefined;
+    }
+    case 'phone': {
+      if (!trimmed) return 'Phone or WhatsApp number is required.';
+      const digits = trimmed.replace(/\D/g, '');
+      if (digits.length < 8 || digits.length > 15) {
+        return 'Enter a phone number containing 8–15 digits.';
+      }
+      if (!/^\+?[\d\s().-]+$/.test(trimmed)) {
+        return 'Use digits, spaces, parentheses, dots, or hyphens only.';
+      }
+      return undefined;
+    }
+    case 'companyName':
+      if (trimmed && trimmed.length < 2) return 'Company name must be at least 2 characters.';
+      if (trimmed.length > 120) return 'Company name must be 120 characters or fewer.';
+      return undefined;
+    case 'message':
+      if (!trimmed) return 'Please describe your matter.';
+      if (trimmed.length < 15) return `Please provide at least 15 characters (${trimmed.length}/15).`;
+      if (trimmed.length > 3000) return 'Please keep your description under 3,000 characters.';
+      return undefined;
+    case 'service':
+      return SERVICES.includes(value) ? undefined : 'Select a service area.';
+    default:
+      return undefined;
+  }
+}
+
+function validateForm(form: InquiryFormData): FieldErrors {
+  const fields: FormField[] = [
+    'firstName',
+    'lastName',
+    'email',
+    'phone',
+    'companyName',
+    'service',
+    'message',
+  ];
+  return fields.reduce<FieldErrors>((errors, field) => {
+    const error = validateField(field, form[field]);
+    if (error) errors[field] = error;
+    return errors;
+  }, {});
+}
+
+type TextFieldProps = {
+  id: string;
+  label: string;
+  name: string;
+  value: string;
+  type?: 'text' | 'email' | 'tel';
+  autoComplete?: string;
+  placeholder?: string;
+  helper?: string;
+  error?: string;
+  showError: boolean;
+  maxLength?: number;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+};
+
+function TextField({
+  id,
+  label,
+  name,
+  value,
+  type = 'text',
+  autoComplete,
+  placeholder,
+  helper,
+  error,
+  showError,
+  maxLength,
+  onChange,
+  onBlur,
+}: TextFieldProps) {
+  const helpId = `${id}-help`;
+  const errorId = `${id}-error`;
+
+  return (
+    <div className="min-w-0">
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-slate-800">
+        {label} <span className="text-emerald-700">*</span>
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        autoComplete={autoComplete}
+        maxLength={maxLength}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        aria-invalid={showError}
+        aria-describedby={showError ? errorId : helper ? helpId : undefined}
+        className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+          showError
+            ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
+        }`}
+      />
+      {showError ? (
+        <p id={errorId} className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700" role="alert">
+          <span aria-hidden="true">•</span><span>{error}</span>
+        </p>
+      ) : helper ? (
+        <p id={helpId} className="mt-1.5 text-xs text-slate-500">{helper}</p>
+      ) : null}
+    </div>
+  );
+}
+
+type MessageFieldProps = {
+  value: string;
+  error?: string;
+  showError: boolean;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+};
+
+function MessageField({ value, error, showError, onChange, onBlur }: MessageFieldProps) {
+  const errorId = 'contact-message-error';
+  const helpId = 'contact-message-help';
+
+  return (
+    <div>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <label htmlFor="contact-message" className="text-sm font-semibold text-slate-800">
+          Matter description <span className="text-emerald-700">*</span>
+        </label>
+        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+          value.trim().length >= 15
+            ? 'bg-emerald-50 text-emerald-800'
+            : 'bg-slate-100 text-slate-500'
+        }`}>
+          {value.trim().length}/15 minimum
+        </span>
+      </div>
+      <textarea
+        id="contact-message"
+        name="message"
+        rows={5}
+        maxLength={3000}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
+        placeholder="Tell us briefly about your business, legal, tax, or compliance needs..."
+        aria-invalid={showError}
+        aria-describedby={showError ? errorId : helpId}
+        className={`w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+          showError
+            ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
+        }`}
+      />
+      {showError ? (
+        <p id={errorId} className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700" role="alert">
+          <span aria-hidden="true">•</span><span>{error}</span>
+        </p>
+      ) : (
+        <p id={helpId} className="mt-1.5 text-xs text-slate-500">
+          Please avoid including passwords or other sensitive account credentials.
+        </p>
+      )}
+    </div>
+  );
+}
+
+type SocialLink = { label: string; href: string; Icon: LucideIcon };
+
+type SocialGroup = { brand: string; description: string; color: 'emerald' | 'teal'; links: SocialLink[] };
+
+const SOCIAL_GROUPS: SocialGroup[] = [
+  {
+    brand: 'ACCOUNTICCA',
+    description: 'Tax, finance and business advisory',
+    color: 'emerald',
+    links: [
+      { label: 'LinkedIn', href: 'https://linkedin.com/company/accounticca', Icon: Linkedin },
+      { label: 'Facebook', href: 'https://facebook.com/accounticca', Icon: Facebook },
+      { label: 'YouTube', href: 'https://youtube.com/@accounticca', Icon: Youtube },
+    ],
+  },
+  {
+    brand: 'E-LAWYERS',
+    description: 'Corporate law and compliance',
+    color: 'teal',
+    links: [
+      { label: 'LinkedIn', href: 'https://linkedin.com/company/elawyersbd', Icon: Linkedin },
+      { label: 'Facebook', href: 'https://facebook.com/elawyersbd', Icon: Facebook },
+      { label: 'Instagram', href: 'https://instagram.com/elawyerssbd', Icon: Instagram },
+      { label: 'YouTube', href: 'https://youtube.com/@elawyerssbd', Icon: Youtube },
+    ],
+  },
+];
 
 export function Contact() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const [activeTab, setActiveTab] = useState<'inquiry' | 'appointment'>(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash.toLowerCase();
-      if (hash.includes('appointment') || hash.includes('book')) {
-        return 'appointment';
-      }
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('tab') === 'appointment' || params.get('area') || params.get('practice')) {
-        return 'appointment';
-      }
-    }
-    return 'inquiry';
-  });
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [service, setService] = useState('Corporate Law & RJSC Compliance');
-  const [companyName, setCompanyName] = useState('');
-  const [message, setMessage] = useState('');
-  const [copiedPhone, setCopiedPhone] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
-
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash.includes('appointment') || hash.includes('book')) {
-        setActiveTab('appointment');
-      } else if (hash.includes('inquiry')) {
-        setActiveTab('inquiry');
-      }
-    };
-
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
-
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    const areaParam = searchParams.get('area') || searchParams.get('practice');
-    if (tabParam === 'appointment' || areaParam) {
-      setActiveTab('appointment');
-    }
-  }, [searchParams]);
-
-  const scrollToFormSection = () => {
-    const section = document.getElementById('inquiry-form-section');
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const primaryPhone = '+880 1335-230170';
-  const rawTelNumber = '+8801335230170';
-  const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=BTI+Centara+Grand+144+Green+Road+Panthapath+Dhaka+1205';
-
-  const handleCopyPhone = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(rawTelNumber);
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2200);
-    }
-  };
-
-  const handleCopyEmail = (address: string) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(address);
-      setCopiedEmail(address);
-      setTimeout(() => setCopiedEmail(null), 2200);
-    }
-  };
-
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ContactTab>(() =>
+    getRequestedTab(location.search, location.hash),
+  );
+  const [form, setForm] = useState<InquiryFormData>(INITIAL_FORM);
+  const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({});
   const [formAttempted, setFormAttempted] = useState(false);
+  const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
-  const getFieldError = (name: string, value: string): string | null => {
-    switch (name) {
-      case 'firstName':
-        if (!value.trim()) return 'First name is required.';
-        if (value.trim().length < 2) return 'First name must be at least 2 characters.';
-        return null;
-      case 'lastName':
-        if (!value.trim()) return 'Last name is required.';
-        if (value.trim().length < 2) return 'Last name must be at least 2 characters.';
-        return null;
-      case 'email':
-        if (!value.trim()) return 'Corporate email is required.';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'Please enter a valid corporate email (e.g. name@company.com).';
-        return null;
-      case 'phone':
-        if (!value.trim()) return 'Phone or WhatsApp number is required.';
-        if (!/^[\d\+\-\s\(\)]{8,20}$/.test(value.trim())) return 'Please enter a valid phone number (at least 8 digits, e.g. +880 1712-345678).';
-        return null;
-      case 'companyName':
-        if (value.trim() && value.trim().length < 2) return 'Company name must be at least 2 characters if provided.';
-        return null;
-      case 'message':
-        if (!value.trim()) return 'Matter description or legal brief is required.';
-        if (value.trim().length < 15) return ;
-        return null;
-      default:
-        return null;
+  useEffect(() => {
+    setActiveTab(getRequestedTab(location.search, location.hash));
+  }, [location.search, location.hash]);
+
+  const errors = useMemo(() => validateForm(form), [form]);
+  const requiredFields: FormField[] = ['firstName', 'lastName', 'email', 'phone', 'message'];
+  const completedRequiredFields = requiredFields.filter(
+    (field) => form[field].trim().length > 0 && !validateField(field, form[field]),
+  ).length;
+  const completionPercentage = Math.round((completedRequiredFields / requiredFields.length) * 100);
+  const hasErrors = Object.keys(errors).length > 0;
+
+  const updateField = (field: FormField, value: string) => {
+    setForm((previous) => ({ ...previous, [field]: value }));
+    setEmailDraftUrl(null);
+  };
+
+  const selectTab = (tab: ContactTab) => {
+    const params = new URLSearchParams(location.search);
+    params.set('tab', tab);
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString() ? `?${params.toString()}` : '',
+        hash: `#${tab}`,
+      },
+      { replace: true },
+    );
+    setActiveTab(tab);
+  };
+
+  const scrollToForm = (tab: ContactTab) => {
+    selectTab(tab);
+    window.setTimeout(() => {
+      document.getElementById('contact-form-section')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 0);
+  };
+
+  const markTouched = (field: FormField) => {
+    setTouched((previous) => ({ ...previous, [field]: true }));
+  };
+
+  const handleCopy = async (value: string, label: string) => {
+    setCopyError(null);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(value);
+      setCopyStatus(label);
+      window.setTimeout(() => setCopyStatus(null), 2200);
+    } catch {
+      setCopyError('Copy is unavailable in this browser. Please select the contact detail and copy it manually.');
     }
   };
 
-  const errors = useMemo(() => {
-    const errs: Record<string, string> = {};
-    const fnErr = getFieldError('firstName', firstName);
-    if (fnErr) errs.firstName = fnErr;
-
-    const lnErr = getFieldError('lastName', lastName);
-    if (lnErr) errs.lastName = lnErr;
-
-    const emailErr = getFieldError('email', email);
-    if (emailErr) errs.email = emailErr;
-
-    const phoneErr = getFieldError('phone', phone);
-    if (phoneErr) errs.phone = phoneErr;
-
-    const compErr = getFieldError('companyName', companyName);
-    if (compErr) errs.companyName = compErr;
-
-    const msgErr = getFieldError('message', message);
-    if (msgErr) errs.message = msgErr;
-
-    return errs;
-  }, [firstName, lastName, email, phone, companyName, message]);
-
-  const handleBlur = (field: string) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setFormAttempted(true);
     setTouched({
       firstName: true,
@@ -181,1123 +404,475 @@ export function Contact() {
       email: true,
       phone: true,
       companyName: true,
+      service: true,
       message: true,
     });
+    setEmailDraftUrl(null);
 
-    if (Object.keys(errors).length === 0) {
-      setSubmitted(true);
+    if (hasErrors) {
+      const orderedFields: FormField[] = [
+        'firstName', 'lastName', 'email', 'phone', 'companyName', 'service', 'message',
+      ];
+      const firstInvalid = orderedFields.find((field) => errors[field]);
+      const ids: Record<FormField, string> = {
+        firstName: 'contact-first-name',
+        lastName: 'contact-last-name',
+        email: 'contact-email',
+        phone: 'contact-phone',
+        companyName: 'contact-company-name',
+        service: 'contact-service',
+        message: 'contact-message',
+      };
+      if (firstInvalid) {
+        window.setTimeout(() => {
+          const element = document.getElementById(ids[firstInvalid]);
+          element?.focus();
+          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 0);
+      }
+      return;
     }
+
+    const isJointInquiry = form.service === 'Integrated Joint Ecosystem Consultation';
+    const recipient = isJointInquiry
+      ? ACCOUNTICCA_EMAIL
+      : LEGAL_SERVICES.has(form.service)
+        ? ELAWYERS_EMAIL
+        : ACCOUNTICCA_EMAIL;
+    const cc = isJointInquiry ? `&cc=${encodeURIComponent(ELAWYERS_EMAIL)}` : '';
+    const subject = `Consultation Inquiry — ${form.service}`;
+    const body = [
+      'New consultation inquiry',
+      '',
+      `Name: ${form.firstName.trim()} ${form.lastName.trim()}`,
+      `Email: ${form.email.trim()}`,
+      `Phone / WhatsApp: ${form.phone.trim()}`,
+      `Company: ${form.companyName.trim() || 'Not provided'}`,
+      `Service area: ${form.service}`,
+      '',
+      'Matter description:',
+      form.message.trim(),
+    ].join('\n');
+
+    setEmailDraftUrl(
+      `mailto:${recipient}?subject=${encodeURIComponent(subject)}${cc}&body=${encodeURIComponent(body)}`,
+    );
   };
 
+  const resetForm = () => {
+    setForm(INITIAL_FORM);
+    setTouched({});
+    setFormAttempted(false);
+    setEmailDraftUrl(null);
+  };
+
+  const inputError = (field: FormField) => Boolean((touched[field] || formAttempted) && errors[field]);
+
   return (
-    <div className="min-h-screen bg-slate-50/60 pb-20">
-      {/* 1. Full-Screen Edge-to-Edge Hero Section (Matching Community Hero) */}
-      <section 
-        className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-slate-50 to-white text-slate-900 pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 shadow-2xs"
-        style={{ paddingTop: '62px', paddingBottom: '62px', marginLeft: '1px', marginRight: '1px' }}
-      >
-        {/* Subtle decorative mesh background and ambient orbs */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.12),rgba(255,255,255,0))] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+    <main className="min-h-screen bg-[#f5f7f4] pb-16 text-slate-900">
+      {/* Hero */}
+      <section className="px-4 pb-10 pt-5 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/60 to-teal-50/40 text-slate-900 shadow-xl shadow-emerald-950/5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(16,185,129,0.12),transparent_42%),radial-gradient(ellipse_at_0%_100%,rgba(20,184,166,0.10),transparent_38%)]" />
+          <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full border border-emerald-900/10" />
+          <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full border border-emerald-900/10" />
 
-        {/* Top Breadcrumb Navigation */}
-        <div className="max-w-7xl mx-auto mb-8 relative z-10">
-          <nav className="flex items-center text-xs sm:text-sm font-medium text-emerald-800/80 overflow-x-auto whitespace-nowrap">
-            <Link to="/" className="flex items-center text-emerald-700 hover:text-emerald-950 transition-colors">
-              <Home className="w-3.5 h-3.5 mr-1" />
-              <span>Home</span>
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-400 shrink-0" />
-            <span className="text-slate-900 font-bold">Contact Us</span>
-          </nav>
-        </div>
+          <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
+            <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-sm text-slate-600">
+              <Link to="/" className="transition hover:text-emerald-800">Home</Link>
+              <ChevronRight className="h-4 w-4 text-slate-400" aria-hidden="true" />
+              <span className="font-semibold text-slate-900">Contact</span>
+            </nav>
 
-        <div 
-          className="max-w-5xl mx-auto text-center relative z-10 space-y-6"
-          style={{ marginTop: '-86px' }}
-        >
-          {/* Eyebrow Header Badge */}
-          <div className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-bold mb-2 shadow-2xs">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>Integrated Advisory Ecosystem</span>
-          </div>
-
-          {/* Hero Main Heading & Dual Identity */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.2] space-y-2">
-            <span className="hidden sm:block text-xl sm:text-2xl lg:text-3xl font-bold tracking-normal text-slate-600">
-              Contact Us
-            </span>
-            <span 
-              className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-1"
-              style={{ paddingTop: '62px' }}
-            >
-              <span className="bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 bg-clip-text text-transparent drop-shadow-xs tracking-tight font-black">
-                ACCOUNTICCA
-              </span>
-              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-medium text-base sm:text-xl shadow-xs select-none">
-                ×
-              </span>
-              <span className="bg-gradient-to-r from-teal-800 via-emerald-700 to-teal-900 bg-clip-text text-transparent drop-shadow-xs tracking-tight font-black">
-                E-LAWYERS
-              </span>
-            </span>
-          </h1>
-
-          {/* Core Taglines */}
-          <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-800">
-              Complete Business Support. One Ecosystem.
-            </h2>
-            <p className="text-base sm:text-lg italic font-semibold text-emerald-700">
-              Where Business Strategy Meets Legal Excellence.
-            </p>
-          </div>
-
-          {/* Value Proposition Description */}
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto font-normal">
-            Whether you require corporate legal counsel, tax &amp; VAT optimization, statutory audit, or end-to-end business consultancy, our integrated team provides unified, cross-disciplinary advisory under one roof.
-          </p>
-
-          {/* Hero Quick Action Buttons */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('appointment');
-                scrollToFormSection();
-                if (typeof window !== 'undefined') {
-                  window.history.replaceState(null, '', '#appointment');
-                }
-              }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 group cursor-pointer"
-            >
-              <Calendar className="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" />
-              <span>Book Consultation Appointment</span>
-              <ArrowRight className="w-4 h-4 text-emerald-100 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('inquiry');
-                scrollToFormSection();
-                if (typeof window !== 'undefined') {
-                  window.history.replaceState(null, '', '#inquiry');
-                }
-              }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-950 border border-slate-300 font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-sm transition-all duration-200 group cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
-              <span>Submit Matter Brief</span>
-            </button>
-
-            <a
-              href={`tel:${rawTelNumber}`}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100/80 px-4 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 group"
-            >
-              <Phone className="w-4 h-4 text-emerald-600 group-hover:rotate-12 transition-transform" />
-              <span>Direct Desk ({primaryPhone})</span>
-            </a>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="pt-8 border-t border-slate-200 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-600 font-semibold">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              Dual-Firm Chartered Advisory
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              Direct Senior Partner Oversight
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              Guaranteed 24-Hour Inquiry Turnaround
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Direct Channels Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 uppercase tracking-widest mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-600" />
-            <span>Immediate Contacts</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Direct Communication Channels
-          </h2>
-          <p className="text-sm text-slate-600 mt-1">
-            Reach our advisory departments directly by telephone, verified email desks, or in-person at our Panthapath executive suite.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1: Head Office */}
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 mb-5">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <div className="inline-block text-[11px] font-bold text-emerald-700 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded-md mb-2">
-                Head Office
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
-                ACCOUNTICCA × E-LAWYERS
-              </h3>
-              <address className="not-italic text-sm text-slate-600 leading-relaxed space-y-1 mb-4">
-                <p className="font-semibold text-slate-800">Suite G-5, BTI Centara Grand</p>
-                <p>144–144/1 Green Road, Panthapath</p>
-                <p>Dhaka–1205, Bangladesh</p>
-              </address>
-              <p className="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-100 mb-4">
-                Conveniently located near Panthapath junction, accessible with dedicated client parking.
-              </p>
-            </div>
-            
-            <a
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-between w-full text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200/80 px-4 py-2.5 rounded-xl transition-colors group mt-2"
-            >
-              <span>Get Directions via Google Maps</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-          </div>
-
-          {/* Card 2: Telephone & Hunting Lines */}
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 mb-5">
-                <Phone className="w-6 h-6" />
-              </div>
-              <div className="inline-block text-[11px] font-bold text-teal-800 uppercase tracking-wider bg-teal-50 px-2 py-0.5 rounded-md mb-2">
-                Telephone &amp; Hunting Lines
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
-                Direct Telephony Desk
-              </h3>
-
-              <div className="space-y-3 mb-4">
-                <div>
-                  <span className="text-xs font-semibold text-slate-500 block mb-1">
-                    Primary Hunting Line (Click to Call):
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={`tel:${rawTelNumber}`}
-                      className="text-base sm:text-lg font-mono font-bold text-emerald-700 hover:text-emerald-800 hover:underline tracking-tight"
-                    >
-                      {primaryPhone}
-                    </a>
-                    <button
-                      onClick={handleCopyPhone}
-                      title="Copy phone number"
-                      className="p-1 text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-colors"
-                    >
-                      {copiedPhone ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs text-slate-600 space-y-1">
-                  <p className="font-semibold text-slate-800">
-                    PABX / Extension Range:
-                  </p>
-                  <p className="font-mono text-slate-700">
-                    +880 1335-230170 through 230181
-                  </p>
-                  <p className="text-[11px] text-slate-500 pt-0.5">
-                    12 dedicated lines routing to corporate, tax, and audit secretariats.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
-                <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Available Sunday to Thursday for corporate consultations &amp; inquiries.</span>
-              </div>
-            </div>
-
-            <a
-              href={`tel:${rawTelNumber}`}
-              className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-white bg-slate-900 hover:bg-emerald-700 px-4 py-2.5 rounded-xl transition-colors shadow-xs group mt-2"
-            >
-              <Phone className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>Place Direct Call Now</span>
-            </a>
-          </div>
-
-          {/* Card 3: Email Advisory Desks */}
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 mb-5">
-                <Mail className="w-6 h-6" />
-              </div>
-              <div className="inline-block text-[11px] font-bold text-blue-800 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded-md mb-2">
-                Electronic Mail Desks
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
-                Email Advisory Desks
-              </h3>
-
-              <div className="space-y-3 mb-4">
-                {/* Accounticca Desk */}
-                <div className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70">
-                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wider">
-                    ACCOUNTICCA Desk
-                  </span>
-                  <p className="text-[11px] text-slate-500 mb-1">
-                    Finance, Tax, VAT, Audit &amp; Advisory:
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <a
-                      href="mailto:info@accounticca.com"
-                      className="text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-800 hover:underline"
-                    >
-                      info@accounticca.com
-                    </a>
-                    <button
-                      onClick={() => handleCopyEmail('info@accounticca.com')}
-                      className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors"
-                      title="Copy email"
-                    >
-                      {copiedEmail === 'info@accounticca.com' ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* E-Lawyers Desk */}
-                <div className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70">
-                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wider">
-                    E-LAWYERS Desk
-                  </span>
-                  <p className="text-[11px] text-slate-500 mb-1">
-                    Corporate Law, Litigation &amp; Compliance:
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <a
-                      href="mailto:info@elawyersbd.com"
-                      className="text-xs sm:text-sm font-semibold text-teal-700 hover:text-teal-800 hover:underline"
-                    >
-                      info@elawyersbd.com
-                    </a>
-                    <button
-                      onClick={() => handleCopyEmail('info@elawyersbd.com')}
-                      className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors"
-                      title="Copy email"
-                    >
-                      {copiedEmail === 'info@elawyersbd.com' ? (
-                        <Check className="w-3.5 h-3.5 text-teal-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-500 flex items-center gap-1.5 mb-3">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>All client communications protected under strict confidentiality covenants.</span>
-              </p>
-            </div>
-
-            <a
-              href="mailto:info@accounticca.com?cc=info@elawyersbd.com&subject=Joint%20Ecosystem%20Consultation%20Inquiry"
-              className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-slate-800 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-4 py-2.5 rounded-xl transition-colors group mt-2"
-            >
-              <Mail className="w-3.5 h-3.5 text-slate-600 group-hover:scale-110 transition-transform" />
-              <span>Compose Joint Brief</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Head Office Map & Navigation Hub */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <OfficeLocationMap primaryPhone={primaryPhone} rawTelNumber={rawTelNumber} />
-      </section>
-
-      {/* Explore Our Ecosystem Portals */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">
-              <Globe className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Integrated Digital Infrastructure</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Explore Our Ecosystem Portals
-            </h2>
-            <p className="text-sm text-slate-600 mt-2">
-              Access the specialized platforms, appointment calendars, and institutional knowledge engines of both practices.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Ecosystem Card 1: ACCOUNTICCA */}
-            <div className="rounded-2xl border-2 border-emerald-100 bg-gradient-to-b from-emerald-50/40 to-white p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-300 transition-colors">
+            <div className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
               <div>
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-lg shadow-sm">
-                      A
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900">ACCOUNTICCA</h3>
-                      <p className="text-xs text-emerald-800 font-semibold uppercase tracking-wider">
-                        Business &amp; Financial Practice
-                      </p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Finance &amp; Tax
-                  </span>
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold tracking-wide text-emerald-900">
+                  <Sparkles className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                  ACCOUNTICCA <span className="text-emerald-600">×</span> E-LAWYERS
                 </div>
-
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                    Core Focus Areas:
-                  </h4>
-                  <p className="text-sm font-semibold text-slate-800 leading-relaxed bg-white p-3 rounded-xl border border-slate-200/80">
-                    Accounting • Tax &amp; VAT • Statutory Audit • Corporate Finance • Fractional CFO
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 mb-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
-                    Official Portals &amp; Systems:
-                  </h4>
-                  
-                  <a
-                    href="https://accounticca.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-400 hover:shadow-xs transition-all group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Globe className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-emerald-700">
-                        accounticca.com
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-emerald-700">
-                      Primary Portal <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </a>
-
-                  <a
-                    href="https://blog.accounticca.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-400 hover:shadow-xs transition-all group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <FileText className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-emerald-700">
-                        blog.accounticca.com
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-emerald-700">
-                      Advisory Blog <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </a>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-emerald-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Partner Desk: Chartered &amp; Tax Advisors</span>
-                <span className="text-emerald-700 font-bold">Online Intake Active</span>
-              </div>
-            </div>
-
-            {/* Ecosystem Card 2: E-LAWYERS */}
-            <div className="rounded-2xl border-2 border-teal-100 bg-gradient-to-b from-teal-50/40 to-white p-6 sm:p-8 flex flex-col justify-between hover:border-teal-300 transition-colors">
-              <div>
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-700 text-white flex items-center justify-center font-black text-lg shadow-sm">
-                      E
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900">E-LAWYERS</h3>
-                      <p className="text-xs text-teal-800 font-semibold uppercase tracking-wider">
-                        Legal &amp; Compliance Practice
-                      </p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
-                    Corporate &amp; Law
-                  </span>
-                </div>
-
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                    Core Focus Areas:
-                  </h4>
-                  <p className="text-sm font-semibold text-slate-800 leading-relaxed bg-white p-3 rounded-xl border border-slate-200/80">
-                    Corporate Law • Litigation • Compliance • Regulatory Advisory • RJSC &amp; BIDA
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 mb-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
-                    Official Portals &amp; Systems:
-                  </h4>
-                  
-                  <a
-                    href="https://elawyersbd.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-teal-400 hover:shadow-xs transition-all group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Globe className="w-4 h-4 text-teal-700" />
-                      <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-teal-700">
-                        elawyersbd.com
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1 group-hover:text-teal-700">
-                      Legal Firm Portal <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </a>
-
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-400">
-                    <div className="flex items-center gap-2.5">
-                      <Scale className="w-4 h-4 text-slate-400" />
-                      <span className="text-xs sm:text-sm font-semibold text-slate-600">
-                        High Court &amp; RJSC Chambers
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-slate-500">Dhaka Jurisdiction</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-teal-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Partner Desk: Barristers &amp; Corporate Advocates</span>
-                <span className="text-teal-700 font-bold">Chambers Active</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Standardized Social Networks Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-xl">
-          <div className="max-w-3xl mb-8">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Verified Ecosystem Handles</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Connect Across Our Networks
-            </h2>
-            <p className="text-sm text-slate-300 mt-2">
-              Follow our official media channels for timely statutory alerts, NBR circular breakdowns, High Court precedents, and executive commentary.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Accounticca Social Hub */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-800/90 via-slate-800/60 to-slate-900/90 border border-emerald-500/30 shadow-xl space-y-5 relative overflow-hidden group">
-              {/* Subtle ambient corner glow */}
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-300" />
-
-              {/* Official Brand Header */}
-              <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
-                <div className="flex items-center gap-3.5">
-                  {/* Official Emblem */}
-                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-teal-900 p-0.5 shadow-md shadow-emerald-950/60 shrink-0">
-                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-emerald-500/15" />
-                      <div className="relative z-10 w-full h-full flex items-center justify-center text-emerald-400 font-black text-xl tracking-tight">
-                        A
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-black text-white tracking-wide">
-                        ACCOUNTICCA
-                      </h3>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        Verified
-                      </span>
-                    </div>
-                    <p className="text-xs text-emerald-300/80 font-medium">
-                      Chartered &amp; Financial Practice
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-right hidden sm:block">
-                  <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                    @accounticca
-                  </span>
-                </div>
-              </div>
-
-              {/* Official Social Links */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative z-10">
-                {/* LinkedIn */}
-                <a
-                  href="https://linkedin.com/company/accounticca"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all group text-slate-200 hover:text-white"
-                >
-                  <Linkedin className="w-4 h-4 text-[#0A66C2] group-hover:text-white shrink-0 transition-colors" />
-                  <span className="text-xs font-bold">LinkedIn</span>
-                </a>
-
-                {/* Facebook */}
-                <a
-                  href="https://facebook.com/accounticca"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all group text-slate-200 hover:text-white"
-                >
-                  <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white shrink-0 transition-colors" />
-                  <span className="text-xs font-bold">Facebook</span>
-                </a>
-
-                {/* X */}
-                <a
-                  href="https://x.com/accounticca"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all group text-slate-200 hover:text-white"
-                >
-                  <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-white fill-current shrink-0 transition-colors" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                  <span className="text-xs font-bold">X</span>
-                </a>
-
-                {/* YouTube */}
-                <a
-                  href="https://youtube.com/@accounticca"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all group text-slate-200 hover:text-white"
-                >
-                  <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white shrink-0 transition-colors" />
-                  <span className="text-xs font-bold">YouTube</span>
-                </a>
-              </div>
-            </div>
-
-            {/* E-Lawyers Social Hub */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-slate-800/90 via-slate-800/60 to-slate-900/90 border border-teal-500/30 shadow-xl space-y-5 relative overflow-hidden group">
-              {/* Subtle ambient corner glow */}
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-teal-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-teal-500/20 transition-all duration-300" />
-
-              {/* Official Brand Header */}
-              <div className="flex items-center justify-between border-b border-slate-700/80 pb-4 relative z-10">
-                <div className="flex items-center gap-3.5">
-                  {/* Official Emblem */}
-                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-cyan-600 to-slate-900 p-0.5 shadow-md shadow-teal-950/60 shrink-0">
-                    <div className="w-full h-full rounded-[14px] bg-slate-900/95 flex items-center justify-center p-2 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-teal-500/15" />
-                      <div className="relative z-10 w-full h-full flex items-center justify-center text-teal-400 font-black text-xl tracking-tight">
-                        E
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-black text-white tracking-wide">
-                        E-LAWYERS
-                      </h3>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 border border-teal-400/40 text-teal-300">
-                        <CheckCircle2 className="w-3 h-3 text-teal-400" />
-                        Verified
-                      </span>
-                    </div>
-                    <p className="text-xs text-teal-300/80 font-medium">
-                      Corporate Law &amp; Litigation Chambers
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-right hidden sm:block">
-                  <span className="text-xs font-mono text-teal-300 font-bold bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-500/30">
-                    @elawyerssbd
-                  </span>
-                </div>
-              </div>
-
-              {/* Official Social Links with Real Brand Logos */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 relative z-10">
-                {/* LinkedIn */}
-                <a
-                  href="https://linkedin.com/company/elawyersbd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#0A66C2] border border-slate-700/80 hover:border-[#0A66C2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#0A66C2]/20 hover:-translate-y-1 relative"
-                >
-                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Linkedin className="w-4 h-4 text-[#0A66C2] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">LinkedIn</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/company</span>
-                </a>
-
-                {/* Facebook */}
-                <a
-                  href="https://facebook.com/elawyersbd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#1877F2] border border-slate-700/80 hover:border-[#1877F2] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#1877F2]/20 hover:-translate-y-1 relative"
-                >
-                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">Facebook</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono mt-0.5">/elawyersbd</span>
-                </a>
-
-                {/* X */}
-                <a
-                  href="https://x.com/elawyerssbd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-black border border-slate-700/80 hover:border-slate-500 transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-white/10 hover:-translate-y-1 relative"
-                >
-                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <svg className="w-4 h-4 text-slate-300 group-hover:text-white fill-current transition-colors" viewBox="0 0 24 24">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">X</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-slate-300 font-mono mt-0.5">@elawyerssbd</span>
-                </a>
-
-                {/* Instagram */}
-                <a
-                  href="https://instagram.com/elawyerssbd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#E1306C] border border-slate-700/80 hover:border-[#E1306C] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#E1306C]/20 hover:-translate-y-1 relative"
-                >
-                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Instagram className="w-4 h-4 text-[#E1306C] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">Instagram</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-pink-100 font-mono mt-0.5">@elawyerssbd</span>
-                </a>
-
-                {/* YouTube */}
-                <a
-                  href="https://youtube.com/@elawyerssbd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 hover:bg-[#FF0000] border border-slate-700/80 hover:border-[#FF0000] transition-all duration-200 group text-center shadow-xs hover:shadow-xl hover:shadow-[#FF0000]/20 hover:-translate-y-1 col-span-2 sm:col-span-1 relative"
-                >
-                  <ArrowUpRight className="w-3 h-3 absolute top-2 right-2 text-slate-500 group-hover:text-white transition-all opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/90 group-hover:bg-white/15 flex items-center justify-center mb-1.5 transition-colors">
-                    <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-white">YouTube</span>
-                  <span className="text-[9px] text-slate-400 group-hover:text-red-100 font-mono mt-0.5">@elawyerssbd</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Column: Inquiry Form & Appointment Booking */}
-      <section id="inquiry-form-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 scroll-mt-24">
-        <div className="max-w-3xl mx-auto space-y-4">
-            {/* Tab Toggle Navigation */}
-            <div className="bg-slate-200/80 p-1.5 rounded-2xl flex items-center gap-1.5 border border-slate-200 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('appointment');
-                  setSearchParams(prev => {
-                    const next = new URLSearchParams(prev);
-                    next.set('tab', 'appointment');
-                    return next;
-                  }, { replace: true });
-                  if (typeof window !== 'undefined') {
-                    window.history.replaceState(null, '', '#appointment');
-                  }
-                }}
-                className={`flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === 'appointment'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-                }`}
-              >
-                <Calendar className={`w-4 h-4 ${activeTab === 'appointment' ? 'text-emerald-700' : 'text-slate-500'}`} />
-                <span>Book Appointment</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  activeTab === 'appointment' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-300/80 text-slate-700'
-                }`}>
-                  Live Slots
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('inquiry');
-                  setSearchParams(prev => {
-                    const next = new URLSearchParams(prev);
-                    next.set('tab', 'inquiry');
-                    return next;
-                  }, { replace: true });
-                  if (typeof window !== 'undefined') {
-                    window.history.replaceState(null, '', '#inquiry');
-                  }
-                }}
-                className={`flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  activeTab === 'inquiry'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-                }`}
-              >
-                <FileText className={`w-4 h-4 ${activeTab === 'inquiry' ? 'text-emerald-700' : 'text-slate-500'}`} />
-                <span>Submit Inquiry</span>
-                <span className="text-[10px] font-semibold text-slate-500 hidden sm:inline">(Matter Brief)</span>
-              </button>
-            </div>
-
-            {/* Tab 1: Book Consultation Appointment */}
-            {activeTab === 'appointment' ? (
-              <AppointmentBookingForm />
-            ) : (
-              /* Tab 2: Submit Executive Inquiry */
-              <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                    Submit an Executive Inquiry
-                  </h2>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    Senior Advisory Routing
-                  </span>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
-                  Complete your brief below. Our senior advisory leads review every corporate inquiry and respond within 2 to 4 business hours.
+                <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                  One point of contact.
+                  <span className="mt-1 block text-emerald-700">Complete business support.</span>
+                </h1>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                  Corporate law, tax, VAT, audit, and business advisory—connected through one coordinated team.
+                  Tell us what you need, and we’ll help you identify the right next step.
                 </p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => scrollToForm('appointment')}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-600/20"
+                  >
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a consultation
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollToForm('inquiry')}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-xs transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-600/15"
+                  >
+                    <MessageCircle className="h-4 w-4 text-emerald-700" aria-hidden="true" /> Send an inquiry
+                  </button>
+                </div>
+              </div>
 
-                {submitted ? (
-                  <div className="p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="w-14 h-14 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-md">
-                      <CheckCircle2 className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900">Inquiry Received Successfully</h3>
-                    <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                      Thank you, <strong>{firstName} {lastName}</strong>. Your matter brief regarding <strong>{service}</strong> has been assigned to our senior advisory desk. We will reach out to you at <strong>{email}</strong> or <strong>{phone}</strong> shortly.
-                    </p>
-                    <div className="pt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSubmitted(false);
-                          setFirstName('');
-                          setLastName('');
-                          setEmail('');
-                          setPhone('');
-                          setCompanyName('');
-                          setMessage('');
-                        }}
-                        className="px-6 py-2.5 rounded-xl bg-white border border-emerald-300 text-emerald-800 font-bold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
-                      >
-                        Submit Another Inquiry
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                <form onSubmit={handleFormSubmit} className="space-y-4" noValidate>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label htmlFor="contact-first-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          First Name *
-                        </label>
-                        {touched.firstName && !errors.firstName && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
-                          </span>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        name="given-name"
-                        id="contact-first-name"
-                        autoComplete="given-name"
-                        value={firstName}
-                        onChange={(e) => {
-                          setFirstName(e.target.value);
-                          if (!touched.firstName) setTouched(prev => ({ ...prev, firstName: true }));
-                        }}
-                        onBlur={() => handleBlur('firstName')}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.firstName || formAttempted) && errors.firstName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.firstName && !errors.firstName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
-                        placeholder="e.g. Mahfuz"
-                      />
-                      {(touched.firstName || formAttempted) && errors.firstName && (
-                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span>{errors.firstName}</span>
-                        </p>
-                      )}
-                    </div>
+              <div className="rounded-2xl border border-emerald-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Speak with our team</p>
+                <a href={`tel:${RAW_PHONE}`} className="mt-3 flex items-center gap-3 text-2xl font-semibold tracking-tight text-slate-950 transition hover:text-emerald-700 sm:text-3xl">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <Phone className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  {PRIMARY_PHONE}
+                </a>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Sunday–Thursday · Corporate consultations and business inquiries</p>
+                <div className="mt-5 border-t border-slate-200 pt-4">
+                  <p className="flex items-start gap-2 text-sm leading-6 text-slate-700">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                    Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label htmlFor="contact-last-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Last Name *
-                        </label>
-                        {touched.lastName && !errors.lastName && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
-                          </span>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        name="family-name"
-                        id="contact-last-name"
-                        autoComplete="family-name"
-                        value={lastName}
-                        onChange={(e) => {
-                          setLastName(e.target.value);
-                          if (!touched.lastName) setTouched(prev => ({ ...prev, lastName: true }));
-                        }}
-                        onBlur={() => handleBlur('lastName')}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.lastName || formAttempted) && errors.lastName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.lastName && !errors.lastName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
-                        placeholder="e.g. Rahman"
-                      />
-                      {(touched.lastName || formAttempted) && errors.lastName && (
-                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span>{errors.lastName}</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
+            <div className="mt-10 grid gap-3 border-t border-emerald-200/70 pt-6 sm:grid-cols-3">
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><ShieldCheck className="h-4 w-4" aria-hidden="true" /></span>
+                Coordinated advisory support
+              </div>
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><Scale className="h-4 w-4" aria-hidden="true" /></span>
+                Legal and financial expertise
+              </div>
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><Clock3 className="h-4 w-4" aria-hidden="true" /></span>
+                Clear next steps, without the runaround
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label htmlFor="contact-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Corporate Email *
-                        </label>
-                        {touched.email && !errors.email && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
-                          </span>
-                        )}
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        id="contact-email"
-                        autoComplete="email"
-                        value={email}
-                        onChange={(e) => {
-                          setEmail(e.target.value);
-                          if (!touched.email) setTouched(prev => ({ ...prev, email: true }));
-                        }}
-                        onBlur={() => handleBlur('email')}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.email || formAttempted) && errors.email ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.email && !errors.email ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
-                        placeholder="name@company.com"
-                      />
-                      {(touched.email || formAttempted) && errors.email && (
-                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span>{errors.email}</span>
-                        </p>
-                      )}
-                    </div>
+      {/* Direct contact cards */}
+      <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mb-6 max-w-2xl">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Direct contact</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Reach the right team</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Choose the contact channel that works best for you.</p>
+        </div>
 
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label htmlFor="contact-phone" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Phone / WhatsApp *
-                        </label>
-                        {touched.phone && !errors.phone && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
-                          </span>
-                        )}
-                      </div>
-                      <input
-                        type="tel"
-                        name="tel"
-                        id="contact-phone"
-                        autoComplete="tel"
-                        value={phone}
-                        onChange={(e) => {
-                          setPhone(e.target.value);
-                          if (!touched.phone) setTouched(prev => ({ ...prev, phone: true }));
-                        }}
-                        onBlur={() => handleBlur('phone')}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 font-mono ${(touched.phone || formAttempted) && errors.phone ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : touched.phone && !errors.phone ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
-                        placeholder="+880 1712-XXXXXX"
-                      />
-                      {(touched.phone || formAttempted) && errors.phone && (
-                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span>{errors.phone}</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><MapPin className="h-5 w-5" aria-hidden="true" /></span>
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Head office</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-950">ACCOUNTICCA × E-LAWYERS</h3>
+            <address className="mt-3 not-italic text-sm leading-6 text-slate-600">
+              Suite G-5, BTI Centara Grand<br />
+              144–144/1 Green Road, Panthapath<br />
+              Dhaka–1205, Bangladesh
+            </address>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 transition hover:text-emerald-950">
+              Get directions <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </article>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label htmlFor="contact-company-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Company / Entity Name
-                        </label>
-                        {companyName.trim() && touched.companyName && !errors.companyName && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Valid
-                          </span>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        id="contact-company-name"
-                        value={companyName}
-                        onChange={(e) => {
-                          setCompanyName(e.target.value);
-                          if (!touched.companyName) setTouched(prev => ({ ...prev, companyName: true }));
-                        }}
-                        onBlur={() => handleBlur('companyName')}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all text-slate-900 ${(touched.companyName || formAttempted) && errors.companyName ? "border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20" : companyName.trim() && touched.companyName && !errors.companyName ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10" : "border-slate-200 focus:ring-2 focus:ring-emerald-500"}`}
-                        placeholder="Company or Venture Ltd."
-                      />
-                      {(touched.companyName || formAttempted) && errors.companyName && (
-                        <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span>{errors.companyName}</span>
-                        </p>
-                      )}
-                    </div>
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Phone className="h-5 w-5" aria-hidden="true" /></span>
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Telephone desk</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-950">Call or WhatsApp</h3>
+            <a href={`tel:${RAW_PHONE}`} className="mt-3 block text-xl font-semibold tracking-tight text-slate-900 hover:text-emerald-800">{PRIMARY_PHONE}</a>
+            <button type="button" onClick={() => void handleCopy(RAW_PHONE, 'phone')} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50" aria-label="Copy phone number">
+              {copyStatus === 'phone' ? <Check className="h-3.5 w-3.5 text-emerald-700" /> : <Copy className="h-3.5 w-3.5" />}
+              {copyStatus === 'phone' ? 'Copied' : 'Copy number'}
+            </button>
+            <p className="mt-5 text-sm leading-6 text-slate-500">Sunday to Thursday for corporate consultations and inquiries.</p>
+          </article>
 
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Practice Service Area *
-                      </label>
-                      <select
-                        value={service}
-                        onChange={(e) => setService(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 font-medium"
-                      >
-                        <option value="Corporate Law & RJSC Compliance">Corporate Law &amp; RJSC Compliance (E-Lawyers)</option>
-                        <option value="Corporate Tax, VAT & Statutory Audit">Corporate Tax, VAT &amp; Statutory Audit (Accounticca)</option>
-                        <option value="Fractional CFO & Financial Modeling">Fractional CFO &amp; Financial Modeling (Accounticca)</option>
-                        <option value="BIDA Approvals & Foreign Direct Investment">BIDA Approvals &amp; FDI Services (E-Lawyers)</option>
-                        <option value="Commercial Contracts & IP Protection">Commercial Contracts &amp; IP Protection (E-Lawyers)</option>
-                        <option value="Business Process Optimization & Automation">Business Process Optimization &amp; Automation (Accounticca)</option>
-                        <option value="Integrated Joint Ecosystem Consultation">Integrated Joint Ecosystem Consultation</option>
-                      </select>
-                    </div>
-                  </div>
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Mail className="h-5 w-5" aria-hidden="true" /></span>
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Email desks</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-950">Contact by email</h3>
+            <div className="mt-4 space-y-4">
+              <div>
+                <p className="text-xs font-medium text-slate-500">Finance, tax, VAT and audit</p>
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <a href={`mailto:${ACCOUNTICCA_EMAIL}`} className="break-all text-sm font-semibold text-emerald-800 hover:underline">{ACCOUNTICCA_EMAIL}</a>
+                  <button type="button" onClick={() => void handleCopy(ACCOUNTICCA_EMAIL, ACCOUNTICCA_EMAIL)} aria-label="Copy Accounticca email" className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-emerald-50 hover:text-emerald-800">
+                    {copyStatus === ACCOUNTICCA_EMAIL ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Corporate law and compliance</p>
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <a href={`mailto:${ELAWYERS_EMAIL}`} className="break-all text-sm font-semibold text-teal-800 hover:underline">{ELAWYERS_EMAIL}</a>
+                  <button type="button" onClick={() => void handleCopy(ELAWYERS_EMAIL, ELAWYERS_EMAIL)} aria-label="Copy E-Lawyers email" className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-teal-50 hover:text-teal-800">
+                    {copyStatus === ELAWYERS_EMAIL ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+        {copyError && <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{copyError}</p>}
+      </section>
 
+      {/* Inquiry and appointment */}
+      <section id="contact-form-section" className="mx-auto max-w-7xl scroll-mt-6 px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+          <div className="lg:sticky lg:top-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Let’s get started</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">Tell us what you’re working on.</h2>
+            <p className="mt-4 text-base leading-7 text-slate-600">
+              Book a consultation or send a written brief. Share enough context for our team to understand your needs and identify the appropriate practice area.
+            </p>
+
+            <div className="mt-7 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><ShieldCheck className="h-5 w-5" aria-hidden="true" /></span>
+                <div><h3 className="text-sm font-semibold text-slate-900">Thoughtful, coordinated support</h3><p className="mt-1 text-sm leading-6 text-slate-600">Your selected service helps route the inquiry to the relevant team.</p></div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><BriefcaseBusiness className="h-5 w-5" aria-hidden="true" /></span>
+                <div><h3 className="text-sm font-semibold text-slate-900">Business-first context</h3><p className="mt-1 text-sm leading-6 text-slate-600">Tell us what decision, deadline, or challenge you need help with.</p></div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Clock3 className="h-5 w-5" aria-hidden="true" /></span>
+                <div><h3 className="text-sm font-semibold text-slate-900">Clear next steps</h3><p className="mt-1 text-sm leading-6 text-slate-600">We’ll use your details to understand the best way to follow up.</p></div>
+              </div>
+            </div>
+
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950">
+              Visit our Dhaka office <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
+            <div className="border-b border-slate-100 p-3 sm:p-4">
+              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5" role="tablist" aria-label="Contact options">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'inquiry'}
+                  onClick={() => selectTab('inquiry')}
+                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 ${activeTab === 'inquiry' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-600 hover:text-slate-950'}`}
+                >
+                  <FileText className="h-4 w-4" aria-hidden="true" /> Send an inquiry
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'appointment'}
+                  onClick={() => selectTab('appointment')}
+                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 ${activeTab === 'appointment' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-600 hover:text-slate-950'}`}
+                >
+                  <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book appointment
+                </button>
+              </div>
+            </div>
+
+            {activeTab === 'appointment' ? (
+              <div className="p-5 sm:p-8" role="tabpanel">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-slate-950">Book a consultation</h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">Choose an available option in the appointment form below.</p>
+                </div>
+                <AppointmentBookingForm />
+              </div>
+            ) : (
+              <div className="p-5 sm:p-8" role="tabpanel">
+                <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="contact-message" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Matter Description / Legal Brief *
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[11px] font-bold ${message.trim().length >= 15 ? "text-emerald-600" : "text-slate-400"}`}>
-                          {message.trim().length}/15 chars min
-                        </span>
-                        {touched.message && !errors.message && (
-                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Ready
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <textarea
-                      id="contact-message"
-                      rows={4}
-                      value={message}
-                      onChange={(e) => {
-                        setMessage(e.target.value);
-                        if (!touched.message) setTouched(prev => ({ ...prev, message: true }));
-                      }}
-                      onBlur={() => handleBlur('message')}
-                      className={`w-full bg-slate-50 border rounded-xl p-3.5 text-sm focus:outline-none transition-all text-slate-900 resize-none leading-relaxed ${(touched.message || formAttempted) && errors.message ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/30 bg-rose-50/20' : touched.message && !errors.message ? 'border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50/10' : 'border-slate-200 focus:ring-2 focus:ring-emerald-500'}`}
-                      placeholder="Outline your requirements (e.g. corporate structuring, tax notice defense, contract review, or audit planning)..."
+                    <h3 className="text-xl font-semibold text-slate-950">Send your matter brief</h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">Fields marked with an asterisk are required.</p>
+                  </div>
+                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-900">
+                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Private inquiry
+                  </span>
+                </div>
+
+                <div className="mb-6 rounded-xl bg-slate-50 p-4">
+                  <div className="mb-2 flex items-center justify-between gap-3 text-xs">
+                    <span className="font-semibold text-slate-700">Required fields completed</span>
+                    <span className="font-bold tabular-nums text-slate-800">{completedRequiredFields} of {requiredFields.length} · {completionPercentage}%</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="Required fields completed" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completionPercentage}>
+                    <div className="h-full rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${completionPercentage}%` }} />
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <TextField
+                      id="contact-first-name" label="First name" name="firstName" value={form.firstName}
+                      autoComplete="given-name" placeholder="Your first name" maxLength={80}
+                      error={errors.firstName} showError={inputError('firstName')}
+                      onChange={(value) => updateField('firstName', value)} onBlur={() => markTouched('firstName')}
                     />
-                    {(touched.message || formAttempted) && errors.message && (
-                      <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1 animate-in fade-in duration-150">
-                        <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                        <span>{errors.message}</span>
-                      </p>
-                    )}
+                    <TextField
+                      id="contact-last-name" label="Last name" name="lastName" value={form.lastName}
+                      autoComplete="family-name" placeholder="Your last name" maxLength={80}
+                      error={errors.lastName} showError={inputError('lastName')}
+                      onChange={(value) => updateField('lastName', value)} onBlur={() => markTouched('lastName')}
+                    />
+                    <TextField
+                      id="contact-email" label="Work or personal email" name="email" type="email" value={form.email}
+                      autoComplete="email" placeholder="you@company.com" maxLength={254}
+                      error={errors.email} showError={inputError('email')}
+                      onChange={(value) => updateField('email', value)} onBlur={() => markTouched('email')}
+                    />
+                    <TextField
+                      id="contact-phone" label="Phone or WhatsApp" name="phone" type="tel" value={form.phone}
+                      autoComplete="tel" placeholder="+880 1XXX-XXXXXX" maxLength={24}
+                      error={errors.phone} showError={inputError('phone')}
+                      onChange={(value) => updateField('phone', value)} onBlur={() => markTouched('phone')}
+                    />
+                    <TextField
+                      id="contact-company-name" label="Company name (optional)" name="companyName" value={form.companyName}
+                      autoComplete="organization" placeholder="Company or organization" maxLength={120}
+                      helper="Leave blank if you are contacting us as an individual."
+                      error={errors.companyName} showError={inputError('companyName')}
+                      onChange={(value) => updateField('companyName', value)} onBlur={() => markTouched('companyName')}
+                    />
+                    <div>
+                      <label htmlFor="contact-service" className="mb-2 block text-sm font-semibold text-slate-800">Service area <span className="text-emerald-700">*</span></label>
+                      <select
+                        id="contact-service"
+                        name="service"
+                        value={form.service}
+                        onChange={(event) => updateField('service', event.target.value)}
+                        onBlur={() => markTouched('service')}
+                        aria-invalid={inputError('service')}
+                        aria-describedby={inputError('service') ? 'contact-service-error' : undefined}
+                        className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-4 ${inputError('service') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'}`}
+                      >
+                        {SERVICES.map((service) => <option key={service} value={service}>{service}</option>)}
+                      </select>
+                      {inputError('service') && <p id="contact-service-error" role="alert" className="mt-1.5 text-xs font-medium text-rose-700">{errors.service}</p>}
+                    </div>
                   </div>
 
-                  {/* Validation Summary Notification Bar */}
-                  {(formAttempted || Object.keys(touched).length > 0) && (
-                    <div className="animate-in fade-in duration-200">
-                      {Object.keys(errors).length > 0 ? (
-                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                          <span>Please fix {Object.keys(errors).length} field{Object.keys(errors).length > 1 ? 's' : ''} with validation errors before submitting.</span>
-                        </div>
-                      ) : (
-                        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>All required inputs verified cleanly. Ready to submit to Senior Advisory Desk.</span>
-                        </div>
-                      )}
+                  <MessageField
+                    value={form.message}
+                    error={errors.message}
+                    showError={inputError('message')}
+                    onChange={(value) => updateField('message', value)}
+                    onBlur={() => markTouched('message')}
+                  />
+
+                  {formAttempted && hasErrors && (
+                    <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span>Please review the highlighted fields before preparing your email.</span>
                     </div>
                   )}
 
-                  <button
-                    type="submit"
-                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl px-6 py-4 font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg cursor-pointer group"
-                  >
-                    <span>Submit Inquiry to Advisory Desk</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  {emailDraftUrl && (
+                    <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /></span>
+                        <div>
+                          <h4 className="font-semibold text-emerald-950">Your inquiry is ready to email</h4>
+                          <p className="mt-1 text-sm leading-6 text-emerald-900/80">Open the prepared draft, then press Send in your email application. This website has not received or sent the inquiry itself.</p>
+                          <a href={emailDraftUrl} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20">
+                            Open email draft <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                          </a>
+                          <button type="button" onClick={resetForm} className="ml-3 mt-3 inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950">Start a new inquiry</button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex items-center justify-between text-xs text-slate-500 pt-2 flex-wrap gap-2">
-                    <span>Need immediate telephone assistance?</span>
-                    <a
-                      href={`tel:${rawTelNumber}`}
-                      className="font-bold text-emerald-700 hover:text-emerald-800 underline inline-flex items-center gap-1"
-                    >
-                      <span>Call Direct Desk: {primaryPhone}</span>
-                    </a>
-                  </div>
+                  <button type="submit" className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20">
+                    Prepare inquiry email <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  </button>
+                  <p className="text-center text-xs leading-5 text-slate-500">Selecting this button validates your details and prepares an email draft; it does not submit the form to a server.</p>
                 </form>
-                )}
               </div>
             )}
+          </div>
         </div>
       </section>
 
-      <OfficeLocationMap />
+      {/* Portals */}
+      <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-9">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Our ecosystem</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Explore our portals</h2>
+            </div>
+            <p className="max-w-xl text-sm leading-6 text-slate-600">Find the right specialist practice for your business and compliance needs.</p>
+          </div>
+          <div className="mt-7 grid gap-4 md:grid-cols-2">
+            <a href="https://accounticca.com" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 transition hover:border-emerald-300 hover:bg-emerald-50">
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-800 text-lg font-bold text-white">A</span>
+                <div><h3 className="font-semibold text-slate-950">ACCOUNTICCA</h3><p className="mt-1 text-sm text-slate-600">Accounting, tax, VAT, audit and finance</p><span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800">accounticca.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></span></div>
+              </div>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-emerald-800 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+            </a>
+            <a href="https://elawyersbd.com" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-2xl border border-teal-100 bg-teal-50/50 p-5 transition hover:border-teal-300 hover:bg-teal-50">
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-800 text-lg font-bold text-white">E</span>
+                <div><h3 className="font-semibold text-slate-950">E-LAWYERS</h3><p className="mt-1 text-sm text-slate-600">Corporate law, litigation and compliance</p><span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-800">elawyersbd.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></span></div>
+              </div>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-teal-800 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+            </a>
+            <a href="https://blog.accounticca.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-emerald-200 hover:bg-slate-50">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><FileText className="h-5 w-5" aria-hidden="true" /></span>
+              <div><h3 className="text-sm font-semibold text-slate-900">Accounticca Advisory Blog</h3><p className="mt-1 text-xs text-slate-500">Guides, updates and business insights</p></div>
+              <ExternalLink className="ml-auto h-4 w-4 text-slate-400" aria-hidden="true" />
+            </a>
+            <a href="https://elawyersbd.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-teal-200 hover:bg-slate-50">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><Globe2 className="h-5 w-5" aria-hidden="true" /></span>
+              <div><h3 className="text-sm font-semibold text-slate-900">E-Lawyers Legal Portal</h3><p className="mt-1 text-xs text-slate-500">Legal services and compliance support</p></div>
+              <ExternalLink className="ml-auto h-4 w-4 text-slate-400" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Social links */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Stay connected</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Follow our channels</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {SOCIAL_GROUPS.map((group) => {
+            const accent = group.color === 'emerald' ? 'text-emerald-800 bg-emerald-50' : 'text-teal-800 bg-teal-50';
+            return (
+              <article key={group.brand} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex items-center gap-3">
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl text-sm font-black ${accent}`}>{group.brand === 'ACCOUNTICCA' ? 'A' : 'E'}</span>
+                  <div><h3 className="font-semibold text-slate-950">{group.brand}</h3><p className="mt-0.5 text-xs text-slate-500">{group.description}</p></div>
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {group.links.map(({ label, href, Icon }) => (
+                    <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-900">
+                      <Icon className="h-4 w-4" aria-hidden="true" /> {label} <ArrowUpRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* One map instance */}
+      <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mb-4">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Find us</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Visit our Dhaka office</h2>
+        </div>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <OfficeLocationMap primaryPhone={PRIMARY_PHONE} rawTelNumber={RAW_PHONE} />
+        </div>
+      </section>
+
       <FloatingLiveChat />
-    </div>
+    </main>
   );
 }

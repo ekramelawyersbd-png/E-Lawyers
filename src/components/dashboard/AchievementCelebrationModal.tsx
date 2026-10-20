@@ -44,7 +44,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     icon: 'Zap',
     xpPoints: 150,
     rewardNote: 'Unlocked 1 Free NBR Statutory Form Guide PDF',
-    perkList: ['+150 Compliance XP', 'Active Learner Badge on Profile', 'Access to Daily Tax Dispatch Alerts'],
+    perkList: ['+150 Compliance XP', 'Active Learner Badge on Profile', '+1 Streak Freeze Token ❄️', 'Access to Daily Tax Dispatch Alerts'],
     gradientBg: 'from-amber-600 via-orange-500 to-amber-700',
     accentColor: 'text-amber-400',
     description: 'You completed 3 consecutive days of reading tax dispatches and completing compliance goals!'
@@ -57,7 +57,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     icon: 'Flame',
     xpPoints: 500,
     rewardNote: '10% OFF Any Premium Tax & Legal Toolkit',
-    perkList: ['+500 Compliance XP', 'Master Compliance Rank Flame Badge', '10% Discount Code on Single Tool Purchases', 'Eligible for Community Leaderboard'],
+    perkList: ['+500 Compliance XP', 'Master Compliance Rank Flame Badge', '+1 Bonus Streak Freeze Token ❄️', '10% Discount Code on Single Tool Purchases', 'Eligible for Community Leaderboard'],
     gradientBg: 'from-orange-600 via-amber-600 to-red-600',
     accentColor: 'text-orange-300',
     description: '1 Full Week of daily statutory reading & tax calculation practice! You are building elite corporate habits.'
@@ -70,7 +70,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     icon: 'Star',
     xpPoints: 1000,
     rewardNote: 'Unlocked Exclusive Salary Tax Deduction Calculator Kit',
-    perkList: ['+1,000 Compliance XP', 'Practitioner Elite Badge', 'Free Access to Salary Tax Deduction Calculator', 'Priority Q&A in Consultations'],
+    perkList: ['+1,000 Compliance XP', 'Practitioner Elite Badge', '+2 Bonus Streak Freeze Tokens ❄️', 'Free Access to Salary Tax Deduction Calculator', 'Priority Q&A in Consultations'],
     gradientBg: 'from-purple-600 via-indigo-600 to-blue-600',
     accentColor: 'text-purple-300',
     description: '14 Days of uninterrupted tax & corporate learning! You demonstrate exceptional professional diligence.'
@@ -83,7 +83,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     icon: 'ShieldCheck',
     xpPoints: 2500,
     rewardNote: 'Free Access to RJSC Annual Filing Automation Kit',
-    perkList: ['+2,500 Compliance XP', '30-Day Champion Crest Badge', 'Free Download of RJSC Form XII Automation Kit', 'Featured Practitioner Tag on Discussion Dispatches'],
+    perkList: ['+2,500 Compliance XP', '30-Day Champion Crest Badge', '+2 Bonus Streak Freeze Tokens ❄️', 'Free Download of RJSC Form XII Automation Kit', 'Featured Practitioner Tag on Discussion Dispatches'],
     gradientBg: 'from-emerald-600 via-teal-600 to-cyan-700',
     accentColor: 'text-emerald-300',
     description: 'A full month of continuous daily growth! You have established a solid foundation in Bangladesh Tax & Corporate Law.'

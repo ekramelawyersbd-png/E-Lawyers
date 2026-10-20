@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { CheckSquare, Square, FileText, CheckCircle2, AlertCircle, Camera, Loader2 } from 'lucide-react';
 import { addClientActivity } from '../../services/clientActivityService';
 
-interface ChecklistItem {
+export interface ChecklistItem {
   id: string;
   label: string;
   description?: string;
   category: 'mandatory' | 'conditional';
 }
 
-const CHECKLIST_ITEMS: ChecklistItem[] = [
+export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'audited_financials',
     label: 'Audited Financial Statements',
@@ -56,14 +56,24 @@ export function ComplianceChecklist() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('corporateChecklist');
-    if (saved) {
-      try {
-        setCheckedItems(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse checklist', e);
+    const loadChecklist = () => {
+      const saved = localStorage.getItem('corporateChecklist');
+      if (saved) {
+        try {
+          setCheckedItems(JSON.parse(saved));
+        } catch (e) {
+          console.error('Failed to parse checklist', e);
+        }
       }
-    }
+    };
+
+    loadChecklist();
+    window.addEventListener('storage', loadChecklist);
+    window.addEventListener('corporate_checklist_updated', loadChecklist);
+    return () => {
+      window.removeEventListener('storage', loadChecklist);
+      window.removeEventListener('corporate_checklist_updated', loadChecklist);
+    };
   }, []);
 
   useEffect(() => {

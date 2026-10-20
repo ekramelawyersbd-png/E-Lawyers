@@ -34,6 +34,9 @@ import { MinimumTurnoverTaxPage } from './pages/tools/MinimumTurnoverTaxPage';
 import { DvcVerificationPage } from './pages/tools/DvcVerificationPage';
 import { ResourceLibraryPage as StandaloneResourceLibraryPage } from './pages/tools/ResourceLibraryPage';
 import { EarlyFilingIncentivePage } from './pages/tools/EarlyFilingIncentivePage';
+import { LossCarryForwardToolPage } from './pages/tools/LossCarryForwardToolPage';
+import { TaxSlabsExplorerPage } from './pages/tools/TaxSlabsExplorerPage';
+import { RateFinderPage } from './pages/tools/RateFinderPage';
 import { TrainingHub } from './pages/TrainingHub';
 import { Team } from './pages/Team';
 import { VatGuide } from './pages/VatGuide';
@@ -87,6 +90,7 @@ export default function App() {
 
                     {/* Public Shop Pages (Open to All Visitors, Displays Published Catalog) */}
                     <Route path="shop" element={<Shop />} />
+                    <Route path="shop/checkout" element={<CheckoutPage />} />
                     <Route path="shop/:slug" element={<ProductDetail />} />
                     <Route path="shop/product/:slug" element={<ProductDetail />} />
                     <Route path="checkout" element={<CheckoutPage />} />
@@ -124,6 +128,10 @@ export default function App() {
                 <Route path="tools/dvc-verification" element={<DvcVerificationPage />} />
                 <Route path="tools/resource-library" element={<StandaloneResourceLibraryPage />} />
                 <Route path="tools/early-filing-incentive" element={<EarlyFilingIncentivePage />} />
+                <Route path="tools/loss-carry-forward-calculator" element={<LossCarryForwardToolPage />} />
+                <Route path="tools/tax-slabs-explorer" element={<TaxSlabsExplorerPage />} />
+                <Route path="tools/rate-finder" element={<RateFinderPage />} />
+                <Route path="rate-finder" element={<Navigate to="/tools/rate-finder" replace />} />
                 <Route path="training" element={<TrainingHub />} />
                 <Route path="course/personal-income-tax" element={<PersonalIncomeTaxCourse />} />
                 <Route path="income-tax-training" element={<Navigate to="/course/personal-income-tax" replace />} />

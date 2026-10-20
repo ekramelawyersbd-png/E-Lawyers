@@ -42,6 +42,8 @@ import { usePurchases } from '../../contexts/PurchaseContext';
 import { SHOP_PRODUCTS } from '../../data/shopProducts';
 import { mockArticles } from '../../data/mockData';
 import { Link } from 'react-router-dom';
+import { WeeklyActivityTrendChart } from './WeeklyActivityTrendChart';
+import { AnnualActivityHeatmap } from './AnnualActivityHeatmap';
 
 interface UserActivityDashboardProps {
   onNavigateTab?: (tab: 'saved' | 'articles' | 'payments' | 'activity') => void;
@@ -72,7 +74,7 @@ export const UserActivityDashboard: React.FC<UserActivityDashboardProps> = ({ on
   const { savedItems } = useBookmarks();
   const { purchasedProductIds, transactions } = usePurchases();
   const [activeTimeframe, setActiveTimeframe] = useState<'7d' | '30d' | 'year'>('7d');
-  const [activeTab, setActiveTab] = useState<'overview' | 'reads' | 'bookmarks' | 'purchases'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'heatmap' | 'reads' | 'bookmarks' | 'purchases'>('overview');
 
   // Resolved purchased products
   const purchasedProducts = useMemo(() => {
@@ -266,6 +268,7 @@ export const UserActivityDashboard: React.FC<UserActivityDashboardProps> = ({ on
       <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
         {[
           { id: 'overview', label: 'Activity Overview & Visual Charts', icon: BarChart2 },
+          { id: 'heatmap', label: '365-Day Activity Heatmap (D3)', icon: Calendar },
           { id: 'reads', label: 'Recent Article Reads (28)', icon: FileText },
           { id: 'bookmarks', label: `Saved Bookmarks (${savedItems.length})`, icon: Bookmark },
           { id: 'purchases', label: `Unlocked Tools (${purchasedProducts.length})`, icon: ShoppingBag }
@@ -293,7 +296,12 @@ export const UserActivityDashboard: React.FC<UserActivityDashboardProps> = ({ on
       {/* TAB CONTENT 1: OVERVIEW & CHARTS */}
       {activeTab === 'overview' && (
         <div className="space-y-8">
+          {/* Recharts Line Chart: Long-Term Weekly Activity & Compliance Trends */}
+          <WeeklyActivityTrendChart />
           
+          {/* D3.js 365-Day Contribution-Style Heatmap */}
+          <AnnualActivityHeatmap />
+
           {/* Main Visualizations Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
@@ -409,6 +417,13 @@ export const UserActivityDashboard: React.FC<UserActivityDashboardProps> = ({ on
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* TAB CONTENT: 365-DAY D3 CONTRIBUTION HEATMAP */}
+      {activeTab === 'heatmap' && (
+        <div className="space-y-4">
+          <AnnualActivityHeatmap />
         </div>
       )}
 

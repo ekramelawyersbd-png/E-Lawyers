@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   X, 
   Trash2, 
@@ -16,10 +16,11 @@ import {
 import { useCart } from '../../contexts/CartContext';
 
 interface CartDrawerProps {
-  onCheckout: () => void;
+  onCheckout?: () => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
+  const navigate = useNavigate();
   const { 
     items, 
     removeFromCart, 
@@ -297,7 +298,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
                 type="button"
                 onClick={() => {
                   setIsCartOpen(false);
-                  onCheckout();
+                  if (onCheckout) {
+                    onCheckout();
+                  } else {
+                    navigate('/checkout');
+                  }
                 }}
                 className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer"
               >

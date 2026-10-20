@@ -68,8 +68,13 @@ The company's statutory corporate tax liability will be **Tk. 2.75 Crore**.
 
 To aggressively encourage digital payments and formal audit trails across the commercial sector, an additional tax penalty applies if a company fails to process all eligible transactions and sales income through official banking channels.
 
-### Statutory Condition:
-If a company fails to conduct all eligible transactions through formal banking channels (e.g., electronic bank transfers, account-payee cheques, RTGS, NPSB, or authorized digital merchant gateways):
+### Statutory Condition & Commercial Expenditure Bank Transfer Mandates:
+To qualify for the **2.5% corporate tax reduction** (and avoid the +2.5% non-compliance surcharge) under the Seventh Schedule of the Income Tax Act, 2023 and Finance Act, 2026, a corporate entity must satisfy three cumulative formal banking channel mandates:
+1. **100% Receipts & Capital Inflows Mandate:** **100%** of all business receipts and income, as well as every loan, investment, and advance received, must be transacted through formal bank transfer (e.g., electronic bank transfers, account-payee cheques, RTGS, BEFTN, NPSB, or authorized merchant gateways).
+2. **Single-Transaction Expenditure Mandate (BDT 5 Lakh Threshold):** Every single commercial expense, vendor payment, or asset purchase exceeding **BDT 5,00,000 (BDT 5 Lakh)** must be settled exclusively via formal bank transfer.
+3. **Annual Aggregate Expenditure Mandate (BDT 36 Lakh Cap):** Total annual commercial expenditures and purchases paid outside formal bank transfers across the entire income year must **not exceed BDT 36,00,000 (BDT 36 Lakh)** (i.e., all annual expenditure exceeding BDT 36 Lakh must be routed via formal bank transfer).
+
+If a non-listed company breaches any of these three banking mandates:
 * **Standard tax rate:** 27.5%
 * **Additional non-compliance penalty:** **+2.5%**
 * **Effective penal tax rate:** **30.0%**

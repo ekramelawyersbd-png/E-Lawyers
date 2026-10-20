@@ -25,6 +25,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AchievementCelebrationModal, STREAK_MILESTONES } from './AchievementCelebrationModal';
+import { 
+  getStreakFreezeData, 
+  StreakFreezeData 
+} from '../../services/streakFreezeService';
+import { StreakFreezeModal } from './StreakFreezeModal';
 
 export interface DailyGoalItem {
   id: string;
@@ -122,6 +127,23 @@ export const DailyGoalTracker: React.FC = () => {
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [celebrationMilestone, setCelebrationMilestone] = useState<number | undefined>(undefined);
 
+  // Streak Freeze Protection State
+  const [freezeData, setFreezeData] = useState<StreakFreezeData>(() => getStreakFreezeData());
+  const [showFreezeModal, setShowFreezeModal] = useState(false);
+
+  useEffect(() => {
+    const handleFreezeUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<StreakFreezeData>;
+      if (customEvent.detail) {
+        setFreezeData(customEvent.detail);
+      } else {
+        setFreezeData(getStreakFreezeData());
+      }
+    };
+    window.addEventListener('accounticca_freeze_updated', handleFreezeUpdate);
+    return () => window.removeEventListener('accounticca_freeze_updated', handleFreezeUpdate);
+  }, []);
+
   // Auto trigger Achievement Celebration Modal when streak matches milestone
   useEffect(() => {
     const milestoneDays = [3, 7, 14, 30, 60, 90, 100];
@@ -137,6 +159,25 @@ export const DailyGoalTracker: React.FC = () => {
       } catch {}
     }
   }, [streakDays]);
+
+  // Sync external updates from Floating Action Button / Quick Links
+  useEffect(() => {
+    const syncFromStorage = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_GOALS);
+        if (saved) setGoalItems(JSON.parse(saved));
+        const savedStreak = localStorage.getItem(STORAGE_KEY_STREAK);
+        if (savedStreak) setStreakDays(parseInt(savedStreak, 10));
+      } catch {}
+    };
+
+    window.addEventListener('storage', syncFromStorage);
+    window.addEventListener('accounticca_goals_updated', syncFromStorage);
+    return () => {
+      window.removeEventListener('storage', syncFromStorage);
+      window.removeEventListener('accounticca_goals_updated', syncFromStorage);
+    };
+  }, []);
 
   // Derived metrics
   const completedCount = goalItems.filter(i => i.completed).length;
@@ -232,6 +273,12 @@ export const DailyGoalTracker: React.FC = () => {
   };
 
   const handleResetStreak = () => {
+    if (freezeData.isFreezeActiveForToday) {
+      const confirmReset = window.confirm(
+        `Notice: Your ${streakDays}-day streak is currently shielded by an active Streak Freeze for today! 🛡️\n\nAre you sure you want to manually reset your streak to 0?`
+      );
+      if (!confirmReset) return;
+    }
     setStreakDays(0);
   };
 
@@ -261,6 +308,26 @@ export const DailyGoalTracker: React.FC = () => {
                 <Flame className={`w-4 h-4 ${streakDays > 0 ? 'text-amber-100 fill-amber-200 animate-bounce' : 'text-slate-400'}`} />
                 <span>{streakDays > 0 ? `${streakDays}-Day Active Streak!` : 'Start Daily Streak'}</span>
               </button>
+
+              {/* Quick Streak Freeze Status Badge */}
+              {freezeData.isFreezeActiveForToday ? (
+                <button
+                  onClick={() => setShowFreezeModal(true)}
+                  className="inline-flex items-center gap-1 text-[11px] font-black text-cyan-800 bg-cyan-100 border border-cyan-300 px-2.5 py-0.5 rounded-full hover:bg-cyan-200 transition-colors cursor-pointer"
+                  title="Streak Freeze is Active for Today!"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-700" />
+                  <span>Freeze Active</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowFreezeModal(true)}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full hover:bg-slate-200 transition-colors cursor-pointer"
+                  title="Click to manage Streak Freeze protection"
+                >
+                  <span>❄️ {freezeData.tokensAvailable} Freeze</span>
+                </button>
+              )}
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
               Set daily goals for reading statutory tax dispatches, practicing calculations, and completing compliance checklists
@@ -307,13 +374,19 @@ export const DailyGoalTracker: React.FC = () => {
             <Flame className="w-8 h-8 text-amber-100 fill-amber-100 animate-bounce" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-black uppercase tracking-wider text-amber-100 bg-black/20 px-2.5 py-0.5 rounded-full">
                 Consecutive Learning Streak
               </span>
               {isAllGoalsMet && (
                 <span className="text-xs font-bold text-emerald-200 bg-emerald-950/40 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Check className="w-3 h-3" /> Today Met
+                </span>
+              )}
+              {freezeData.isFreezeActiveForToday && (
+                <span className="text-xs font-black text-cyan-100 bg-cyan-950/50 border border-cyan-300/60 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Freeze Shield Active</span>
                 </span>
               )}
             </div>
@@ -324,14 +397,30 @@ export const DailyGoalTracker: React.FC = () => {
               </span>
             </h4>
             <p className="text-xs text-amber-100/90 mt-0.5">
-              {isAllGoalsMet
-                ? 'Congratulations! You met all daily activity goals today. Your streak is recorded.'
-                : `Complete ${settings.targetArticles - completedArticles > 0 ? `${settings.targetArticles - completedArticles} more article` : 'your remaining goals'} today to extend your flame streak!`}
+              {freezeData.isFreezeActiveForToday
+                ? 'Streak Freeze is protecting your streak today! You will not lose your progress even if you miss daily goals.'
+                : isAllGoalsMet
+                  ? 'Congratulations! You met all daily activity goals today. Your streak is recorded.'
+                  : `Complete ${settings.targetArticles - completedArticles > 0 ? `${settings.targetArticles - completedArticles} more article` : 'your remaining goals'} today to extend your flame streak!`}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 relative z-10">
+        <div className="flex items-center gap-2 shrink-0 relative z-10 flex-wrap">
+          {/* Streak Freeze Vault button */}
+          <button
+            onClick={() => setShowFreezeModal(true)}
+            className={`px-3 py-1.5 rounded-xl font-extrabold text-xs backdrop-blur-sm transition-all cursor-pointer border flex items-center gap-1.5 shadow-2xs ${
+              freezeData.isFreezeActiveForToday
+                ? 'bg-cyan-600/80 hover:bg-cyan-600 text-white border-cyan-300'
+                : 'bg-black/20 hover:bg-black/30 text-amber-100 border-white/20'
+            }`}
+            title="Open Streak Freeze Vault"
+          >
+            <span>❄️</span>
+            <span>{freezeData.isFreezeActiveForToday ? 'Freeze Shielded' : `Freeze (${freezeData.tokensAvailable})`}</span>
+          </button>
+
           <button
             onClick={() => setShowCelebrationModal(true)}
             className="px-3 py-1.5 rounded-xl bg-slate-900/40 hover:bg-slate-900/60 text-amber-200 font-extrabold text-xs backdrop-blur-sm transition-colors cursor-pointer border border-amber-300/40 flex items-center gap-1"
@@ -834,6 +923,13 @@ export const DailyGoalTracker: React.FC = () => {
         }}
         currentStreak={streakDays}
         forcedMilestoneDays={celebrationMilestone}
+      />
+
+      {/* Streak Freeze Vault & Protection Modal */}
+      <StreakFreezeModal
+        isOpen={showFreezeModal}
+        onClose={() => setShowFreezeModal(false)}
+        streakDays={streakDays}
       />
 
     </div>

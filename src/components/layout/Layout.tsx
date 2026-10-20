@@ -3,6 +3,7 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileInstallPrompt } from '../pwa/MobileInstallPrompt';
+import { CartDrawer } from '../shop/CartDrawer';
 
 export function Layout() {
   return (
@@ -14,6 +15,7 @@ export function Layout() {
       <Footer />
       <MobileBottomNav />
       <MobileInstallPrompt />
+      <CartDrawer />
     </div>
   );
 }

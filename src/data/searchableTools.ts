@@ -335,5 +335,17 @@ export const searchableTaxTools: SearchableTool[] = [
     badge: 'Interactive Glossary',
     tags: ['glossary', 'dictionary', 'tds', 'vat', 'sixth schedule', 'ait', 'psr', 'tin', 'bin', 'mushak 6.3', 'mushak 9.1', 'quiz', 'definition', 'terminology'],
     featured: true
+  },
+  {
+    id: 'national-rate-finder',
+    name: 'National Rate Finder (Tax, VAT, VDS, TDS & Customs HS Search)',
+    shortName: 'National Rate Finder',
+    category: 'Compliance Reference',
+    description: 'Central rate directory to search live VAT rates, Withholding Tax (TDS/VDS) rules under ITA 2023, and Customs HS Code tariffs with total tax incidence (TTI) calculator.',
+    path: '/tools/rate-finder',
+    iconName: 'Receipt',
+    badge: 'VAT, TDS & Customs',
+    tags: ['rate finder', 'vat rate', 'tds rate', 'vds rate', 'customs duty', 'hs code', 'hs tariff', 'duty calculator', 'tti', 'sro 240', 'tax finder', 'rate database'],
+    featured: true
   }
 ];

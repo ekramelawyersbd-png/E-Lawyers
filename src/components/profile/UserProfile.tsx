@@ -26,7 +26,11 @@ import {
   Sparkles,
   ShoppingBag,
   Calendar,
-  CreditCard
+  CreditCard,
+  BellRing,
+  AlertTriangle,
+  SlidersHorizontal,
+  Zap
 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { updateProfile, sendPasswordResetEmail } from 'firebase/auth';
@@ -40,6 +44,17 @@ import { authService } from '../../services/authService';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { MyAppointmentsView } from './MyAppointmentsView';
 import { fetchUserAppointments } from '../../services/appointmentService';
+import {
+  isNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  getSmartNotificationConfig,
+  saveSmartNotificationConfig,
+  sendTestSmartNotification,
+  checkAndDispatchDeadlineNotifications,
+  getApproachingDeadlines,
+  SmartNotificationConfig
+} from '../../services/smartNotificationService';
 
 export interface UserPreferences {
   language: 'en' | 'bn';
@@ -50,6 +65,9 @@ export interface UserPreferences {
   compactTables: boolean;
   highContrast: boolean;
   fontSize: 'normal' | 'large';
+  smartNotificationsEnabled?: boolean;
+  smartNotificationLeadDays?: number;
+  smartNotificationSound?: boolean;
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -60,7 +78,10 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   weeklyDigest: false,
   compactTables: false,
   highContrast: false,
-  fontSize: 'normal'
+  fontSize: 'normal',
+  smartNotificationsEnabled: false,
+  smartNotificationLeadDays: 3,
+  smartNotificationSound: true
 };
 
 export const UserProfile: React.FC = () => {
@@ -116,6 +137,35 @@ export const UserProfile: React.FC = () => {
       setActiveSection('appointments');
     }
   }, [tabParam, location.hash]);
+
+  // Smart Notifications State (Browser Notification API)
+  const [smartNotifConfig, setSmartNotifConfig] = useState<SmartNotificationConfig>(() => getSmartNotificationConfig());
+  const [smartPermission, setSmartPermission] = useState<NotificationPermission | 'unsupported'>('default');
+  const [isTestingSmartNotif, setIsTestingSmartNotif] = useState(false);
+  const [isScanningSmartNotif, setIsScanningSmartNotif] = useState(false);
+  const [approachingDeadlines, setApproachingDeadlines] = useState(() => getApproachingDeadlines(getSmartNotificationConfig().leadDays || 3));
+
+  // Sync smart notification permissions and updates
+  useEffect(() => {
+    setSmartPermission(getNotificationPermission());
+    const config = getSmartNotificationConfig();
+    setSmartNotifConfig(config);
+    setApproachingDeadlines(getApproachingDeadlines(config.leadDays || 3));
+
+    const handleUpdate = () => {
+      const updated = getSmartNotificationConfig();
+      setSmartNotifConfig(updated);
+      setApproachingDeadlines(getApproachingDeadlines(updated.leadDays || 3));
+      setSmartPermission(getNotificationPermission());
+    };
+
+    window.addEventListener('accounticca_smart_notifications_updated', handleUpdate);
+    window.addEventListener('accounticca_deadlines_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('accounticca_smart_notifications_updated', handleUpdate);
+      window.removeEventListener('accounticca_deadlines_updated', handleUpdate);
+    };
+  }, []);
 
   // Load appointments count for navigation tab indicator
   useEffect(() => {
@@ -231,6 +281,122 @@ export const UserProfile: React.FC = () => {
       localStorage.setItem('accounticca_user_preferences', JSON.stringify(updated));
       return updated;
     });
+  };
+
+  // Smart Notifications handlers
+  const handleToggleSmartNotifications = async () => {
+    if (!isNotificationSupported()) {
+      setFeedback({
+        type: 'error',
+        message: 'Browser Notification API is not supported on this device/browser.'
+      });
+      return;
+    }
+
+    if (!smartNotifConfig.enabled) {
+      let currentPerm = getNotificationPermission();
+      if (currentPerm !== 'granted') {
+        try {
+          currentPerm = await requestNotificationPermission();
+          setSmartPermission(currentPerm);
+        } catch (err: any) {
+          setFeedback({
+            type: 'error',
+            message: err.message || 'Notification permission request failed.'
+          });
+          return;
+        }
+      }
+
+      if (currentPerm === 'granted') {
+        const next = saveSmartNotificationConfig({ enabled: true, leadDays: smartNotifConfig.leadDays || 3 });
+        setSmartNotifConfig(next);
+        setPreferences(prev => {
+          const up = { ...prev, smartNotificationsEnabled: true, smartNotificationLeadDays: next.leadDays };
+          localStorage.setItem('accounticca_user_preferences', JSON.stringify(up));
+          return up;
+        });
+        setFeedback({
+          type: 'success',
+          message: `Smart Notifications enabled! The browser will alert you ${next.leadDays} days before stored compliance deadlines.`
+        });
+        // Run initial check
+        checkAndDispatchDeadlineNotifications({ customLeadDays: next.leadDays });
+      } else if (currentPerm === 'denied') {
+        setFeedback({
+          type: 'error',
+          message: 'Notifications are blocked in your browser permissions. Click the lock/tune icon in your address bar to Allow notifications.'
+        });
+      }
+    } else {
+      const next = saveSmartNotificationConfig({ enabled: false });
+      setSmartNotifConfig(next);
+      setPreferences(prev => {
+        const up = { ...prev, smartNotificationsEnabled: false };
+        localStorage.setItem('accounticca_user_preferences', JSON.stringify(up));
+        return up;
+      });
+      setFeedback({
+        type: 'success',
+        message: 'Smart Compliance Notifications have been disabled.'
+      });
+    }
+  };
+
+  const handleLeadDaysChange = (newDays: number) => {
+    const validDays = Math.max(1, Math.min(30, Math.round(newDays)));
+    const updated = saveSmartNotificationConfig({ leadDays: validDays });
+    setSmartNotifConfig(updated);
+    setApproachingDeadlines(getApproachingDeadlines(validDays));
+    setPreferences(prev => {
+      const up = { ...prev, smartNotificationLeadDays: validDays };
+      localStorage.setItem('accounticca_user_preferences', JSON.stringify(up));
+      return up;
+    });
+  };
+
+  const handleTestSmartNotification = async () => {
+    setIsTestingSmartNotif(true);
+    try {
+      const res = await sendTestSmartNotification(smartNotifConfig.leadDays);
+      setFeedback({
+        type: res.success ? 'success' : 'error',
+        message: res.message
+      });
+      setSmartPermission(getNotificationPermission());
+    } finally {
+      setIsTestingSmartNotif(false);
+    }
+  };
+
+  const handleEvaluateDeadlinesNow = async () => {
+    setIsScanningSmartNotif(true);
+    try {
+      const result = await checkAndDispatchDeadlineNotifications({ force: true, customLeadDays: smartNotifConfig.leadDays });
+      if (result.dispatched > 0) {
+        setFeedback({
+          type: 'success',
+          message: `Dispatched ${result.dispatched} statutory compliance browser notification(s) for upcoming deadlines!`
+        });
+      } else if (result.matches.length > 0) {
+        setFeedback({
+          type: 'success',
+          message: `Evaluated ${result.matches.length} deadline(s). Browser alerts are scheduled for their ${smartNotifConfig.leadDays}-day window.`
+        });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: `Evaluated stored deadlines: none currently fall within the ${smartNotifConfig.leadDays}-day alert window.`
+        });
+      }
+    } catch (err: any) {
+      setFeedback({
+        type: 'error',
+        message: err.message || 'Error checking deadlines.'
+      });
+    } finally {
+      setIsScanningSmartNotif(false);
+    }
   };
 
   // Copy User UID
@@ -802,6 +968,236 @@ Note: This is a system-generated computer invoice and serves as official proof o
                   <div className="text-xs text-slate-500 mt-0.5">বাংলায় ব্যাখ্যা ও সহজ নির্দেশিকা</div>
                 </div>
                 {preferences.language === 'bn' && <Check className="w-4 h-4 text-emerald-600" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Smart Notifications Hero Card (Browser Notification API) */}
+          <div className="rounded-3xl border-2 border-amber-300/80 bg-gradient-to-br from-amber-50/70 via-white to-amber-50/30 p-5 sm:p-6 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-amber-200/70">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shadow-2xs shrink-0">
+                  <BellRing className={`w-6 h-6 ${smartNotifConfig.enabled ? 'animate-bounce text-amber-600' : 'text-slate-400'}`} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-extrabold text-slate-900 text-base">
+                      Smart Compliance Notifications
+                    </h3>
+                    {smartPermission === 'granted' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Notification API Ready
+                      </span>
+                    ) : smartPermission === 'denied' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                        <AlertTriangle className="w-3 h-3 text-rose-600" />
+                        Blocked by Browser
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                        Permission Required
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Uses the browser's native Notification API to alert you in advance before stored compliance deadlines.
+                  </p>
+                </div>
+              </div>
+
+              {/* Master Smart Notifications Toggle */}
+              <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                <span className="text-xs font-bold text-slate-700">
+                  {smartNotifConfig.enabled ? 'Active' : 'Disabled'}
+                </span>
+                <button
+                  id="smart-notifications-toggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={smartNotifConfig.enabled}
+                  onClick={handleToggleSmartNotifications}
+                  className={`w-14 h-8 rounded-full transition-colors relative cursor-pointer shadow-inner p-1 ${
+                    smartNotifConfig.enabled ? 'bg-emerald-600' : 'bg-slate-300'
+                  }`}
+                  title={smartNotifConfig.enabled ? 'Disable Smart Notifications' : 'Enable Smart Notifications'}
+                >
+                  <span className={`block w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                    smartNotifConfig.enabled ? 'translate-x-6' : 'translate-x-0'
+                  }`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Notification Permission Warning if Denied */}
+            {smartPermission === 'denied' && (
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-rose-900">
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="font-bold text-rose-950">Browser Push Notifications are Blocked</div>
+                  <p className="leading-relaxed">
+                    Your browser has notifications blocked for this site. To enable Smart Notifications:
+                    click the <strong>lock / tune icon</strong> in your browser address bar &rarr; select <strong>Site Settings</strong> &rarr; change <strong>Notifications</strong> to <strong>Allow</strong>, then reload.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Customizable Lead Time Selection Controls */}
+            <div className="space-y-3 pt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Customizable Alert Lead Time</span>
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Set how many days before a stored deadline the browser should alert you (Default: <strong className="text-amber-800 font-bold">3 days</strong>).
+                  </p>
+                </div>
+
+                {/* Direct Number Stepper */}
+                <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1 shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => handleLeadDaysChange(smartNotifConfig.leadDays - 1)}
+                    disabled={smartNotifConfig.leadDays <= 1}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm disabled:opacity-40 cursor-pointer"
+                    title="Decrease lead days"
+                  >
+                    -
+                  </button>
+                  <div className="px-2 font-mono text-xs font-black text-slate-900 text-center min-w-[3.8rem]">
+                    {smartNotifConfig.leadDays} day{smartNotifConfig.leadDays > 1 ? 's' : ''}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleLeadDaysChange(smartNotifConfig.leadDays + 1)}
+                    disabled={smartNotifConfig.leadDays >= 30}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm disabled:opacity-40 cursor-pointer"
+                    title="Increase lead days"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Select Lead Time Presets */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Presets:</span>
+                {[
+                  { days: 1, label: '1 Day Before' },
+                  { days: 2, label: '2 Days Before' },
+                  { days: 3, label: '3 Days (Default)', isDefault: true },
+                  { days: 5, label: '5 Days Before' },
+                  { days: 7, label: '7 Days (1 Wk)' },
+                  { days: 14, label: '14 Days (2 Wks)' }
+                ].map(preset => {
+                  const isSelected = smartNotifConfig.leadDays === preset.days;
+                  return (
+                    <button
+                      key={preset.days}
+                      type="button"
+                      onClick={() => handleLeadDaysChange(preset.days)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                        isSelected 
+                          ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-xs' 
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50 hover:border-amber-300'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Live Approaching Deadlines Preview Box */}
+            <div className="bg-white rounded-2xl border border-amber-200/90 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Stored Deadlines in Your {smartNotifConfig.leadDays}-Day Alert Window</span>
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                  {approachingDeadlines.length} qualifying
+                </span>
+              </div>
+
+              {approachingDeadlines.length > 0 ? (
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {approachingDeadlines.map(({ deadline, daysRemaining }) => (
+                    <div 
+                      key={deadline.id}
+                      className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="space-y-0.5 min-w-0">
+                        <div className="font-bold text-slate-900 truncate">
+                          {deadline.title}
+                        </div>
+                        <div className="text-[11px] text-slate-500 flex items-center gap-2">
+                          <span className="font-medium text-emerald-700">{deadline.category}</span>
+                          {deadline.entityName && <span>• {deadline.entityName}</span>}
+                          <span>• Due Date: {deadline.dueDate}</span>
+                        </div>
+                      </div>
+                      <span className={`shrink-0 font-extrabold px-2.5 py-1 rounded-lg text-[11px] ${
+                        daysRemaining === 0 
+                          ? 'bg-rose-100 text-rose-800 animate-pulse' 
+                          : daysRemaining <= 1 
+                            ? 'bg-amber-100 text-amber-900' 
+                            : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {daysRemaining === 0 ? 'DUE TODAY' : `${daysRemaining} day${daysRemaining > 1 ? 's' : ''} left`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500 py-1 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>
+                    No stored deadlines fall within the {smartNotifConfig.leadDays}-day window right now. The browser will notify you when a deadline reaches {smartNotifConfig.leadDays} days remaining.
+                  </span>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100">
+                <span className="text-slate-500 text-[11px]">
+                  Checked against browser storage (`accounticca_compliance_deadline_reminders_v1`)
+                </span>
+                <Link 
+                  to="/dashboard?tab=deadlines"
+                  className="font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 text-[11px]"
+                >
+                  <span>Manage Deadlines</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Test & Immediate Check Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={handleTestSmartNotification}
+                disabled={isTestingSmartNotif}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                title="Send a sample browser notification now"
+              >
+                {isTestingSmartNotif ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bell className="w-3.5 h-3.5" />}
+                <span>Test Browser Notification</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleEvaluateDeadlinesNow}
+                disabled={isScanningSmartNotif}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                title="Evaluate stored deadlines against the lead time right now"
+              >
+                {isScanningSmartNotif ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                <span>Check Approaching Deadlines Now</span>
               </button>
             </div>
           </div>

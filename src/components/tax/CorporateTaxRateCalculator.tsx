@@ -34,6 +34,7 @@ import {
   Cell 
 } from 'recharts';
 import { generateCorporateTaxPDF } from '../../utils/taxPdfExport';
+import { CorporateComplianceMasteryQuiz } from './CorporateComplianceMasteryQuiz';
 
 export type CompanyTypeCategory = 'non_listed' | 'listed_over_10' | 'listed_under_10';
 
@@ -895,6 +896,11 @@ Accounticca × E-Lawyers Corporate Taxation & Capital Markets Advisory
             </ul>
           </div>
         </div>
+      </div>
+
+      {/* Interactive Mastery Quiz & Rule Evaluators (2.5% Banking Rule, BDT 5L/36L Mandates, Sec 56/56Ka 50% Penalty & Startup Sandbox) */}
+      <div className="p-6 sm:p-8 border-t border-slate-200 bg-white">
+        <CorporateComplianceMasteryQuiz initialTopic="ALL" />
       </div>
     </div>
   );
