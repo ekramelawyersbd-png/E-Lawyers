@@ -65,6 +65,14 @@ import { RelatedResources } from '../components/RelatedResources';
 import { EcosystemSocialKit } from '../components/EcosystemSocialKit';
 import { BlogCover } from '../components/BlogCover';
 import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
+import { GlossaryTerm } from '../data/glossaryData';
+import { TermDetailModal } from '../components/glossary/TermDetailModal';
+import {
+  ArticleGlossaryBar,
+  highlightGlossaryInReactNodes,
+  detectArticleGlossaryTerms,
+  ALL_GLOSSARY_TERMS,
+} from '../components/glossary/GlossaryTooltipSystem';
 
 export function Article() {
   const { id } = useParams();
@@ -92,6 +100,28 @@ export function Article() {
 
   const { isFocusMode, toggleFocusMode, readerTheme, readerFontSize } = useFocusMode();
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [glossaryHighlightsEnabled, setGlossaryHighlightsEnabled] = useState(true);
+  const [activeGlossaryModalTerm, setActiveGlossaryModalTerm] = useState<GlossaryTerm | null>(null);
+  const [bookmarkedGlossaryIds, setBookmarkedGlossaryIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('compliance_hub_glossary_bookmarks');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleToggleGlossaryBookmark = (termId: string) => {
+    setBookmarkedGlossaryIds(prev => {
+      const next = prev.includes(termId) ? prev.filter(item => item !== termId) : [...prev, termId];
+      try {
+        localStorage.setItem('compliance_hub_glossary_bookmarks', JSON.stringify(next));
+      } catch {
+        // Ignore storage error
+      }
+      return next;
+    });
+  };
 
   // Scroll-based progress tracker for Focus Mode reader bar
   useEffect(() => {
@@ -252,6 +282,11 @@ export function Article() {
   // Long-form articles typically exceed 300 words or require >= 2 minutes to read thoroughly
   const isLongForm = readingTimeMinutes >= 2 || localizedContent.length > 500;
 
+  const detectedGlossaryTerms = useMemo(
+    () => detectArticleGlossaryTerms(localizedContent),
+    [localizedContent]
+  );
+
   const markdownComponents = useMemo(() => ({
     h1: ({ node, children, ...props }: any) => {
       const id = React.Children.toArray(children).join('').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -306,10 +341,15 @@ export function Article() {
         return <ImageCarousel images={carouselImages} />;
       }
       
-            if (elementChildren.some((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === "document-checklist")) {
+      if (elementChildren.some((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === "document-checklist")) {
         return <div className="mb-4">{children}</div>;
       }
-      return <p className="text-[15px] leading-[25px] text-slate-600 mb-6 text-justify">{children}</p>;
+      const highlightedChildren = highlightGlossaryInReactNodes(
+        children,
+        glossaryHighlightsEnabled,
+        setActiveGlossaryModalTerm
+      );
+      return <p className="text-[15px] leading-[25px] text-slate-600 mb-6 text-justify">{highlightedChildren}</p>;
     },
     img: ({ node, ...props }: any) => <MarkdownImage {...props} />,
     ul: ({ node, children, ...props }: any) => {
@@ -319,13 +359,26 @@ export function Article() {
       return <ul className="list-disc pl-5 space-y-2 mb-6 text-[15px] leading-[25px] text-justify text-slate-600" {...props}>{children}</ul>;
     },
     li: ({ node, children, ...props }: any) => {
+      const highlightedChildren = highlightGlossaryInReactNodes(
+        children,
+        glossaryHighlightsEnabled,
+        setActiveGlossaryModalTerm
+      );
       if (article.id === 'personal-income-tax-return-submission-guide-2025-2026') {
-        return <InteractiveChecklistItem articleId={article.id} {...props}>{children}</InteractiveChecklistItem>;
+        return <InteractiveChecklistItem articleId={article.id} {...props}>{highlightedChildren}</InteractiveChecklistItem>;
       }
-      return <li {...props}>{children}</li>;
+      return <li {...props}>{highlightedChildren}</li>;
+    },
+    td: ({ node, children, ...props }: any) => {
+      const highlightedChildren = highlightGlossaryInReactNodes(
+        children,
+        glossaryHighlightsEnabled,
+        setActiveGlossaryModalTerm
+      );
+      return <td {...props}>{highlightedChildren}</td>;
     },
     table: ({ node, children, ...props }: any) => <SortableTable {...props}>{children}</SortableTable>
-  }), [article.id]);
+  }), [article.id, glossaryHighlightsEnabled]);
 
   const articleCustomSchema = useMemo(() => {
     if (article.id === 'total-income-calculation-bangladesh-2026-2027') {
@@ -774,6 +827,14 @@ export function Article() {
               </div>
             )}
 
+            {/* Interactive Legal & Accounting Glossary Companion Bar */}
+            <ArticleGlossaryBar
+              detectedTerms={detectedGlossaryTerms}
+              highlightsEnabled={glossaryHighlightsEnabled}
+              onToggleHighlights={() => setGlossaryHighlightsEnabled(prev => !prev)}
+              onSelectTerm={(term) => setActiveGlossaryModalTerm(term)}
+            />
+
             {/* 2-7. Article Content Area (Markdown) */}
             <div 
               id="article-content-body" 
@@ -1201,6 +1262,18 @@ export function Article() {
 
       {/* 9. Related Articles (Hidden in Focus Mode) */}
       {!isFocusMode && <RelatedArticles currentArticle={article} maxItems={4} />}
+
+      {/* Statutory Term Detail Modal triggered from Glossary Tooltip or Bar */}
+      <TermDetailModal
+        term={activeGlossaryModalTerm}
+        onClose={() => setActiveGlossaryModalTerm(null)}
+        isBookmarked={activeGlossaryModalTerm ? bookmarkedGlossaryIds.includes(activeGlossaryModalTerm.id) : false}
+        onToggleBookmark={handleToggleGlossaryBookmark}
+        onSelectRelatedTerm={(relatedId) => {
+          const found = ALL_GLOSSARY_TERMS.find(t => t.id === relatedId);
+          if (found) setActiveGlossaryModalTerm(found);
+        }}
+      />
     </>
   );
 }

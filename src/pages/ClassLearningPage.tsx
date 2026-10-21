@@ -35,6 +35,7 @@ import {
 } from '../utils/r2StorageClient';
 import { R2VideoPlayer } from '../components/lms/R2VideoPlayer';
 import { VideoPlayerErrorBoundary } from '../components/lms/VideoPlayerErrorBoundary';
+import { ProtectedPdfReader } from '../components/lms/ProtectedPdfReader';
 import { ServiceSEO } from '../components/SEO';
 
 export type LearningMaterialMode = 'video' | 'notes' | 'ppt' | 'quiz';
@@ -77,7 +78,8 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
     markNotesLessonComplete,
     recordPptSlideView,
     submitClassQuiz,
-    getLessonQuizAttempts
+    getLessonQuizAttempts,
+    updateLessonConfig
   } = useLms();
 
   // Resolve active course from URL param
@@ -1246,64 +1248,55 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Signed R2 PDF Reading Notes Viewer (when uploaded in R2) */}
-                      {lesson.notesAsset.r2ObjectKey && signedReadData ? (
-                        <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 p-4 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div className="flex items-center gap-2">
-                              <HardDrive className="w-4 h-4 text-emerald-400" />
-                              <span className="font-bold">
-                                R2 Protected Notes PDF: {lesson.notesAsset.r2FileName}
-                              </span>
-                              <span className="font-mono text-slate-400">
-                                ({formatBytesTabular(lesson.notesAsset.r2FileSizeBytes)})
-                              </span>
-                            </div>
-                            <a
-                              href={signedReadData.signedReadUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>Open Signed PDF in Full Tab</span>
-                            </a>
-                          </div>
-                          <iframe
-                            src={signedReadData.signedReadUrl}
-                            title={lesson.notesAsset.title}
-                            className="w-full h-[460px] rounded-xl bg-white border border-slate-700"
-                          />
-                        </div>
-                      ) : lesson.notesAsset.externalUrl ? (
-                        <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 p-4 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div className="flex items-center gap-2">
-                              <Globe className="w-4 h-4 text-blue-400" />
-                              <span className="font-bold">
-                                External Notes Document: {lesson.notesAsset.title}
-                              </span>
-                            </div>
-                            <a
-                              href={lesson.notesAsset.externalUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>Open Notes Document</span>
-                            </a>
-                          </div>
-                          <iframe
-                            src={lesson.notesAsset.externalUrl}
-                            title={lesson.notesAsset.title}
-                            className="w-full h-[460px] rounded-xl bg-white border border-slate-700"
-                          />
-                        </div>
-                      ) : null}
+                      {/* Protected Interactive PDF Reader (R2 Signed PDF, External PDF, & Multi-Page Statutory Handout) */}
+                      <ProtectedPdfReader
+                        pdfUrl={
+                          (lesson.notesAsset.r2ObjectKey && signedReadData?.signedReadUrl) ||
+                          lesson.notesAsset.externalUrl ||
+                          null
+                        }
+                        r2ObjectKey={lesson.notesAsset.r2ObjectKey}
+                        fileName={lesson.notesAsset.r2FileName || `${lesson.lessonId}-statutory-notes.pdf`}
+                        fileSizeBytes={lesson.notesAsset.r2FileSizeBytes}
+                        title={lesson.notesAsset.title}
+                        subtitle={`Class ${lesson.classNumber}: ${lesson.heading} · ${resolvedCourse.title}`}
+                        watermarkText={watermarkText}
+                        sections={lesson.notesAsset.sections}
+                        activePageIndex={activeSectionIdx}
+                        readSectionIds={progress.notesSectionsRead}
+                        onPageChange={(pageIdx) => {
+                          if (pageIdx >= 0 && pageIdx < lesson.notesAsset.sections.length) {
+                            setActiveSectionIdx(pageIdx);
+                            recordNotesSectionRead(
+                              resolvedCourse.courseId,
+                              lesson.lessonId,
+                              lesson.notesAsset.sections[pageIdx].id
+                            );
+                          }
+                        }}
+                        onCompleteDocument={handleMarkCurrentSectionComplete}
+                        isLoadingSignedUrl={isLoadingSignedUrl}
+                        onRetrySignedUrl={fetchSignedMaterialUrl}
+                        onAdminSaveSections={(updatedSections, updatedTitle) => {
+                          updateLessonConfig(resolvedCourse.courseId, lesson.lessonId, {
+                            notesAsset: {
+                              ...lesson.notesAsset,
+                              title: updatedTitle || lesson.notesAsset.title,
+                              sections: updatedSections
+                            }
+                          });
+                          if (activeSectionIdx >= updatedSections.length) {
+                            setActiveSectionIdx(Math.max(0, updatedSections.length - 1));
+                          }
+                          setFeedbackBanner({
+                            type: 'success',
+                            text: `Saved ${updatedSections.length} Study Page(s) for Class ${lesson.classNumber} to Course Curriculum & Firestore.`
+                          });
+                        }}
+                      />
 
-                      {/* Section Selector Bar */}
-                      <div className="flex flex-wrap items-center gap-2">
+                      {/* Section Selector Bar (Hidden) */}
+                      <div className="hidden">
                         {lesson.notesAsset.sections.map((sec, idx) => {
                           const isRead = progress.notesSectionsRead.includes(sec.id);
                           const isCurrent = activeSectionIdx === idx;
@@ -1336,9 +1329,9 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                         })}
                       </div>
 
-                      {/* Active Note Section Document Surface */}
+                      {/* Active Note Section Document Surface (Hidden) */}
                       {lesson.notesAsset.sections[activeSectionIdx] && (
-                        <div className="relative bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-5">
+                        <div className="hidden">
                           <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-slate-200 pb-3">
                             <span>{watermarkText}</span>
                             <span>
@@ -1453,64 +1446,52 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Signed R2 PPT Presentation Viewer (when uploaded in R2) or External Deck */}
-                      {lesson.pptAsset.r2ObjectKey && signedReadData ? (
-                        <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 p-4 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div className="flex items-center gap-2">
-                              <HardDrive className="w-4 h-4 text-emerald-400" />
-                              <span className="font-bold">
-                                R2 Presentation Deck: {lesson.pptAsset.r2FileName}
-                              </span>
-                              <span className="font-mono text-slate-400">
-                                ({formatBytesTabular(lesson.pptAsset.r2FileSizeBytes)})
-                              </span>
-                            </div>
-                            <a
-                              href={signedReadData.signedReadUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>Open Signed Deck</span>
-                            </a>
-                          </div>
-                          {lesson.pptAsset.r2MimeType === 'application/pdf' ||
-                          lesson.pptAsset.r2FileName?.toLowerCase().endsWith('.pdf') ? (
-                            <iframe
-                              src={signedReadData.signedReadUrl}
-                              title={lesson.pptAsset.title}
-                              className="w-full h-[460px] rounded-xl bg-white border border-slate-700"
-                            />
-                          ) : null}
-                        </div>
-                      ) : lesson.pptAsset.externalUrl ? (
-                        <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 p-4 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div className="flex items-center gap-2">
-                              <Globe className="w-4 h-4 text-blue-400" />
-                              <span className="font-bold">
-                                External Presentation Deck: {lesson.pptAsset.title}
-                              </span>
-                            </div>
-                            <a
-                              href={lesson.pptAsset.externalUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>Open Slide Deck</span>
-                            </a>
-                          </div>
-                          <iframe
-                            src={lesson.pptAsset.externalUrl}
-                            title={lesson.pptAsset.title}
-                            className="w-full h-[460px] rounded-xl bg-white border border-slate-700"
-                          />
-                        </div>
-                      ) : null}
+                      {/* Protected PDF / Presentation Deck Reader (when uploaded in R2 or External URL) */}
+                      {(lesson.pptAsset.r2ObjectKey || lesson.pptAsset.externalUrl) && (
+                        <ProtectedPdfReader
+                          pdfUrl={
+                            (lesson.pptAsset.r2ObjectKey && signedReadData?.signedReadUrl) ||
+                            lesson.pptAsset.externalUrl ||
+                            null
+                          }
+                          r2ObjectKey={lesson.pptAsset.r2ObjectKey}
+                          fileName={lesson.pptAsset.r2FileName || `${lesson.pptAsset.deckCode}.pdf`}
+                          fileSizeBytes={lesson.pptAsset.r2FileSizeBytes}
+                          title={lesson.pptAsset.title}
+                          subtitle={`Class ${lesson.classNumber} Presentation Deck · ${lesson.pptAsset.deckCode}`}
+                          watermarkText={watermarkText}
+                          slides={lesson.pptAsset.slides}
+                          activePageIndex={activeSlideIdx}
+                          onPageChange={(pageIdx) => {
+                            if (pageIdx >= 0 && pageIdx < lesson.pptAsset.slides.length) {
+                              setActiveSlideIdx(pageIdx);
+                              recordPptSlideView(
+                                resolvedCourse.courseId,
+                                lesson.lessonId,
+                                pageIdx + 1
+                              );
+                            }
+                          }}
+                          isLoadingSignedUrl={isLoadingSignedUrl}
+                          onRetrySignedUrl={fetchSignedMaterialUrl}
+                          onAdminSaveSlides={(updatedSlides, updatedTitle) => {
+                            updateLessonConfig(resolvedCourse.courseId, lesson.lessonId, {
+                              pptAsset: {
+                                ...lesson.pptAsset,
+                                title: updatedTitle || lesson.pptAsset.title,
+                                slides: updatedSlides
+                              }
+                            });
+                            if (activeSlideIdx >= updatedSlides.length) {
+                              setActiveSlideIdx(Math.max(0, updatedSlides.length - 1));
+                            }
+                            setFeedbackBanner({
+                              type: 'success',
+                              text: `Saved ${updatedSlides.length} Study Slide(s) for Class ${lesson.classNumber} to Course Curriculum & Firestore.`
+                            });
+                          }}
+                        />
+                      )}
 
                       {/* Slide Canvas */}
                       {lesson.pptAsset.slides[activeSlideIdx] && (

@@ -2043,7 +2043,18 @@ Each object must follow this exact JSON schema:
     const fileSize = stat.size;
     const range = req.headers.range;
 
-    res.setHeader("Content-Type", payload.contentType || "application/octet-stream");
+    const lowerName = `${payload.fileName || ""} ${payload.diskFileName || ""} ${payload.objectKey || ""}`.toLowerCase();
+    let resolvedContentType = payload.contentType || "application/octet-stream";
+    if (lowerName.includes(".pdf") || payload.materialType === "notes") {
+      resolvedContentType = "application/pdf";
+    } else if (lowerName.includes(".mp4")) {
+      resolvedContentType = "video/mp4";
+    } else if (lowerName.includes(".webm")) {
+      resolvedContentType = "video/webm";
+    }
+
+    res.setHeader("Content-Type", resolvedContentType);
+    res.setHeader("Content-Disposition", "inline");
     res.setHeader("Accept-Ranges", "bytes");
     res.setHeader("Cache-Control", "private, max-age=300");
 
@@ -2063,6 +2074,70 @@ Each object must follow this exact JSON schema:
         "Content-Length": fileSize
       });
       fs.createReadStream(filePath).pipe(res);
+    }
+  });
+
+  // 6b. GET /api/r2/pdf-proxy — Stream PDF bytes with inline Content-Disposition and same-origin headers for Protected PDF Reader
+  app.get("/api/r2/pdf-proxy", async (req, res) => {
+    try {
+      const targetUrl = String(req.query.url || "").trim();
+      const objectKey = String(req.query.objectKey || "").trim();
+
+      // First check if objectKey exists in local R2 storage
+      if (objectKey) {
+        const manifest = loadLocalR2Manifest();
+        const localRecord = manifest[objectKey];
+        if (localRecord && fs.existsSync(path.join(R2_LOCAL_STORAGE_DIR, localRecord.diskFileName))) {
+          const fullPath = path.join(R2_LOCAL_STORAGE_DIR, localRecord.diskFileName);
+          const stat = fs.statSync(fullPath);
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader("Content-Disposition", "inline");
+          res.setHeader("Content-Length", stat.size);
+          res.setHeader("Cache-Control", "private, max-age=300");
+          return fs.createReadStream(fullPath).pipe(res);
+        }
+      }
+
+      if (!targetUrl) {
+        return res.status(400).json({ error: "Missing url or objectKey parameter." });
+      }
+
+      // If targetUrl is a relative local-object URL, resolve internally
+      if (targetUrl.startsWith("/api/r2/local-object/")) {
+        const token = targetUrl.replace("/api/r2/local-object/", "").split("?")[0];
+        const payload = localSignedTokens.get(token);
+        if (payload && fs.existsSync(path.join(R2_LOCAL_STORAGE_DIR, payload.diskFileName))) {
+          const fullPath = path.join(R2_LOCAL_STORAGE_DIR, payload.diskFileName);
+          const stat = fs.statSync(fullPath);
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader("Content-Disposition", "inline");
+          res.setHeader("Content-Length", stat.size);
+          return fs.createReadStream(fullPath).pipe(res);
+        }
+      }
+
+      if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+        return res.status(400).json({ error: "Invalid PDF URL." });
+      }
+
+      const upstream = await fetch(targetUrl);
+      if (!upstream.ok) {
+        return res.status(upstream.status).json({
+          error: `Upstream PDF server returned HTTP ${upstream.status}`
+        });
+      }
+
+      const arrayBuffer = await upstream.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "inline");
+      res.setHeader("Content-Length", buffer.length);
+      res.setHeader("Cache-Control", "private, max-age=300");
+      return res.send(buffer);
+    } catch (err: any) {
+      console.error("[R2 PDF Proxy Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to stream PDF document." });
     }
   });
 
