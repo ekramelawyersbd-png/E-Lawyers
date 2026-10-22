@@ -16,7 +16,7 @@ export function Footer() {
     <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12" style={{ textAlign: 'center' }}>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10" style={{ textAlign: 'center' }}>
           <div className="col-span-1 md:col-span-1 text-justify">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white/10 p-1 group-hover:scale-105 transition-transform">
@@ -66,16 +66,20 @@ export function Footer() {
                   <ExternalLink className="w-3 h-3 text-slate-500" />
                 </a>
               </li>
+              <li>
+                <Link to="/Careers" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  Careers · Job Openings
+                </Link>
+              </li>
             </ul>
           </div>
 
-          <div style={{ textAlign: 'left', lineHeight: '33px', fontSize: '14px', fontStyle: 'normal', fontWeight: 'normal', width: '240.6px', height: '173.988px' }}>
+          <div style={{ textAlign: 'left', lineHeight: '33px', fontSize: '14px', fontStyle: 'normal', fontWeight: 'normal' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Resources</h3>
             <ul 
               className="space-y-4 text-sm font-medium"
               style={{
-                width: '226.6px',
-                height: '137px',
                 marginLeft: '0px',
                 marginRight: '0px',
                 paddingLeft: '0px',
@@ -93,6 +97,32 @@ export function Footer() {
             </ul>
           </div>
 
+          <div style={{ textAlign: 'left', fontSize: '12px' }}>
+            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Community</h3>
+            <ul className="space-y-4 text-sm font-medium">
+              <li>
+                <Link to="/community" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">
+                  Community Hub &amp; Rankings
+                </Link>
+              </li>
+              <li>
+                <Link to="/community?tab=experts" className="hover:text-emerald-400 transition-colors">
+                  Experts Directory
+                </Link>
+              </li>
+              <li>
+                <Link to="/community?tab=discussions" className="hover:text-emerald-400 transition-colors">
+                  Discussions &amp; Q&amp;A
+                </Link>
+              </li>
+              <li>
+                <Link to="/training" className="hover:text-emerald-400 transition-colors">
+                  Events &amp; CPD Workshops
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           <div style={{ textAlign: 'justify' }}>
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Get in Touch</h3>
             <p className="text-sm text-slate-500 font-medium mb-4">
@@ -100,7 +130,13 @@ export function Footer() {
             </p>
             <Link 
               to="/contact" 
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"
+              className="inline-flex items-center gap-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"
+              style={{
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                paddingLeft: '12px',
+                paddingRight: '12px'
+              }}
             >
               <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
               <span>Contact Our Advisors</span>

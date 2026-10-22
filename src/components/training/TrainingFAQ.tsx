@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     question: "Are there any prerequisites?",
-    answer: "Prerequisites vary by course. For example, our VAT Training requires a basic understanding of tax or a background in accounting/law, while our MS Office Training is suitable for beginners. Check the comparison table for specific requirements."
+    answer: "Prerequisites vary by course. For example, our VAT Training requires a basic understanding of tax or a background in accounting/law, while our MS Office and Practical Accounting tracks are suitable for beginners."
   },
   {
     question: "Will I receive a certificate upon completion?",
@@ -36,8 +36,8 @@ export function TrainingFAQ() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 md:p-12 mt-16 mb-12">
-      <div className="text-center mb-10">
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-6 sm:p-10">
+      <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
         <p className="text-slate-600 text-lg">Got questions? We've got answers.</p>
       </div>

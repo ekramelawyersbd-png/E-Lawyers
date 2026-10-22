@@ -76,6 +76,9 @@ import { StudentLearningPortalPage } from './pages/StudentLearningPortalPage';
 import { ClassLearningPage } from './pages/ClassLearningPage';
 import { PublicCertificateVerifyPage } from './pages/PublicCertificateVerifyPage';
 import { AdminLmsDashboardPage } from './pages/AdminLmsDashboardPage';
+import { CareerAccountantPage } from './pages/CareerAccountantPage';
+import { CareerCustomerCarePage } from './pages/CareerCustomerCarePage';
+import { CareersHubPage } from './pages/CareersHubPage';
 
 export default function App() {
   return (
@@ -195,11 +198,11 @@ export default function App() {
                     {/* Public Certificate Verification Registry (No Login Required) */}
                     <Route path="verify-certificate" element={<PublicCertificateVerifyPage />} />
 
-                    {/* Admin LMS Console & Course Editor */}
-                    <Route path="admin/dashboard" element={<AdminLmsDashboardPage initialTab="editor" />} />
-                    <Route path="admin/courses/:courseId/edit" element={<AdminLmsDashboardPage initialTab="editor" />} />
-                    <Route path="admin/assessments" element={<AdminLmsDashboardPage initialTab="assessments" />} />
-                    <Route path="admin/certificates" element={<AdminLmsDashboardPage initialTab="certificates" />} />
+                    {/* Admin LMS Console & Course Editor (Protected by Authorized Admin: hmekram@gmail.com) */}
+                    <Route path="admin/dashboard" element={<ShopAdminRouteGuard><AdminLmsDashboardPage initialTab="editor" /></ShopAdminRouteGuard>} />
+                    <Route path="admin/courses/:courseId/edit" element={<ShopAdminRouteGuard><AdminLmsDashboardPage initialTab="editor" /></ShopAdminRouteGuard>} />
+                    <Route path="admin/assessments" element={<ShopAdminRouteGuard><AdminLmsDashboardPage initialTab="assessments" /></ShopAdminRouteGuard>} />
+                    <Route path="admin/certificates" element={<ShopAdminRouteGuard><AdminLmsDashboardPage initialTab="certificates" /></ShopAdminRouteGuard>} />
 
                     {/* Admin Authentication Login Pages */}
                     <Route path="admin/login" element={<ShopAdminLogin />} />
@@ -222,8 +225,22 @@ export default function App() {
                     <Route path="products" element={<Navigate to="/shop" replace />} />
                     <Route path="resource-library" element={<ResourceLibraryPage />} />
                     <Route path="resources" element={<Navigate to="/resource-library" replace />} />
-                    <Route path="careers" element={<Navigate to="/contact" replace />} />
-                    <Route path="jobs" element={<Navigate to="/contact" replace />} />
+                    <Route path="Careers/accountant" element={<CareerAccountantPage />} />
+                    <Route path="Careers/accountant=" element={<CareerAccountantPage />} />
+                    <Route path="careers/accountant" element={<CareerAccountantPage />} />
+                    <Route path="careers/accountant=" element={<CareerAccountantPage />} />
+                    <Route path="Careers/customer-care" element={<CareerCustomerCarePage />} />
+                    <Route path="Careers/customer-care=" element={<CareerCustomerCarePage />} />
+                    <Route path="careers/customer-care" element={<CareerCustomerCarePage />} />
+                    <Route path="careers/customer-care=" element={<CareerCustomerCarePage />} />
+                    <Route path="Careers/customer-care-executive" element={<CareerCustomerCarePage />} />
+                    <Route path="careers/customer-care-executive" element={<CareerCustomerCarePage />} />
+                    <Route path="e_lawyers_customer_care_application.html" element={<CareerCustomerCarePage />} />
+                    <Route path="Careers" element={<CareersHubPage />} />
+                    <Route path="Careers=" element={<CareersHubPage />} />
+                    <Route path="careers" element={<CareersHubPage />} />
+                    <Route path="careers=" element={<CareersHubPage />} />
+                    <Route path="jobs" element={<CareersHubPage />} />
                   <Route path="category/:id" element={<Category />} />
                 <Route path="article/:id" element={<Article />} />
                 <Route path="tax-refund-guide" element={<TaxRefundGuide />} />

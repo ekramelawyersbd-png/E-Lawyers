@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
@@ -11,20 +11,11 @@ import {
   Sparkles, 
   ArrowRight, 
   CheckCircle2, 
-  HelpCircle, 
   Scale, 
-  Building2, 
-  Calculator, 
-  GraduationCap, 
-  Clock, 
-  Tag, 
   Eye, 
   Check, 
-  ChevronRight,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
-  Lock,
   LogOut,
   Video,
   Package,
@@ -38,10 +29,10 @@ import { ServiceSEO } from '../components/SEO';
 import { 
   SHOP_CATEGORIES, 
   ShopProduct, 
-  ShopCategory,
-  ProductType,
-  PRODUCT_TYPES,
-  inferProductType
+  ShopCategory, 
+  ProductType, 
+  PRODUCT_TYPES, 
+  inferProductType 
 } from '../data/shopProducts';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
@@ -49,7 +40,7 @@ import { useShopAuth } from '../contexts/ShopAuthContext';
 
 export function Shop() {
   const navigate = useNavigate();
-  const { products, loading } = useProducts();
+  const { products } = useProducts();
   const { addToCart, totalItemsCount, setIsCartOpen } = useCart();
   const { adminUser, isAuthenticated, logout } = useShopAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -881,6 +872,9 @@ export function Shop() {
               >
                 <button
                   type="button"
+                  id={`shop-faq-trigger-${index}`}
+                  aria-expanded={isOpen}
+                  aria-controls={`shop-faq-panel-${index}`}
                   onClick={() => setOpenFaqIndex(isOpen ? null : index)}
                   className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-extrabold text-sm text-slate-900 hover:text-emerald-800 transition-colors cursor-pointer"
                 >
@@ -892,7 +886,12 @@ export function Shop() {
                   )}
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                  <div
+                    id={`shop-faq-panel-${index}`}
+                    role="region"
+                    aria-labelledby={`shop-faq-trigger-${index}`}
+                    className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3"
+                  >
                     {faq.a}
                   </div>
                 )}

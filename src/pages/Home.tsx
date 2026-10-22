@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check, ThumbsUp, MessageCircle, HelpCircle, Star, CheckCircle2 } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
+import { INITIAL_EXPERTS, INITIAL_QUESTIONS } from '../data/communityData';
 import { format } from 'date-fns';
 import { CopySectionButton } from '../components/CopySectionButton';
 import { BookmarkSectionButton } from '../components/BookmarkSectionButton';
@@ -16,6 +17,7 @@ import { SEO } from '../components/SEO';
 export function Home() {
   const navigate = useNavigate();
   const [latestArticlesCategory, setLatestArticlesCategory] = useState('all');
+  const [communityTopicFilter, setCommunityTopicFilter] = useState('all');
   const [isLoadingGuides, setIsLoadingGuides] = useState(true);
   const [heroArticleIndex, setHeroArticleIndex] = useState(0);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
@@ -664,9 +666,294 @@ export function Home() {
         </div>
       </section>
 
+      {/* 6. Professional Legal, Tax & Business Community Section (/community) */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200/80">
+        {/* Section Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2.5">
+              <Users className="w-4 h-4 text-emerald-600" />
+              <span>Accounticca Verified Professional Network</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Legal, Tax &amp; Corporate Compliance Community
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-2 leading-relaxed">
+              Connect directly with Supreme Court advocates, Income Tax Practitioners (ITP), Chartered Accountants, and entrepreneurs across Bangladesh. Ask statutory questions, review verified legal answers, or book a practitioner consultation.
+            </p>
+          </div>
 
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              to="/community?ask=true"
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-2xs transition-colors"
+            >
+              <HelpCircle className="w-4 h-4 text-emerald-600" />
+              <span>Ask a Question</span>
+            </Link>
+            <Link
+              to="/community"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm transition-colors group"
+            >
+              <span>Explore Community Hub</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        </div>
 
+        {/* 12-Column Split: 7 Cols Live Q&A Discussions + 5 Cols Verified Experts */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          {/* Left Column (7 Cols): Live Community Q&A & Statutory Discussions */}
+          <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <MessageSquare className="w-5 h-5 text-emerald-600" />
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Recent Practitioner Q&amp;A Discussions
+                  </h3>
+                </div>
 
+                {/* Topic Filter Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'Income Tax', label: 'Income Tax' },
+                    { id: 'Company Law & RJSC', label: 'RJSC & Corporate' },
+                    { id: 'VAT & Customs', label: 'VAT' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setCommunityTopicFilter(tab.id)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                        communityTopicFilter === tab.id
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Questions List */}
+              <div className="divide-y divide-slate-100">
+                {(communityTopicFilter === 'all'
+                  ? INITIAL_QUESTIONS
+                  : INITIAL_QUESTIONS.filter(
+                      (q) =>
+                        q.category.toLowerCase().includes(communityTopicFilter.toLowerCase()) ||
+                        q.tags.some((t) =>
+                          t.toLowerCase().includes(communityTopicFilter.toLowerCase())
+                        )
+                    )
+                )
+                  .slice(0, 3)
+                  .map((question) => {
+                    const topAnswer = question.answers?.[0];
+                    return (
+                      <div key={question.id} className="py-5 first:pt-4 last:pb-2">
+                        {/* Unboxed Metadata Row */}
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 mb-1.5">
+                          <span className="font-bold text-emerald-700">{question.category}</span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-medium text-slate-700">{question.author.name}</span>
+                          <span className="text-slate-400">({question.author.role})</span>
+                          <span aria-hidden="true">·</span>
+                          <span>{question.time}</span>
+                          {question.isAnsweredByExpert && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Expert Answered</span>
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        <Link
+                          to="/community?tab=discussions"
+                          className="group block"
+                        >
+                          <h4 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug mb-1.5">
+                            {question.title}
+                          </h4>
+                          <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                            {question.content}
+                          </p>
+                        </Link>
+
+                        {/* Top Verified Answer Preview */}
+                        {topAnswer && (
+                          <div className="mt-3 pl-3.5 border-l-2 border-emerald-500/70 bg-slate-50/70 rounded-r-xl py-2.5 pr-3.5">
+                            <div className="flex items-center gap-2 text-xs mb-1">
+                              <img
+                                src={topAnswer.author.avatar}
+                                alt={topAnswer.author.name}
+                                className="w-5 h-5 rounded-full object-cover border border-slate-200"
+                              />
+                              <span className="font-bold text-slate-900">
+                                {topAnswer.author.name}
+                              </span>
+                              <span className="text-slate-400">·</span>
+                              <span className="text-emerald-700 font-medium text-[11px]">
+                                {topAnswer.author.role}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                              {topAnswer.content}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Engagement Footer */}
+                        <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                          <div className="flex items-center gap-4 font-mono tabular-nums">
+                            <span className="inline-flex items-center gap-1">
+                              <ThumbsUp className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{question.upvotes} helpful</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                              <MessageCircle className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{question.answersCount} answers</span>
+                            </span>
+                          </div>
+
+                          <Link
+                            to="/community?tab=discussions"
+                            className="font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1"
+                          >
+                            <span>Read thread</span>
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs text-slate-500">
+                Have a specific Income Tax, VAT, or RJSC compliance question?
+              </span>
+              <Link
+                to="/community?tab=discussions"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1.5"
+              >
+                <span>View All Community Discussions</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Column (5 Cols): Verified Community Experts Directory Spotlight */}
+          <div className="lg:col-span-5 bg-slate-900 rounded-2xl border border-slate-800 p-6 sm:p-7 text-white flex flex-col justify-between shadow-lg">
+            <div>
+              <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-800">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                    Verified Panelists
+                  </div>
+                  <h3 className="text-lg font-bold text-white mt-0.5">
+                    Top Legal &amp; Tax Contributors
+                  </h3>
+                </div>
+                <Link
+                  to="/community?tab=experts"
+                  className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+                >
+                  <span>All Experts</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="divide-y divide-slate-800/80 my-2">
+                {INITIAL_EXPERTS.slice(0, 3).map((expert) => (
+                  <div key={expert.id} className="py-4 flex items-start gap-3.5">
+                    <img
+                      src={expert.avatar}
+                      alt={expert.name}
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-700 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="text-sm font-bold text-white truncate">
+                          {expert.name}
+                        </h4>
+                        <span className="inline-flex items-center gap-1 text-xs font-mono tabular-nums font-bold text-amber-400 shrink-0">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span>{expert.rating.toFixed(1)}</span>
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-emerald-400 font-medium truncate mt-0.5">
+                        {expert.role}
+                      </p>
+
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        {expert.credentials}
+                      </p>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-slate-400 font-mono tabular-nums">
+                        <span>{expert.experience} exp</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{expert.answersCount} answers</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{expert.helpfulVotes} helpful votes</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom Callout & CTA */}
+            <div className="pt-4 mt-2 border-t border-slate-800 space-y-4">
+              <div className="grid grid-cols-3 gap-2 text-center bg-slate-800/60 rounded-xl p-3 border border-slate-800">
+                <div>
+                  <div className="text-base font-extrabold text-white font-mono tabular-nums">
+                    50+
+                  </div>
+                  <div className="text-[11px] text-slate-400">Verified Experts</div>
+                </div>
+                <div className="border-x border-slate-700/70">
+                  <div className="text-base font-extrabold text-emerald-400 font-mono tabular-nums">
+                    1,200+
+                  </div>
+                  <div className="text-[11px] text-slate-400">Solved Inquiries</div>
+                </div>
+                <div>
+                  <div className="text-base font-extrabold text-white font-mono tabular-nums">
+                    24h
+                  </div>
+                  <div className="text-[11px] text-slate-400">Avg. Response</div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <Link
+                  to="/community"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <span>Visit /community Forum</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  to="/community?tab=experts"
+                  className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Meet Experts</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Customer Testimonial Carousel */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">

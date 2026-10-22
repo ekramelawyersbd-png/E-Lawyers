@@ -33,9 +33,12 @@ import {
   AlertCircle,
   Activity,
   BarChart2,
+  BarChart3,
+  Settings,
   MessageSquarePlus,
   FileSpreadsheet,
-  Trophy
+  Trophy,
+  GraduationCap
 } from 'lucide-react';
 import { ComplianceCalendar } from '../components/dashboard/ComplianceCalendar';
 import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist';
@@ -70,6 +73,7 @@ type SortOption = 'recent' | 'title' | 'readTime';
 export function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
+  const sectionParam = searchParams.get('section');
   const { user, signInWithGoogle, logout } = useAuth();
   const { 
     savedItems, 
@@ -81,8 +85,29 @@ export function Dashboard() {
   } = useBookmarks();
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [profileSubTab, setProfileSubTab] = useState<
+    'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'analytics' | 'achievements'
+  >(() => {
+    const target = sectionParam || tabParam;
+    if (target === 'achievements' || target === 'badges') return 'achievements';
+    if (target === 'analytics' || target === 'charts') return 'analytics';
+    if (target === 'activity') return 'activity';
+    if (target === 'reminders' || target === 'invoices') return 'reminders';
+    if (target === 'payments') return 'payments';
+    if (target === 'saved' || target === 'bookmarks') return 'saved';
+    if (target === 'applications') return 'applications';
+    return 'overview';
+  });
   const [activeTab, setActiveTab] = useState<'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback' | 'achievements' | 'deadlines'>(
-    tabParam === 'deadlines' || tabParam === 'calendar' || tabParam === 'schedule' ? 'deadlines' : tabParam === 'achievements' || tabParam === 'badges' ? 'achievements' : tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review' ? 'feedback' : tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history' ? 'purchases' : tabParam === 'articles' ? 'articles' : tabParam === 'profile' || tabParam === 'settings' ? 'profile' : tabParam === 'applications' ? 'applications' : tabParam === 'payments' ? 'payments' : tabParam === 'activity' ? 'activity' : tabParam === 'analytics' || tabParam === 'charts' ? 'analytics' : tabParam === 'reminders' || tabParam === 'invoices' ? 'reminders' : 'saved'
+    tabParam === 'deadlines' || tabParam === 'calendar' || tabParam === 'schedule'
+      ? 'deadlines'
+      : tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review'
+      ? 'feedback'
+      : tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history'
+      ? 'purchases'
+      : tabParam === 'articles'
+      ? 'articles'
+      : 'profile'
   );
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -158,35 +183,71 @@ export function Dashboard() {
   };
 
   useEffect(() => {
+    const target = sectionParam || tabParam;
     if (tabParam === 'deadlines' || tabParam === 'calendar' || tabParam === 'schedule') {
       setActiveTab('deadlines');
-    } else if (tabParam === 'achievements' || tabParam === 'badges') {
-      setActiveTab('achievements');
     } else if (tabParam === 'feedback' || tabParam === 'rating' || tabParam === 'review') {
       setActiveTab('feedback');
     } else if (tabParam === 'purchases' || tabParam === 'unlocked' || tabParam === 'history') {
       setActiveTab('purchases');
     } else if (tabParam === 'articles') {
       setActiveTab('articles');
+    } else if (target === 'achievements' || target === 'badges') {
+      setActiveTab('profile');
+      setProfileSubTab('achievements');
+    } else if (target === 'analytics' || target === 'charts') {
+      setActiveTab('profile');
+      setProfileSubTab('analytics');
+    } else if (target === 'activity') {
+      setActiveTab('profile');
+      setProfileSubTab('activity');
+    } else if (target === 'reminders' || target === 'invoices') {
+      setActiveTab('profile');
+      setProfileSubTab('reminders');
+    } else if (target === 'payments') {
+      setActiveTab('profile');
+      setProfileSubTab('payments');
+    } else if (target === 'saved' || target === 'bookmarks') {
+      setActiveTab('profile');
+      setProfileSubTab('saved');
+    } else if (target === 'applications') {
+      setActiveTab('profile');
+      setProfileSubTab('applications');
     } else if (tabParam === 'profile' || tabParam === 'settings') {
       setActiveTab('profile');
-    } else if (tabParam === 'applications') {
-      setActiveTab('applications');
-    } else if (tabParam === 'payments') {
-      setActiveTab('payments');
-    } else if (tabParam === 'activity') {
-      setActiveTab('activity');
-    } else if (tabParam === 'analytics' || tabParam === 'charts') {
-      setActiveTab('analytics');
-    } else if (tabParam === 'reminders' || tabParam === 'invoices') {
-      setActiveTab('reminders');
-    } else if (tabParam === 'saved' || tabParam === 'bookmarks') {
-      setActiveTab('saved');
+      setProfileSubTab('overview');
     }
-  }, [tabParam]);
+  }, [tabParam, sectionParam]);
+
+  const switchProfileSubTab = (
+    subTab: 'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'analytics' | 'achievements'
+  ) => {
+    setActiveTab('profile');
+    setProfileSubTab(subTab);
+    if (subTab === 'overview') {
+      setSearchParams({ tab: 'profile' }, { preventScrollReset: true });
+    } else {
+      setSearchParams({ tab: 'profile', section: subTab }, { preventScrollReset: true });
+    }
+  };
 
   const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback' | 'achievements' | 'deadlines') => {
+    if (
+      tab === 'achievements' ||
+      tab === 'analytics' ||
+      tab === 'activity' ||
+      tab === 'reminders' ||
+      tab === 'payments' ||
+      tab === 'saved' ||
+      tab === 'applications'
+    ) {
+      switchProfileSubTab(tab);
+      return;
+    }
     setActiveTab(tab);
+    if (tab === 'profile') {
+      setProfileSubTab('overview');
+    }
     setSearchParams({ tab }, { preventScrollReset: true });
   };
 
@@ -328,9 +389,9 @@ export function Dashboard() {
   }, [user]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row gap-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-20 flex flex-col md:flex-row items-start gap-8">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 shrink-0">
+      <aside className="w-full md:w-64 shrink-0 md:sticky md:top-24">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-6">
           {/* User Profile Card */}
           <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
@@ -364,118 +425,78 @@ export function Dashboard() {
 
           {/* Navigation Links */}
           <nav className="space-y-2 mb-6 text-left">
-            <button 
-              id="dashboard-tab-bookmarks"
-              onClick={() => switchTab('saved')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'saved' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <BookMarked className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-left leading-snug">Saved Articles</span>
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-bold shrink-0 ${
-                activeTab === 'saved' ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'
-              }`}>
-                {savedItems.length}
-              </span>
-            </button>
+            <div className="space-y-1.5">
+              <button 
+                id="dashboard-tab-profile"
+                onClick={() => switchProfileSubTab('overview')} 
+                className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
+                  activeTab === 'profile' 
+                    ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
+                    : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+                }`}
+              >
+                <div className="flex items-center justify-start gap-3 text-left min-w-0">
+                  <User className="w-5 h-5 text-emerald-600 shrink-0" /> 
+                  <span className="text-left leading-snug">Account Profile</span>
+                </div>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
+                  Hub
+                </span>
+              </button>
 
-            <button 
-              id="dashboard-tab-applications"
-              onClick={() => switchTab('applications')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'applications' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <Briefcase className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-left leading-snug">My Applications & Interviews</span>
-              </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
-                2
-              </span>
-            </button>
+              {activeTab === 'profile' && (
+                <div className="ml-4 pl-3 border-l-2 border-emerald-100 space-y-1 py-1">
+                  {[
+                    { id: 'overview', label: 'Account Settings', badge: null },
+                    { id: 'saved', label: 'Saved Articles', badge: savedItems.length },
+                    { id: 'applications', label: 'My Applications', badge: myApplications.length },
+                    { id: 'payments', label: 'Payment Status', badge: null },
+                    { id: 'reminders', label: 'Invoice Reminders', badge: pendingInvoicesCount },
+                    { id: 'activity', label: 'Activity Feed', badge: null },
+                    { id: 'analytics', label: 'Activity Analytics', badge: null },
+                    { id: 'achievements', label: 'Achievements & Badges', badge: null },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => switchProfileSubTab(item.id as any)}
+                      className={`w-full flex items-center justify-between text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                        profileSubTab === item.id
+                          ? 'bg-emerald-600 text-white font-bold shadow-2xs'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      <span className="truncate">{item.label}</span>
+                      {item.badge !== null && (
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold shrink-0 ${
+                            profileSubTab === item.id
+                              ? 'bg-emerald-800 text-emerald-100'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <button 
-              id="dashboard-tab-payments"
-              onClick={() => switchTab('payments')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'payments' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
+            <Link
+              id="dashboard-link-my-study"
+              to="/student/dashboard"
+              className="w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
             >
               <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <CreditCard className="w-5 h-5 text-emerald-600 animate-pulse shrink-0" />
-                <span className="text-left leading-snug">Payment Status Tracker</span>
+                <GraduationCap className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="text-left leading-snug">My study</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
-                Live
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                LMS
               </span>
-            </button>
-
-            <button 
-              id="dashboard-tab-reminders"
-              onClick={() => switchTab('reminders')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'reminders' 
-                  ? 'bg-amber-50 text-amber-900 shadow-xs' 
-                  : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <BellRing className="w-5 h-5 text-amber-600 shrink-0" />
-                <span className="text-left leading-snug">Invoice Reminders</span>
-              </div>
-              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                Auto
-              </span>
-            </button>
-
-            <button 
-              id="dashboard-tab-activity"
-              onClick={() => switchTab('activity')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'activity' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <Activity className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-left leading-snug">Client Activity Feed</span>
-              </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Feed
-              </span>
-            </button>
-
-            <button 
-              id="dashboard-tab-analytics"
-              onClick={() => switchTab('analytics')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'analytics' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <BarChart2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-left leading-snug">User Activity Analytics</span>
-              </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-                <Sparkles className="w-3 h-3 text-emerald-600" />
-                Charts
-              </span>
-            </button>
+            </Link>
 
             <button 
               id="dashboard-tab-deadlines"
@@ -511,44 +532,6 @@ export function Dashboard() {
               <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 Rate
               </span>
-            </button>
-
-            <button 
-              id="dashboard-tab-achievements"
-              onClick={() => switchTab('achievements')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'achievements' 
-                  ? 'bg-amber-50 text-amber-900 shadow-xs' 
-                  : 'text-slate-600 hover:bg-amber-50 hover:text-amber-900'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <Trophy className="w-5 h-5 text-amber-500 shrink-0" />
-                <span className="text-left leading-snug">Achievements & Badges</span>
-              </div>
-              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-                Badges
-              </span>
-            </button>
-
-            <button 
-              id="dashboard-tab-profile"
-              onClick={() => switchTab('profile')} 
-              className={`w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-sm cursor-pointer ${
-                activeTab === 'profile' 
-                  ? 'bg-emerald-50 text-emerald-700 shadow-xs' 
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-            >
-              <div className="flex items-center justify-start gap-3 text-left min-w-0">
-                <User className="w-5 h-5 text-emerald-600 shrink-0" /> 
-                <span className="text-left leading-snug">Account Profile</span>
-              </div>
-              {user && (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
-                  Active
-                </span>
-              )}
             </button>
 
             <div className="pt-2">
@@ -638,7 +621,7 @@ export function Dashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 space-y-8">
+      <main className="flex-1 min-w-0 w-full space-y-8">
         {/* Dashboard Title & Quick Actions Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
           <div>
@@ -759,56 +742,198 @@ export function Dashboard() {
           onNavigateTab={(tab) => switchTab(tab as any)} 
         />
 
-        {activeTab === 'profile' ? (
-          <UserProfile />
-        ) : activeTab === 'payments' ? (
-          <PaymentStatusWidget onNavigateReminders={() => switchTab('reminders')} />
-        ) : activeTab === 'activity' ? (
-          <ClientActivityFeed />
-        ) : activeTab === 'analytics' ? (
-          <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
-        ) : activeTab === 'deadlines' ? (
+        {activeTab === 'deadlines' ? (
           <ComplianceDeadlinesCalendarView />
-        ) : activeTab === 'reminders' ? (
-          <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
         ) : activeTab === 'purchases' ? (
           <PurchaseHistorySection />
         ) : activeTab === 'feedback' ? (
           <QuickFeedbackWidget />
-        ) : activeTab === 'achievements' ? (
-          <UserBadgesSection />
         ) : (
-          <>
-            <ApproachingComplianceToastBanner />
-            <GoalReminderToast />
-            <DailyGoalTracker />
-            <WeeklyActivityTrendChart />
-            <AnnualActivityHeatmap />
-            <UserBadgesSection />
-            <SocialStreakShareWidget />
-            <ComplianceDeadlineReminder />
-            <ComplianceDeadlinesCalendarView />
-            <QuickFeedbackWidget />
-            <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
-            <PurchaseHistorySection />
-            <InvoiceReminderManager onViewPayments={() => switchTab('payments')} />
-            <ComplianceCalendar />
-            <ComplianceChecklist />
-            <ServiceWorkloadDonutChart />
-            <ClientActivityFeed onViewAll={() => switchTab('activity')} />
+          <div className="space-y-6">
+            {/* Consolidated Account Profile Navigation Bar */}
+            <div
+              id="profile-consolidated-subnav"
+              className="bg-white rounded-2xl border border-slate-200 p-3 shadow-xs flex flex-col gap-2.5"
+            >
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-emerald-700" />
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                    Account Profile Hub
+                  </span>
+                </div>
+                <span className="text-[11px] font-semibold text-slate-500">
+                  All personal settings, saved resources, billing & activity
+                </span>
+              </div>
 
-            <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                <button
+                  id="profile-subtab-overview"
+                  type="button"
+                  onClick={() => switchProfileSubTab('overview')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'overview'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  <span>Account Settings</span>
+                </button>
+
+                <button
+                  id="profile-subtab-saved"
+                  type="button"
+                  onClick={() => switchProfileSubTab('saved')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'saved'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <Bookmark className="w-3.5 h-3.5" />
+                  <span>Saved Articles</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      profileSubTab === 'saved'
+                        ? 'bg-emerald-800 text-emerald-100'
+                        : 'bg-slate-200/80 text-slate-700'
+                    }`}
+                  >
+                    {savedItems.length}
+                  </span>
+                </button>
+
+                <button
+                  id="profile-subtab-applications"
+                  type="button"
+                  onClick={() => switchProfileSubTab('applications')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'applications'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <Briefcase className="w-3.5 h-3.5" />
+                  <span>My Applications</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      profileSubTab === 'applications'
+                        ? 'bg-emerald-800 text-emerald-100'
+                        : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
+                    {myApplications.length}
+                  </span>
+                </button>
+
+                <button
+                  id="profile-subtab-payments"
+                  type="button"
+                  onClick={() => switchProfileSubTab('payments')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'payments'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Payment Status</span>
+                </button>
+
+                <button
+                  id="profile-subtab-reminders"
+                  type="button"
+                  onClick={() => switchProfileSubTab('reminders')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'reminders'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <BellRing className="w-3.5 h-3.5" />
+                  <span>Invoice Reminders</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      profileSubTab === 'reminders'
+                        ? 'bg-emerald-800 text-emerald-100'
+                        : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
+                    {pendingInvoicesCount}
+                  </span>
+                </button>
+
+                <button
+                  id="profile-subtab-activity"
+                  type="button"
+                  onClick={() => switchProfileSubTab('activity')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'activity'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Activity Feed</span>
+                </button>
+
+                <button
+                  id="profile-subtab-analytics"
+                  type="button"
+                  onClick={() => switchProfileSubTab('analytics')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'analytics'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Activity Analytics</span>
+                </button>
+
+                <button
+                  id="profile-subtab-achievements"
+                  type="button"
+                  onClick={() => switchProfileSubTab('achievements')}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    profileSubTab === 'achievements'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <Trophy className="w-3.5 h-3.5" />
+                  <span>Achievements & Badges</span>
+                </button>
+              </div>
+            </div>
+
+            {profileSubTab === 'overview' && activeTab !== 'articles' ? (
+              <UserProfile />
+            ) : profileSubTab === 'payments' ? (
+              <PaymentStatusWidget onNavigateReminders={() => switchProfileSubTab('reminders')} />
+            ) : profileSubTab === 'activity' ? (
+              <ClientActivityFeed />
+            ) : profileSubTab === 'analytics' ? (
+              <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
+            ) : profileSubTab === 'reminders' ? (
+              <InvoiceReminderManager onViewPayments={() => switchProfileSubTab('payments')} />
+            ) : profileSubTab === 'achievements' ? (
+              <UserBadgesSection />
+            ) : (
+              <div id="dashboard-main-card" className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm min-h-[500px]">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 border-b border-slate-100 pb-6">
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 id="dashboard-section-title" className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-                  {activeTab === 'saved' ? (
+                  {profileSubTab === 'saved' ? (
                     <>
                       <BookMarked className="w-6 h-6 text-emerald-600" />
                       <span>Saved Articles & Reference Library</span>
                     </>
-                  ) : activeTab === 'applications' ? (
+                  ) : profileSubTab === 'applications' ? (
                     <>
                       <Briefcase className="w-6 h-6 text-emerald-600" />
                       <span>My Applications & Interview Scheduler</span>
@@ -821,7 +946,7 @@ export function Dashboard() {
                   )}
                 </h1>
 
-                {activeTab === 'saved' && (
+                {profileSubTab === 'saved' && (
                   user ? (
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
                       <Cloud className="w-3.5 h-3.5 text-emerald-600" />
@@ -837,7 +962,7 @@ export function Dashboard() {
               </div>
 
               <p className="text-sm text-slate-500 mt-1.5 max-w-2xl">
-                {activeTab === 'saved' 
+                {profileSubTab === 'saved' 
                   ? user 
                     ? `Your private repository of bookmarked statutory guides, tax analysis, and legal commentary linked to ${user.email}.`
                     : 'Statutory guides saved in this browser. Sign in to permanently sync your reading list to your account across all devices.'
@@ -911,7 +1036,7 @@ export function Dashboard() {
           </div>
 
           {/* Guest Sign-in Callout if not logged in */}
-          {activeTab === 'saved' && !user && (
+          {profileSubTab === 'saved' && !user && (
             <div id="saved-items-auth-prompt" className="mb-6 bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5">
                 <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl shrink-0 mt-0.5 sm:mt-0">
@@ -934,7 +1059,7 @@ export function Dashboard() {
             </div>
           )}
           
-          {activeTab === 'applications' ? (
+          {profileSubTab === 'applications' ? (
             <div className="space-y-6">
               <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -1247,7 +1372,8 @@ export function Dashboard() {
             </div>
           )}
         </div>
-        </>
+        )}
+          </div>
         )}
       </main>
 

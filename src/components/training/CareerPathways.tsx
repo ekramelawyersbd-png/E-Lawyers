@@ -73,7 +73,7 @@ export function CareerPathways() {
   const activePathway = pathways.find(p => p.role === activeRole) || pathways[0];
 
   return (
-    <div className="bg-slate-50 rounded-3xl border border-slate-200 shadow-sm p-8 md:p-12 mt-16 mb-12">
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-6 sm:p-10">
       <div className="text-center mb-10">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Career Pathways</h2>
         <p className="text-slate-600 text-lg max-w-2xl mx-auto">

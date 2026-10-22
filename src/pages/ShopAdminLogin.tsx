@@ -60,7 +60,7 @@ export function ShopAdminLogin() {
   };
 
   const handleAutofill = () => {
-    setEmail('admin@admin.com');
+    setEmail('hmekram@gmail.com');
     setPassword('123ekraM.com');
     setErrorMsg(null);
     clearError();

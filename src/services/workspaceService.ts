@@ -593,3 +593,129 @@ export const workspaceFormsApi = {
     return res.json();
   }
 };
+
+// ──────────────────────────────────────────
+// ✉️ Gmail API
+// ──────────────────────────────────────────
+export interface GmailMessageSummary {
+  id: string;
+  threadId: string;
+  snippet?: string;
+  subject?: string;
+  from?: string;
+  date?: string;
+}
+
+export interface GmailProfile {
+  emailAddress: string;
+  messagesTotal: number;
+  threadsTotal: number;
+  historyId: string;
+}
+
+function encodeBase64Url(str: string): string {
+  const utf8Bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < utf8Bytes.length; i++) {
+    binary += String.fromCharCode(utf8Bytes[i]);
+  }
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+export const workspaceGmailApi = {
+  getProfile: async (): Promise<GmailProfile> => {
+    const token = checkToken();
+    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `Failed to fetch Gmail profile (${res.status})`);
+    }
+    return res.json();
+  },
+
+  listMessages: async (maxResults: number = 15, q?: string): Promise<GmailMessageSummary[]> => {
+    const token = checkToken();
+    let url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}`;
+    if (q) {
+      url += `&q=${encodeURIComponent(q)}`;
+    }
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `Failed to list Gmail messages (${res.status})`);
+    }
+    const data = await res.json();
+    const messages = data.messages || [];
+
+    // Fetch message headers for previews
+    const detailed = await Promise.all(
+      messages.slice(0, 10).map(async (msg: { id: string; threadId: string }) => {
+        try {
+          const detailRes = await fetch(
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (!detailRes.ok) return { id: msg.id, threadId: msg.threadId };
+          const detailData = await detailRes.json();
+          const headers = detailData.payload?.headers || [];
+          const subjectHeader = headers.find((h: any) => h.name.toLowerCase() === 'subject');
+          const fromHeader = headers.find((h: any) => h.name.toLowerCase() === 'from');
+          const dateHeader = headers.find((h: any) => h.name.toLowerCase() === 'date');
+          return {
+            id: msg.id,
+            threadId: msg.threadId,
+            snippet: detailData.snippet,
+            subject: subjectHeader?.value || '(No Subject)',
+            from: fromHeader?.value || 'Unknown',
+            date: dateHeader?.value
+          };
+        } catch {
+          return { id: msg.id, threadId: msg.threadId };
+        }
+      })
+    );
+    return detailed;
+  },
+
+  sendEmail: async (
+    to: string,
+    subject: string,
+    bodyText: string,
+    bodyHtml?: string
+  ): Promise<{ id: string; threadId: string; labelIds: string[] }> => {
+    const token = checkToken();
+    const htmlContent = bodyHtml || bodyText.replace(/\n/g, '<br/>');
+    const rfc822Lines = [
+      `To: ${to}`,
+      `Subject: =?utf-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+      'MIME-Version: 1.0',
+      'Content-Type: text/html; charset=UTF-8',
+      'Content-Transfer-Encoding: 7bit',
+      '',
+      htmlContent
+    ];
+    const raw = encodeBase64Url(rfc822Lines.join('\r\n'));
+
+    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ raw })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `Failed to send email via Gmail API (${res.status})`);
+    }
+    return res.json();
+  }
+};

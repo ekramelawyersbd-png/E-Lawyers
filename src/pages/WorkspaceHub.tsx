@@ -24,7 +24,10 @@ import {
   Sparkles,
   Layers,
   ChevronRight,
-  HardDrive
+  HardDrive,
+  Mail,
+  Send,
+  Inbox
 } from 'lucide-react';
 import { 
   getAccessToken, 
@@ -46,18 +49,21 @@ import {
   workspaceClassroomApi, 
   workspaceChatApi, 
   workspaceFormsApi,
+  workspaceGmailApi,
   DriveFile,
   CalendarEvent,
   GoogleTask,
   GoogleContact,
   ClassroomCourse,
   ChatSpace,
-  MeetSpace
+  MeetSpace,
+  GmailMessageSummary,
+  GmailProfile
 } from '../services/workspaceService';
 import { useAuth } from '../contexts/AuthContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 
-type ActiveTab = 'drive' | 'sheets' | 'calendar' | 'docs' | 'slides' | 'tasks' | 'contacts' | 'meet' | 'classroom' | 'chat' | 'forms';
+type ActiveTab = 'drive' | 'sheets' | 'calendar' | 'docs' | 'slides' | 'tasks' | 'contacts' | 'meet' | 'classroom' | 'chat' | 'forms' | 'gmail';
 
 export const WorkspaceHub: React.FC = () => {
   const { user } = useAuth();
@@ -98,6 +104,14 @@ export const WorkspaceHub: React.FC = () => {
   const [createdSheetId, setCreatedSheetId] = useState<string | null>(null);
   const [createdSlideId, setCreatedSlideId] = useState<string | null>(null);
   const [createdFormId, setCreatedFormId] = useState<string | null>(null);
+
+  // Gmail states
+  const [gmailMessages, setGmailMessages] = useState<GmailMessageSummary[]>([]);
+  const [gmailProfile, setGmailProfile] = useState<GmailProfile | null>(null);
+  const [gmailRecipient, setGmailRecipient] = useState('');
+  const [gmailSubject, setGmailSubject] = useState('');
+  const [gmailBody, setGmailBody] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Confirmation Modal state for destructive operations (MANDATORY per skill instructions)
   const [confirmModal, setConfirmModal] = useState<{
@@ -175,6 +189,16 @@ export const WorkspaceHub: React.FC = () => {
           // Google Chat API requires Chat app configuration on GCP
           console.warn('Google Chat notice:', chatErr.message);
         }
+      } else if (tab === 'gmail') {
+        try {
+          const profile = await workspaceGmailApi.getProfile();
+          setGmailProfile(profile);
+          const messages = await workspaceGmailApi.listMessages(15);
+          setGmailMessages(messages);
+        } catch (gmailErr: any) {
+          console.warn('Gmail fetch error:', gmailErr.message);
+          throw gmailErr;
+        }
       }
     } catch (err: any) {
       setFeedback({ 
@@ -213,6 +237,7 @@ export const WorkspaceHub: React.FC = () => {
   // Tab definitions
   const tabs = [
     { id: 'drive', label: 'Google Drive', icon: FolderGit2, desc: 'Files & Storage' },
+    { id: 'gmail', label: 'Gmail', icon: Mail, desc: 'Emails & Communications' },
     { id: 'sheets', label: 'Google Sheets', icon: FileSpreadsheet, desc: 'Spreadsheets' },
     { id: 'calendar', label: 'Calendar', icon: Calendar, desc: 'Events & Deadlines' },
     { id: 'docs', label: 'Docs', icon: FileText, desc: 'Drafts & Agreements' },
@@ -1265,6 +1290,175 @@ export const WorkspaceHub: React.FC = () => {
                         <span>Open Form</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ✉️ GMAIL TAB */}
+            {activeTab === 'gmail' && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-emerald-600" />
+                      Gmail Messages &amp; Communications
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Connected to <span className="font-semibold text-slate-700">{gmailProfile?.emailAddress || getConnectedWorkspaceEmail()}</span> · Read incoming inquiries and send official replies
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => loadTabData('gmail')}
+                      disabled={loading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                      Refresh Inbox
+                    </button>
+                    <a
+                      href="https://mail.google.com/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700"
+                    >
+                      <span>Open Gmail</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Profile Overview */}
+                {gmailProfile && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Connected Account</div>
+                      <div className="text-sm font-extrabold text-[#10243a] mt-0.5 truncate">{gmailProfile.emailAddress}</div>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Inbox Messages</div>
+                      <div className="text-sm font-extrabold text-emerald-700 mt-0.5">{gmailProfile.messagesTotal.toLocaleString()} messages</div>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Conversation Threads</div>
+                      <div className="text-sm font-extrabold text-teal-800 mt-0.5">{gmailProfile.threadsTotal.toLocaleString()} threads</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Compose Email Form */}
+                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                      <Send className="w-4 h-4 text-emerald-700" />
+                      Compose Email (via Official Gmail API)
+                    </h4>
+                    <span className="text-[11px] text-slate-500 font-medium">Explicit confirmation required before send</span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <input
+                      type="email"
+                      placeholder="Recipient Email (e.g., client@example.com, info@elawyersbd.com)"
+                      value={gmailRecipient}
+                      onChange={(e) => setGmailRecipient(e.target.value)}
+                      className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Subject line (e.g., Notice of Tax Assessment Review - AY 2026-27)"
+                      value={gmailSubject}
+                      onChange={(e) => setGmailSubject(e.target.value)}
+                      className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <textarea
+                      rows={4}
+                      placeholder="Write your email body message here..."
+                      value={gmailBody}
+                      onChange={(e) => setGmailBody(e.target.value)}
+                      className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-y"
+                    />
+                  </div>
+
+                  <div className="flex justify-end pt-1">
+                    <button
+                      onClick={() => {
+                        if (!gmailRecipient.trim() || !gmailSubject.trim() || !gmailBody.trim()) {
+                          setFeedback({ message: 'Please fill in recipient, subject, and email body.', type: 'error' });
+                          return;
+                        }
+                        triggerDestructiveAction(
+                          'Send Email via Gmail',
+                          `Are you sure you want to send this email to "${gmailRecipient}" from your official account (${gmailProfile?.emailAddress || getConnectedWorkspaceEmail()})?`,
+                          async () => {
+                            setIsSendingEmail(true);
+                            try {
+                              await workspaceGmailApi.sendEmail(gmailRecipient, gmailSubject, gmailBody);
+                              setGmailRecipient('');
+                              setGmailSubject('');
+                              setGmailBody('');
+                              setFeedback({ message: `Email successfully sent to ${gmailRecipient}!`, type: 'success' });
+                              loadTabData('gmail');
+                            } finally {
+                              setIsSendingEmail(false);
+                            }
+                          }
+                        );
+                      }}
+                      disabled={isSendingEmail || loading}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>{isSendingEmail ? 'Sending...' : 'Send Email via Gmail'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Inbox Messages List */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                      <Inbox className="w-4 h-4 text-emerald-600" />
+                      Recent Inbox Messages
+                    </h4>
+                    <span className="text-xs text-slate-400">Showing latest {gmailMessages.length} conversations</span>
+                  </div>
+
+                  {gmailMessages.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
+                      {loading ? 'Fetching messages from Gmail...' : 'No recent messages found or inbox is empty.'}
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                      {gmailMessages.map((msg) => (
+                        <div key={msg.id} className="p-4 hover:bg-slate-50/80 transition flex items-start justify-between gap-4">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-[#10243a] truncate max-w-[240px]">
+                                {msg.from || 'Unknown Sender'}
+                              </span>
+                              {msg.date && (
+                                <span className="text-[10px] text-slate-400">
+                                  {new Date(msg.date).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-bold text-slate-800 truncate">{msg.subject || '(No Subject)'}</p>
+                            <p className="text-xs text-slate-500 line-clamp-1">{msg.snippet || ''}</p>
+                          </div>
+                          <a
+                            href={`https://mail.google.com/mail/u/0/#inbox/${msg.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 shrink-0 transition"
+                            title="Open Message in Gmail"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

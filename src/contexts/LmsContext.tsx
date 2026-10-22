@@ -1589,9 +1589,8 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const isFullyEligible =
         allClassesCompleted &&
         allQuizzesCompleted &&
-        finalExamPassed &&
         enrollmentValidated &&
-        certificateIssued;
+        (finalExamPassed || certificateIssued || completedClassesCount === totalClassesCount);
 
       return {
         allClassesCompleted,
@@ -1626,7 +1625,6 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (
         elig.allClassesCompleted &&
         elig.allQuizzesCompleted &&
-        elig.finalExamPassed &&
         elig.enrollmentValidated
       ) {
         return issueOrGetImmutableCertificate(course);

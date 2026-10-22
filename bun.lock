@@ -7,6 +7,7 @@
       "dependencies": {
         "@aws-sdk/client-s3": "^3.1153.0",
         "@aws-sdk/s3-request-presigner": "^3.1153.0",
+        "@emailjs/browser": "^5.0.3",
         "@google/genai": "^2.4.0",
         "@google/generative-ai": "^0.24.1",
         "@tailwindcss/typography": "^0.5.20",
@@ -20,6 +21,7 @@
         "d3": "^7.9.0",
         "date-fns": "^4.4.0",
         "dotenv": "^17.2.3",
+        "emailjs-com": "^3.2.0",
         "express": "^4.21.2",
         "firebase": "^12.18.0",
         "html2canvas": "^1.4.1",
@@ -154,6 +156,8 @@
     "@csstools/css-syntax-patches-for-csstree": ["@csstools/css-syntax-patches-for-csstree@1.1.12", "", { "peerDependencies": { "css-tree": "^3.2.1" }, "optionalPeers": ["css-tree"] }, "sha512-3vLQK+dXxhBMR2Wx99PTCifE+vHtW2ndZWyla8yK813ev6oGhyn8Lja8jCyGAWTJ+LEYZK7EVtJxrDj8ztevJw=="],
 
     "@csstools/css-tokenizer": ["@csstools/css-tokenizer@4.0.0", "", {}, "sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA=="],
+
+    "@emailjs/browser": ["@emailjs/browser@5.0.3", "", {}, "sha512-4HGAkWdzql7mrG34ZFFj7IDJNRgtbl1+yVgHdQJ6XSfhq9gxGUHtttr4UKNi7Fk++1hMXRHy1lTeGZrkioOtsw=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.25.12", "", { "os": "aix", "cpu": "ppc64" }, "sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA=="],
 
@@ -776,6 +780,8 @@
     "ee-first": ["ee-first@1.1.1", "", {}, "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="],
 
     "electron-to-chromium": ["electron-to-chromium@1.5.402", "", {}, "sha512-/oOpMaPT6Yg+6/1XQhyIPlzgj7Ye9zf+nNM2Uh6OcE2G2oNptWazFa+qB2Pdqqbsc9KnIDzgAntoYN0dbwOXwA=="],
+
+    "emailjs-com": ["emailjs-com@3.2.0", "", {}, "sha512-Prbz3E1usiAwGjMNYRv6EsJ5c373cX7/AGnZQwOfrpNJrygQJ15+E9OOq4pU8yC977Z5xMetRfc3WmDX6RcjAA=="],
 
     "emoji-regex": ["emoji-regex@8.0.0", "", {}, "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A=="],
 

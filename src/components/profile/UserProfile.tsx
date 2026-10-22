@@ -627,14 +627,18 @@ Note: This is a system-generated computer invoice and serves as official proof o
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-px">
+      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-px overflow-x-auto">
         <button
           type="button"
           onClick={() => {
             setActiveSection('details');
-            setSearchParams({});
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({});
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeSection === 'details'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
@@ -646,9 +650,13 @@ Note: This is a system-generated computer invoice and serves as official proof o
           type="button"
           onClick={() => {
             setActiveSection('preferences');
-            setSearchParams({ tab: 'preferences' });
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile', sub: 'preferences' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({ tab: 'preferences' });
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeSection === 'preferences'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
@@ -660,9 +668,13 @@ Note: This is a system-generated computer invoice and serves as official proof o
           type="button"
           onClick={() => {
             setActiveSection('security');
-            setSearchParams({ tab: 'security' });
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile', sub: 'security' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({ tab: 'security' });
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
             activeSection === 'security'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
@@ -674,45 +686,57 @@ Note: This is a system-generated computer invoice and serves as official proof o
           type="button"
           onClick={() => {
             setActiveSection('purchases');
-            setSearchParams({ tab: 'purchases' });
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile', sub: 'purchases' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({ tab: 'purchases' });
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeSection === 'purchases'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
-          <ShoppingBag className="w-3.5 h-3.5" />
+          <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
           <span>My Purchases ({purchasedProducts.length})</span>
         </button>
         <button
           type="button"
           onClick={() => {
             setActiveSection('payment-history');
-            setSearchParams({ tab: 'payment-history' });
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile', sub: 'payment-history' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({ tab: 'payment-history' });
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeSection === 'payment-history'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
-          <CreditCard className="w-3.5 h-3.5" />
+          <CreditCard className="w-3.5 h-3.5 shrink-0" />
           <span>Payment History ({transactions.length})</span>
         </button>
         <button
           type="button"
           onClick={() => {
             setActiveSection('appointments');
-            setSearchParams({ tab: 'appointments' });
+            if (location.pathname.startsWith('/dashboard')) {
+              setSearchParams({ tab: 'profile', sub: 'appointments' }, { preventScrollReset: true });
+            } else {
+              setSearchParams({ tab: 'appointments' });
+            }
           }}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeSection === 'appointments'
               ? 'border-emerald-600 text-emerald-800'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
-          <Calendar className="w-3.5 h-3.5" />
+          <Calendar className="w-3.5 h-3.5 shrink-0" />
           <span>My Appointments</span>
           {appointmentsCount > 0 && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
