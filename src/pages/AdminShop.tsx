@@ -31,7 +31,9 @@ import {
   Activity,
   TrendingUp,
   BarChart3,
-  CreditCard
+  CreditCard,
+  FileSpreadsheet,
+  RefreshCw
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
@@ -51,6 +53,7 @@ import {
   inferProductType
 } from '../data/shopProducts';
 import { generateSlug } from '../services/productService';
+import { syncAllShopRecordsToSheet, getStoredShopSheetId } from '../services/shopSheetsSync';
 
 // Curated Unsplash images for quick selection by admin
 const IMAGE_PRESETS = [
@@ -176,6 +179,31 @@ export function AdminShop() {
   // Status message
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSyncingToSheets, setIsSyncingToSheets] = useState(false);
+
+  const handleQuickSyncShopToSheets = async () => {
+    const sheetId = getStoredShopSheetId();
+    if (!sheetId) {
+      navigate('/workspace');
+      return;
+    }
+    try {
+      setIsSyncingToSheets(true);
+      const res = await syncAllShopRecordsToSheet(sheetId);
+      setStatusMessage({
+        type: 'success',
+        text: res.message
+      });
+      setTimeout(() => setStatusMessage(null), 4500);
+    } catch (err: any) {
+      setStatusMessage({
+        type: 'error',
+        text: err?.message || 'Failed to sync Shop Catalog & Orders to Google Sheets. Open /workspace to verify connection.'
+      });
+    } finally {
+      setIsSyncingToSheets(false);
+    }
+  };
 
   // Auto-generate slug when title changes (if creating or if slug was untouched)
   const handleTitleChange = (val: string) => {
@@ -422,111 +450,82 @@ export function AdminShop() {
         </div>
       </div>
 
-      {/* Admin Top Header */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 pt-8 pb-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Accounticca & E-Lawyers • Catalog Control Desk</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Digital Shop Product Administration
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Add new agreements, tax workbooks, set BDT pricing, customize features, and publish instant download kits.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Link
-                to="/shop"
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 border border-slate-700"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>View Live Shop</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleOpenCreateForm}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all shadow-md inline-flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New Product</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Catalog Metrics Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Products</div>
-              <div className="text-2xl font-black text-white mt-1">{totalProducts} Items</div>
-            </div>
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80">
-              <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Published (Live)</span>
-              </div>
-              <div className="text-2xl font-black text-emerald-400 mt-1">{publishedCount} Live</div>
-            </div>
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80">
-              <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <span>Drafts (Hidden)</span>
-              </div>
-              <div className="text-2xl font-black text-amber-400 mt-1">{draftsCount} Drafts</div>
-            </div>
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Categories</div>
-              <div className="text-2xl font-black text-slate-200 mt-1">{categoriesCount} Categories</div>
-            </div>
-          </div>
-
-        </div>
-      </header>
-
-      {/* Admin Navigation Tabs */}
+      {/* Admin Navigation Tabs & Action Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex items-center gap-2 border-b border-slate-200 pb-4">
-          <button
-            type="button"
-            onClick={() => setActiveAdminTab('catalog')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
-              activeAdminTab === 'catalog'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            <Layers className="w-4 h-4 text-emerald-400" />
-            <span>Product Catalog Manager</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveAdminTab('analytics')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
-              activeAdminTab === 'analytics'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span>Sales & Revenue Analytics</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveAdminTab('payments')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
-              activeAdminTab === 'payments'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            <CreditCard className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span>Payment Status & Link Tracker</span>
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('catalog')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'catalog'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <Layers className="w-4 h-4 text-emerald-400" />
+              <span>Product Catalog Manager</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-200 font-mono">
+                {totalProducts}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('analytics')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'analytics'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <span>Sales & Revenue Analytics</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('payments')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'payments'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <CreditCard className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <span>Payment Status & Link Tracker</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            <button
+              type="button"
+              onClick={handleQuickSyncShopToSheets}
+              disabled={isSyncingToSheets}
+              className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-800 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 border border-emerald-200 cursor-pointer whitespace-nowrap"
+              title="Synchronize all Shop Catalog items and Customer Orders to Google Sheets"
+            >
+              {isSyncingToSheets ? (
+                <RefreshCw className="w-3.5 h-3.5 text-emerald-600 animate-spin shrink-0" />
+              ) : (
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              )}
+              <span>{isSyncingToSheets ? 'Syncing Sheet...' : 'Sync to Google Sheets'}</span>
+            </button>
+            <Link
+              to="/shop"
+              className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 border border-slate-200 whitespace-nowrap"
+            >
+              <Eye className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Live Shop</span>
+            </Link>
+            <button
+              type="button"
+              onClick={handleOpenCreateForm}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>Add New Product</span>
+            </button>
+          </div>
         </div>
       </div>
 

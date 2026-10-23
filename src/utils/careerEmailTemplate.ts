@@ -24,6 +24,11 @@ export interface CareerApplicationData {
   skillsDetails?: string;
   customerServiceSkills?: string[];
   computerSkills?: string[];
+  mtoTracks?: string[];
+  salesMarketingSkills?: string[];
+  leadGenChannels?: string[];
+  analyticalRating?: string;
+  rotationalPreference?: string;
   englishFluency?: string;
   bengaliFluency?: string;
   typingSpeed?: string;
@@ -33,7 +38,7 @@ export interface CareerApplicationData {
   organization?: string;
   jobTitle?: string;
   responsibilities?: string;
-  training: string;
+  training?: string;
   trainingDetails?: string;
   fullTime: string;
   joinTime: string;
@@ -86,13 +91,19 @@ ACADEMIC BACKGROUND:
 - Result: ${data.academicResult}
 - Currently Studying: ${data.currentlyStudying}
 
-ACCOUNTING & TECHNICAL COMPETENCIES:
-- Accounting Principles: ${data.accountingPrinciplesRating} / 5
-- Core Activities: ${data.accountingActivities.join(', ')}
-- Software & Tools: ${data.accountingSoftware.join(', ')}
-- Microsoft Excel: ${data.excelSkill}
-- Tax & VAT Knowledge: ${data.taxVat}
-${data.skillsDetails ? `- Additional Skills: ${data.skillsDetails}\n` : ''}
+${data.salesMarketingSkills && data.salesMarketingSkills.length > 0 ? `SALES & MARKETING COMPETENCIES:
+- Key Sales Skills: ${data.salesMarketingSkills.join(', ')}
+${data.leadGenChannels && data.leadGenChannels.length > 0 ? `- Lead Gen Channels: ${data.leadGenChannels.join(', ')}\n` : ''}` : ''}${data.mtoTracks && data.mtoTracks.length > 0 ? `MANAGEMENT TRAINEE ROTATIONAL TRACKS:
+- Preferred Tracks: ${data.mtoTracks.join(', ')}
+- Analytical/Problem-Solving Self-Rating: ${data.analyticalRating || '4'} / 5
+- Rotational Preferences: ${data.rotationalPreference || 'Open to all departments'}
+` : ''}${data.accountingActivities && data.accountingActivities.length > 0 ? `ACCOUNTING & TECHNICAL COMPETENCIES:
+- Accounting Principles: ${data.accountingPrinciplesRating || 'N/A'} / 5
+- Core Activities: ${(data.accountingActivities || []).join(', ')}
+- Software & Tools: ${(data.accountingSoftware || []).join(', ')}
+- Microsoft Excel: ${data.excelSkill || 'N/A'}
+- Tax & VAT Knowledge: ${data.taxVat || 'N/A'}
+` : ''}${data.skillsDetails ? `- Additional Skills: ${data.skillsDetails}\n` : ''}
 EXPERIENCE & AVAILABILITY:
 - Work Experience: ${data.workExperience} (${data.experienceLength || 'N/A'})
 ${data.organization ? `- Organization: ${data.organization} | Role: ${data.jobTitle || 'N/A'}\n` : ''}
@@ -210,30 +221,49 @@ Recruitment Desk: career@elawyersbd.com | Phone: +880 1712-345678
                 2. Accounting &amp; Technical Competencies
               </h2>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border-collapse: collapse; font-size: 13px; margin-bottom: 16px;">
+${data.salesMarketingSkills && data.salesMarketingSkills.length > 0 ? `
                 <tr style="border-bottom: 1px solid #edf1f4;">
-                  <td width="35%" style="color: #68788a; font-weight: 600;">Principles Self-Rating</td>
-                  <td style="color: #10243a; font-weight: 700;">${data.accountingPrinciplesRating} / 5</td>
+                  <td width="35%" style="color: #68788a; font-weight: 600;">Sales &amp; Marketing Skills</td>
+                  <td style="color: #10243a; font-weight: 700;">${data.salesMarketingSkills.join(' · ')}</td>
+                </tr>
+                ${data.leadGenChannels && data.leadGenChannels.length > 0 ? `
+                <tr style="border-bottom: 1px solid #edf1f4;">
+                  <td style="color: #68788a; font-weight: 600;">Lead Generation Channels</td>
+                  <td style="color: #10243a;">${data.leadGenChannels.join(' · ')}</td>
+                </tr>` : ''}
+` : ''}
+${data.mtoTracks && data.mtoTracks.length > 0 ? `
+                <tr style="border-bottom: 1px solid #edf1f4;">
+                  <td width="35%" style="color: #68788a; font-weight: 600;">Preferred Rotational Tracks</td>
+                  <td style="color: #10243a; font-weight: 700;">${data.mtoTracks.join(' · ')}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #edf1f4;">
-                  <td style="color: #68788a; font-weight: 600;">Excel Proficiency</td>
-                  <td style="color: #10243a; font-weight: 700;">${data.excelSkill}</td>
+                  <td style="color: #68788a; font-weight: 600;">Analytical / Problem-Solving</td>
+                  <td style="color: #10243a; font-weight: 700;">${data.analyticalRating || '4'} / 5</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #edf1f4;">
-                  <td style="color: #68788a; font-weight: 600;">Tax &amp; VAT Knowledge</td>
-                  <td style="color: #10243a;">${data.taxVat}</td>
+                  <td style="color: #68788a; font-weight: 600;">Rotational Preference</td>
+                  <td style="color: #10243a;">${data.rotationalPreference || 'Open to all departments'}</td>
                 </tr>
+` : ''}
                 <tr style="border-bottom: 1px solid #edf1f4;">
-                  <td style="color: #68788a; font-weight: 600;">Activities Performed</td>
-                  <td style="color: #10243a;">${data.accountingActivities.join(' · ')}</td>
+                  <td width="35%" style="color: #68788a; font-weight: 600;">Excel / Software Proficiency</td>
+                  <td style="color: #10243a; font-weight: 700;">${data.excelSkill || 'Proficient'}</td>
+                </tr>
+                ${data.accountingActivities && data.accountingActivities.length > 0 ? `
+                <tr style="border-bottom: 1px solid #edf1f4;">
+                  <td style="color: #68788a; font-weight: 600;">Accounting Activities</td>
+                  <td style="color: #10243a;">${(data.accountingActivities || []).join(' · ')}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #edf1f4;">
                   <td style="color: #68788a; font-weight: 600;">Software Handled</td>
-                  <td style="color: #10243a;">${data.accountingSoftware.join(' · ')}</td>
+                  <td style="color: #10243a;">${(data.accountingSoftware || []).join(' · ')}</td>
                 </tr>
+                ` : ''}
                 ${
                   data.skillsDetails
                     ? `<tr style="border-bottom: 1px solid #edf1f4;">
-                        <td style="color: #68788a; font-weight: 600;">Additional Skills</td>
+                        <td style="color: #68788a; font-weight: 600;">Additional Skills &amp; Qualifications</td>
                         <td style="color: #10243a;">${data.skillsDetails}</td>
                       </tr>`
                     : ''

@@ -288,8 +288,8 @@ export function Auth() {
           
           {/* Header & Logo */}
           <div className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center p-1 bg-emerald-800/10 shadow-xs mb-5 overflow-hidden">
-              <img src="/logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
+            <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center p-1.5 bg-slate-950 border border-slate-800 shadow-md mb-5 overflow-hidden">
+              <img src="/logo.png" alt="E-Lawyers Logo" className="w-full h-full object-contain" />
             </div>
             
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">

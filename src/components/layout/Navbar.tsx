@@ -379,8 +379,8 @@ export function Navbar() {
           {/* Logo */}
           <div className="flex items-center shrink-0">
             <Link to="/" className="flex items-center gap-3 group focus:outline-none">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shadow-xs shrink-0 overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200/80 p-1 group-hover:scale-105 group-hover:border-emerald-400 group-hover:shadow-sm transition-all duration-200">
-                <img src="/logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-slate-950 border border-slate-800 p-0.5 group-hover:scale-105 group-hover:border-amber-400 group-hover:shadow-md transition-all duration-200">
+                <img src="/logo.png" alt="E-Lawyers & Accounticca Logo" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">

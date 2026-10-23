@@ -17,7 +17,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import multer from "multer";
 import nodemailer from "nodemailer";
-import { SHOP_PRODUCTS, ShopProduct } from "./src/data/shopProducts";
+import { SHOP_PRODUCTS, ShopProduct, inferProductType } from "./src/data/shopProducts";
 import { 
   generateAppointmentEmailHtml, 
   generateAppointmentReminderEmailHtml, 
@@ -52,6 +52,335 @@ const PRODUCTS_STORAGE_FILE = path.join(process.cwd(), "data", "shop-products-se
 const SESSIONS_STORAGE_FILE = path.join(process.cwd(), "data", "admin-sessions-server.json");
 const NOTIFICATIONS_STORAGE_FILE = path.join(process.cwd(), "data", "appointment-email-notifications.json");
 const CAREER_APPLICATIONS_STORAGE_FILE = path.join(process.cwd(), "data", "career-applications-server.json");
+const RECRUITMENT_SHEET_CONFIG_FILE = path.join(process.cwd(), "data", "recruitment-sheet-config.json");
+const CONTACT_REQUESTS_STORAGE_FILE = path.join(process.cwd(), "data", "contact-requests-server.json");
+const CONTACT_SHEET_CONFIG_FILE = path.join(process.cwd(), "data", "contact-sheet-config.json");
+const SHOP_ORDERS_STORAGE_FILE = path.join(process.cwd(), "data", "shop-orders-server.json");
+const SHOP_SHEET_CONFIG_FILE = path.join(process.cwd(), "data", "shop-sheet-config.json");
+
+export interface RecruitmentSheetConfig {
+  spreadsheetId: string;
+  title?: string;
+  updatedAt?: string;
+}
+
+export interface ContactSheetConfig {
+  spreadsheetId: string;
+  title?: string;
+  updatedAt?: string;
+}
+
+export interface ShopSheetConfig {
+  spreadsheetId: string;
+  title?: string;
+  updatedAt?: string;
+}
+
+export interface ShopOrderItemSummary {
+  productId: string;
+  slug: string;
+  title: string;
+  category: string;
+  productType: string;
+  format: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+}
+
+export interface ShopOrderRecord {
+  id: string;
+  referenceId: string;
+  recordType: "Customer Order";
+  customerName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  items: ShopOrderItemSummary[];
+  orderSummary: string;
+  primaryCategory: string;
+  productTypeSummary: string;
+  formatSummary: string;
+  subtotal: number;
+  discount: number;
+  total: number;
+  promoCode?: string;
+  paymentMethod: string;
+  trxId: string;
+  authProvider: string;
+  status: string;
+  submittedAt: string;
+  sheetSynced?: boolean;
+  sheetSyncedAt?: string;
+}
+
+const DEFAULT_SHOP_ORDERS: ShopOrderRecord[] = [
+  {
+    id: "ord-2026-101",
+    referenceId: "ACC-2026-841920",
+    recordType: "Customer Order",
+    customerName: "Tanvir Ahmed",
+    email: "tanvir.ahmed@corporatebd.com",
+    phone: "01711882299",
+    companyName: "Apex FinTech Ventures Ltd.",
+    items: [
+      {
+        productId: "income-tax-return-excel-2026-27",
+        slug: "income-tax-return-excel-2026-27",
+        title: "Personal Income Tax Return Excel Calculator (AY 2026–27)",
+        category: "Tax & Financial Kits",
+        productType: "Templates",
+        format: "XLSX + PDF Guide",
+        quantity: 1,
+        unitPrice: 750,
+        lineTotal: 750
+      }
+    ],
+    orderSummary: "Personal Income Tax Return Excel Calculator (AY 2026–27) (×1)",
+    primaryCategory: "Tax & Financial Kits",
+    productTypeSummary: "Templates",
+    formatSummary: "XLSX + PDF Guide",
+    subtotal: 750,
+    discount: 0,
+    total: 750,
+    paymentMethod: "bKash Personal (Google Auth)",
+    trxId: "BK26TX9941",
+    authProvider: "google",
+    status: "Completed Order",
+    submittedAt: "2026-10-21T09:15:00.000Z",
+    sheetSynced: false
+  },
+  {
+    id: "ord-2026-102",
+    referenceId: "ACC-2026-904512",
+    recordType: "Customer Order",
+    customerName: "Barrister Farhana Rahman",
+    email: "farhana@rahmanassociates.bd",
+    phone: "01819334455",
+    companyName: "Rahman & Associates Chambers",
+    items: [
+      {
+        productId: "shareholders-agreement-jv-bd",
+        slug: "shareholders-agreement-jv-bd",
+        title: "Shareholders & Joint Venture Agreement (Bangladesh Companies Act)",
+        category: "Corporate & Compliance",
+        productType: "Templates",
+        format: "DOCX + PDF • 18 Pages",
+        quantity: 1,
+        unitPrice: 2500,
+        lineTotal: 2500
+      }
+    ],
+    orderSummary: "Shareholders & Joint Venture Agreement (Bangladesh Companies Act) (×1)",
+    primaryCategory: "Corporate & Compliance",
+    productTypeSummary: "Templates",
+    formatSummary: "DOCX + PDF • 18 Pages",
+    subtotal: 2500,
+    discount: 0,
+    total: 2500,
+    paymentMethod: "bKash Personal (Google Auth)",
+    trxId: "BK26TX9988",
+    authProvider: "google",
+    status: "Completed Order",
+    submittedAt: "2026-10-22T14:40:00.000Z",
+    sheetSynced: false
+  }
+];
+
+function loadShopSheetConfig(): ShopSheetConfig | null {
+  try {
+    if (fs.existsSync(SHOP_SHEET_CONFIG_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SHOP_SHEET_CONFIG_FILE, "utf-8"));
+      if (data && data.spreadsheetId) return data;
+    }
+  } catch (err) {
+    console.warn("[Shop Sheet Config] Read notice:", err);
+  }
+  return null;
+}
+
+function saveShopSheetConfig(config: ShopSheetConfig) {
+  try {
+    const dir = path.dirname(SHOP_SHEET_CONFIG_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(SHOP_SHEET_CONFIG_FILE, JSON.stringify(config, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Shop Sheet Config] Save notice:", err);
+  }
+}
+
+function loadShopOrders(): ShopOrderRecord[] {
+  try {
+    if (fs.existsSync(SHOP_ORDERS_STORAGE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SHOP_ORDERS_STORAGE_FILE, "utf-8"));
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch (err) {
+    console.warn("[Shop Orders] Read notice:", err);
+  }
+  saveShopOrders(DEFAULT_SHOP_ORDERS);
+  return [...DEFAULT_SHOP_ORDERS];
+}
+
+function saveShopOrders(list: ShopOrderRecord[]) {
+  try {
+    const dir = path.dirname(SHOP_ORDERS_STORAGE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(SHOP_ORDERS_STORAGE_FILE, JSON.stringify(list, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Shop Orders] Save notice:", err);
+  }
+}
+
+function formatServerShopProductRow(product: ShopProduct, updatedAtIso?: string): string[] {
+  const skuId = product.id.startsWith("PRD-") ? product.id : `PRD-${product.id}`;
+  const timestamp = (updatedAtIso || new Date().toISOString()).replace("T", " ").substring(0, 16);
+  const prodType = product.productType || inferProductType(product);
+  const origPrice = Number(product.originalPrice || product.price || 0);
+  const salePrice = Number(product.price || 0);
+  const savings = Math.max(0, origPrice - salePrice);
+  const discountBadge =
+    savings > 0
+      ? `Save BDT ${savings.toLocaleString("en-IN")}${product.badge ? ` • ${product.badge}` : ""}`
+      : product.badge || "Standard Rate";
+  const statusLabel = product.status === "draft" ? "Draft Hidden" : "Published Live";
+
+  return [
+    skuId,
+    timestamp,
+    "Catalog Product",
+    product.category || "Legal Contracts",
+    prodType,
+    product.title,
+    `${product.format || "DOCX + PDF"} (${product.pagesOrFiles || "1 Package"})`,
+    `BDT ${origPrice.toLocaleString("en-IN")}`,
+    `BDT ${salePrice.toLocaleString("en-IN")}`,
+    discountBadge,
+    product.authorOrVettedBy || "Adv. Ekram Hossain",
+    "shop@accounticca.com",
+    "+8801335230170",
+    "Accounticca × E-Lawyers Repository",
+    product.governingLaw || "Bangladesh Statutory Law (FY 2026-27)",
+    statusLabel
+  ];
+}
+
+function formatServerShopOrderRow(order: ShopOrderRecord): string[] {
+  const timestamp = (order.submittedAt || new Date().toISOString()).replace("T", " ").substring(0, 16);
+  const discountVal = Number(order.discount || 0);
+  const discountLabel =
+    discountVal > 0
+      ? `BDT ${discountVal.toLocaleString("en-IN")}${order.promoCode ? ` (${order.promoCode})` : ""}`
+      : "None (BDT 0)";
+  const paymentSummary = `${order.paymentMethod || "bKash Personal"} | TrxID: ${order.trxId || "VERIFIED"}`;
+
+  return [
+    order.referenceId,
+    timestamp,
+    "Customer Order",
+    order.primaryCategory || "Legal & Tax Digital Store",
+    order.productTypeSummary || "Templates",
+    order.orderSummary || "Digital Toolkit Order",
+    order.formatSummary || "Digital Download",
+    `BDT ${Number(order.subtotal || order.total || 0).toLocaleString("en-IN")}`,
+    `BDT ${Number(order.total || 0).toLocaleString("en-IN")}`,
+    discountLabel,
+    order.customerName || "Verified Purchaser",
+    order.email || "",
+    order.phone || "",
+    order.companyName || "Direct Individual Client",
+    paymentSummary,
+    order.status || "Completed Order"
+  ];
+}
+
+export interface ContactRequestRecord {
+  id: string;
+  referenceId: string;
+  requestType: 'Service Inquiry' | 'Consultation Meeting';
+  division: string;
+  clientName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  serviceArea: string;
+  expertiseTopic: string;
+  consultationMode: string;
+  preferredDate: string;
+  preferredTimeSlot: string;
+  assignedPartner: string;
+  messageOrNotes: string;
+  status: string;
+  submittedAt: string;
+  sheetSynced?: boolean;
+  sheetSyncedAt?: string;
+}
+
+function loadContactSheetConfig(): ContactSheetConfig | null {
+  try {
+    if (fs.existsSync(CONTACT_SHEET_CONFIG_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CONTACT_SHEET_CONFIG_FILE, "utf-8"));
+      if (data && data.spreadsheetId) return data;
+    }
+  } catch (err) {
+    console.warn("[Contact Sheet Config] Read notice:", err);
+  }
+  return null;
+}
+
+function saveContactSheetConfig(config: ContactSheetConfig) {
+  try {
+    const dir = path.dirname(CONTACT_SHEET_CONFIG_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CONTACT_SHEET_CONFIG_FILE, JSON.stringify(config, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Contact Sheet Config] Save notice:", err);
+  }
+}
+
+function loadContactRequests(): ContactRequestRecord[] {
+  try {
+    if (fs.existsSync(CONTACT_REQUESTS_STORAGE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CONTACT_REQUESTS_STORAGE_FILE, "utf-8"));
+      if (Array.isArray(data)) return data;
+    }
+  } catch (err) {
+    console.warn("[Contact Requests] Read notice:", err);
+  }
+  return [];
+}
+
+function saveContactRequests(list: ContactRequestRecord[]) {
+  try {
+    const dir = path.dirname(CONTACT_REQUESTS_STORAGE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CONTACT_REQUESTS_STORAGE_FILE, JSON.stringify(list, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Contact Requests] Save notice:", err);
+  }
+}
+
+function loadRecruitmentSheetConfig(): RecruitmentSheetConfig | null {
+  try {
+    if (fs.existsSync(RECRUITMENT_SHEET_CONFIG_FILE)) {
+      const data = JSON.parse(fs.readFileSync(RECRUITMENT_SHEET_CONFIG_FILE, "utf-8"));
+      if (data && data.spreadsheetId) return data;
+    }
+  } catch (err) {
+    console.warn("[Recruitment Sheet Config] Read notice:", err);
+  }
+  return null;
+}
+
+function saveRecruitmentSheetConfig(config: RecruitmentSheetConfig) {
+  try {
+    const dir = path.dirname(RECRUITMENT_SHEET_CONFIG_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(RECRUITMENT_SHEET_CONFIG_FILE, JSON.stringify(config, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Recruitment Sheet Config] Save notice:", err);
+  }
+}
 
 export interface CareerApplicationRecord {
   id: string;
@@ -74,6 +403,8 @@ export interface CareerApplicationRecord {
   emailTransport: string;
   status: 'Received' | 'Screening' | 'Shortlisted' | 'Interviewed' | 'Rejected';
   notes?: string;
+  sheetSynced?: boolean;
+  sheetSyncedAt?: string;
 }
 
 function loadCareerApplications(): CareerApplicationRecord[] {
@@ -769,7 +1100,14 @@ async function startServer() {
 
       const year = new Date().getFullYear();
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const applicationRefId = body.applicationRefId || `ELAW-ACC-${year}-${randomSuffix}`;
+      const posCode = (body.position || '').toLowerCase().includes('sales') || (body.position || '').toLowerCase().includes('marketing')
+        ? 'SME'
+        : (body.position || '').toLowerCase().includes('mto') || (body.position || '').toLowerCase().includes('trainee')
+        ? 'MTO'
+        : (body.position || '').toLowerCase().includes('customer')
+        ? 'CCE'
+        : 'ACC';
+      const applicationRefId = body.applicationRefId || `ELAW-${posCode}-${year}-${randomSuffix}`;
       const submittedAt = new Date().toISOString();
 
       const candidateData: CareerApplicationData = {
@@ -811,8 +1149,13 @@ async function startServer() {
         academicDocsSummary: academicDocsSummary ? String(academicDocsSummary) : undefined,
         portfolio: portfolio ? String(portfolio).trim() : undefined,
         motivation: String(motivation || 'Passionate about building an career with E-Lawyers.'),
-        position: body.position ? String(body.position).trim() : 'Accountant (Accounts Division)',
-        department: body.department ? String(body.department).trim() : 'Accounts Division',
+        position: body.position ? String(body.position).trim() : 'Sales & Marketing Executive',
+        department: body.department ? String(body.department).trim() : 'Sales & Marketing',
+        salesMarketingSkills: Array.isArray(body.salesMarketingSkills) ? body.salesMarketingSkills : undefined,
+        leadGenChannels: Array.isArray(body.leadGenChannels) ? body.leadGenChannels : undefined,
+        mtoTracks: Array.isArray(body.mtoTracks) ? body.mtoTracks : undefined,
+        analyticalRating: body.analyticalRating ? String(body.analyticalRating) : undefined,
+        rotationalPreference: body.rotationalPreference ? String(body.rotationalPreference) : undefined,
         customerServiceSkills: Array.isArray(body.customerServiceSkills) ? body.customerServiceSkills : undefined,
         computerSkills: Array.isArray(body.computerSkills) ? body.computerSkills : undefined,
         englishFluency: body.englishFluency ? String(body.englishFluency) : undefined,
@@ -879,6 +1222,70 @@ async function startServer() {
         emailTransport = "Automated ELA Recruitment Gateway & Log";
       }
 
+      // Check if Google Sheets auto-append should run with provided access token or configured sheet
+      let sheetSynced = false;
+      const workspaceToken = req.body.workspaceAccessToken || (req.headers['x-workspace-token'] as string);
+      const sheetConfig = loadRecruitmentSheetConfig();
+      const targetSpreadsheetId = req.body.spreadsheetId || sheetConfig?.spreadsheetId;
+
+      if (workspaceToken && targetSpreadsheetId) {
+        try {
+          const rowValues = [
+            applicationRefId,
+            submittedAt.replace('T', ' ').substring(0, 16),
+            candidateData.position || body.position || 'Applicant',
+            candidateData.fullName,
+            candidateData.email,
+            candidateData.phone,
+            candidateData.whatsapp || candidateData.phone || '',
+            candidateData.location || 'Dhaka',
+            candidateData.highestQualification || 'Graduate',
+            candidateData.degreeProgram || 'N/A',
+            candidateData.institution || 'N/A',
+            candidateData.graduationYear || '2025',
+            candidateData.workExperience || 'N/A',
+            candidateData.salary || 'Negotiable',
+            candidateData.joinTime || 'Immediate',
+            candidateData.cvFileName || 'Candidate_CV.pdf',
+            'Received / Under Review',
+            ''
+          ];
+
+          let appendRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/Applications:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${workspaceToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ values: [rowValues] })
+            }
+          );
+
+          if (!appendRes.ok && appendRes.status === 400) {
+            appendRes = await fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${workspaceToken}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ values: [rowValues] })
+              }
+            );
+          }
+
+          if (appendRes.ok) {
+            sheetSynced = true;
+            console.log(`[Google Sheets Auto-Append] Application ${applicationRefId} synced to spreadsheet ${targetSpreadsheetId}`);
+          }
+        } catch (sheetErr) {
+          console.warn("[Google Sheets Auto-Append Warning]", sheetErr);
+        }
+      }
+
       const newRecord: CareerApplicationRecord = {
         id: `appl-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
         referenceId: applicationRefId,
@@ -898,7 +1305,9 @@ async function startServer() {
         hrEmails: hrRecipients,
         candidateNotified,
         emailTransport,
-        status: "Received"
+        status: "Received",
+        sheetSynced,
+        sheetSyncedAt: sheetSynced ? submittedAt : undefined
       };
 
       const applications = loadCareerApplications();
@@ -923,8 +1332,9 @@ async function startServer() {
         candidateNotified,
         emailTransport,
         submittedAt,
+        sheetSynced,
         recordId: newRecord.id,
-        message: `Application ${applicationRefId} submitted successfully. E-Lawyers HR team (${hrRecipients.join(", ")}) notified.`
+        message: `Application ${applicationRefId} submitted successfully. E-Lawyers HR team (${hrRecipients.join(", ")}) notified.${sheetSynced ? ' Synced to Google Sheets.' : ''}`
       });
     } catch (err: any) {
       console.error("[Career Application Submit Error]", err);
@@ -956,6 +1366,559 @@ async function startServer() {
       });
     } catch (err: any) {
       res.status(500).json({ error: "Failed to load career applications" });
+    }
+  });
+
+  // --- Workspace Recruitment Google Sheets Configuration & Sync APIs ---
+  app.get("/api/workspace/recruitment-sheet-config", (req, res) => {
+    try {
+      const config = loadRecruitmentSheetConfig();
+      res.json({
+        success: true,
+        configured: Boolean(config && config.spreadsheetId),
+        config: config || null
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to read recruitment sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/recruitment-sheet-config", (req, res) => {
+    try {
+      const { spreadsheetId, title } = req.body || {};
+      if (!spreadsheetId || typeof spreadsheetId !== 'string') {
+        return res.status(400).json({ error: "A valid spreadsheetId is required." });
+      }
+
+      const config: RecruitmentSheetConfig = {
+        spreadsheetId: spreadsheetId.trim(),
+        title: title ? String(title).trim() : 'E-Lawyers - Recruitment Applications 2026',
+        updatedAt: new Date().toISOString()
+      };
+      saveRecruitmentSheetConfig(config);
+      res.json({ success: true, message: "Recruitment spreadsheet configured.", config });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to save recruitment sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/sync-careers-sheet", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = (req.body.token || (authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : '')).trim();
+      const sheetConfig = loadRecruitmentSheetConfig();
+      const spreadsheetId = (req.body.spreadsheetId || sheetConfig?.spreadsheetId || '').trim();
+
+      if (!spreadsheetId) {
+        return res.status(400).json({ error: "No recruitment spreadsheet ID is configured." });
+      }
+      if (!token) {
+        return res.status(401).json({ error: "Google Workspace access token is required." });
+      }
+
+      const allApps = loadCareerApplications();
+
+      // Ensure headers exist
+      const headers = [
+        'Reference ID', 'Submission Date', 'Position / Track', 'Candidate Full Name',
+        'Email Address', 'Contact Phone', 'WhatsApp Number', 'Present Location',
+        'Highest Qualification', 'Degree Program', 'University / Institution',
+        'Graduation Year', 'Experience Summary', 'Expected Salary', 'Availability / Joining',
+        'CV / Resume Document', 'Application Status', 'HR Notes & Rating'
+      ];
+
+      // Read existing rows to avoid duplicates
+      let existingRowsRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Applications!A2:A1000`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!existingRowsRes.ok) {
+        existingRowsRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A2:A1000`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      const existingRefIds = new Set<string>();
+      if (existingRowsRes.ok) {
+        const data = await existingRowsRes.json();
+        if (Array.isArray(data.values)) {
+          data.values.forEach((r: any[]) => {
+            if (r && r[0]) existingRefIds.add(String(r[0]).trim());
+          });
+        }
+      }
+
+      // Filter un-synced applications
+      const missing = allApps.filter(a => a.referenceId && !existingRefIds.has(a.referenceId.trim()));
+
+      if (missing.length === 0) {
+        return res.json({
+          success: true,
+          total: allApps.length,
+          newAppended: 0,
+          alreadySynced: allApps.length,
+          message: `All ${allApps.length} applications are already synchronized.`
+        });
+      }
+
+      const rowsToAppend = missing.map(a => [
+        a.referenceId,
+        (a.submittedAt || '').replace('T', ' ').substring(0, 16),
+        a.position || 'Applicant',
+        a.candidateName,
+        a.candidateEmail,
+        a.phone,
+        a.whatsapp || a.phone || '',
+        a.location || 'Dhaka',
+        a.highestQualification || 'Graduate',
+        a.data?.degreeProgram || 'N/A',
+        a.institution || 'N/A',
+        a.data?.graduationYear || '2025',
+        a.data?.workExperience || 'N/A',
+        a.salary || 'Negotiable',
+        a.data?.joinTime || 'Immediate',
+        a.data?.cvFileName || 'Candidate_CV.pdf',
+        a.status || 'Received',
+        ''
+      ]);
+
+      let appendRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Applications:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ values: rowsToAppend })
+        }
+      );
+
+      if (!appendRes.ok && appendRes.status === 400) {
+        appendRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ values: rowsToAppend })
+          }
+        );
+      }
+
+      if (!appendRes.ok) {
+        const errData = await appendRes.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `Google Sheets API error (${appendRes.status})`);
+      }
+
+      // Mark records as sheetSynced
+      missing.forEach(m => {
+        m.sheetSynced = true;
+        m.sheetSyncedAt = new Date().toISOString();
+      });
+      saveCareerApplications(allApps);
+
+      res.json({
+        success: true,
+        total: allApps.length,
+        newAppended: rowsToAppend.length,
+        alreadySynced: existingRefIds.size,
+        message: `Successfully synchronized ${rowsToAppend.length} applications to Google Sheets.`
+      });
+    } catch (err: any) {
+      console.error("[Sync Careers Sheet Error]", err);
+      res.status(500).json({ error: "Failed to synchronize applications to Google Sheet", details: err.message });
+    }
+  });
+
+  // --- Contact Inquiries & Consultation Meetings Ledger + Google Sheets Sync APIs ---
+  app.post("/api/contact/submit", async (req, res) => {
+    try {
+      const body = req.body || {};
+      const isMeeting =
+        body.requestType === "Consultation Meeting" ||
+        body.type === "meeting" ||
+        body.type === "appointment";
+
+      const requestType: "Service Inquiry" | "Consultation Meeting" = isMeeting
+        ? "Consultation Meeting"
+        : "Service Inquiry";
+
+      const clientName = String(
+        body.clientName ||
+          `${body.firstName || ""} ${body.lastName || ""}`.trim() ||
+          "Valued Client"
+      ).trim();
+      const email = String(body.email || "").trim().toLowerCase();
+      const phone = String(body.phone || "").trim();
+
+      if (!clientName || !email || !phone) {
+        return res.status(400).json({
+          error: "Client Name, Email, and Phone / WhatsApp number are required."
+        });
+      }
+
+      const year = new Date().getFullYear();
+      const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+      const referenceId = String(
+        body.referenceId || (isMeeting ? `APT-${year}-${randomSuffix}` : `INQ-${year}-${randomSuffix}`)
+      ).trim();
+      const submittedAt = new Date().toISOString();
+
+      const division = String(
+        body.division ||
+          (body.serviceArea && String(body.serviceArea).toLowerCase().includes("law")
+            ? "E-Lawyers Chambers"
+            : "Accounticca × E-Lawyers")
+      ).trim();
+      const companyName = String(body.companyName || "Direct Client / Individual").trim() || "Direct Client / Individual";
+      const serviceArea = String(body.serviceArea || body.practiceArea || body.service || "Corporate & Tax Advisory").trim();
+      const expertiseTopic = String(
+        body.expertiseTopic || body.expertiseArea || (isMeeting ? "Scheduled Consultation" : "General Service Inquiry")
+      ).trim();
+      const consultationMode = String(
+        body.consultationMode ||
+          (body.mode === "in_person"
+            ? "In-Person Chamber (Dhaka)"
+            : body.mode === "virtual"
+            ? "Virtual (Google Meet)"
+            : "N/A (Written Inquiry)")
+      ).trim();
+      const preferredDate = String(body.preferredDate || body.date || "Immediate / Written").trim();
+      const preferredTimeSlot = String(body.preferredTimeSlot || body.timeSlot || "N/A").trim();
+      const assignedPartner = String(
+        body.assignedPartner || (isMeeting ? "Senior Chamber Partner" : "Advisory Routing Desk")
+      ).trim();
+      const messageOrNotes = String(body.messageOrNotes || body.message || body.notes || "").trim();
+      const status = String(body.status || (isMeeting ? "Confirmed Booking" : "New Inquiry")).trim();
+
+      let sheetSynced = false;
+      const workspaceToken =
+        body.workspaceAccessToken ||
+        (req.headers["x-workspace-token"] as string) ||
+        "";
+      const sheetConfig = loadContactSheetConfig();
+      const targetSpreadsheetId = String(body.spreadsheetId || sheetConfig?.spreadsheetId || "").trim();
+
+      if (workspaceToken && targetSpreadsheetId) {
+        try {
+          const rowValues = [
+            referenceId,
+            submittedAt.replace("T", " ").substring(0, 16),
+            requestType,
+            division,
+            clientName,
+            email,
+            phone,
+            companyName,
+            serviceArea,
+            expertiseTopic,
+            consultationMode,
+            preferredDate,
+            preferredTimeSlot,
+            assignedPartner,
+            messageOrNotes,
+            status
+          ];
+
+          let appendRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/Requests:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${workspaceToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ values: [rowValues] })
+            }
+          );
+
+          if (!appendRes.ok && appendRes.status === 400) {
+            appendRes = await fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${workspaceToken}`,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ values: [rowValues] })
+              }
+            );
+          }
+
+          if (appendRes.ok) {
+            sheetSynced = true;
+            console.log(
+              `[Google Sheets Auto-Append] Contact/Meeting ${referenceId} (${requestType}) synced to spreadsheet ${targetSpreadsheetId}`
+            );
+          }
+        } catch (sheetErr) {
+          console.warn("[Google Sheets Contact Auto-Append Warning]", sheetErr);
+        }
+      }
+
+      const newRecord: ContactRequestRecord = {
+        id: `creq-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        referenceId,
+        requestType,
+        division,
+        clientName,
+        email,
+        phone,
+        companyName,
+        serviceArea,
+        expertiseTopic,
+        consultationMode,
+        preferredDate,
+        preferredTimeSlot,
+        assignedPartner,
+        messageOrNotes,
+        status,
+        submittedAt,
+        sheetSynced,
+        sheetSyncedAt: sheetSynced ? submittedAt : undefined
+      };
+
+      const requests = loadContactRequests();
+      const existingIdx = requests.findIndex((r) => r.referenceId === referenceId);
+      if (existingIdx >= 0) {
+        requests[existingIdx] = newRecord;
+      } else {
+        requests.unshift(newRecord);
+      }
+      saveContactRequests(requests);
+
+      return res.json({
+        success: true,
+        referenceId,
+        requestType,
+        sheetSynced,
+        submittedAt,
+        record: newRecord,
+        message: `${requestType} ${referenceId} recorded successfully.${
+          sheetSynced ? " Automatically synced to Google Sheets." : ""
+        }`
+      });
+    } catch (err: any) {
+      console.error("[Contact Request Submit Error]", err);
+      res.status(500).json({
+        error: "Failed to record contact or meeting request.",
+        details: err.message
+      });
+    }
+  });
+
+  app.get("/api/contact/requests", (req, res) => {
+    try {
+      const { type, refId, email, limit: limitParam } = req.query;
+      let all = loadContactRequests();
+
+      if (type) {
+        all = all.filter((r) => r.requestType.toLowerCase().includes(String(type).toLowerCase()));
+      }
+      if (refId) {
+        all = all.filter((r) => r.referenceId.toLowerCase() === String(refId).toLowerCase());
+      }
+      if (email) {
+        all = all.filter((r) => r.email.toLowerCase() === String(email).toLowerCase());
+      }
+
+      const fullList = loadContactRequests();
+      const inquiriesCount = fullList.filter((r) => r.requestType === "Service Inquiry").length;
+      const meetingsCount = fullList.filter((r) => r.requestType === "Consultation Meeting").length;
+      const syncedCount = fullList.filter((r) => r.sheetSynced).length;
+      const unsyncedCount = fullList.length - syncedCount;
+
+      const limit = limitParam ? parseInt(limitParam as string, 10) : 50;
+      res.json({
+        success: true,
+        count: all.length,
+        total: fullList.length,
+        inquiriesCount,
+        meetingsCount,
+        syncedCount,
+        unsyncedCount,
+        requests: all.slice(0, limit)
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to load contact and meeting requests." });
+    }
+  });
+
+  app.get("/api/workspace/contact-sheet-config", (_req, res) => {
+    try {
+      const config = loadContactSheetConfig();
+      res.json({
+        success: true,
+        configured: Boolean(config && config.spreadsheetId),
+        config: config || null
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to read contact sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/contact-sheet-config", (req, res) => {
+    try {
+      const { spreadsheetId, title } = req.body || {};
+      if (!spreadsheetId || typeof spreadsheetId !== "string") {
+        return res.status(400).json({ error: "A valid spreadsheetId is required." });
+      }
+
+      const config: ContactSheetConfig = {
+        spreadsheetId: spreadsheetId.trim(),
+        title: title
+          ? String(title).trim()
+          : "Accounticca × E-Lawyers — Contact & Meeting Requests 2026",
+        updatedAt: new Date().toISOString()
+      };
+      saveContactSheetConfig(config);
+      res.json({ success: true, message: "Contact & Meetings spreadsheet configured.", config });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to save contact sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/sync-contact-sheet", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = (
+        req.body.token ||
+        (authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : "")
+      ).trim();
+      const sheetConfig = loadContactSheetConfig();
+      const spreadsheetId = (req.body.spreadsheetId || sheetConfig?.spreadsheetId || "").trim();
+
+      if (!spreadsheetId) {
+        return res.status(400).json({ error: "No Contact & Meetings spreadsheet ID is configured." });
+      }
+      if (!token) {
+        return res.status(401).json({ error: "Google Workspace access token is required." });
+      }
+
+      const allRequests = loadContactRequests();
+
+      // Read existing Reference IDs in Column A to prevent duplicate rows
+      let existingRowsRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Requests!A2:A1000`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!existingRowsRes.ok) {
+        existingRowsRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A2:A1000`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      const existingRefIds = new Set<string>();
+      if (existingRowsRes.ok) {
+        const data = await existingRowsRes.json();
+        if (Array.isArray(data.values)) {
+          data.values.forEach((r: any[]) => {
+            if (r && r[0]) existingRefIds.add(String(r[0]).trim());
+          });
+        }
+      }
+
+      const missing = allRequests.filter(
+        (r) => r.referenceId && !existingRefIds.has(r.referenceId.trim())
+      );
+
+      if (missing.length === 0) {
+        // Ensure all matching records are marked sheetSynced
+        let updated = false;
+        allRequests.forEach((r) => {
+          if (existingRefIds.has(r.referenceId.trim()) && !r.sheetSynced) {
+            r.sheetSynced = true;
+            r.sheetSyncedAt = new Date().toISOString();
+            updated = true;
+          }
+        });
+        if (updated) saveContactRequests(allRequests);
+
+        return res.json({
+          success: true,
+          total: allRequests.length,
+          newAppended: 0,
+          alreadySynced: allRequests.length,
+          message: `All ${allRequests.length} contact inquiries and meeting requests are already synchronized in Google Sheets.`
+        });
+      }
+
+      const rowsToAppend = missing.map((r) => [
+        r.referenceId,
+        (r.submittedAt || "").replace("T", " ").substring(0, 16),
+        r.requestType || "Service Inquiry",
+        r.division || "Accounticca × E-Lawyers",
+        r.clientName,
+        r.email,
+        r.phone,
+        r.companyName || "Direct Client / Individual",
+        r.serviceArea || "Corporate & Tax Advisory",
+        r.expertiseTopic || "General Service Inquiry",
+        r.consultationMode || "N/A (Written Inquiry)",
+        r.preferredDate || "Immediate / Written",
+        r.preferredTimeSlot || "N/A",
+        r.assignedPartner || "Advisory Routing Desk",
+        r.messageOrNotes || "",
+        r.status || "New Inquiry"
+      ]);
+
+      let appendRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Requests:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ values: rowsToAppend })
+        }
+      );
+
+      if (!appendRes.ok && appendRes.status === 400) {
+        appendRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ values: rowsToAppend })
+          }
+        );
+      }
+
+      if (!appendRes.ok) {
+        const errData = await appendRes.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `Google Sheets API error (${appendRes.status})`);
+      }
+
+      const nowIso = new Date().toISOString();
+      missing.forEach((m) => {
+        m.sheetSynced = true;
+        m.sheetSyncedAt = nowIso;
+      });
+      saveContactRequests(allRequests);
+
+      res.json({
+        success: true,
+        total: allRequests.length,
+        newAppended: rowsToAppend.length,
+        alreadySynced: existingRefIds.size,
+        message: `Successfully synchronized ${rowsToAppend.length} contact & meeting request(s) to Google Sheets!`
+      });
+    } catch (err: any) {
+      console.error("[Sync Contact Sheet Error]", err);
+      res.status(500).json({
+        error: "Failed to synchronize contact requests to Google Sheet",
+        details: err.message
+      });
     }
   });
 
@@ -1051,6 +2014,394 @@ async function startServer() {
       res.json({ success: true, products: defaults });
     } catch (err: any) {
       res.status(500).json({ error: "Failed to reset products" });
+    }
+  });
+
+  // --- Shop Customer Orders & Unified Workspace Google Sheets Sync APIs ---
+  app.post("/api/shop/orders", async (req, res) => {
+    try {
+      const body = req.body || {};
+      const customerName = String(body.customerName || body.fullName || "Verified Purchaser").trim();
+      const email = String(body.email || "").trim().toLowerCase();
+      const phone = String(body.phone || "").trim();
+      const companyName = String(body.companyName || body.company || "Direct Individual Client").trim() || "Direct Individual Client";
+
+      if (!customerName || !email) {
+        return res.status(400).json({ error: "Customer Name and Email are required to record an order." });
+      }
+
+      const year = new Date().getFullYear();
+      const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+      const referenceId = String(body.referenceId || body.orderNumber || `ACC-${year}-${randomSuffix}`).trim();
+      const submittedAt = new Date().toISOString();
+
+      const rawItems: any[] = Array.isArray(body.items) ? body.items : [];
+      const items: ShopOrderItemSummary[] = rawItems.map((it) => {
+        const prod = it.product || it;
+        const qty = Number(it.quantity) || 1;
+        const price = Number(prod.price ?? it.unitPrice ?? 0);
+        return {
+          productId: String(prod.id || prod.productId || prod.slug || "item"),
+          slug: String(prod.slug || prod.id || "item"),
+          title: String(prod.title || "Digital Toolkit"),
+          category: String(prod.category || "Legal Contracts"),
+          productType: String(prod.productType || inferProductType(prod) || "Templates"),
+          format: String(prod.format || "DOCX + PDF"),
+          quantity: qty,
+          unitPrice: price,
+          lineTotal: price * qty
+        };
+      });
+
+      const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+      const orderSummary =
+        body.orderSummary ||
+        (items.length > 0 ? items.map((i) => `${i.title} (×${i.quantity})`).join("; ") : "Digital Toolkit Order");
+      const primaryCategory =
+        body.primaryCategory ||
+        (items.length === 1
+          ? items[0].category
+          : items.length > 1
+          ? `Multi-Category (${items[0].category})`
+          : "Legal & Tax Digital Store");
+      const productTypeSummary =
+        body.productTypeSummary ||
+        (items.length === 1
+          ? items[0].productType
+          : items.length > 1
+          ? `Multi-Item Order (${totalQty} items)`
+          : "Templates");
+      const formatSummary =
+        body.formatSummary ||
+        (items.length === 1
+          ? items[0].format
+          : items.length > 1
+          ? `${items.length} Digital Packages (DOCX / XLSX / PDF)`
+          : "Digital Download");
+
+      const subtotal = Number(body.subtotal ?? items.reduce((s, i) => s + i.lineTotal, 0));
+      const discount = Number(body.discount ?? 0);
+      const total = Number(body.total ?? Math.max(0, subtotal - discount));
+      const paymentMethod = String(
+        body.paymentMethod || (total === 0 ? "Free Access" : "bKash Personal")
+      ).trim();
+      const trxId = String(body.trxId || (total === 0 ? "FREE-ACCESS" : "VERIFIED")).trim();
+      const authProvider = String(body.authProvider || "google").trim();
+      const status = String(body.status || "Completed Order").trim();
+
+      const newOrder: ShopOrderRecord = {
+        id: `ord-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        referenceId,
+        recordType: "Customer Order",
+        customerName,
+        email,
+        phone,
+        companyName,
+        items,
+        orderSummary,
+        primaryCategory,
+        productTypeSummary,
+        formatSummary,
+        subtotal,
+        discount,
+        total,
+        promoCode: body.promoCode ? String(body.promoCode) : undefined,
+        paymentMethod,
+        trxId,
+        authProvider,
+        status,
+        submittedAt,
+        sheetSynced: false
+      };
+
+      // Attempt real-time Google Sheets append if token & spreadsheetId are available
+      let sheetSynced = false;
+      const workspaceToken = String(
+        body.workspaceAccessToken || (req.headers["x-workspace-token"] as string) || ""
+      ).trim();
+      const sheetConfig = loadShopSheetConfig();
+      const targetSpreadsheetId = String(body.spreadsheetId || sheetConfig?.spreadsheetId || "").trim();
+
+      if (workspaceToken && targetSpreadsheetId) {
+        try {
+          const rowValues = formatServerShopOrderRow(newOrder);
+          let appendRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/Shop:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${workspaceToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ values: [rowValues] })
+            }
+          );
+
+          if (!appendRes.ok && appendRes.status === 400) {
+            appendRes = await fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${targetSpreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${workspaceToken}`,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ values: [rowValues] })
+              }
+            );
+          }
+
+          if (appendRes.ok) {
+            sheetSynced = true;
+            newOrder.sheetSynced = true;
+            newOrder.sheetSyncedAt = submittedAt;
+            console.log(
+              `[Google Sheets Auto-Append] Shop Order ${referenceId} synced to spreadsheet ${targetSpreadsheetId}`
+            );
+          }
+        } catch (sheetErr) {
+          console.warn("[Google Sheets Shop Order Auto-Append Warning]", sheetErr);
+        }
+      }
+
+      const orders = loadShopOrders();
+      const existingIdx = orders.findIndex((o) => o.referenceId === referenceId);
+      if (existingIdx >= 0) {
+        orders[existingIdx] = newOrder;
+      } else {
+        orders.unshift(newOrder);
+      }
+      saveShopOrders(orders);
+
+      return res.json({
+        success: true,
+        referenceId,
+        sheetSynced,
+        submittedAt,
+        order: newOrder,
+        message: `Order ${referenceId} recorded.${
+          sheetSynced ? " Automatically synced to Workspace Google Sheet." : ""
+        }`
+      });
+    } catch (err: any) {
+      console.error("[Shop Order Submit Error]", err);
+      res.status(500).json({ error: "Failed to record shop order", details: err.message });
+    }
+  });
+
+  app.get("/api/shop/orders", (req, res) => {
+    try {
+      const { refId, email, limit: limitParam } = req.query;
+      let orders = loadShopOrders();
+
+      if (refId) {
+        orders = orders.filter((o) => o.referenceId.toLowerCase() === String(refId).toLowerCase());
+      }
+      if (email) {
+        orders = orders.filter((o) => o.email.toLowerCase() === String(email).toLowerCase());
+      }
+
+      const allOrders = loadShopOrders();
+      const allProducts = loadServerProducts();
+      const publishedProductsCount = allProducts.filter((p) => p.status !== "draft").length;
+      const draftProductsCount = allProducts.filter((p) => p.status === "draft").length;
+      const totalRevenueBdt = allOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+      const syncedOrdersCount = allOrders.filter((o) => o.sheetSynced).length;
+      const unsyncedOrdersCount = allOrders.length - syncedOrdersCount;
+
+      const limit = limitParam ? parseInt(limitParam as string, 10) : 50;
+      res.json({
+        success: true,
+        count: orders.length,
+        ordersTotal: allOrders.length,
+        productsTotal: allProducts.length,
+        publishedProductsCount,
+        draftProductsCount,
+        totalRecords: allOrders.length + allProducts.length,
+        totalRevenueBdt,
+        syncedOrdersCount,
+        unsyncedOrdersCount,
+        orders: orders.slice(0, limit),
+        products: allProducts
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to load shop orders and catalog ledger" });
+    }
+  });
+
+  app.get("/api/workspace/shop-sheet-config", (_req, res) => {
+    try {
+      const config = loadShopSheetConfig();
+      res.json({
+        success: true,
+        configured: Boolean(config && config.spreadsheetId),
+        config: config || null
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to read shop sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/shop-sheet-config", (req, res) => {
+    try {
+      const { spreadsheetId, title } = req.body || {};
+      if (!spreadsheetId || typeof spreadsheetId !== "string") {
+        return res.status(400).json({ error: "A valid spreadsheetId is required." });
+      }
+
+      const config: ShopSheetConfig = {
+        spreadsheetId: spreadsheetId.trim(),
+        title: title
+          ? String(title).trim()
+          : "Accounticca × E-Lawyers — Shop Orders & Catalog Master 2026",
+        updatedAt: new Date().toISOString()
+      };
+      saveShopSheetConfig(config);
+      res.json({ success: true, message: "Shop Orders & Catalog spreadsheet configured.", config });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to save shop sheet configuration" });
+    }
+  });
+
+  app.post("/api/workspace/sync-shop-sheet", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = (
+        req.body.token ||
+        (authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : "")
+      ).trim();
+      const sheetConfig = loadShopSheetConfig();
+      const spreadsheetId = (req.body.spreadsheetId || sheetConfig?.spreadsheetId || "").trim();
+
+      if (!spreadsheetId) {
+        return res.status(400).json({ error: "No Shop spreadsheet ID is configured." });
+      }
+      if (!token) {
+        return res.status(401).json({ error: "Google Workspace access token is required." });
+      }
+
+      const allOrders = loadShopOrders();
+      const allProducts = loadServerProducts();
+
+      // Read existing Reference / SKU IDs in Column A to prevent duplicate rows
+      let existingRowsRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Shop!A2:A2000`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!existingRowsRes.ok) {
+        existingRowsRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A2:A2000`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      const existingRefIds = new Set<string>();
+      if (existingRowsRes.ok) {
+        const data = await existingRowsRes.json();
+        if (Array.isArray(data.values)) {
+          data.values.forEach((r: any[]) => {
+            if (r && r[0]) existingRefIds.add(String(r[0]).trim());
+          });
+        }
+      }
+
+      const missingOrders = allOrders.filter(
+        (o) => o.referenceId && !existingRefIds.has(o.referenceId.trim())
+      );
+
+      const missingProducts = allProducts.filter((p) => {
+        const skuId = p.id.startsWith("PRD-") ? p.id : `PRD-${p.id}`;
+        return !existingRefIds.has(skuId.trim());
+      });
+
+      const totalRecords = allOrders.length + allProducts.length;
+
+      if (missingOrders.length === 0 && missingProducts.length === 0) {
+        let updated = false;
+        const nowIso = new Date().toISOString();
+        allOrders.forEach((o) => {
+          if (existingRefIds.has(o.referenceId.trim()) && !o.sheetSynced) {
+            o.sheetSynced = true;
+            o.sheetSyncedAt = nowIso;
+            updated = true;
+          }
+        });
+        if (updated) saveShopOrders(allOrders);
+
+        return res.json({
+          success: true,
+          totalRecords,
+          ordersTotal: allOrders.length,
+          productsTotal: allProducts.length,
+          newAppended: 0,
+          alreadySynced: totalRecords,
+          message: `All ${allOrders.length} Customer Orders and ${allProducts.length} Catalog Products (${totalRecords} total records) are already synchronized in Google Sheets.`
+        });
+      }
+
+      const nowIso = new Date().toISOString();
+      const orderRows = missingOrders.map((o) => formatServerShopOrderRow(o));
+      const productRows = missingProducts.map((p) => formatServerShopProductRow(p, nowIso));
+      const rowsToAppend = [...orderRows, ...productRows];
+
+      let appendRes = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Shop:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ values: rowsToAppend })
+        }
+      );
+
+      if (!appendRes.ok && appendRes.status === 400) {
+        appendRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ values: rowsToAppend })
+          }
+        );
+      }
+
+      if (!appendRes.ok) {
+        const errData = await appendRes.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `Google Sheets API error (${appendRes.status})`);
+      }
+
+      missingOrders.forEach((o) => {
+        o.sheetSynced = true;
+        o.sheetSyncedAt = nowIso;
+      });
+      allOrders.forEach((o) => {
+        if (existingRefIds.has(o.referenceId.trim()) && !o.sheetSynced) {
+          o.sheetSynced = true;
+          o.sheetSyncedAt = nowIso;
+        }
+      });
+      saveShopOrders(allOrders);
+
+      res.json({
+        success: true,
+        totalRecords,
+        ordersTotal: allOrders.length,
+        productsTotal: allProducts.length,
+        newAppended: rowsToAppend.length,
+        alreadySynced: existingRefIds.size,
+        message: `Synchronized ${rowsToAppend.length} Shop record(s) (${missingOrders.length} Customer Orders, ${missingProducts.length} Catalog Products) to Google Sheets!`
+      });
+    } catch (err: any) {
+      console.error("[Sync Shop Sheet Error]", err);
+      res.status(500).json({
+        error: "Failed to synchronize Shop records to Google Sheet",
+        details: err.message
+      });
     }
   });
 

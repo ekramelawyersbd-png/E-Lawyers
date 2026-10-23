@@ -13,7 +13,13 @@ import {
   ExternalLink,
   Check,
   AlertCircle,
-  LogOut
+  LogOut,
+  FileSpreadsheet,
+  Mail,
+  Copy,
+  Send,
+  Eye,
+  Code2
 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { usePurchases } from '../contexts/PurchaseContext';
@@ -21,9 +27,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { auth, fallbackAuth, db } from '../lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useProducts } from '../hooks/useProducts';
-import { SHOP_PRODUCTS, ShopProduct } from '../data/shopProducts';
+import { SHOP_PRODUCTS, ShopProduct, inferProductType } from '../data/shopProducts';
 import { SEO } from '../components/SEO';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { getAccessToken } from '../services/workspaceAuth';
+import { getStoredShopSheetId, appendShopOrderToSheet } from '../services/shopSheetsSync';
+import {
+  sendShopOrderConfirmationEmail,
+  EMAILJS_SHOP_ORDER_HTML_TEMPLATE,
+  type OrderConfirmationEmailResult
+} from '../utils/emailService';
+import { generateShopOrderEmailHtml } from '../utils/shopOrderEmailTemplate';
 
 export const CheckoutPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -142,6 +156,112 @@ export const CheckoutPage: React.FC = () => {
   const [isOrderComplete, setIsOrderComplete] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [purchasedProducts, setPurchasedProducts] = useState<ShopProduct[]>([]);
+  const [orderSheetSynced, setOrderSheetSynced] = useState<boolean>(false);
+  const [orderEmailResult, setOrderEmailResult] = useState<OrderConfirmationEmailResult | null>(null);
+  const [completedOrderSnapshot, setCompletedOrderSnapshot] = useState<{
+    items: Array<{
+      productId: string;
+      slug?: string;
+      title: string;
+      category: string;
+      productType?: string;
+      format: string;
+      quantity: number;
+      unitPrice: number;
+      lineTotal: number;
+    }>;
+    subtotal: number;
+    discount: number;
+    total: number;
+    paymentMethod: string;
+    trxId: string;
+  } | null>(null);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
+  const [emailPreviewTab, setEmailPreviewTab] = useState<'rendered' | 'template'>('rendered');
+  const [copiedTemplate, setCopiedTemplate] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+
+  const liveEmailPreview = useMemo(() => {
+    const activeItems =
+      completedOrderSnapshot?.items ||
+      checkoutItems.map((item) => ({
+        productId: item.product.id,
+        slug: item.product.slug,
+        title: item.product.title,
+        category: item.product.category,
+        productType: item.product.productType || inferProductType(item.product),
+        format: item.product.format,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+        lineTotal: item.product.price * item.quantity
+      }));
+    const activeSubtotal = completedOrderSnapshot?.subtotal ?? orderSubtotal;
+    const activeDiscount = completedOrderSnapshot?.discount ?? orderDiscount;
+    const activeTotal = completedOrderSnapshot?.total ?? orderTotal;
+    const providerLabel = activeProvider === 'facebook' ? 'Facebook Auth' : 'Google Auth';
+    const activeMethod =
+      completedOrderSnapshot?.paymentMethod ||
+      (activeTotal === 0 ? `Free Access (${providerLabel})` : `bKash Personal (${providerLabel})`);
+    const activeTrxId =
+      completedOrderSnapshot?.trxId || (activeTotal === 0 ? 'FREE-ACCESS' : trxId.trim().toUpperCase() || 'PENDING-TRX');
+
+    return generateShopOrderEmailHtml({
+      orderId: completedOrderNumber || `ACC-${new Date().getFullYear()}-PREVIEW`,
+      customerName: fullName.trim() || 'Valued Client',
+      customerEmail: email.trim().toLowerCase() || 'client@example.com',
+      customerPhone: phone.trim() || '+880 17XX-XXXXXX',
+      companyName: company.trim() || 'Direct Individual Client',
+      items: activeItems,
+      subtotal: activeSubtotal,
+      discount: activeDiscount,
+      totalCost: activeTotal,
+      paymentMethod: activeMethod,
+      trxId: activeTrxId
+    });
+  }, [
+    completedOrderSnapshot,
+    checkoutItems,
+    orderSubtotal,
+    orderDiscount,
+    orderTotal,
+    activeProvider,
+    trxId,
+    completedOrderNumber,
+    fullName,
+    email,
+    phone,
+    company
+  ]);
+
+  const handleCopyEmailJsTemplate = () => {
+    navigator.clipboard.writeText(EMAILJS_SHOP_ORDER_HTML_TEMPLATE);
+    setCopiedTemplate(true);
+    setTimeout(() => setCopiedTemplate(false), 2500);
+  };
+
+  const handleResendConfirmationEmail = async () => {
+    if (!completedOrderSnapshot || !completedOrderNumber) return;
+    setResendingEmail(true);
+    try {
+      const emailRes = await sendShopOrderConfirmationEmail({
+        orderId: completedOrderNumber,
+        customerName: fullName.trim() || 'Valued Client',
+        customerEmail: email.trim().toLowerCase(),
+        customerPhone: phone.trim(),
+        companyName: company.trim() || 'Direct Individual Client',
+        items: completedOrderSnapshot.items,
+        subtotal: completedOrderSnapshot.subtotal,
+        discount: completedOrderSnapshot.discount,
+        totalCost: completedOrderSnapshot.total,
+        paymentMethod: completedOrderSnapshot.paymentMethod,
+        trxId: completedOrderSnapshot.trxId,
+        authProvider: activeProvider || 'google'
+      });
+      setOrderEmailResult(emailRes);
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   const handleCopyBkash = () => {
     navigator.clipboard.writeText('01744883636');
@@ -189,22 +309,125 @@ export const CheckoutPage: React.FC = () => {
       // Non-blocking profile sync fallback
     }
 
-    setTimeout(() => {
-      const orderNum = `ACC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
-      setCompletedOrderNumber(orderNum);
-      const prods = checkoutItems.map(i => i.product);
-      setPurchasedProducts(prods);
-      const providerLabel = activeProvider === 'facebook' ? 'Facebook Auth' : 'Google Auth';
-      const methodLabel = isFree
-        ? `Free Access (${providerLabel})`
-        : `bKash Personal (${providerLabel})`;
-      prods.forEach(p => purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed'));
-      setIsSubmitting(false);
-      setIsOrderComplete(true);
-      if (!singleProduct) {
-        clearCart();
+    const orderNum = `ACC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const prods = checkoutItems.map((i) => i.product);
+    const providerLabel = activeProvider === 'facebook' ? 'Facebook Auth' : 'Google Auth';
+    const methodLabel = isFree
+      ? `Free Access (${providerLabel})`
+      : `bKash Personal (${providerLabel})`;
+    const resolvedTrxId = isFree ? 'FREE-ACCESS' : trxId.trim().toUpperCase();
+
+    const orderItemsPayload = checkoutItems.map((item) => ({
+      productId: item.product.id,
+      slug: item.product.slug,
+      title: item.product.title,
+      category: item.product.category,
+      productType: item.product.productType || inferProductType(item.product),
+      format: item.product.format,
+      quantity: item.quantity,
+      unitPrice: item.product.price,
+      lineTotal: item.product.price * item.quantity
+    }));
+
+    let syncedToSheet = false;
+    try {
+      const workspaceToken = getAccessToken() || '';
+      const storedSheetId = getStoredShopSheetId() || '';
+
+      const orderRes = await fetch('/api/shop/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(workspaceToken ? { 'x-workspace-token': workspaceToken } : {})
+        },
+        body: JSON.stringify({
+          referenceId: orderNum,
+          customerName: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          companyName: company.trim() || 'Direct Individual Client',
+          items: orderItemsPayload,
+          subtotal: orderSubtotal,
+          discount: orderDiscount,
+          total: orderTotal,
+          paymentMethod: methodLabel,
+          trxId: resolvedTrxId,
+          authProvider: activeProvider,
+          status: 'Completed Order',
+          workspaceAccessToken: workspaceToken,
+          spreadsheetId: storedSheetId
+        })
+      });
+
+      if (orderRes.ok) {
+        const orderData = await orderRes.json();
+        syncedToSheet = Boolean(orderData?.sheetSynced);
       }
-    }, 900);
+
+      if (!syncedToSheet && workspaceToken) {
+        const fallbackAppend = await appendShopOrderToSheet(
+          {
+            referenceId: orderNum,
+            customerName: fullName.trim(),
+            email: email.trim().toLowerCase(),
+            phone: phone.trim(),
+            companyName: company.trim() || 'Direct Individual Client',
+            items: orderItemsPayload,
+            subtotal: orderSubtotal,
+            discount: orderDiscount,
+            total: orderTotal,
+            paymentMethod: methodLabel,
+            trxId: resolvedTrxId,
+            authProvider: activeProvider,
+            status: 'Completed Order',
+            submittedAt: new Date().toISOString()
+          },
+          workspaceToken
+        );
+        syncedToSheet = fallbackAppend.synced;
+      }
+    } catch {
+      // Non-blocking order ledger fallback
+    }
+
+    // Automatically trigger EmailJS Order Confirmation Email with itemized products & total cost
+    try {
+      const emailConfirmation = await sendShopOrderConfirmationEmail({
+        orderId: orderNum,
+        customerName: fullName.trim(),
+        customerEmail: email.trim().toLowerCase(),
+        customerPhone: phone.trim(),
+        companyName: company.trim() || 'Direct Individual Client',
+        items: orderItemsPayload,
+        subtotal: orderSubtotal,
+        discount: orderDiscount,
+        totalCost: orderTotal,
+        paymentMethod: methodLabel,
+        trxId: resolvedTrxId,
+        authProvider: activeProvider
+      });
+      setOrderEmailResult(emailConfirmation);
+    } catch {
+      // Non-blocking EmailJS confirmation fallback
+    }
+
+    setCompletedOrderSnapshot({
+      items: orderItemsPayload,
+      subtotal: orderSubtotal,
+      discount: orderDiscount,
+      total: orderTotal,
+      paymentMethod: methodLabel,
+      trxId: resolvedTrxId
+    });
+    setCompletedOrderNumber(orderNum);
+    setPurchasedProducts(prods);
+    setOrderSheetSynced(syncedToSheet);
+    prods.forEach((p) => purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed'));
+    setIsSubmitting(false);
+    setIsOrderComplete(true);
+    if (!singleProduct) {
+      clearCart();
+    }
   };
 
   const handleDownloadSimulatedFile = (product: ShopProduct) => {
@@ -333,6 +556,159 @@ Contact & Advisory: https://blog.accounticca.com/contact
               <p className="text-xs sm:text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed">
                 Order Token: <strong className="font-mono bg-white px-2 py-0.5 rounded border border-emerald-300">{completedOrderNumber}</strong>
               </p>
+              <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
+                {orderSheetSynced ? (
+                  <Link
+                    to="/workspace"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-emerald-300 text-emerald-800 text-xs font-bold hover:bg-emerald-100/60 transition-colors"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Order Automatically Synced to Workspace Google Sheet</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/workspace"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Recorded in Shop Ledger • Sync to Google Sheets in /workspace</span>
+                  </Link>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setShowEmailPreview((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100/60 transition-colors cursor-pointer"
+                >
+                  <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>
+                    {orderEmailResult?.transport === 'emailjs-live'
+                      ? `EmailJS Confirmation Sent to ${email}`
+                      : `EmailJS Order Confirmation Triggered (${email})`}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* EmailJS Order Confirmation Email Panel */}
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-extrabold text-slate-900 flex items-center gap-2">
+                      <span>Automated EmailJS Order Confirmation</span>
+                      <span className="text-[11px] font-semibold text-emerald-700">
+                        · {completedOrderSnapshot?.items.length || purchasedProducts.length} Item(s) · BDT {(completedOrderSnapshot?.total ?? orderTotal).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      {orderEmailResult?.message ||
+                        `Order confirmation email generated for ${email} confirming itemized products and total settlement cost.`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailPreview((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>{showEmailPreview ? 'Hide Email Preview' : 'View Confirmation Email'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmationEmail}
+                    disabled={resendingEmail}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{resendingEmail ? 'Sending...' : 'Resend via EmailJS'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {showEmailPreview && (
+                <div className="pt-3 border-t border-slate-200 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 p-1 bg-slate-200/70 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setEmailPreviewTab('rendered')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                          emailPreviewTab === 'rendered'
+                            ? 'bg-white text-slate-900 shadow-2xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        Rendered Customer Email
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEmailPreviewTab('template')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                          emailPreviewTab === 'template'
+                            ? 'bg-white text-slate-900 shadow-2xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        EmailJS HTML Template
+                      </button>
+                    </div>
+
+                    {emailPreviewTab === 'template' && (
+                      <button
+                        type="button"
+                        onClick={handleCopyEmailJsTemplate}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        <Copy className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{copiedTemplate ? 'Copied HTML Template!' : 'Copy EmailJS HTML'}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {emailPreviewTab === 'rendered' ? (
+                    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                      <div className="px-4 py-2.5 bg-slate-100 border-b border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <span className="font-bold text-slate-900">Subject:</span>{' '}
+                          <span>{orderEmailResult?.subject || liveEmailPreview.subject}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          To: <strong className="text-slate-800">{email}</strong>
+                        </div>
+                      </div>
+                      <div
+                        className="max-h-[520px] overflow-y-auto"
+                        dangerouslySetInnerHTML={{
+                          __html: orderEmailResult?.html || liveEmailPreview.html
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="text-[11px] text-slate-600">
+                        Paste this HTML template into your EmailJS Dashboard (Template ID:{' '}
+                        <code className="font-mono font-bold text-slate-900">VITE_EMAILJS_ORDER_TEMPLATE_ID</code>). Dynamic variables include{' '}
+                        <code className="font-mono text-emerald-700">{'{{order_id}}'}</code>,{' '}
+                        <code className="font-mono text-emerald-700">{'{{to_name}}'}</code>,{' '}
+                        <code className="font-mono text-emerald-700">{'{{{items_rows_html}}}'}</code>,{' '}
+                        <code className="font-mono text-emerald-700">{'{{subtotal_bdt}}'}</code>,{' '}
+                        <code className="font-mono text-emerald-700">{'{{discount_bdt}}'}</code>, and{' '}
+                        <code className="font-mono text-emerald-700">{'{{total_cost_bdt}}'}</code>.
+                      </div>
+                      <pre className="p-4 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-mono overflow-x-auto max-h-80 leading-relaxed">
+                        {EMAILJS_SHOP_ORDER_HTML_TEMPLATE}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Downloads List */}
@@ -870,6 +1246,92 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   </button>
                 </div>
 
+              </div>
+
+              {/* EmailJS Order Confirmation Template Inspector & Live Preview */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-extrabold text-slate-900">
+                        Automated EmailJS Order Confirmation
+                      </h3>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Triggers automatically on submission to confirm your {checkoutItems.length} item(s) and{' '}
+                        <strong className="text-slate-800">BDT {orderTotal.toLocaleString('en-IN')}</strong> total cost.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailPreview((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition-colors shrink-0 cursor-pointer"
+                  >
+                    <Code2 className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>{showEmailPreview ? 'Hide Template' : 'Preview Template'}</span>
+                  </button>
+                </div>
+
+                {showEmailPreview && (
+                  <div className="pt-3 border-t border-slate-200 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => setEmailPreviewTab('rendered')}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-colors cursor-pointer ${
+                            emailPreviewTab === 'rendered'
+                              ? 'bg-white text-slate-900 shadow-2xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          Live Email Preview
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEmailPreviewTab('template')}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-colors cursor-pointer ${
+                            emailPreviewTab === 'template'
+                              ? 'bg-white text-slate-900 shadow-2xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          EmailJS HTML Source
+                        </button>
+                      </div>
+
+                      {emailPreviewTab === 'template' && (
+                        <button
+                          type="button"
+                          onClick={handleCopyEmailJsTemplate}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                        >
+                          <Copy className="w-3 h-3 text-emerald-400" />
+                          <span>{copiedTemplate ? 'Copied!' : 'Copy HTML'}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {emailPreviewTab === 'rendered' ? (
+                      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                        <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 text-[11px] text-slate-600 truncate">
+                          <strong className="text-slate-900">Subject:</strong> {liveEmailPreview.subject}
+                        </div>
+                        <div
+                          className="max-h-96 overflow-y-auto"
+                          dangerouslySetInnerHTML={{ __html: liveEmailPreview.html }}
+                        />
+                      </div>
+                    ) : (
+                      <pre className="p-3 rounded-xl bg-slate-900 text-slate-100 text-[10px] font-mono overflow-x-auto max-h-72 leading-relaxed">
+                        {EMAILJS_SHOP_ORDER_HTML_TEMPLATE}
+                      </pre>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

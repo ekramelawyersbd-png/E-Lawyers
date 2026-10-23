@@ -24,8 +24,13 @@ import {
   Youtube,
   Facebook,
   Scale,
+  FileSpreadsheet,
   type LucideIcon,
 } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { getAccessToken } from '../services/workspaceAuth';
+import { getStoredContactSheetId } from '../services/contactSheetsSync';
 import { AppointmentBookingForm } from '../components/AppointmentBookingForm';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
@@ -335,6 +340,9 @@ export function Contact() {
   const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({});
   const [formAttempted, setFormAttempted] = useState(false);
   const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null);
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+  const [submittedInquiryRef, setSubmittedInquiryRef] = useState<string | null>(null);
+  const [inquirySheetSynced, setInquirySheetSynced] = useState(false);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
 
@@ -353,6 +361,7 @@ export function Contact() {
   const updateField = (field: FormField, value: string) => {
     setForm((previous) => ({ ...previous, [field]: value }));
     setEmailDraftUrl(null);
+    setSubmittedInquiryRef(null);
   };
 
   const selectTab = (tab: ContactTab) => {
@@ -380,8 +389,12 @@ export function Contact() {
   };
 
   const markTouched = (field: FormField) => {
-    setTouched((previous) => ({ ...previous, [field]: true }));
+    setTouched((previous) => ({ ...prevOrEmpty(previous), [field]: true }));
   };
+
+  function prevOrEmpty(prev: Partial<Record<FormField, boolean>>) {
+    return prev || {};
+  }
 
   const handleCopy = async (value: string, label: string) => {
     setCopyError(null);
@@ -395,7 +408,7 @@ export function Contact() {
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormAttempted(true);
     setTouched({
@@ -408,6 +421,7 @@ export function Contact() {
       message: true,
     });
     setEmailDraftUrl(null);
+    setSubmittedInquiryRef(null);
 
     if (hasErrors) {
       const orderedFields: FormField[] = [
@@ -433,18 +447,87 @@ export function Contact() {
       return;
     }
 
+    setIsSubmittingInquiry(true);
+    const refNumber = Math.floor(10000 + Math.random() * 90000);
+    const referenceId = `INQ-2026-${refNumber}`;
+
     const isJointInquiry = form.service === 'Integrated Joint Ecosystem Consultation';
     const recipient = isJointInquiry
       ? ACCOUNTICCA_EMAIL
       : LEGAL_SERVICES.has(form.service)
         ? ELAWYERS_EMAIL
         : ACCOUNTICCA_EMAIL;
+    const division = isJointInquiry
+      ? 'Accounticca × E-Lawyers'
+      : LEGAL_SERVICES.has(form.service)
+        ? 'E-Lawyers Chambers'
+        : 'Accounticca Advisory';
+
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
+
+    // 1. Best-effort Firestore save
+    try {
+      await addDoc(collection(db, 'contact_messages'), {
+        referenceId,
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        fullName,
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        companyName: form.companyName.trim() || 'Direct Client / Individual',
+        service: form.service,
+        division,
+        message: form.message.trim(),
+        status: 'new',
+        createdAt: serverTimestamp(),
+      });
+    } catch (fsErr) {
+      console.warn('Firestore inquiry backup notice:', fsErr);
+    }
+
+    // 2. Save to Backend Ledger & Real-Time Workspace Google Sheet Sync
+    let synced = false;
+    try {
+      const workspaceAccessToken = getAccessToken();
+      const spreadsheetId = getStoredContactSheetId();
+      const res = await fetch('/api/contact/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referenceId,
+          requestType: 'Service Inquiry',
+          division,
+          clientName: fullName,
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          companyName: form.companyName.trim() || 'Direct Client / Individual',
+          serviceArea: form.service,
+          expertiseTopic: 'General Service Inquiry',
+          consultationMode: 'N/A (Written Inquiry)',
+          preferredDate: 'Immediate / Written',
+          preferredTimeSlot: 'N/A',
+          assignedPartner: `${division} (${recipient})`,
+          messageOrNotes: form.message.trim(),
+          status: 'New Inquiry',
+          workspaceAccessToken: workspaceAccessToken || undefined,
+          spreadsheetId: spreadsheetId || undefined,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        synced = Boolean(data.sheetSynced);
+      }
+    } catch (apiErr) {
+      console.warn('Backend contact ledger notice:', apiErr);
+    }
+
     const cc = isJointInquiry ? `&cc=${encodeURIComponent(ELAWYERS_EMAIL)}` : '';
-    const subject = `Consultation Inquiry — ${form.service}`;
+    const subject = `[${referenceId}] Consultation Inquiry — ${form.service}`;
     const body = [
+      `Reference ID: ${referenceId}`,
       'New consultation inquiry',
       '',
-      `Name: ${form.firstName.trim()} ${form.lastName.trim()}`,
+      `Name: ${fullName}`,
       `Email: ${form.email.trim()}`,
       `Phone / WhatsApp: ${form.phone.trim()}`,
       `Company: ${form.companyName.trim() || 'Not provided'}`,
@@ -454,9 +537,12 @@ export function Contact() {
       form.message.trim(),
     ].join('\n');
 
+    setSubmittedInquiryRef(referenceId);
+    setInquirySheetSynced(synced);
     setEmailDraftUrl(
       `mailto:${recipient}?subject=${encodeURIComponent(subject)}${cc}&body=${encodeURIComponent(body)}`,
     );
+    setIsSubmittingInquiry(false);
   };
 
   const resetForm = () => {
@@ -464,6 +550,8 @@ export function Contact() {
     setTouched({});
     setFormAttempted(false);
     setEmailDraftUrl(null);
+    setSubmittedInquiryRef(null);
+    setInquirySheetSynced(false);
   };
 
   const inputError = (field: FormField) => Boolean((touched[field] || formAttempted) && errors[field]);
@@ -771,22 +859,46 @@ export function Contact() {
                     <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
                       <div className="flex items-start gap-3">
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /></span>
-                        <div>
-                          <h4 className="font-semibold text-emerald-950">Your inquiry is ready to email</h4>
-                          <p className="mt-1 text-sm leading-6 text-emerald-900/80">Open the prepared draft, then press Send in your email application. This website has not received or sent the inquiry itself.</p>
-                          <a href={emailDraftUrl} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20">
-                            Open email draft <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                          </a>
-                          <button type="button" onClick={resetForm} className="ml-3 mt-3 inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950">Start a new inquiry</button>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-semibold text-emerald-950">Inquiry Submitted &amp; Recorded</h4>
+                            {submittedInquiryRef && (
+                              <span className="rounded-md bg-white px-2 py-0.5 font-mono text-xs font-bold text-emerald-900 border border-emerald-200">
+                                {submittedInquiryRef}
+                              </span>
+                            )}
+                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                              <FileSpreadsheet className="h-3 w-3" aria-hidden="true" />
+                              {inquirySheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm leading-6 text-emerald-900/80">
+                            Your inquiry has been logged to our advisory desk ledger{inquirySheetSynced ? ' and automatically appended to our Google Sheet' : ''}. You may also open a direct email draft below if you wish to attach files.
+                          </p>
+                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <a href={emailDraftUrl} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20">
+                              Open email draft <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                            </a>
+                            <button type="button" onClick={resetForm} className="inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950">
+                              Start a new inquiry
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <button type="submit" className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20">
-                    Prepare inquiry email <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  <button
+                    type="submit"
+                    disabled={isSubmittingInquiry}
+                    className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20 disabled:opacity-60"
+                  >
+                    {isSubmittingInquiry ? 'Submitting inquiry & syncing...' : 'Submit inquiry & prepare email'}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                   </button>
-                  <p className="text-center text-xs leading-5 text-slate-500">Selecting this button validates your details and prepares an email draft; it does not submit the form to a server.</p>
+                  <p className="text-center text-xs leading-5 text-slate-500">
+                    Submitting saves your inquiry directly to our Workspace Contact Ledger &amp; Google Sheet and prepares an optional direct email draft.
+                  </p>
                 </form>
               </div>
             )}

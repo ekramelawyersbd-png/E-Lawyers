@@ -27,8 +27,43 @@ import {
   HardDrive,
   Mail,
   Send,
-  Inbox
+  Inbox,
+  Briefcase,
+  CheckCircle2,
+  ArrowRight,
+  Link as LinkIcon,
+  ShoppingBag
 } from 'lucide-react';
+import { 
+  getStoredRecruitmentSheetId,
+  setStoredRecruitmentSheetId,
+  getStoredRecruitmentSheetTitle,
+  createOfficialRecruitmentSpreadsheet,
+  syncAllApplicationsToSheet,
+  initializeRecruitmentSheetHeaders,
+  RECRUITMENT_SHEET_SYNC_COUNT_KEY,
+  SHEET_HEADERS
+} from '../services/careerSheetsSync';
+import {
+  getStoredContactSheetId,
+  setStoredContactSheetId,
+  getStoredContactSheetTitle,
+  createOfficialContactSpreadsheet,
+  syncAllContactRequestsToSheet,
+  initializeContactSheetHeaders,
+  extractContactSpreadsheetId,
+  CONTACT_SHEET_HEADERS
+} from '../services/contactSheetsSync';
+import {
+  getStoredShopSheetId,
+  setStoredShopSheetId,
+  getStoredShopSheetTitle,
+  createOfficialShopSpreadsheet,
+  syncAllShopRecordsToSheet,
+  initializeShopSheetHeaders,
+  extractShopSpreadsheetId,
+  SHOP_SHEET_HEADERS
+} from '../services/shopSheetsSync';
 import { 
   getAccessToken, 
   signInWithWorkspaceGoogle, 
@@ -125,6 +160,489 @@ export const WorkspaceHub: React.FC = () => {
     description: '',
     onConfirm: async () => {}
   });
+
+  // Career Recruitment Google Sheets integration state
+  const [recruitmentSheetId, setRecruitmentSheetId] = useState<string>(getStoredRecruitmentSheetId() || '');
+  const [recruitmentSheetTitle, setRecruitmentSheetTitle] = useState<string>(getStoredRecruitmentSheetTitle());
+  const [recruitmentSyncCount, setRecruitmentSyncCount] = useState<number>(() => {
+    try {
+      return parseInt(localStorage.getItem(RECRUITMENT_SHEET_SYNC_COUNT_KEY) || '0', 10);
+    } catch {
+      return 0;
+    }
+  });
+  const [inputRecruitmentSheetId, setInputRecruitmentSheetId] = useState<string>('');
+  const [isSyncingRecruitment, setIsSyncingRecruitment] = useState(false);
+  const [isCreatingRecruitmentSheet, setIsCreatingRecruitmentSheet] = useState(false);
+  const [recruitmentFeedback, setRecruitmentFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [recentApplications, setRecentApplications] = useState<any[]>([]);
+
+  // Fetch server config for recruitment sheet on mount
+  useEffect(() => {
+    fetch('/api/workspace/recruitment-sheet-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && data.config?.spreadsheetId) {
+          setRecruitmentSheetId(data.config.spreadsheetId);
+          setStoredRecruitmentSheetId(data.config.spreadsheetId, data.config.title);
+          if (data.config.title) setRecruitmentSheetTitle(data.config.title);
+        }
+      })
+      .catch(() => {});
+
+    // Also load recent applications count
+    fetch('/api/careers/applications?limit=6')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.applications)) {
+          setRecentApplications(data.applications);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleConnectExistingRecruitmentSheet = async () => {
+    const cleanId = inputRecruitmentSheetId.trim();
+    if (!cleanId) {
+      setRecruitmentFeedback({ message: 'Please enter a valid Google Spreadsheet ID.', type: 'error' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setRecruitmentFeedback(null);
+
+      // Verify token
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in to Google Workspace first using the button at the top.');
+      }
+
+      // Initialize headers on the target sheet
+      await initializeRecruitmentSheetHeaders(cleanId, currentToken);
+
+      // Save locally
+      setStoredRecruitmentSheetId(cleanId, 'Connected Recruitment Sheet');
+      setRecruitmentSheetId(cleanId);
+      setInputRecruitmentSheetId('');
+
+      // Save on server
+      await fetch('/api/workspace/recruitment-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: cleanId, title: 'Connected Recruitment Sheet' })
+      });
+
+      setRecruitmentFeedback({
+        message: `Successfully connected Google Sheet (${cleanId})! Header columns verified.`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setRecruitmentFeedback({ message: err.message || 'Failed to connect spreadsheet.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateOfficialRecruitmentSheet = async () => {
+    try {
+      setIsCreatingRecruitmentSheet(true);
+      setRecruitmentFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in with Google Workspace first to create spreadsheets.');
+      }
+
+      const res = await createOfficialRecruitmentSpreadsheet('E-Lawyers - Recruitment Applications 2026', currentToken);
+      setRecruitmentSheetId(res.spreadsheetId);
+      setRecruitmentSheetTitle(res.title);
+
+      // Persist to server
+      await fetch('/api/workspace/recruitment-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: res.spreadsheetId, title: res.title })
+      });
+
+      setRecruitmentFeedback({
+        message: `Official recruitment spreadsheet created successfully! ID: ${res.spreadsheetId}`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setRecruitmentFeedback({ message: err.message || 'Failed to create official spreadsheet.', type: 'error' });
+    } finally {
+      setIsCreatingRecruitmentSheet(false);
+    }
+  };
+
+  const handleBatchSyncApplications = async () => {
+    const targetId = recruitmentSheetId || getStoredRecruitmentSheetId();
+    if (!targetId) {
+      setRecruitmentFeedback({
+        message: 'No recruitment spreadsheet connected yet. Please connect an existing Sheet ID or create a new template first.',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      setIsSyncingRecruitment(true);
+      setRecruitmentFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Google Workspace access token required. Please sign in with Google in /workspace.');
+      }
+
+      const res = await syncAllApplicationsToSheet(targetId, currentToken);
+      setRecruitmentSyncCount(res.totalServerApps);
+      setRecruitmentFeedback({ message: res.message, type: 'success' });
+
+      // Refresh applications list
+      const appsRes = await fetch('/api/careers/applications?limit=6');
+      const appsData = await appsRes.json();
+      if (appsData && appsData.success && Array.isArray(appsData.applications)) {
+        setRecentApplications(appsData.applications);
+      }
+    } catch (err: any) {
+      setRecruitmentFeedback({ message: err.message || 'Failed to sync applications.', type: 'error' });
+    } finally {
+      setIsSyncingRecruitment(false);
+    }
+  };
+
+  // Contact, Inquiries & Meeting Requests Google Sheets integration state
+  const [contactSheetId, setContactSheetId] = useState<string>(getStoredContactSheetId() || '');
+  const [contactSheetTitle, setContactSheetTitle] = useState<string>(getStoredContactSheetTitle());
+  const [inputContactSheetId, setInputContactSheetId] = useState<string>('');
+  const [isSyncingContact, setIsSyncingContact] = useState(false);
+  const [isCreatingContactSheet, setIsCreatingContactSheet] = useState(false);
+  const [contactFeedback, setContactFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [recentContactRequests, setRecentContactRequests] = useState<any[]>([]);
+  const [contactMetrics, setContactMetrics] = useState<{
+    total: number;
+    inquiriesCount: number;
+    meetingsCount: number;
+    syncedCount: number;
+    unsyncedCount: number;
+  }>({
+    total: 0,
+    inquiriesCount: 0,
+    meetingsCount: 0,
+    syncedCount: 0,
+    unsyncedCount: 0
+  });
+
+  const refreshContactRequestsLedger = async () => {
+    try {
+      const res = await fetch('/api/contact/requests?limit=8');
+      const data = await res.json();
+      if (data && data.success) {
+        if (Array.isArray(data.requests)) setRecentContactRequests(data.requests);
+        setContactMetrics({
+          total: data.total || 0,
+          inquiriesCount: data.inquiriesCount || 0,
+          meetingsCount: data.meetingsCount || 0,
+          syncedCount: data.syncedCount || 0,
+          unsyncedCount: data.unsyncedCount || 0
+        });
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetch('/api/workspace/contact-sheet-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && data.config?.spreadsheetId) {
+          setContactSheetId(data.config.spreadsheetId);
+          setStoredContactSheetId(data.config.spreadsheetId, data.config.title);
+          if (data.config.title) setContactSheetTitle(data.config.title);
+        }
+      })
+      .catch(() => {});
+
+    refreshContactRequestsLedger();
+  }, []);
+
+  const handleConnectExistingContactSheet = async () => {
+    const cleanId = extractContactSpreadsheetId(inputContactSheetId);
+    if (!cleanId) {
+      setContactFeedback({ message: 'Please enter a valid Google Spreadsheet ID or URL.', type: 'error' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setContactFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in to Google Workspace first using the button at the top.');
+      }
+
+      await initializeContactSheetHeaders(cleanId, currentToken);
+
+      const sheetTitle = 'Connected Contact & Meetings Sheet';
+      setStoredContactSheetId(cleanId, sheetTitle);
+      setContactSheetId(cleanId);
+      setContactSheetTitle(sheetTitle);
+      setInputContactSheetId('');
+
+      await fetch('/api/workspace/contact-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: cleanId, title: sheetTitle })
+      });
+
+      setContactFeedback({
+        message: `Successfully connected Contact & Meetings Google Sheet (${cleanId})! Unified 16-column headers verified.`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setContactFeedback({ message: err.message || 'Failed to connect Contact & Meetings spreadsheet.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateOfficialContactSheet = async () => {
+    try {
+      setIsCreatingContactSheet(true);
+      setContactFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in with Google Workspace first to create spreadsheets.');
+      }
+
+      const res = await createOfficialContactSpreadsheet(
+        'Accounticca × E-Lawyers — Contact & Meeting Requests 2026',
+        currentToken
+      );
+      setContactSheetId(res.spreadsheetId);
+      setContactSheetTitle(res.title);
+
+      await fetch('/api/workspace/contact-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: res.spreadsheetId, title: res.title })
+      });
+
+      setContactFeedback({
+        message: `Official Contact & Meetings spreadsheet created and connected! ID: ${res.spreadsheetId}`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setContactFeedback({ message: err.message || 'Failed to create Contact & Meetings spreadsheet.', type: 'error' });
+    } finally {
+      setIsCreatingContactSheet(false);
+    }
+  };
+
+  const handleBatchSyncContactRequests = async () => {
+    const targetId = contactSheetId || getStoredContactSheetId();
+    if (!targetId) {
+      setContactFeedback({
+        message: 'No Contact & Meetings spreadsheet connected yet. Please connect an existing Sheet ID or create a new template first.',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      setIsSyncingContact(true);
+      setContactFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Google Workspace access token required. Please sign in with Google in /workspace.');
+      }
+
+      const res = await syncAllContactRequestsToSheet(targetId, currentToken);
+      setContactFeedback({ message: res.message, type: 'success' });
+      await refreshContactRequestsLedger();
+    } catch (err: any) {
+      setContactFeedback({ message: err.message || 'Failed to sync contact & meeting requests.', type: 'error' });
+    } finally {
+      setIsSyncingContact(false);
+    }
+  };
+
+  // Shop Orders & Product Catalog Google Sheets integration state
+  const [shopSheetId, setShopSheetId] = useState<string>(getStoredShopSheetId() || '');
+  const [shopSheetTitle, setShopSheetTitle] = useState<string>(getStoredShopSheetTitle());
+  const [inputShopSheetId, setInputShopSheetId] = useState<string>('');
+  const [isSyncingShop, setIsSyncingShop] = useState(false);
+  const [isCreatingShopSheet, setIsCreatingShopSheet] = useState(false);
+  const [shopFeedback, setShopFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [shopOrdersList, setShopOrdersList] = useState<any[]>([]);
+  const [shopProductsList, setShopProductsList] = useState<any[]>([]);
+  const [shopLedgerFilter, setShopLedgerFilter] = useState<'all' | 'orders' | 'products'>('all');
+  const [shopMetrics, setShopMetrics] = useState<{
+    totalRecords: number;
+    ordersTotal: number;
+    productsTotal: number;
+    publishedProductsCount: number;
+    draftProductsCount: number;
+    totalRevenueBdt: number;
+    syncedOrdersCount: number;
+    unsyncedOrdersCount: number;
+  }>({
+    totalRecords: 0,
+    ordersTotal: 0,
+    productsTotal: 0,
+    publishedProductsCount: 0,
+    draftProductsCount: 0,
+    totalRevenueBdt: 0,
+    syncedOrdersCount: 0,
+    unsyncedOrdersCount: 0
+  });
+
+  const refreshShopLedger = async () => {
+    try {
+      const res = await fetch('/api/shop/orders?limit=20');
+      const data = await res.json();
+      if (data && data.success) {
+        if (Array.isArray(data.orders)) setShopOrdersList(data.orders);
+        if (Array.isArray(data.products)) setShopProductsList(data.products);
+        setShopMetrics({
+          totalRecords: data.totalRecords || 0,
+          ordersTotal: data.ordersTotal || 0,
+          productsTotal: data.productsTotal || 0,
+          publishedProductsCount: data.publishedProductsCount || 0,
+          draftProductsCount: data.draftProductsCount || 0,
+          totalRevenueBdt: data.totalRevenueBdt || 0,
+          syncedOrdersCount: data.syncedOrdersCount || 0,
+          unsyncedOrdersCount: data.unsyncedOrdersCount || 0
+        });
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetch('/api/workspace/shop-sheet-config')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && data.config?.spreadsheetId) {
+          setShopSheetId(data.config.spreadsheetId);
+          setStoredShopSheetId(data.config.spreadsheetId, data.config.title);
+          if (data.config.title) setShopSheetTitle(data.config.title);
+        }
+      })
+      .catch(() => {});
+
+    refreshShopLedger();
+  }, []);
+
+  const handleConnectExistingShopSheet = async () => {
+    const cleanId = extractShopSpreadsheetId(inputShopSheetId);
+    if (!cleanId) {
+      setShopFeedback({ message: 'Please enter a valid Google Spreadsheet ID or URL.', type: 'error' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setShopFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in to Google Workspace first using the button at the top.');
+      }
+
+      await initializeShopSheetHeaders(cleanId, currentToken);
+
+      const sheetTitle = 'Connected Shop Orders & Catalog Master Sheet';
+      setStoredShopSheetId(cleanId, sheetTitle);
+      setShopSheetId(cleanId);
+      setShopSheetTitle(sheetTitle);
+      setInputShopSheetId('');
+
+      await fetch('/api/workspace/shop-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: cleanId, title: sheetTitle })
+      });
+
+      setShopFeedback({
+        message: `Successfully connected Shop Google Sheet (${cleanId})! Unified 16-column headers verified.`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setShopFeedback({ message: err.message || 'Failed to connect Shop spreadsheet.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateOfficialShopSheet = async () => {
+    try {
+      setIsCreatingShopSheet(true);
+      setShopFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Please sign in with Google Workspace first to create spreadsheets.');
+      }
+
+      const res = await createOfficialShopSpreadsheet(
+        'Accounticca × E-Lawyers — Shop Orders & Catalog Master 2026',
+        currentToken
+      );
+      setShopSheetId(res.spreadsheetId);
+      setShopSheetTitle(res.title);
+
+      await fetch('/api/workspace/shop-sheet-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId: res.spreadsheetId, title: res.title })
+      });
+
+      setShopFeedback({
+        message: `Official Shop Orders & Catalog Master spreadsheet created and connected! ID: ${res.spreadsheetId}`,
+        type: 'success'
+      });
+    } catch (err: any) {
+      setShopFeedback({ message: err.message || 'Failed to create Shop spreadsheet.', type: 'error' });
+    } finally {
+      setIsCreatingShopSheet(false);
+    }
+  };
+
+  const handleBatchSyncShopRecords = async () => {
+    const targetId = shopSheetId || getStoredShopSheetId();
+    if (!targetId) {
+      setShopFeedback({
+        message: 'No Shop spreadsheet connected yet. Please connect an existing Sheet ID or create a new template first.',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      setIsSyncingShop(true);
+      setShopFeedback(null);
+
+      const currentToken = token || getAccessToken();
+      if (!currentToken) {
+        throw new Error('Google Workspace access token required. Please sign in with Google in /workspace.');
+      }
+
+      const res = await syncAllShopRecordsToSheet(targetId, currentToken);
+      setShopFeedback({ message: res.message, type: 'success' });
+      await refreshShopLedger();
+    } catch (err: any) {
+      setShopFeedback({ message: err.message || 'Failed to sync Shop orders & catalog products.', type: 'error' });
+    } finally {
+      setIsSyncingShop(false);
+    }
+  };
 
   // Sync token state and auto-load if already permanently connected
   useEffect(() => {
@@ -570,6 +1088,811 @@ export const WorkspaceHub: React.FC = () => {
                         <span>Open Sheet</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* 💼 CAREER APPLICATIONS RECRUITMENT GOOGLE SHEET INTEGRATION */}
+                <div className="bg-white rounded-2xl p-6 border-2 border-emerald-600/30 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-1">
+                        <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Recruitment Sync · /Careers Public Applications</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#10243a]">Career Applications Google Sheet Integration</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Stream all candidate submissions from MTO, Sales &amp; Marketing, Accountant, and Customer Care forms directly into a single consolidated Google Spreadsheet.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleBatchSyncApplications}
+                        disabled={isSyncingRecruitment || !recruitmentSheetId}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition disabled:opacity-50 cursor-pointer shadow-xs"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncingRecruitment ? 'animate-spin' : ''}`} />
+                        <span>{isSyncingRecruitment ? 'Syncing...' : 'Sync All Applications Now'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {recruitmentFeedback && (
+                    <div className={`p-3.5 rounded-xl text-xs flex items-center justify-between gap-3 ${
+                      recruitmentFeedback.type === 'success' 
+                        ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' 
+                        : 'bg-rose-50 text-rose-900 border border-rose-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {recruitmentFeedback.type === 'success' ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                        )}
+                        <span>{recruitmentFeedback.message}</span>
+                      </div>
+                      <button 
+                        onClick={() => setRecruitmentFeedback(null)} 
+                        className="text-[11px] font-bold underline opacity-70 hover:opacity-100 cursor-pointer"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Connected Sheet Display or Setup Options */}
+                  {recruitmentSheetId ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Connected Recruitment Spreadsheet
+                          </div>
+                          <div className="text-sm font-bold text-[#10243a] flex items-center gap-2 mt-0.5">
+                            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                            <span>{recruitmentSheetTitle}</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                            ID: <span className="text-slate-800 font-semibold">{recruitmentSheetId}</span> · Sheet Tab: <span className="text-emerald-700 font-semibold">Applications</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <a
+                            href={`https://docs.google.com/spreadsheets/d/${recruitmentSheetId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition shadow-xs"
+                          >
+                            <span>Open in Google Sheets</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+
+                          <button
+                            onClick={() => {
+                              const proceed = window.confirm('Do you want to switch or disconnect this recruitment Google Sheet?');
+                              if (proceed) {
+                                setStoredRecruitmentSheetId('');
+                                setRecruitmentSheetId('');
+                              }
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-white text-xs font-semibold transition"
+                          >
+                            Switch Sheet
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Header columns preview */}
+                      <div className="pt-2 border-t border-slate-200/70">
+                        <div className="text-[11px] text-slate-500 font-medium mb-1.5">
+                          Standardized Row Structure (18 Columns):
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {SHEET_HEADERS.map((h, i) => (
+                            <span key={i} className="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 bg-emerald-50/50 border border-emerald-200/80 rounded-xl space-y-4">
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+                          Connect or Create Recruitment Google Sheet
+                        </h4>
+                        <p className="text-xs text-slate-600">
+                          Paste your existing Google Spreadsheet ID to sync into an existing sheet, or click below to automatically create and format an official recruitment sheet with frozen headers.
+                        </p>
+                      </div>
+
+                      {/* Option A: Paste Existing ID */}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                        <div className="relative flex-1">
+                          <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={inputRecruitmentSheetId}
+                            onChange={(e) => setInputRecruitmentSheetId(e.target.value)}
+                            placeholder="Paste Google Spreadsheet ID (e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms)"
+                            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-600"
+                          />
+                        </div>
+                        <button
+                          onClick={handleConnectExistingRecruitmentSheet}
+                          disabled={loading || !inputRecruitmentSheetId.trim()}
+                          className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition disabled:opacity-40 whitespace-nowrap cursor-pointer"
+                        >
+                          Connect Existing Sheet
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        <div className="flex-1 border-b border-slate-200"></div>
+                        <span>OR</span>
+                        <div className="flex-1 border-b border-slate-200"></div>
+                      </div>
+
+                      {/* Option B: Create 1-Click Template Sheet */}
+                      <div>
+                        <button
+                          onClick={handleCreateOfficialRecruitmentSheet}
+                          disabled={isCreatingRecruitmentSheet}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition shadow-xs disabled:opacity-50 cursor-pointer"
+                        >
+                          <Plus className={`w-4 h-4 ${isCreatingRecruitmentSheet ? 'animate-spin' : ''}`} />
+                          <span>{isCreatingRecruitmentSheet ? 'Generating Sheet...' : 'Create & Connect Official Recruitment Spreadsheet'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recent Applications Preview */}
+                  {recentApplications.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#10243a]">Recent Candidate Submissions (/Careers)</span>
+                        <span className="text-slate-500 font-medium">Showing latest {recentApplications.length} entries</span>
+                      </div>
+
+                      <div className="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                            <tr>
+                              <th className="py-2.5 px-3">Reference ID</th>
+                              <th className="py-2.5 px-3">Position</th>
+                              <th className="py-2.5 px-3">Candidate Name</th>
+                              <th className="py-2.5 px-3">Email &amp; Phone</th>
+                              <th className="py-2.5 px-3">Submitted</th>
+                              <th className="py-2.5 px-3 text-right">Sheet Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {recentApplications.map((app) => (
+                              <tr key={app.id || app.referenceId} className="hover:bg-slate-50/60">
+                                <td className="py-2.5 px-3 font-mono font-bold text-[#10243a]">
+                                  {app.referenceId}
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-800 font-medium">
+                                  {app.position || 'Applicant'}
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-900 font-semibold">
+                                  {app.candidateName}
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-600 font-mono text-[11px]">
+                                  <div>{app.candidateEmail}</div>
+                                  <div className="text-slate-500">{app.phone}</div>
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-500 text-[11px]">
+                                  {app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'Recent'}
+                                </td>
+                                <td className="py-2.5 px-3 text-right">
+                                  {app.sheetSynced ? (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                      <span>Synced</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                      <span>Local Record</span>
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 📞 CONTACT, INQUIRIES & MEETING REQUESTS GOOGLE SHEET INTEGRATION */}
+                <div className="bg-white rounded-2xl p-6 border-2 border-teal-600/30 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-teal-800 uppercase tracking-wider mb-1">
+                        <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                        <span>Client Advisory Sync · /contact Inquiries &amp; Meetings</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#10243a]">
+                        Contact, Inquiries &amp; Meeting Requests Google Sheet Integration
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Automatically save all General Service Inquiries and Scheduled Consultation Meetings from the <code className="text-teal-800 font-semibold">/contact</code> page into a unified Google Spreadsheet with a <span className="font-semibold text-slate-700">Request Type</span> column.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleBatchSyncContactRequests}
+                        disabled={isSyncingContact || !contactSheetId}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 text-white text-xs font-bold hover:bg-teal-800 transition disabled:opacity-50 cursor-pointer shadow-xs"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncingContact ? 'animate-spin' : ''}`} />
+                        <span>{isSyncingContact ? 'Syncing...' : 'Sync All Contact & Meeting Requests'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Live Ledger Summary Counters */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Requests</div>
+                      <div className="text-xl font-black text-slate-900 mt-0.5">{contactMetrics.total}</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200">
+                      <div className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">Service Inquiries</div>
+                      <div className="text-xl font-black text-emerald-900 mt-0.5">{contactMetrics.inquiriesCount}</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-teal-50/60 border border-teal-200">
+                      <div className="text-[11px] font-semibold text-teal-800 uppercase tracking-wider">Consultation Meetings</div>
+                      <div className="text-xl font-black text-teal-900 mt-0.5">{contactMetrics.meetingsCount}</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Synced / Pending</div>
+                      <div className="text-xl font-black text-slate-900 mt-0.5">
+                        <span className="text-emerald-700">{contactMetrics.syncedCount}</span>
+                        <span className="text-slate-400 text-sm font-normal"> / {contactMetrics.unsyncedCount} pending</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {contactFeedback && (
+                    <div className={`p-3.5 rounded-xl text-xs flex items-center justify-between gap-3 ${
+                      contactFeedback.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                        : 'bg-rose-50 text-rose-900 border border-rose-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {contactFeedback.type === 'success' ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                        )}
+                        <span>{contactFeedback.message}</span>
+                      </div>
+                      <button
+                        onClick={() => setContactFeedback(null)}
+                        className="text-[11px] font-bold underline opacity-70 hover:opacity-100 cursor-pointer"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Connected Contact Sheet Display or Setup Options */}
+                  {contactSheetId ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Connected Contact &amp; Meetings Spreadsheet
+                          </div>
+                          <div className="text-sm font-bold text-[#10243a] flex items-center gap-2 mt-0.5">
+                            <FileSpreadsheet className="w-4 h-4 text-teal-600" />
+                            <span>{contactSheetTitle}</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                            ID: <span className="text-slate-800 font-semibold">{contactSheetId}</span> · Sheet Tab: <span className="text-teal-700 font-semibold">Requests</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <a
+                            href={`https://docs.google.com/spreadsheets/d/${contactSheetId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-700 text-white text-xs font-bold hover:bg-teal-800 transition shadow-xs"
+                          >
+                            <span>Open in Google Sheets</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+
+                          <button
+                            onClick={() => {
+                              setStoredContactSheetId('');
+                              setContactSheetId('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-white text-xs font-semibold transition cursor-pointer"
+                          >
+                            Switch Sheet
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Header columns preview */}
+                      <div className="pt-2 border-t border-slate-200/70">
+                        <div className="text-[11px] text-slate-500 font-medium mb-1.5">
+                          Unified Contact &amp; Meeting Row Structure (16 Columns):
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {CONTACT_SHEET_HEADERS.map((h, i) => (
+                            <span key={i} className="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 bg-teal-50/50 border border-teal-200/80 rounded-xl space-y-4">
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-teal-950 uppercase tracking-wide">
+                          Connect or Create Dedicated Contact &amp; Meetings Google Sheet
+                        </h4>
+                        <p className="text-xs text-slate-600">
+                          Paste an existing Google Spreadsheet ID (or full Google Sheets URL) to sync into an existing sheet, or click below to automatically create a dedicated Contact &amp; Meetings Master Sheet.
+                        </p>
+                      </div>
+
+                      {/* Option A: Paste Existing ID or URL */}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                        <div className="relative flex-1">
+                          <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={inputContactSheetId}
+                            onChange={(e) => setInputContactSheetId(e.target.value)}
+                            placeholder="Paste Google Spreadsheet ID or full URL (https://docs.google.com/spreadsheets/d/...)"
+                            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-600"
+                          />
+                        </div>
+                        <button
+                          onClick={handleConnectExistingContactSheet}
+                          disabled={loading || !inputContactSheetId.trim()}
+                          className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition disabled:opacity-40 whitespace-nowrap cursor-pointer"
+                        >
+                          Connect Existing Sheet
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        <div className="flex-1 border-b border-slate-200"></div>
+                        <span>OR</span>
+                        <div className="flex-1 border-b border-slate-200"></div>
+                      </div>
+
+                      {/* Option B: Create 1-Click Template Sheet */}
+                      <div>
+                        <button
+                          onClick={handleCreateOfficialContactSheet}
+                          disabled={isCreatingContactSheet}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-teal-700 text-white text-xs font-bold hover:bg-teal-800 transition shadow-xs disabled:opacity-50 cursor-pointer"
+                        >
+                          <Plus className={`w-4 h-4 ${isCreatingContactSheet ? 'animate-spin' : ''}`} />
+                          <span>
+                            {isCreatingContactSheet
+                              ? 'Generating Sheet...'
+                              : 'Create & Connect Official Contact & Meetings Spreadsheet'}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recent Contact Inquiries & Meetings Preview */}
+                  {recentContactRequests.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#10243a]">Recent Contact Inquiries &amp; Consultation Meetings (/contact)</span>
+                        <span className="text-slate-500 font-medium">Showing latest {recentContactRequests.length} entries</span>
+                      </div>
+
+                      <div className="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                            <tr>
+                              <th className="py-2.5 px-3">Reference ID</th>
+                              <th className="py-2.5 px-3">Request Type</th>
+                              <th className="py-2.5 px-3">Client &amp; Contact</th>
+                              <th className="py-2.5 px-3">Service / Practice Area</th>
+                              <th className="py-2.5 px-3">Schedule / Mode</th>
+                              <th className="py-2.5 px-3 text-right">Sheet Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {recentContactRequests.map((reqItem) => (
+                              <tr key={reqItem.id || reqItem.referenceId} className="hover:bg-slate-50/60">
+                                <td className="py-2.5 px-3 font-mono font-bold text-[#10243a]">
+                                  {reqItem.referenceId}
+                                </td>
+                                <td className="py-2.5 px-3">
+                                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold border ${
+                                    reqItem.requestType === 'Consultation Meeting'
+                                      ? 'bg-teal-50 text-teal-800 border-teal-200'
+                                      : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  }`}>
+                                    {reqItem.requestType}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3">
+                                  <div className="text-slate-900 font-semibold">{reqItem.clientName}</div>
+                                  <div className="text-slate-500 font-mono text-[11px]">{reqItem.email} · {reqItem.phone}</div>
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-800 font-medium">
+                                  <div>{reqItem.serviceArea}</div>
+                                  <div className="text-[11px] text-slate-500">{reqItem.expertiseTopic}</div>
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                                  <div className="font-semibold text-slate-700">{reqItem.preferredDate}</div>
+                                  <div>{reqItem.consultationMode}</div>
+                                </td>
+                                <td className="py-2.5 px-3 text-right">
+                                  {reqItem.sheetSynced ? (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                      <span>Synced</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                      <span>Local Record</span>
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 🛍️ SHOP CATALOG & CUSTOMER ORDERS GOOGLE SHEET INTEGRATION */}
+                <div className="bg-white rounded-2xl p-6 border-2 border-amber-500/35 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-1">
+                        <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Digital Commerce Sync · /shop Catalog &amp; /checkout Orders</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#10243a]">
+                        Shop Catalog &amp; Customer Orders Google Sheet Integration
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Stream both <span className="font-semibold text-slate-700">Customer Orders</span> (placed on <code className="text-amber-800 font-semibold">/checkout</code>) and <span className="font-semibold text-slate-700">Product Catalog Inventory</span> (from <code className="text-amber-800 font-semibold">/shop</code> and <code className="text-amber-800 font-semibold">/admin/shop</code>) into a single unified <code className="text-amber-800 font-semibold">Shop</code> Google Sheet tab.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={handleBatchSyncShopRecords}
+                        disabled={isSyncingShop || !shopSheetId}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-amber-300 border border-amber-400/30 text-xs font-bold hover:bg-slate-800 transition disabled:opacity-50 cursor-pointer shadow-xs whitespace-nowrap"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncingShop ? 'animate-spin' : ''}`} />
+                        <span>{isSyncingShop ? 'Syncing Shop...' : 'Sync All Shop Orders & Catalog'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Live Shop Ledger Summary Counters */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Shop Records</div>
+                      <div className="text-xl font-black text-slate-900 mt-0.5 font-mono tabular-nums">
+                        {shopMetrics.totalRecords}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Unified Sheet Rows</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                      <div className="text-[11px] font-semibold text-amber-900 uppercase tracking-wider">Customer Orders</div>
+                      <div className="text-xl font-black text-amber-950 mt-0.5 font-mono tabular-nums">
+                        {shopMetrics.ordersTotal}
+                      </div>
+                      <div className="text-[11px] text-amber-800 font-mono tabular-nums mt-0.5">
+                        BDT {shopMetrics.totalRevenueBdt.toLocaleString('en-IN')} Revenue
+                      </div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                      <div className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">Catalog Products</div>
+                      <div className="text-xl font-black text-emerald-950 mt-0.5 font-mono tabular-nums">
+                        {shopMetrics.productsTotal}
+                      </div>
+                      <div className="text-[11px] text-emerald-800 font-mono tabular-nums mt-0.5">
+                        {shopMetrics.publishedProductsCount} Live · {shopMetrics.draftProductsCount} Draft
+                      </div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Order Sheet Status</div>
+                      <div className="text-xl font-black text-slate-900 mt-0.5 font-mono tabular-nums">
+                        <span className="text-emerald-700">{shopMetrics.syncedOrdersCount}</span>
+                        <span className="text-slate-400 text-sm font-normal"> / {shopMetrics.unsyncedOrdersCount} pending</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Real-Time + Batch Sync</div>
+                    </div>
+                  </div>
+
+                  {shopFeedback && (
+                    <div className={`p-3.5 rounded-xl text-xs flex items-center justify-between gap-3 ${
+                      shopFeedback.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                        : 'bg-rose-50 text-rose-900 border border-rose-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {shopFeedback.type === 'success' ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                        )}
+                        <span>{shopFeedback.message}</span>
+                      </div>
+                      <button
+                        onClick={() => setShopFeedback(null)}
+                        className="text-[11px] font-bold underline opacity-70 hover:opacity-100 cursor-pointer shrink-0"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Connected Shop Sheet Display or Setup Options */}
+                  {shopSheetId ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Connected Shop Orders &amp; Catalog Spreadsheet
+                          </div>
+                          <div className="text-sm font-bold text-[#10243a] flex items-center gap-2 mt-0.5">
+                            <FileSpreadsheet className="w-4 h-4 text-amber-600" />
+                            <span>{shopSheetTitle}</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                            ID: <span className="text-slate-800 font-semibold">{shopSheetId}</span> · Unified Tab: <span className="text-amber-700 font-semibold">Shop</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <a
+                            href={`https://docs.google.com/spreadsheets/d/${shopSheetId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition shadow-xs whitespace-nowrap"
+                          >
+                            <span>Open in Google Sheets</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+
+                          <button
+                            onClick={() => {
+                              setStoredShopSheetId('');
+                              setShopSheetId('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-white text-xs font-semibold transition cursor-pointer whitespace-nowrap"
+                          >
+                            Switch Sheet
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Header columns preview */}
+                      <div className="pt-2 border-t border-slate-200/70">
+                        <div className="text-[11px] text-slate-500 font-medium mb-1.5">
+                          Unified Shop Row Structure (16 Columns — Customer Orders &amp; Catalog Products):
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {SHOP_SHEET_HEADERS.map((h, i) => (
+                            <span key={i} className="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-mono">
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 bg-amber-50/50 border border-amber-200/80 rounded-xl space-y-4">
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                          Connect or Create Unified Shop Orders &amp; Catalog Google Sheet
+                        </h4>
+                        <p className="text-xs text-slate-600">
+                          Paste an existing Google Spreadsheet ID (or full Google Sheets URL) to sync into an existing sheet, or click below to automatically create an official Shop Orders &amp; Catalog Master Spreadsheet.
+                        </p>
+                      </div>
+
+                      {/* Option A: Paste Existing ID or URL */}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                        <div className="relative flex-1">
+                          <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={inputShopSheetId}
+                            onChange={(e) => setInputShopSheetId(e.target.value)}
+                            placeholder="Paste Google Spreadsheet ID or full URL (https://docs.google.com/spreadsheets/d/...)"
+                            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-600"
+                          />
+                        </div>
+                        <button
+                          onClick={handleConnectExistingShopSheet}
+                          disabled={loading || !inputShopSheetId.trim()}
+                          className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition disabled:opacity-40 whitespace-nowrap cursor-pointer"
+                        >
+                          Connect Existing Sheet
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        <div className="flex-1 border-b border-slate-200"></div>
+                        <span>OR</span>
+                        <div className="flex-1 border-b border-slate-200"></div>
+                      </div>
+
+                      {/* Option B: Create 1-Click Template Sheet */}
+                      <div>
+                        <button
+                          onClick={handleCreateOfficialShopSheet}
+                          disabled={isCreatingShopSheet}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 border border-amber-400/30 text-xs font-bold hover:bg-slate-800 transition shadow-xs disabled:opacity-50 cursor-pointer"
+                        >
+                          <Plus className={`w-4 h-4 ${isCreatingShopSheet ? 'animate-spin' : ''}`} />
+                          <span>
+                            {isCreatingShopSheet
+                              ? 'Generating Master Sheet...'
+                              : 'Create & Connect Official Shop Orders & Catalog Spreadsheet'}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unified Shop Ledger Table (Orders + Catalog Products) */}
+                  {(shopOrdersList.length > 0 || shopProductsList.length > 0) && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                        <span className="font-bold text-[#10243a]">
+                          Unified Shop Ledger Preview (/shop &amp; /checkout)
+                        </span>
+                        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                          {[
+                            { id: 'all' as const, label: `All Records (${shopOrdersList.length + shopProductsList.length})` },
+                            { id: 'orders' as const, label: `Customer Orders (${shopOrdersList.length})` },
+                            { id: 'products' as const, label: `Catalog Products (${shopProductsList.length})` }
+                          ].map((tabItem) => (
+                            <button
+                              key={tabItem.id}
+                              type="button"
+                              onClick={() => setShopLedgerFilter(tabItem.id)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer whitespace-nowrap ${
+                                shopLedgerFilter === tabItem.id
+                                  ? 'bg-white text-slate-900 shadow-2xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              {tabItem.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto max-h-96 overflow-y-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0 z-10">
+                            <tr>
+                              <th className="py-2.5 px-3">Ref / SKU ID</th>
+                              <th className="py-2.5 px-3">Record Type</th>
+                              <th className="py-2.5 px-3">Title / Order Summary</th>
+                              <th className="py-2.5 px-3">Category &amp; Type</th>
+                              <th className="py-2.5 px-3">Amount (BDT)</th>
+                              <th className="py-2.5 px-3">Customer / Maintainer</th>
+                              <th className="py-2.5 px-3 text-right">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {shopLedgerFilter !== 'products' &&
+                              shopOrdersList.map((ord) => (
+                                <tr key={ord.id || ord.referenceId} className="hover:bg-slate-50/60">
+                                  <td className="py-2.5 px-3 font-mono font-bold text-[#10243a] whitespace-nowrap">
+                                    {ord.referenceId}
+                                  </td>
+                                  <td className="py-2.5 px-3 whitespace-nowrap">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                                      Customer Order
+                                    </span>
+                                  </td>
+                                  <td className="py-2.5 px-3">
+                                    <div className="text-slate-900 font-semibold line-clamp-1">{ord.orderSummary}</div>
+                                    <div className="text-[11px] text-slate-500 font-mono">
+                                      {ord.paymentMethod} · TrxID: {ord.trxId}
+                                    </div>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-slate-700">
+                                    <div className="font-medium">{ord.primaryCategory}</div>
+                                    <div className="text-[11px] text-slate-500">{ord.productTypeSummary}</div>
+                                  </td>
+                                  <td className="py-2.5 px-3 font-mono font-bold text-slate-900 tabular-nums whitespace-nowrap">
+                                    BDT {Number(ord.total || 0).toLocaleString('en-IN')}
+                                  </td>
+                                  <td className="py-2.5 px-3">
+                                    <div className="text-slate-900 font-semibold">{ord.customerName}</div>
+                                    <div className="text-[11px] text-slate-500 font-mono">{ord.email} · {ord.phone}</div>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                    {ord.sheetSynced ? (
+                                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                        <span>Synced</span>
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                        <span>Ready to Sync</span>
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            {shopLedgerFilter !== 'orders' &&
+                              shopProductsList.map((prod) => {
+                                const skuId = prod.id?.startsWith('PRD-') ? prod.id : `PRD-${prod.id}`;
+                                const isDraft = prod.status === 'draft';
+                                return (
+                                  <tr key={skuId} className="hover:bg-slate-50/60">
+                                    <td className="py-2.5 px-3 font-mono font-bold text-slate-700 whitespace-nowrap">
+                                      {skuId}
+                                    </td>
+                                    <td className="py-2.5 px-3 whitespace-nowrap">
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                        Catalog Product
+                                      </span>
+                                    </td>
+                                    <td className="py-2.5 px-3">
+                                      <div className="text-slate-900 font-semibold line-clamp-1">{prod.title}</div>
+                                      <div className="text-[11px] text-slate-500">{prod.format}</div>
+                                    </td>
+                                    <td className="py-2.5 px-3 text-slate-700">
+                                      <div className="font-medium">{prod.category}</div>
+                                      <div className="text-[11px] text-slate-500">{prod.productType || 'Templates'}</div>
+                                    </td>
+                                    <td className="py-2.5 px-3 font-mono font-bold text-slate-900 tabular-nums whitespace-nowrap">
+                                      BDT {Number(prod.price || 0).toLocaleString('en-IN')}
+                                    </td>
+                                    <td className="py-2.5 px-3">
+                                      <div className="text-slate-800 font-medium line-clamp-1">
+                                        {prod.authorOrVettedBy || 'Accounticca × E-Lawyers'}
+                                      </div>
+                                      <div className="text-[11px] text-slate-500">Official Repository</div>
+                                    </td>
+                                    <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                      <span
+                                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold border ${
+                                          isDraft
+                                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        }`}
+                                      >
+                                        {isDraft ? 'Draft Hidden' : 'Published Live'}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </div>

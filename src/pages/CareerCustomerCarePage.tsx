@@ -1,3 +1,17 @@
+/*
+REVISED VERSION NOTES
+- Prevents false-positive success receipts when the application API fails.
+- Checks HTTP status and safely parses the API response before confirming submission.
+- Reports HR/candidate notification status only when the backend explicitly confirms it.
+- Validates supporting-document extensions and sizes on the client.
+- Uses a generic typed form-update helper instead of `any` for field values.
+
+IMPORTANT: Client-side file checks are not security controls. The server must independently
+validate fields and uploaded file contents. This current JSON API payload still sends only
+attachment metadata, not the actual CV/document bytes. Implement multipart upload on the
+backend and frontend together before relying on uploaded documents in production.
+*/
+
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
@@ -35,7 +49,8 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
-  HeartHandshake
+  HeartHandshake,
+  TrendingUp
 } from 'lucide-react';
 import { sendApplicationEmail, isEmailJSReady } from '../utils/emailService';
 import type { CareerApplicationData } from '../utils/careerEmailTemplate';
@@ -361,9 +376,9 @@ export const CareerCustomerCarePage: React.FC = () => {
     }, 4500);
   };
 
-  const handleInputChange = (
-    field: keyof CustomerCareFormState,
-    value: any
+  const handleInputChange = <K extends keyof CustomerCareFormState>(
+    field: K,
+    value: CustomerCareFormState[K]
   ) => {
     setFormState(prev => ({
       ...prev,
@@ -432,11 +447,21 @@ export const CareerCustomerCarePage: React.FC = () => {
     if (!files.length) return;
 
     const validNewDocs: FileMeta[] = [];
+    const allowedExtensions = ['.pdf', '.doc', '.docx'];
+    const rejectedMessages: string[] = [];
+
     for (const f of files) {
       if (f.size > MAX_FILE_BYTES) {
-        setDocsError(`"${f.name}" exceeds 10MB limit (${formatBytes(f.size)}). Skipped.`);
+        rejectedMessages.push(`"${f.name}" exceeds the 10MB limit and was skipped.`);
         continue;
       }
+
+      const lowerName = f.name.toLowerCase();
+      if (!allowedExtensions.some(ext => lowerName.endsWith(ext))) {
+        rejectedMessages.push(`"${f.name}" is not a supported file type. Use PDF, DOC, or DOCX.`);
+        continue;
+      }
+
       validNewDocs.push({
         fileName: f.name,
         fileType: f.type || 'application/pdf',
@@ -447,6 +472,9 @@ export const CareerCustomerCarePage: React.FC = () => {
     if (validNewDocs.length > 0) {
       setAcademicDocs(prev => [...prev, ...validNewDocs]);
       showActionFeedback(`Added ${validNewDocs.length} supporting document(s).`);
+    }
+    if (rejectedMessages.length > 0) {
+      setDocsError(rejectedMessages.join(' '));
     }
     if (docsInputRef.current) docsInputRef.current.value = '';
   };
@@ -913,14 +941,39 @@ export const CareerCustomerCarePage: React.FC = () => {
     }
 
     // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log
+    let workspaceAccessToken: string | undefined;
+    let spreadsheetId: string | undefined;
+    try {
+      workspaceAccessToken = localStorage.getItem('workspace_google_access_token') || undefined;
+      spreadsheetId = localStorage.getItem('elaw_recruitment_spreadsheet_id') || undefined;
+    } catch {
+      // ignore storage errors
+    }
+
     try {
       const res = await fetch('/api/careers/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(candidatePayload)
+        body: JSON.stringify({
+          ...candidatePayload,
+          workspaceAccessToken,
+          spreadsheetId
+        })
       });
-      const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(`Application endpoint returned HTTP ${res.status}.`);
+      }
+
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('The application endpoint returned an invalid response.');
+      }
+
+      // A successful HTTP response confirms the endpoint accepted the request.
+      // Email notification status should be based on explicit backend response fields.
       setIsSubmittedToHr(true);
       setIsPreviewVisible(true);
       setSubmissionReceipt({
@@ -928,36 +981,29 @@ export const CareerCustomerCarePage: React.FC = () => {
         candidateName: candidatePayload.fullName,
         candidateEmail: candidatePayload.email,
         hrEmails: data.hrEmails || ['career@elawyersbd.com', 'career@accounticca.com', 'ekram.elawyersbd@gmail.com'],
-        hrNotified: true,
-        candidateNotified: true,
-        emailTransport: data.emailTransport || (emailjsResultNotice ? 'EmailJS & E-Lawyers Mailer Hub' : 'E-Lawyers Cloud Recruitment Gateway'),
+        hrNotified: data.hrNotified === true,
+        candidateNotified: data.candidateNotified === true,
+        emailTransport: data.emailTransport || (emailjsResultNotice ? 'EmailJS notification attempted; server accepted application' : 'Application endpoint accepted request'),
         submittedAt: now.toLocaleString(),
         emailjsNote: emailjsResultNotice
       });
 
       showActionFeedback(
-        `Application ${currentRefId} submitted! E-Lawyers HR team notified at career@elawyersbd.com.`
+        data.hrNotified === true
+          ? `Application ${currentRefId} submitted and HR notification confirmed.`
+          : `Application ${currentRefId} was accepted by the application server. HR notification is not confirmed.`
       );
       setTimeout(() => {
         resultCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 50);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Server submission error:', err);
-      // Fallback submission display
-      setIsSubmittedToHr(true);
-      setIsPreviewVisible(true);
-      setSubmissionReceipt({
-        referenceId: currentRefId,
-        candidateName: candidatePayload.fullName,
-        candidateEmail: candidatePayload.email,
-        hrEmails: ['career@elawyersbd.com', 'career@accounticca.com', 'ekram.elawyersbd@gmail.com'],
-        hrNotified: true,
-        candidateNotified: true,
-        emailTransport: emailjsResultNotice || 'Client Dispatch Logged',
-        submittedAt: now.toLocaleString(),
-        emailjsNote: emailjsResultNotice
-      });
-      showActionFeedback(`Application ${currentRefId} recorded!`);
+      setIsSubmittedToHr(false);
+      setSubmissionReceipt(null);
+      setErrorSummary(
+        'Your application could not be confirmed as submitted. Please check your connection and try again. If you already retried, contact the recruitment team before submitting again.'
+      );
+      showActionFeedback('Submission was not confirmed. Please try again.');
     } finally {
       setIsSubmittingApplication(false);
     }
@@ -993,19 +1039,33 @@ export const CareerCustomerCarePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               <Link
-                to="/Careers/accountant"
-                className="text-xs bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3.5 py-2 rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center gap-1.5 font-semibold"
+                to="/Careers/mto"
+                className="text-xs bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center gap-1.5 font-semibold"
               >
-                <Briefcase className="w-3.5 h-3.5 text-[#167d83]" />
-                <span>Accountant Opening (2)</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>MTO Trainee Opening</span>
               </Link>
               <Link
-                to="/"
+                to="/Careers/sales-marketing"
+                className="text-xs bg-white hover:bg-slate-50 text-slate-700 hover:text-emerald-800 px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center gap-1.5 font-semibold"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Sales &amp; Marketing</span>
+              </Link>
+              <Link
+                to="/Careers/accountant"
+                className="text-xs bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center gap-1.5 font-semibold"
+              >
+                <Briefcase className="w-3.5 h-3.5 text-[#167d83]" />
+                <span>Accountant (2)</span>
+              </Link>
+              <Link
+                to="/Careers"
                 className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors font-semibold"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back to Main Site
+                <ArrowLeft className="w-3.5 h-3.5" /> All Openings
               </Link>
             </div>
           </div>
@@ -1063,7 +1123,7 @@ export const CareerCustomerCarePage: React.FC = () => {
       </section>
 
       {/* Main Container */}
-      <main className="max-w-5xl mx-auto px-4 -mt-8 pb-20">
+      <main className="relative z-20 max-w-5xl mx-auto px-4 -mt-8 pb-20">
         {/* Tab Navigation Pill Card */}
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-2 mb-8 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 w-full sm:w-auto">

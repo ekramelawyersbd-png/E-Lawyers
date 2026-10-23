@@ -78,6 +78,8 @@ import { PublicCertificateVerifyPage } from './pages/PublicCertificateVerifyPage
 import { AdminLmsDashboardPage } from './pages/AdminLmsDashboardPage';
 import { CareerAccountantPage } from './pages/CareerAccountantPage';
 import { CareerCustomerCarePage } from './pages/CareerCustomerCarePage';
+import { CareerMtoPage } from './pages/CareerMtoPage';
+import { CareerSalesMarketingPage } from './pages/CareerSalesMarketingPage';
 import { CareersHubPage } from './pages/CareersHubPage';
 
 export default function App() {
@@ -236,6 +238,24 @@ export default function App() {
                     <Route path="Careers/customer-care-executive" element={<CareerCustomerCarePage />} />
                     <Route path="careers/customer-care-executive" element={<CareerCustomerCarePage />} />
                     <Route path="e_lawyers_customer_care_application.html" element={<CareerCustomerCarePage />} />
+                    <Route path="Careers/mto" element={<CareerMtoPage />} />
+                    <Route path="Careers/mto=" element={<CareerMtoPage />} />
+                    <Route path="careers/mto" element={<CareerMtoPage />} />
+                    <Route path="careers/mto=" element={<CareerMtoPage />} />
+                    <Route path="Careers/management-trainee" element={<CareerMtoPage />} />
+                    <Route path="careers/management-trainee" element={<CareerMtoPage />} />
+                    <Route path="Careers/management-trainee-officer" element={<CareerMtoPage />} />
+                    <Route path="careers/management-trainee-officer" element={<CareerMtoPage />} />
+                    <Route path="Careers/sales-marketing" element={<CareerSalesMarketingPage />} />
+                    <Route path="Careers/sales-marketing=" element={<CareerSalesMarketingPage />} />
+                    <Route path="careers/sales-marketing" element={<CareerSalesMarketingPage />} />
+                    <Route path="careers/sales-marketing=" element={<CareerSalesMarketingPage />} />
+                    <Route path="Careers/sales" element={<CareerSalesMarketingPage />} />
+                    <Route path="careers/sales" element={<CareerSalesMarketingPage />} />
+                    <Route path="Careers/marketing" element={<CareerSalesMarketingPage />} />
+                    <Route path="careers/marketing" element={<CareerSalesMarketingPage />} />
+                    <Route path="Careers/sales-marketing-executive" element={<CareerSalesMarketingPage />} />
+                    <Route path="careers/sales-marketing-executive" element={<CareerSalesMarketingPage />} />
                     <Route path="Careers" element={<CareersHubPage />} />
                     <Route path="Careers=" element={<CareersHubPage />} />
                     <Route path="careers" element={<CareersHubPage />} />

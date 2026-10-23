@@ -24,7 +24,9 @@ import {
   Check,
   ExternalLink,
   DollarSign,
-  ChevronDown
+  ChevronDown,
+  TrendingUp,
+  Target
 } from 'lucide-react';
 
 interface FaqItem {
@@ -60,7 +62,7 @@ const FAQS: FaqItem[] = [
 ];
 
 export const CareersHubPage: React.FC = () => {
-  const [selectedRoleTab, setSelectedRoleTab] = useState<'both' | 'accountant' | 'customercare'>('both');
+  const [selectedRoleTab, setSelectedRoleTab] = useState<'both' | 'accountant' | 'customercare' | 'mto' | 'sales'>('both');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // Status lookup state
@@ -118,7 +120,7 @@ export const CareersHubPage: React.FC = () => {
         } else {
           setStatusResult({
             found: false,
-            message: `No record found with Reference ID or Email "${query}". Please double-check your Reference ID (e.g. ELAW-ACC-... or ELAW-CCE-...).`
+            message: `No record found with Reference ID or Email "${query}". Please double-check your Reference ID (e.g. ELAW-SME-..., ELAW-MTO-..., ELAW-ACC-..., or ELAW-CCE-...).`
           });
         }
       }
@@ -140,7 +142,7 @@ export const CareersHubPage: React.FC = () => {
     <div className="min-h-screen bg-[#f3f6f9] text-[#243446] font-sans pb-24">
       <ServiceSEO
         title="Careers & Current Openings | E-Lawyers Legal & Business Consultancy Firm"
-        description="Join E-Lawyers Legal & Business Consultancy Firm in Panthapath, Dhaka. Explore career opportunities and apply online for Accountant (Accounts Division) and Customer Care Executive (Female). Deadline: Oct 31, 2026."
+        description="Join E-Lawyers Legal & Business Consultancy Firm in Panthapath, Dhaka. Explore career opportunities and apply online for Management Trainee Officer (MTO), Accountant (Accounts Division), and Customer Care Executive (Female). Deadline: Oct 31, 2026."
         canonicalUrl="/Careers"
         serviceType="Job Recruitment & Career Opportunities"
       />
@@ -190,31 +192,46 @@ export const CareersHubPage: React.FC = () => {
             </p>
 
             {/* Quick 1-Click Action Buttons to Form */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
               <Link
-                to="/Careers/accountant?tab=apply"
-                className="px-5 py-3.5 bg-[#167d83] hover:bg-[#136a70] text-white font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-teal-600/30"
+                to="/Careers/mto?tab=apply"
+                className="px-4 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40"
               >
-                <Briefcase className="w-4 h-4 text-emerald-200" />
-                <span>Apply as Accountant (২ জন)</span>
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>MTO Trainee (একাধিক পদ)</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
               <Link
+                to="/Careers/sales-marketing?tab=apply"
+                className="px-4 py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-emerald-500/40"
+              >
+                <TrendingUp className="w-4 h-4 text-emerald-300" />
+                <span>Sales &amp; Marketing (একাধিক পদ)</span>
+              </Link>
+
+              <Link
+                to="/Careers/accountant?tab=apply"
+                className="px-4 py-3 bg-[#167d83] hover:bg-[#136a70] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-teal-600/30"
+              >
+                <Briefcase className="w-4 h-4 text-emerald-200" />
+                <span>Accountant (২ জন)</span>
+              </Link>
+
+              <Link
                 to="/Careers/customer-care?tab=apply"
-                className="px-5 py-3.5 bg-white hover:bg-amber-50/70 text-amber-900 font-black rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm border-2 border-amber-400"
+                className="px-4 py-3 bg-white hover:bg-amber-50/70 text-amber-900 font-bold rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm border border-amber-300"
               >
                 <Headphones className="w-4 h-4 text-amber-800" />
-                <span>Apply as Customer Care (Female - ২ জন)</span>
-                <ArrowRight className="w-4 h-4 text-amber-800" />
+                <span>Customer Care (Female - ২ জন)</span>
               </Link>
 
               <a
                 href="#check-status"
-                className="px-4 py-3.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5"
+                className="px-3.5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5"
               >
                 <Search className="w-4 h-4 text-[#167d83]" />
-                <span>Check Status</span>
+                <span>Status Desk</span>
               </a>
             </div>
           </div>
@@ -222,13 +239,13 @@ export const CareersHubPage: React.FC = () => {
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-10 pt-6 pb-2 border-t border-slate-200">
             <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-2xl sm:text-3xl font-black text-[#167d83]">4</div>
+              <div className="text-2xl sm:text-3xl font-black text-[#167d83]">Multiple</div>
               <div className="text-xs text-slate-600 font-semibold mt-0.5">Open Vacancies</div>
             </div>
 
             <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-2xl sm:text-3xl font-black text-[#10243a]">2</div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">Key Divisions</div>
+              <div className="text-2xl sm:text-3xl font-black text-[#10243a]">4</div>
+              <div className="text-xs text-slate-600 font-semibold mt-0.5">Key Career Tracks</div>
             </div>
 
             <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
@@ -264,20 +281,42 @@ export const CareersHubPage: React.FC = () => {
             </div>
 
             {/* Role Filter Buttons */}
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs self-start md:self-auto">
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs self-start md:self-auto flex-wrap">
               <button
                 onClick={() => setSelectedRoleTab('both')}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                   selectedRoleTab === 'both'
                     ? 'bg-[#10243a] text-white shadow-sm scale-[1.02]'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                 }`}
               >
-                All Roles (2)
+                All Roles (4)
+              </button>
+              <button
+                onClick={() => setSelectedRoleTab('mto')}
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                  selectedRoleTab === 'mto'
+                    ? 'bg-[#10243a] text-amber-300 shadow-sm scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>MTO Trainee</span>
+              </button>
+              <button
+                onClick={() => setSelectedRoleTab('sales')}
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                  selectedRoleTab === 'sales'
+                    ? 'bg-emerald-700 text-white shadow-sm scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Sales &amp; Marketing</span>
               </button>
               <button
                 onClick={() => setSelectedRoleTab('accountant')}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
                   selectedRoleTab === 'accountant'
                     ? 'bg-[#167d83] text-white shadow-sm scale-[1.02]'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -288,7 +327,7 @@ export const CareersHubPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setSelectedRoleTab('customercare')}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
                   selectedRoleTab === 'customercare'
                     ? 'bg-[#c7a76b] text-[#10243a] shadow-sm scale-[1.02]'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -301,64 +340,104 @@ export const CareersHubPage: React.FC = () => {
           </div>
 
           {/* Quick Direct Link Row - Forward Progression Cards */}
-          <div className="grid sm:grid-cols-2 gap-4 pt-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-5">
+            <Link
+              to="/Careers/mto?tab=apply"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-300/80 hover:border-amber-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] text-amber-300 flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">
+                      Step 1 of 8
+                    </span>
+                    <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider">MTO Batch</span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 mt-0.5">
+                    MTO Trainee (অনলাইন আবেদন)
+                  </div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-amber-800 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+            </Link>
+
+            <Link
+              to="/Careers/sales-marketing?tab=apply"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-slate-50 to-white hover:to-emerald-50 border-2 border-emerald-300/80 hover:border-emerald-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                  <TrendingUp className="w-5 h-5 text-emerald-300" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-1.5 py-0.5 rounded">
+                      Step 1 of 8
+                    </span>
+                    <span className="text-[11px] text-emerald-900 font-bold uppercase tracking-wider">Growth</span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-emerald-800 mt-0.5">
+                    Sales &amp; Marketing Executive
+                  </div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-emerald-800 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+            </Link>
+
             <Link
               to="/Careers/accountant?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-r from-teal-50/90 via-teal-50/50 to-white hover:to-teal-50 border-2 border-teal-200/90 hover:border-teal-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-teal-50/90 via-slate-50 to-white hover:to-teal-50 border-2 border-teal-200/90 hover:border-teal-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
             >
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
                   <Briefcase className="w-5 h-5 text-emerald-300" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-100/80 px-1.5 py-0.5 rounded">
                       Step 1 of 8
                     </span>
-                    <span className="text-xs text-teal-900 font-bold uppercase tracking-wider">Fast-Track Form</span>
+                    <span className="text-[11px] text-teal-900 font-bold uppercase tracking-wider">Fast-Track</span>
                   </div>
-                  <div className="text-sm sm:text-base font-black text-[#10243a] group-hover:text-[#167d83] mt-0.5">
-                    Apply as Accountant (অনলাইন আবেদন)
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-[#167d83] mt-0.5">
+                    Apply as Accountant (হিসাবরক্ষক)
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs font-bold text-teal-700 bg-white/80 px-2.5 py-1.5 rounded-xl border border-teal-200/70 group-hover:bg-[#167d83] group-hover:text-white transition-all">
-                <span className="hidden md:inline">Proceed</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+              <ArrowRight className="w-4 h-4 text-teal-700 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </Link>
 
             <Link
               to="/Careers/customer-care?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white hover:to-amber-50 border-2 border-amber-200/90 hover:border-amber-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-200/90 hover:border-amber-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
             >
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] text-[#10243a] flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] text-[#10243a] flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
                   <Headphones className="w-5 h-5 text-amber-950" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-100/90 px-1.5 py-0.5 rounded">
                       Step 1 of 8
                     </span>
-                    <span className="text-xs text-amber-900 font-bold uppercase tracking-wider">Fast-Track Form</span>
+                    <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider">Customer Care</span>
                   </div>
-                  <div className="text-sm sm:text-base font-black text-[#10243a] group-hover:text-amber-800 mt-0.5">
-                    Apply as Customer Care Executive (অনলাইন আবেদন)
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 mt-0.5">
+                    Apply as Customer Care (নারী কর্মী)
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs font-bold text-amber-900 bg-white/80 px-2.5 py-1.5 rounded-xl border border-amber-200/70 group-hover:bg-[#c7a76b] group-hover:text-[#10243a] transition-all">
-                <span className="hidden md:inline">Proceed</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+              <ArrowRight className="w-4 h-4 text-amber-900 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </Link>
           </div>
         </div>
 
         {/* Detailed Open Positions Showcase - Responsive Grid Layout */}
         <div className={`grid gap-8 items-stretch ${
-          selectedRoleTab === 'both' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-3xl mx-auto w-full'
+          selectedRoleTab === 'both' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 max-w-3xl mx-auto w-full'
         }`}>
           {/* Card 1: Accountant */}
           {(selectedRoleTab === 'both' || selectedRoleTab === 'accountant') && (
@@ -755,6 +834,342 @@ export const CareersHubPage: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Card 3: Management Trainee Officer (MTO) */}
+          {(selectedRoleTab === 'both' || selectedRoleTab === 'mto') && (
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-amber-400 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+              <div>
+                {/* Header Section with Deep Navy-Gold Gradient & Gold Trim */}
+                <div className="bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#1c3c5d] p-6 sm:p-7 text-white border-b-4 border-amber-400 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-44 h-44 bg-amber-400/15 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-teal-400/10 rounded-full blur-xl pointer-events-none"></div>
+
+                  {/* Top Badges Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-[#ddc38f] bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      Accounts, Tax, Legal &amp; Consultancy
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-950/80 px-3.5 py-1.5 rounded-full border border-amber-400/50 shadow-xs">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                      Multiple Openings · Full-Time
+                    </span>
+                  </div>
+
+                  {/* Job Title & Nature */}
+                  <div className="space-y-1.5 relative z-10">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Management Trainee (MTO)
+                      </h3>
+                      <span className="text-xs sm:text-sm font-bold text-[#ddc38f] bg-black/30 border border-[#c7a76b]/40 px-3 py-1 rounded-lg backdrop-blur-xs">
+                        ম্যানেজমেন্ট ট্রেইনি
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-200 font-medium leading-snug">
+                      Practical Rotational Development in Accounts, Tax Compliance, Legal Advisory &amp; Operations Management
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4-Tile Quick Specs Matrix */}
+                <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <GraduationCap className="w-3.5 h-3.5 text-[#167d83]" />
+                      <span>Education</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-[#10243a] leading-tight">
+                      BBA / LL.B / Accounting
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Finance, Law or Management</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <Users className="w-3.5 h-3.5 text-[#167d83]" />
+                      <span>Experience</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-emerald-700 leading-tight">
+                      Fresh Graduates Welcome
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Entry-Level Trainee Program</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <DollarSign className="w-3.5 h-3.5 text-[#167d83]" />
+                      <span>Remuneration</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-emerald-700 leading-tight">
+                      Negotiable Stipend
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">+ 2 Festival Bonuses &amp; Review</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
+                      <span>Workplace</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-[#10243a] leading-tight">
+                      Panthapath, Dhaka
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Corporate HQ Office</div>
+                  </div>
+                </div>
+
+                {/* Card Body & Responsibilities */}
+                <div className="p-6 space-y-4 text-xs sm:text-sm text-slate-700">
+                  <p className="text-slate-600 leading-relaxed">
+                    As a Management Trainee Officer (MTO), you will receive direct on-the-job mentorship from Senior Advocates, Chartered Tax Advisors, and Corporate Consultants, rotating through accounts, tax filings, legal research, and client relationship management.
+                  </p>
+
+                  {/* Key Tasks List */}
+                  <div className="space-y-2 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <div className="font-extrabold text-[#10243a] text-xs uppercase tracking-wider mb-1 flex items-center justify-between">
+                      <span>Core Rotational Responsibilities:</span>
+                      <span className="text-[10px] text-teal-800 font-bold bg-teal-100 px-2 py-0.5 rounded">Multi-Track</span>
+                    </div>
+                    <ul className="space-y-2 text-xs text-slate-700">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Daily office operations, administrative coordination, and cross-departmental tasks</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Supporting accounts documentation, financial record keeping, and tax compliance files</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Assisting legal teams with contract drafting, research, and client communication</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Essential Tool Badges */}
+                  <div>
+                    <div className="text-xs font-bold text-slate-800 mb-2">Required Competencies:</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['MS Word & Excel', 'Analytical Thinking', 'Problem Solving', 'Document Drafting', 'Client Communication', 'Integrity & Confidentiality'].map((tool, idx) => (
+                        <span key={idx} className="text-[11px] bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border border-slate-200 px-2.5 py-1 rounded-md font-medium transition-colors">
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mentorship Box */}
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-teal-50/90 border border-amber-200 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-[#10243a] text-amber-300 flex items-center justify-center font-black text-xs shadow-xs">
+                        MTO
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-[#10243a]">Executive On-the-Job Training</div>
+                        <div className="text-[11px] text-slate-600">Cross-departmental rotation &amp; leadership growth</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-amber-900 bg-white px-2.5 py-1 rounded-md border border-amber-200 whitespace-nowrap shadow-2xs">
+                      Multiple Openings
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* High-Impact Call-To-Action (CTA) Dock */}
+              <div className="p-6 bg-slate-50/90 border-t border-slate-200 space-y-3 mt-auto">
+                <Link
+                  to="/Careers/mto?tab=apply"
+                  className="w-full py-4 px-5 bg-gradient-to-r from-[#10243a] via-[#1c3c5d] to-[#10243a] hover:from-[#193b61] hover:to-[#10243a] text-amber-300 font-black text-sm sm:text-base rounded-2xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group-hover:scale-[1.01] border border-amber-300/40"
+                >
+                  <FileText className="w-5 h-5 text-amber-400" />
+                  <span>Apply Online — MTO Form (অনলাইন আবেদন)</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  <Link
+                    to="/Careers/mto"
+                    className="flex-1 py-2 px-3 text-center text-xs font-bold text-[#10243a] bg-white hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 shadow-2xs"
+                  >
+                    View Job Circular (সম্পূর্ণ বিজ্ঞপ্তি)
+                  </Link>
+                  <span className="text-[11px] text-slate-500 font-semibold bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 whitespace-nowrap">
+                    Deadline: Oct 31, 2026
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Card 4: Sales & Marketing Executive */}
+          {(selectedRoleTab === 'both' || selectedRoleTab === 'sales') && (
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+              <div>
+                {/* Header Section with Deep Emerald Gradient & Gold Trim */}
+                <div className="bg-gradient-to-br from-[#0a231c] via-[#0f3d32] to-[#106b53] p-6 sm:p-7 text-white border-b-4 border-amber-400 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-44 h-44 bg-emerald-400/15 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-amber-400/10 rounded-full blur-xl pointer-events-none"></div>
+
+                  {/* Top Badges Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-emerald-200 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-xs">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
+                      Sales &amp; Business Development
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-emerald-950/80 px-3.5 py-1.5 rounded-full border border-amber-400/50 shadow-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      একাধিক পদ · Full-Time / Part-Time
+                    </span>
+                  </div>
+
+                  {/* Job Title & Nature */}
+                  <div className="space-y-1.5 relative z-10">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Sales &amp; Marketing Executive
+                      </h3>
+                      <span className="text-xs sm:text-sm font-bold text-amber-300 bg-black/30 border border-amber-400/40 px-3 py-1 rounded-lg backdrop-blur-xs">
+                        মার্কেটিং
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-200 font-medium leading-snug">
+                      Client Acquisition, Legal &amp; Tax Solutions Promotion, Corporate Outreach &amp; Account Management
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4-Tile Quick Specs Matrix */}
+                <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <GraduationCap className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Education</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-[#10243a] leading-tight">
+                      BBA / Marketing / Any
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Management or any discipline</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <Users className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Experience</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-emerald-700 leading-tight">
+                      Freshers Welcome
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Prior sales/telemarketing valued</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Remuneration</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-emerald-700 leading-tight">
+                      Negotiable Base
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">+ Sales Commission &amp; Bonuses</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Workplace</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-extrabold text-[#10243a] leading-tight">
+                      Panthapath, Dhaka
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">BTI Centara Grand Office</div>
+                  </div>
+                </div>
+
+                {/* Card Body & Responsibilities */}
+                <div className="p-6 space-y-4 text-xs sm:text-sm text-slate-700">
+                  <p className="text-slate-600 leading-relaxed">
+                    Identify prospective clients, pitch E-Lawyers' suite of corporate legal, company registration (RJSC), taxation, accounting, and business advisory solutions, and build sustainable client relationships to drive firm growth.
+                  </p>
+
+                  {/* Key Tasks List */}
+                  <div className="space-y-2 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <div className="font-extrabold text-[#10243a] text-xs uppercase tracking-wider mb-1 flex items-center justify-between">
+                      <span>Key Sales Responsibilities:</span>
+                      <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded">Growth Engine</span>
+                    </div>
+                    <ul className="space-y-2 text-xs text-slate-700">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Generate new leads via corporate phone calls, email outreach, digital channels, and field networking</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Understand client pain-points and coordinate with legal and tax departments to convert consultations</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Maintain CRM databases, follow-up logs, sales pipelines, and weekly conversion metrics</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Essential Tool Badges */}
+                  <div>
+                    <div className="text-xs font-bold text-slate-800 mb-2">Required Competencies:</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Persuasion & Pitching', 'Corporate Outreach', 'Lead Generation', 'Client Relationship', 'Negotiation Skills', 'Target Drive'].map((tool, idx) => (
+                        <span key={idx} className="text-[11px] bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 px-2.5 py-1 rounded-md font-medium transition-colors">
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Incentive Box */}
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-50/90 via-slate-50 to-amber-50/90 border border-emerald-200 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs shadow-xs">
+                        SME
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-[#10243a]">Performance-Driven Earnings</div>
+                        <div className="text-[11px] text-slate-600">Fixed negotiable base + attractive sales commission</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-emerald-900 bg-white px-2.5 py-1 rounded-md border border-emerald-200 whitespace-nowrap shadow-2xs">
+                      Multiple Openings
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* High-Impact Call-To-Action (CTA) Dock */}
+              <div className="p-6 bg-slate-50/90 border-t border-slate-200 space-y-3 mt-auto">
+                <Link
+                  to="/Careers/sales-marketing?tab=apply"
+                  className="w-full py-4 px-5 bg-gradient-to-r from-[#0a231c] via-[#0f3d32] to-[#106b53] hover:from-[#114b3e] hover:to-[#0a231c] text-amber-300 font-black text-sm sm:text-base rounded-2xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group-hover:scale-[1.01] border border-amber-300/40"
+                >
+                  <TrendingUp className="w-5 h-5 text-amber-400" />
+                  <span>Apply Online — Sales &amp; Marketing Form (অনলাইন আবেদন)</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  <Link
+                    to="/Careers/sales-marketing"
+                    className="flex-1 py-2 px-3 text-center text-xs font-bold text-[#10243a] bg-white hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 shadow-2xs"
+                  >
+                    View Job Circular (সম্পূর্ণ বিজ্ঞপ্তি)
+                  </Link>
+                  <span className="text-[11px] text-slate-500 font-semibold bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 whitespace-nowrap">
+                    Deadline: Oct 31, 2026
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Side-by-Side Detailed Role Comparison Table */}
@@ -773,64 +1188,100 @@ export const CareersHubPage: React.FC = () => {
             <table className="w-full text-left text-xs md:text-sm border-collapse">
               <thead>
                 <tr className="bg-[#10243a] text-white">
-                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 w-1/4">Criteria / Feature</th>
-                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 w-3/8 text-amber-300">
-                    Accountant (Accounts Division)
+                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 w-1/5">Criteria / Feature</th>
+                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 text-amber-300">
+                    Management Trainee (MTO)
                   </th>
-                  <th className="py-3.5 px-4 font-bold w-3/8 text-emerald-300">
-                    Customer Care Executive (Female)
+                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 text-emerald-300">
+                    Sales &amp; Marketing
+                  </th>
+                  <th className="py-3.5 px-4 font-bold border-r border-slate-700 text-teal-300">
+                    Accountant (Accounts)
+                  </th>
+                  <th className="py-3.5 px-4 font-bold text-amber-200">
+                    Customer Care (Female)
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Department</td>
+                  <td className="py-3 px-4 text-slate-900 font-semibold">Accounts, Tax, Legal &amp; Consultancy</td>
+                  <td className="py-3 px-4 text-slate-900 font-semibold">Sales &amp; Marketing (B2B Services)</td>
                   <td className="py-3 px-4 text-slate-900 font-semibold">Accounts &amp; Tax Compliance</td>
                   <td className="py-3 px-4 text-slate-900 font-semibold">Customer Care / Call Center Desk</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Number of Vacancies</td>
-                  <td className="py-3 px-4 font-bold text-[#10243a]">২ জন (Both Male &amp; Female)</td>
-                  <td className="py-3 px-4 font-bold text-[#10243a]">২ জন (Female Candidates Only)</td>
+                  <td className="py-3 px-4 font-bold text-[#10243a]">Multiple Openings</td>
+                  <td className="py-3 px-4 font-bold text-emerald-800">Multiple Openings (Male &amp; Female)</td>
+                  <td className="py-3 px-4 font-bold text-[#10243a]">২ জন (Male &amp; Female)</td>
+                  <td className="py-3 px-4 font-bold text-[#10243a]">২ জন (Female Only)</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Educational Qualification</td>
                   <td className="py-3 px-4 text-slate-800">
-                    BBA / B.Com / M.Com in Accounting, Finance or Business Studies
+                    Bachelor's in BBA, LL.B, Accounting, Finance, Management
                   </td>
                   <td className="py-3 px-4 text-slate-800">
-                    Minimum HSC or Bachelor Degree in any discipline (Honours/Pass/BBA)
+                    Bachelor's in BBA, Marketing, Management or Any Discipline
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    BBA / B.Com / M.Com in Accounting or Finance
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    Minimum HSC or Bachelor Degree in any discipline
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Experience Level</td>
                   <td className="py-3 px-4 text-slate-800">
-                    Fresh graduates warmly welcomed; internship or 1-2 years experience is a plus
+                    Fresh graduates welcome; prior internship/projects valued
                   </td>
                   <td className="py-3 px-4 text-slate-800">
-                    Freshers encouraged; previous call center or customer support experience prioritized
+                    Fresh graduates welcome; sales, telemarketing or B2B exp. valued
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    Freshers welcome; internship or 1-2 years experience is a plus
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    Freshers encouraged; prior customer support exp. prioritized
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Core Competencies</td>
                   <td className="py-3 px-4 text-slate-800">
-                    Bookkeeping, Excel, TDS/VDS deductions, bank reconciliations, attention to detail
+                    Analytical problem-solving, MS Word/Excel, multi-departmental coordination
                   </td>
                   <td className="py-3 px-4 text-slate-800">
-                    Fluent spoken Bengali, polite phone etiquette, patience, active listening, WhatsApp desk
+                    Persuasion, client communication, lead generation, corporate outreach &amp; CRM
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    Bookkeeping, Excel, TDS/VDS deductions, bank reconciliations
+                  </td>
+                  <td className="py-3 px-4 text-slate-800">
+                    Fluent spoken Bengali, polite phone etiquette, WhatsApp desk
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Salary &amp; Benefits</td>
                   <td className="py-3 px-4 font-bold text-emerald-700">
-                    BDT 25,000 – 30,000 / month (Negotiable) + 2 Festival Bonuses
+                    Negotiable + 2 Festival Bonuses + Mentorship
                   </td>
                   <td className="py-3 px-4 font-bold text-emerald-700">
-                    Negotiable based on skills + 2 Festival Bonuses + Performance rewards
+                    Negotiable Base + Commission/Incentives + 2 Festival Bonuses
+                  </td>
+                  <td className="py-3 px-4 font-bold text-emerald-700">
+                    BDT 25,000 – 30,000 / mo + 2 Festival Bonuses
+                  </td>
+                  <td className="py-3 px-4 font-bold text-emerald-700">
+                    Negotiable based on skills + 2 Festival Bonuses
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Location</td>
+                  <td className="py-3 px-4 text-slate-800">Panthapath, Dhaka (On-site)</td>
+                  <td className="py-3 px-4 text-slate-800">Panthapath, Dhaka (On-site)</td>
                   <td className="py-3 px-4 text-slate-800">Panthapath, Dhaka (On-site)</td>
                   <td className="py-3 px-4 text-slate-800">Panthapath, Dhaka (On-site)</td>
                 </tr>
@@ -838,9 +1289,31 @@ export const CareersHubPage: React.FC = () => {
                   <td className="py-3 px-4 font-bold text-slate-700 bg-slate-50/50">Application Deadline</td>
                   <td className="py-3 px-4 font-bold text-amber-800">October 31, 2026</td>
                   <td className="py-3 px-4 font-bold text-amber-800">October 31, 2026</td>
+                  <td className="py-3 px-4 font-bold text-amber-800">October 31, 2026</td>
+                  <td className="py-3 px-4 font-bold text-amber-800">October 31, 2026</td>
                 </tr>
                 <tr className="bg-slate-50/90">
                   <td className="py-3.5 px-4 font-bold text-slate-700">Online Application Form</td>
+                  <td className="py-3.5 px-4">
+                    <Link
+                      to="/Careers/mto?tab=apply"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#10243a] text-amber-300 text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Open MTO Form</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <Link
+                      to="/Careers/sales-marketing?tab=apply"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors shadow-xs"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-200" />
+                      <span>Open Sales Form</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </td>
                   <td className="py-3.5 px-4">
                     <Link
                       to="/Careers/accountant?tab=apply"

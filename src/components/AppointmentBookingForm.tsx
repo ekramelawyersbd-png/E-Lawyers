@@ -35,6 +35,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { generateConsultationChecklistPDF } from '../utils/consultationChecklistPdfGenerator';
+import { getAccessToken } from '../services/workspaceAuth';
+import { getStoredContactSheetId } from '../services/contactSheetsSync';
 
 export interface ExpertiseItem {
   id: string;
@@ -603,6 +605,7 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<AppointmentRecord | null>(null);
+  const [bookingSheetSynced, setBookingSheetSynced] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
 
@@ -729,7 +732,46 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
       console.warn('Note: Stored locally as offline backup or Firestore check:', err);
     }
 
-    // 2. Save locally for instant verification & session recall
+    // 2. Save to Backend Contact & Meetings Ledger + Real-Time Google Sheets Auto-Append
+    let syncedToSheet = false;
+    try {
+      const workspaceAccessToken = getAccessToken();
+      const spreadsheetId = getStoredContactSheetId();
+      const submitRes = await fetch('/api/contact/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referenceId: newAppointment.referenceId,
+          requestType: 'Consultation Meeting',
+          division: activePractice.division,
+          clientName: newAppointment.clientName,
+          email: newAppointment.email,
+          phone: newAppointment.phone,
+          companyName: newAppointment.companyName,
+          serviceArea: newAppointment.practiceArea,
+          expertiseTopic: newAppointment.expertiseArea,
+          consultationMode:
+            newAppointment.mode === 'virtual'
+              ? 'Virtual (Google Meet)'
+              : 'In-Person Chamber (Dhaka)',
+          preferredDate: newAppointment.date,
+          preferredTimeSlot: newAppointment.timeSlot,
+          assignedPartner: `${newAppointment.assignedPartner.name} (${newAppointment.assignedPartner.chamber})`,
+          messageOrNotes: newAppointment.notes || 'Scheduled Consultation Session',
+          status: 'Confirmed Booking',
+          workspaceAccessToken: workspaceAccessToken || undefined,
+          spreadsheetId: spreadsheetId || undefined,
+        }),
+      });
+      if (submitRes.ok) {
+        const submitData = await submitRes.json();
+        syncedToSheet = Boolean(submitData.sheetSynced);
+      }
+    } catch (syncErr) {
+      console.warn('Contact & Meetings sheet ledger sync notice:', syncErr);
+    }
+
+    // 3. Save locally for instant verification & session recall
     try {
       const updated = [newAppointment, ...recentAppointments.slice(0, 4)];
       setRecentAppointments(updated);
@@ -738,6 +780,7 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
       // safe fallback
     }
 
+    setBookingSheetSynced(syncedToSheet);
     setConfirmedBooking(newAppointment);
     setIsSubmitting(false);
   };
@@ -935,7 +978,10 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
                 <span>Confirmation dispatched to: <strong>{confirmedBooking.email}</strong></span>
-                <span className="font-mono text-[11px] text-emerald-700 font-bold">Chamber Partner Brief Prepared</span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-emerald-700 font-bold">
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{bookingSheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}</span>
+                </span>
               </div>
             </div>
 

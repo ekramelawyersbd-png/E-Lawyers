@@ -9,6 +9,7 @@ import {
 import { db } from '../lib/firebase';
 import { SHOP_PRODUCTS, ShopProduct, inferProductType } from '../data/shopProducts';
 import { getStoredAdminToken } from '../contexts/ShopAuthContext';
+import { appendShopProductToSheet } from './shopSheetsSync';
 
 const STORAGE_KEY = 'accounticca_shop_products_catalog';
 const PRODUCTS_UPDATE_EVENT = 'accounticca:products-updated';
@@ -226,6 +227,9 @@ export async function saveProduct(product: ShopProduct): Promise<ShopProduct> {
     console.warn('Could not save product to Firestore, cached locally:', err);
   }
 
+  // 4. Auto-append to connected Workspace Shop Google Sheet (non-blocking)
+  appendShopProductToSheet(normalizedProduct).catch(() => {});
+
   return normalizedProduct;
 }
 
@@ -269,6 +273,9 @@ export async function toggleProductPublishStatus(productId: string): Promise<Sho
   } catch (err) {
     console.warn('Could not sync status toggle to Firestore:', err);
   }
+
+  // Auto-append updated status to connected Workspace Shop Google Sheet (non-blocking)
+  appendShopProductToSheet(updated).catch(() => {});
 
   return updated;
 }

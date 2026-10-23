@@ -30,7 +30,8 @@ import {
   Copy,
   ExternalLink,
   ShieldCheck,
-  Loader2
+  Loader2,
+  TrendingUp
 } from 'lucide-react';
 import { sendEmailJSCareerNotification, isEmailJSConfigured } from '../utils/emailjsService';
 import type { CareerApplicationData } from '../utils/careerEmailTemplate';
@@ -920,11 +921,24 @@ export const CareerAccountantPage: React.FC = () => {
     }
 
     // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log
+    let workspaceAccessToken: string | undefined;
+    let spreadsheetId: string | undefined;
+    try {
+      workspaceAccessToken = localStorage.getItem('workspace_google_access_token') || undefined;
+      spreadsheetId = localStorage.getItem('elaw_recruitment_spreadsheet_id') || undefined;
+    } catch {
+      // ignore storage errors
+    }
+
     try {
       const res = await fetch('/api/careers/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(candidatePayload)
+        body: JSON.stringify({
+          ...candidatePayload,
+          workspaceAccessToken,
+          spreadsheetId
+        })
       });
       const data = await res.json();
 
@@ -1107,19 +1121,33 @@ export const CareerAccountantPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 print:hidden">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap print:hidden">
               <Link
-                to="/Careers/customer-care"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3.5 py-2 rounded-lg border border-slate-200 shadow-2xs transition-all whitespace-nowrap shrink-0"
+                to="/Careers/mto"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all whitespace-nowrap shrink-0"
               >
-                <span>Customer Care Opening (2)</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>MTO Opening</span>
               </Link>
               <Link
-                to="/contact"
+                to="/Careers/sales-marketing"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-emerald-800 px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all whitespace-nowrap shrink-0"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Sales &amp; Marketing</span>
+              </Link>
+              <Link
+                to="/Careers/customer-care"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#10243a] px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs transition-all whitespace-nowrap shrink-0"
+              >
+                <span>Customer Care (2)</span>
+              </Link>
+              <Link
+                to="/Careers"
                 className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
               >
-                <Building2 className="w-3.5 h-3.5" />
-                <span>Office Location</span>
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>All Openings</span>
               </Link>
             </div>
           </div>
@@ -1199,7 +1227,7 @@ export const CareerAccountantPage: React.FC = () => {
       </header>
 
       {/* Main Content Wrap */}
-      <main className="max-w-[960px] mx-auto px-4 sm:px-6 -mt-10 print:mt-2 print:px-0">
+      <main className="relative z-20 max-w-[960px] mx-auto px-4 sm:px-6 -mt-10 print:mt-2 print:px-0">
         {/* View Switcher Tabs (Job Circular vs Online Application) */}
         <div className="bg-white border border-[#dfe6ec] rounded-2xl shadow-sm p-1.5 mb-5 flex items-center justify-between gap-2 print:hidden">
           <div className="flex items-center gap-1">
