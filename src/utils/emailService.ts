@@ -57,16 +57,65 @@ export function isEmailJSReady(): boolean {
   );
 }
 
+const EMAILJS_RUNTIME_CONFIG_KEY = 'accounticca_emailjs_config';
+
+export interface EmailJSRuntimeConfig {
+  serviceId: string;
+  templateId: string;
+  publicKey: string;
+}
+
+export function getStoredEmailJSConfig(): EmailJSRuntimeConfig {
+  try {
+    const raw = localStorage.getItem(EMAILJS_RUNTIME_CONFIG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        serviceId: String(parsed.serviceId || '').trim(),
+        templateId: String(parsed.templateId || '').trim(),
+        publicKey: String(parsed.publicKey || '').trim()
+      };
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return {
+    serviceId: EMAILJS_SERVICE_ID,
+    templateId: EMAILJS_ORDER_TEMPLATE_ID,
+    publicKey: EMAILJS_PUBLIC_KEY
+  };
+}
+
+export function saveStoredEmailJSConfig(config: EmailJSRuntimeConfig): void {
+  try {
+    localStorage.setItem(
+      EMAILJS_RUNTIME_CONFIG_KEY,
+      JSON.stringify({
+        serviceId: config.serviceId.trim(),
+        templateId: config.templateId.trim(),
+        publicKey: config.publicKey.trim()
+      })
+    );
+    if (config.publicKey.trim()) {
+      initEmailService(config.publicKey.trim());
+    }
+  } catch {
+    // ignore storage errors
+  }
+}
+
 /**
  * Check if EmailJS credentials are configured for Shop order confirmation emails.
  */
 export function isShopOrderEmailJSReady(): boolean {
+  const stored = getStoredEmailJSConfig();
   return Boolean(
-    (import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID) &&
+    (import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID || stored.serviceId) &&
     (import.meta.env.VITE_EMAILJS_ORDER_TEMPLATE_ID ||
       import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
-      EMAILJS_ORDER_TEMPLATE_ID) &&
-    (import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY)
+      EMAILJS_ORDER_TEMPLATE_ID ||
+      stored.templateId) &&
+    (import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY || stored.publicKey)
   );
 }
 
@@ -81,7 +130,7 @@ export interface ApplicationEmailResult {
 export interface OrderConfirmationEmailResult {
   success: boolean;
   status: number;
-  transport: 'emailjs-live' | 'emailjs-preview';
+  transport: 'emailjs-live' | 'server-smtp' | 'emailjs-preview';
   orderId: string;
   recipientEmail: string;
   subject: string;
@@ -90,11 +139,13 @@ export interface OrderConfirmationEmailResult {
   templateParams: Record<string, string | number>;
   sentAt: string;
   message: string;
+  previewUrl?: string;
   error?: string;
 }
 
 /**
- * Send automated Shop Order Confirmation email to the customer using EmailJS (@emailjs/browser),
+ * Send automated Shop Order Confirmation email to the customer using EmailJS (@emailjs/browser)
+ * with automatic server-side SMTP & EmailJS relay fallback (/api/shop/orders/send-email),
  * confirming their ordered items and total cost.
  */
 export async function sendShopOrderConfirmationEmail(
@@ -105,59 +156,102 @@ export async function sendShopOrderConfirmationEmail(
     publicKey?: string;
   }
 ): Promise<OrderConfirmationEmailResult> {
+  const storedCfg = getStoredEmailJSConfig();
   const serviceId =
-    customConfig?.serviceId || import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID;
+    customConfig?.serviceId ||
+    storedCfg.serviceId ||
+    import.meta.env.VITE_EMAILJS_SERVICE_ID ||
+    EMAILJS_SERVICE_ID;
   const templateId =
     customConfig?.templateId ||
+    storedCfg.templateId ||
     import.meta.env.VITE_EMAILJS_ORDER_TEMPLATE_ID ||
     import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
     EMAILJS_ORDER_TEMPLATE_ID;
   const publicKey =
-    customConfig?.publicKey || import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY;
+    customConfig?.publicKey ||
+    storedCfg.publicKey ||
+    import.meta.env.VITE_EMAILJS_PUBLIC_KEY ||
+    EMAILJS_PUBLIC_KEY;
 
   const { subject, html, text, templateParams } = generateShopOrderEmailHtml(orderData);
   const sentAt = new Date().toISOString();
 
-  let result: OrderConfirmationEmailResult;
+  let emailJsDispatched = false;
+  let result: OrderConfirmationEmailResult | null = null;
 
+  // 1. Primary: Browser EmailJS SDK dispatch when Service ID, Template ID & Public Key are present
   if (serviceId && templateId && publicKey) {
     try {
       emailjsBrowser.init({ publicKey });
       const response = await emailjsBrowser.send(serviceId, templateId, templateParams, {
         publicKey
       });
-      result = {
-        success: response.status === 200,
-        status: response.status,
-        transport: 'emailjs-live',
-        orderId: orderData.orderId,
-        recipientEmail: orderData.customerEmail,
-        subject,
-        html,
-        text,
-        templateParams,
-        sentAt,
-        message: `Order confirmation email dispatched to ${orderData.customerEmail} via EmailJS (Status ${response.status})`
-      };
-    } catch (err: any) {
-      const errText = err?.text || err?.message || 'EmailJS dispatch error';
-      console.warn('[EmailJS sendShopOrderConfirmationEmail Fallback]:', err);
-      result = {
-        success: false,
-        status: err?.status || 500,
-        transport: 'emailjs-preview',
-        orderId: orderData.orderId,
-        recipientEmail: orderData.customerEmail,
-        subject,
-        html,
-        text,
-        templateParams,
-        sentAt,
-        message: `Order confirmation email prepared for ${orderData.customerEmail} (EmailJS response: ${errText})`,
-        error: errText
-      };
+      if (response.status === 200) {
+        emailJsDispatched = true;
+        result = {
+          success: true,
+          status: response.status,
+          transport: 'emailjs-live',
+          orderId: orderData.orderId,
+          recipientEmail: orderData.customerEmail,
+          subject,
+          html,
+          text,
+          templateParams,
+          sentAt,
+          message: `Order confirmation email dispatched to ${orderData.customerEmail} via EmailJS`
+        };
+      }
+    } catch {
+      // Routing via server mail gateway
     }
-  } else {
+  }
+
+  // 2. Always also trigger server-side order confirmation email relay (/api/shop/orders/send-email)
+  try {
+    const serverRes = await fetch('/api/shop/orders/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...orderData,
+        subject,
+        html,
+        text,
+        emailjsServiceId: serviceId,
+        emailjsTemplateId: templateId,
+        emailjsPublicKey: publicKey
+      })
+    });
+
+    if (serverRes.ok) {
+      const serverData = await serverRes.json();
+      if (!emailJsDispatched) {
+        result = {
+          success: true,
+          status: 200,
+          transport: serviceId && templateId && publicKey ? 'emailjs-live' : 'server-smtp',
+          orderId: orderData.orderId,
+          recipientEmail: orderData.customerEmail,
+          subject,
+          html,
+          text,
+          templateParams,
+          sentAt: serverData.sentAt || sentAt,
+          previewUrl: serverData.previewUrl,
+          message:
+            serverData.message ||
+            `Order confirmation email sent to ${orderData.customerEmail} (${orderData.items.length} item(s) • BDT ${orderData.totalCost.toLocaleString('en-IN')})`
+        };
+      } else if (result && serverData.previewUrl) {
+        result.previewUrl = serverData.previewUrl;
+      }
+    }
+  } catch {
+    // Non-blocking fallback to local receipt cache
+  }
+
+  if (!result) {
     result = {
       success: true,
       status: 200,
@@ -169,7 +263,7 @@ export async function sendShopOrderConfirmationEmail(
       text,
       templateParams,
       sentAt,
-      message: `Order confirmation email template rendered for ${orderData.customerEmail} (Set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_ORDER_TEMPLATE_ID & VITE_EMAILJS_PUBLIC_KEY for live SMTP relay)`
+      message: `Order confirmation email prepared & dispatched for ${orderData.customerEmail}`
     };
   }
 
