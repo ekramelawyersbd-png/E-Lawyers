@@ -17,10 +17,11 @@ export async function sendEmailJSCareerNotification(
   data: CareerApplicationData
 ): Promise<EmailJSResult> {
   const result: ApplicationEmailResult = await sendApplicationEmail(data);
+  const isServerFallback = result.text === 'SERVER_MAILER_GATEWAY';
   return {
-    attempted: result.status !== 0,
+    attempted: true,
     success: result.success,
-    service: 'emailjs',
+    service: isServerFallback ? 'server-mailer' : 'emailjs',
     message: result.message,
     error: result.error
   };

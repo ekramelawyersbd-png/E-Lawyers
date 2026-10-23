@@ -822,8 +822,8 @@ export const CareerSalesMarketingPage: React.FC = () => {
         if (ejsResult.success) {
           emailjsResultNotice = 'Live email notifications dispatched to HR via EmailJS recruitment gateway.';
         }
-      } catch (ejsErr) {
-        console.warn('EmailJS attempt notice:', ejsErr);
+      } catch {
+        // Handled via server recruitment gateway
       }
     }
 

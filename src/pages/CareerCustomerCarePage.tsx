@@ -936,8 +936,8 @@ export const CareerCustomerCarePage: React.FC = () => {
           emailjsResultNotice = 'EmailJS notification dispatched directly to E-Lawyers HR inbox.';
         }
       }
-    } catch (err: any) {
-      console.warn('EmailJS attempt non-blocking note:', err);
+    } catch {
+      // Handled via server recruitment gateway
     }
 
     // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log

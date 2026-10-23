@@ -2232,6 +2232,8 @@ async function startServer() {
     return true;
   }
 
+  const invalidServerEmailJsKeys = new Set<string>();
+
   app.post("/api/shop/orders/send-email", async (req, res) => {
     try {
       const body = req.body || {};
@@ -2274,7 +2276,7 @@ async function startServer() {
       let previewUrl: string | undefined;
       let delivered = false;
 
-      // 1. Optional EmailJS REST API Relay if service_id, template_id & user_id are provided
+      // 1. Optional EmailJS REST API Relay if service_id, template_id & user_id are provided and valid
       const ejsServiceId = String(body.emailjsServiceId || process.env.VITE_EMAILJS_SERVICE_ID || "").trim();
       const ejsTemplateId = String(
         body.emailjsTemplateId ||
@@ -2284,7 +2286,14 @@ async function startServer() {
       ).trim();
       const ejsPublicKey = String(body.emailjsPublicKey || process.env.VITE_EMAILJS_PUBLIC_KEY || "").trim();
 
-      if (ejsServiceId && ejsTemplateId && ejsPublicKey) {
+      if (
+        ejsServiceId &&
+        ejsTemplateId &&
+        ejsPublicKey &&
+        !invalidServerEmailJsKeys.has(ejsPublicKey) &&
+        !ejsPublicKey.toLowerCase().includes("your_") &&
+        !ejsPublicKey.toLowerCase().includes("placeholder")
+      ) {
         try {
           const ejsRes = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
             method: "POST",
@@ -2299,6 +2308,8 @@ async function startServer() {
           if (ejsRes.ok) {
             delivered = true;
             dispatchedTransport = "EmailJS Live Service";
+          } else if (ejsRes.status === 400 || ejsRes.status === 401 || ejsRes.status === 403) {
+            invalidServerEmailJsKeys.add(ejsPublicKey);
           }
         } catch {
           // Non-blocking fallback to SMTP / Ethereal relay

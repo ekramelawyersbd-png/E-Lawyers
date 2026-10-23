@@ -916,8 +916,8 @@ export const CareerAccountantPage: React.FC = () => {
       if (emailjsResult.attempted && emailjsResult.success) {
         emailjsResultNotice = 'EmailJS automated notification successfully triggered.';
       }
-    } catch (err: any) {
-      console.warn('EmailJS attempt non-blocking note:', err);
+    } catch {
+      // Handled via server recruitment gateway
     }
 
     // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log

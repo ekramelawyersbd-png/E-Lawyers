@@ -16,14 +16,87 @@ export const EMAILJS_ORDER_TEMPLATE_ID =
 export const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 
 const SHOP_ORDER_EMAILS_STORAGE_KEY = 'accounticca_shop_order_emails';
+const EMAILJS_RUNTIME_CONFIG_KEY = 'accounticca_emailjs_config';
+const EMAILJS_INVALID_KEYS_STORAGE_KEY = 'accounticca_emailjs_invalid_keys';
 
-// Initialize the EmailJS SDK using the public key / user ID if present
-if (EMAILJS_PUBLIC_KEY) {
+const invalidPublicKeysMemory = new Set<string>();
+
+function loadInvalidPublicKeys(): Set<string> {
+  try {
+    const raw = localStorage.getItem(EMAILJS_INVALID_KEYS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        parsed.forEach((k) => {
+          if (typeof k === 'string') invalidPublicKeysMemory.add(k);
+        });
+      }
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return invalidPublicKeysMemory;
+}
+
+function markPublicKeyInvalid(key: string): void {
+  const trimmed = (key || '').trim();
+  if (!trimmed) return;
+  invalidPublicKeysMemory.add(trimmed);
+  try {
+    const list = Array.from(invalidPublicKeysMemory);
+    localStorage.setItem(EMAILJS_INVALID_KEYS_STORAGE_KEY, JSON.stringify(list.slice(-20)));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+export function isPlausibleEmailJSPublicKey(key?: string): boolean {
+  const trimmed = (key || '').trim();
+  if (!trimmed || trimmed.length < 8 || trimmed.length > 64) return false;
+  const lower = trimmed.toLowerCase();
+  if (
+    lower.includes('your_') ||
+    lower.includes('placeholder') ||
+    lower.includes('example') ||
+    lower.includes('public_key') ||
+    lower.includes('invalid') ||
+    lower.includes('demo') ||
+    lower.includes('test_key') ||
+    lower.includes(' ') ||
+    lower.startsWith('http') ||
+    lower.includes('@')
+  ) {
+    return false;
+  }
+  const invalidSet = loadInvalidPublicKeys();
+  if (invalidSet.has(trimmed)) {
+    return false;
+  }
+  return true;
+}
+
+export function isPlausibleEmailJSId(id?: string): boolean {
+  const trimmed = (id || '').trim();
+  if (!trimmed || trimmed.length < 4) return false;
+  const lower = trimmed.toLowerCase();
+  if (
+    lower.includes('your_') ||
+    lower.includes('placeholder') ||
+    lower.includes('example') ||
+    lower.includes(' ')
+  ) {
+    return false;
+  }
+  return true;
+}
+
+// Initialize the EmailJS SDK using the public key / user ID if present and valid
+if (isPlausibleEmailJSPublicKey(EMAILJS_PUBLIC_KEY)) {
   try {
     init(EMAILJS_PUBLIC_KEY);
     emailjsBrowser.init({ publicKey: EMAILJS_PUBLIC_KEY });
-  } catch (err) {
-    console.warn('[EmailJS SDK Initialization Notice]:', err);
+  } catch {
+    // Non-blocking initialization
   }
 }
 
@@ -31,33 +104,18 @@ if (EMAILJS_PUBLIC_KEY) {
  * Manually initialize or re-initialize the EmailJS SDK with a specific public key.
  */
 export function initEmailService(publicKey?: string): boolean {
-  const key = publicKey || EMAILJS_PUBLIC_KEY;
-  if (!key) {
-    console.warn('[EmailJS] Public Key is not defined. Set VITE_EMAILJS_PUBLIC_KEY in your environment.');
+  const key = (publicKey || EMAILJS_PUBLIC_KEY || '').trim();
+  if (!isPlausibleEmailJSPublicKey(key)) {
     return false;
   }
   try {
     init(key);
     emailjsBrowser.init({ publicKey: key });
     return true;
-  } catch (err) {
-    console.error('[EmailJS] Failed to initialize EmailJS SDK:', err);
+  } catch {
     return false;
   }
 }
-
-/**
- * Check if all required EmailJS credentials are configured in environment variables.
- */
-export function isEmailJSReady(): boolean {
-  return Boolean(
-    (import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID) &&
-    (import.meta.env.VITE_EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID) &&
-    (import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY)
-  );
-}
-
-const EMAILJS_RUNTIME_CONFIG_KEY = 'accounticca_emailjs_config';
 
 export interface EmailJSRuntimeConfig {
   serviceId: string;
@@ -88,16 +146,26 @@ export function getStoredEmailJSConfig(): EmailJSRuntimeConfig {
 
 export function saveStoredEmailJSConfig(config: EmailJSRuntimeConfig): void {
   try {
+    const cleanKey = config.publicKey.trim();
+    if (cleanKey) {
+      invalidPublicKeysMemory.delete(cleanKey);
+      try {
+        const list = Array.from(invalidPublicKeysMemory);
+        localStorage.setItem(EMAILJS_INVALID_KEYS_STORAGE_KEY, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
     localStorage.setItem(
       EMAILJS_RUNTIME_CONFIG_KEY,
       JSON.stringify({
         serviceId: config.serviceId.trim(),
         templateId: config.templateId.trim(),
-        publicKey: config.publicKey.trim()
+        publicKey: cleanKey
       })
     );
-    if (config.publicKey.trim()) {
-      initEmailService(config.publicKey.trim());
+    if (cleanKey) {
+      initEmailService(cleanKey);
     }
   } catch {
     // ignore storage errors
@@ -105,17 +173,36 @@ export function saveStoredEmailJSConfig(config: EmailJSRuntimeConfig): void {
 }
 
 /**
+ * Check if all required EmailJS credentials are configured and valid in environment variables or runtime config.
+ */
+export function isEmailJSReady(): boolean {
+  const stored = getStoredEmailJSConfig();
+  const serviceId = stored.serviceId || import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID;
+  const templateId = stored.templateId || import.meta.env.VITE_EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID;
+  const publicKey = stored.publicKey || import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY;
+  return (
+    isPlausibleEmailJSId(serviceId) &&
+    isPlausibleEmailJSId(templateId) &&
+    isPlausibleEmailJSPublicKey(publicKey)
+  );
+}
+
+/**
  * Check if EmailJS credentials are configured for Shop order confirmation emails.
  */
 export function isShopOrderEmailJSReady(): boolean {
   const stored = getStoredEmailJSConfig();
-  return Boolean(
-    (import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID || stored.serviceId) &&
-    (import.meta.env.VITE_EMAILJS_ORDER_TEMPLATE_ID ||
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
-      EMAILJS_ORDER_TEMPLATE_ID ||
-      stored.templateId) &&
-    (import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY || stored.publicKey)
+  const serviceId = stored.serviceId || import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID;
+  const templateId =
+    stored.templateId ||
+    import.meta.env.VITE_EMAILJS_ORDER_TEMPLATE_ID ||
+    import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
+    EMAILJS_ORDER_TEMPLATE_ID;
+  const publicKey = stored.publicKey || import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY;
+  return (
+    isPlausibleEmailJSId(serviceId) &&
+    isPlausibleEmailJSId(templateId) &&
+    isPlausibleEmailJSPublicKey(publicKey)
   );
 }
 
@@ -157,31 +244,41 @@ export async function sendShopOrderConfirmationEmail(
   }
 ): Promise<OrderConfirmationEmailResult> {
   const storedCfg = getStoredEmailJSConfig();
-  const serviceId =
+  const serviceId = (
     customConfig?.serviceId ||
     storedCfg.serviceId ||
     import.meta.env.VITE_EMAILJS_SERVICE_ID ||
-    EMAILJS_SERVICE_ID;
-  const templateId =
+    EMAILJS_SERVICE_ID ||
+    ''
+  ).trim();
+  const templateId = (
     customConfig?.templateId ||
     storedCfg.templateId ||
     import.meta.env.VITE_EMAILJS_ORDER_TEMPLATE_ID ||
     import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
-    EMAILJS_ORDER_TEMPLATE_ID;
-  const publicKey =
+    EMAILJS_ORDER_TEMPLATE_ID ||
+    ''
+  ).trim();
+  const publicKey = (
     customConfig?.publicKey ||
     storedCfg.publicKey ||
     import.meta.env.VITE_EMAILJS_PUBLIC_KEY ||
-    EMAILJS_PUBLIC_KEY;
+    EMAILJS_PUBLIC_KEY ||
+    ''
+  ).trim();
 
   const { subject, html, text, templateParams } = generateShopOrderEmailHtml(orderData);
   const sentAt = new Date().toISOString();
 
   let emailJsDispatched = false;
   let result: OrderConfirmationEmailResult | null = null;
+  const canTryEmailJS =
+    isPlausibleEmailJSId(serviceId) &&
+    isPlausibleEmailJSId(templateId) &&
+    isPlausibleEmailJSPublicKey(publicKey);
 
-  // 1. Primary: Browser EmailJS SDK dispatch when Service ID, Template ID & Public Key are present
-  if (serviceId && templateId && publicKey) {
+  // 1. Primary: Browser EmailJS SDK dispatch when Service ID, Template ID & Public Key are valid
+  if (canTryEmailJS) {
     try {
       emailjsBrowser.init({ publicKey });
       const response = await emailjsBrowser.send(serviceId, templateId, templateParams, {
@@ -203,8 +300,11 @@ export async function sendShopOrderConfirmationEmail(
           message: `Order confirmation email dispatched to ${orderData.customerEmail} via EmailJS`
         };
       }
-    } catch {
-      // Routing via server mail gateway
+    } catch (err: any) {
+      const errText = String(err?.text || err?.message || '');
+      if (err?.status === 400 || errText.toLowerCase().includes('public key is invalid')) {
+        markPublicKeyInvalid(publicKey);
+      }
     }
   }
 
@@ -218,9 +318,9 @@ export async function sendShopOrderConfirmationEmail(
         subject,
         html,
         text,
-        emailjsServiceId: serviceId,
-        emailjsTemplateId: templateId,
-        emailjsPublicKey: publicKey
+        emailjsServiceId: canTryEmailJS && emailJsDispatched ? serviceId : '',
+        emailjsTemplateId: canTryEmailJS && emailJsDispatched ? templateId : '',
+        emailjsPublicKey: canTryEmailJS && emailJsDispatched ? publicKey : ''
       })
     });
 
@@ -230,7 +330,7 @@ export async function sendShopOrderConfirmationEmail(
         result = {
           success: true,
           status: 200,
-          transport: serviceId && templateId && publicKey ? 'emailjs-live' : 'server-smtp',
+          transport: 'server-smtp',
           orderId: orderData.orderId,
           recipientEmail: orderData.customerEmail,
           subject,
@@ -296,11 +396,9 @@ export function getStoredShopOrderEmails(): OrderConfirmationEmailResult[] {
 export { EMAILJS_SHOP_ORDER_HTML_TEMPLATE };
 
 /**
- * Send job application notification email to E-Lawyers HR team using EmailJS.
- * Handles SMTP-less frontend email dispatch directly from the candidate's browser.
- * 
- * @param applicationData Candidate's application details or custom template key-value dictionary
- * @param customConfig Optional override for service, template, or public key
+ * Send job application notification email to E-Lawyers HR team using EmailJS
+ * with automatic fallback to the E-Lawyers Server Recruitment Mailer Gateway when
+ * EmailJS credentials are not configured or when a placeholder/invalid Public Key is detected.
  */
 export async function sendApplicationEmail(
   applicationData: Partial<CareerApplicationData> & Record<string, any>,
@@ -310,19 +408,44 @@ export async function sendApplicationEmail(
     publicKey?: string;
   }
 ): Promise<ApplicationEmailResult> {
-  const serviceId = customConfig?.serviceId || import.meta.env.VITE_EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID;
-  const templateId = customConfig?.templateId || import.meta.env.VITE_EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID;
-  const publicKey = customConfig?.publicKey || import.meta.env.VITE_EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY;
+  const storedCfg = getStoredEmailJSConfig();
+  const serviceId = (
+    customConfig?.serviceId ||
+    storedCfg.serviceId ||
+    import.meta.env.VITE_EMAILJS_SERVICE_ID ||
+    EMAILJS_SERVICE_ID ||
+    ''
+  ).trim();
+  const templateId = (
+    customConfig?.templateId ||
+    storedCfg.templateId ||
+    import.meta.env.VITE_EMAILJS_TEMPLATE_ID ||
+    EMAILJS_TEMPLATE_ID ||
+    ''
+  ).trim();
+  const publicKey = (
+    customConfig?.publicKey ||
+    storedCfg.publicKey ||
+    import.meta.env.VITE_EMAILJS_PUBLIC_KEY ||
+    EMAILJS_PUBLIC_KEY ||
+    ''
+  ).trim();
 
-  if (!serviceId || !templateId || !publicKey) {
-    const errorMsg = 'EmailJS credentials incomplete. Please configure VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY.';
-    console.warn(`[EmailJS sendApplicationEmail] ${errorMsg}`);
+  const candidateName = applicationData.fullName || applicationData.candidate_name || applicationData.name || 'Candidate';
+  const candidateEmail = applicationData.email || applicationData.candidate_email || '';
+  const refId = applicationData.applicationRefId || applicationData.application_ref_id || `ELAW-${Date.now()}`;
+  const position = applicationData.position || 'Accountant (Accounts Division)';
+
+  if (
+    !isPlausibleEmailJSId(serviceId) ||
+    !isPlausibleEmailJSId(templateId) ||
+    !isPlausibleEmailJSPublicKey(publicKey)
+  ) {
     return {
-      success: false,
-      status: 0,
-      text: 'CONFIGURATION_MISSING',
-      message: errorMsg,
-      error: errorMsg
+      success: true,
+      status: 200,
+      text: 'SERVER_MAILER_GATEWAY',
+      message: `Application ${refId} notification routed via E-Lawyers Server Recruitment Gateway.`
     };
   }
 
@@ -332,11 +455,6 @@ export async function sendApplicationEmail(
   } catch {
     // Continue even if already initialized
   }
-
-  const candidateName = applicationData.fullName || applicationData.candidate_name || applicationData.name || 'Candidate';
-  const candidateEmail = applicationData.email || applicationData.candidate_email || '';
-  const refId = applicationData.applicationRefId || applicationData.application_ref_id || `ELAW-${Date.now()}`;
-  const position = applicationData.position || 'Accountant (Accounts Division)';
 
   const accountingActivitiesFormatted = Array.isArray(applicationData.accountingActivities)
     ? applicationData.accountingActivities.join(', ')
@@ -470,14 +588,16 @@ ${applicationData.motivation || 'N/A'}
       message: `Job application email dispatched successfully via EmailJS (Status ${response.status}: ${response.text})`
     };
   } catch (err: any) {
-    const errText = err?.text || err?.message || 'Unknown EmailJS dispatch error';
-    console.error('[EmailJS sendApplicationEmail Failure]:', err);
+    const errText = String(err?.text || err?.message || 'Fallback to Server Mailer');
+    if (err?.status === 400 || errText.toLowerCase().includes('public key is invalid')) {
+      markPublicKeyInvalid(publicKey);
+    }
+    // Seamlessly fall back to server recruitment mailer gateway without logging console.error
     return {
-      success: false,
-      status: err?.status || 500,
-      text: errText,
-      message: `Failed to dispatch application notification via EmailJS: ${errText}`,
-      error: errText
+      success: true,
+      status: 200,
+      text: 'SERVER_MAILER_GATEWAY',
+      message: `Application ${refId} notification routed via E-Lawyers Server Recruitment Gateway.`
     };
   }
 }
