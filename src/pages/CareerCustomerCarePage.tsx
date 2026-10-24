@@ -52,7 +52,6 @@ import {
   HeartHandshake,
   TrendingUp
 } from 'lucide-react';
-import { sendApplicationEmail, isEmailJSReady } from '../utils/emailService';
 import type { CareerApplicationData } from '../utils/careerEmailTemplate';
 
 interface FileMeta {
@@ -329,7 +328,6 @@ export const CareerCustomerCarePage: React.FC = () => {
     candidateNotified: boolean;
     emailTransport: string;
     submittedAt: string;
-    emailjsNote?: string | null;
   } | null>(null);
 
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -927,20 +925,7 @@ export const CareerCustomerCarePage: React.FC = () => {
       submissionDate: now.toLocaleString()
     };
 
-    // 1. Attempt EmailJS integration if service variables are configured
-    let emailjsResultNotice: string | null = null;
-    try {
-      if (isEmailJSReady()) {
-        const emailjsResult = await sendApplicationEmail(candidatePayload);
-        if (emailjsResult.success) {
-          emailjsResultNotice = 'EmailJS notification dispatched directly to E-Lawyers HR inbox.';
-        }
-      }
-    } catch {
-      // Handled via server recruitment gateway
-    }
-
-    // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log
+    // Transmit to server endpoint for persistence, SMTP dispatch, and registry log
     let workspaceAccessToken: string | undefined;
     let spreadsheetId: string | undefined;
     try {
@@ -983,9 +968,8 @@ export const CareerCustomerCarePage: React.FC = () => {
         hrEmails: data.hrEmails || ['career@elawyersbd.com', 'career@accounticca.com', 'ekram.elawyersbd@gmail.com'],
         hrNotified: data.hrNotified === true,
         candidateNotified: data.candidateNotified === true,
-        emailTransport: data.emailTransport || (emailjsResultNotice ? 'EmailJS notification attempted; server accepted application' : 'Application endpoint accepted request'),
-        submittedAt: now.toLocaleString(),
-        emailjsNote: emailjsResultNotice
+        emailTransport: data.emailTransport || 'Application endpoint accepted request',
+        submittedAt: now.toLocaleString()
       });
 
       showActionFeedback(

@@ -40,7 +40,6 @@ import {
   Share2,
   DollarSign
 } from 'lucide-react';
-import { sendEmailJSCareerNotification, isEmailJSConfigured } from '../utils/emailjsService';
 import type { CareerApplicationData } from '../utils/careerEmailTemplate';
 
 interface FileMeta {
@@ -305,7 +304,6 @@ export const CareerSalesMarketingPage: React.FC = () => {
     candidateNotified: boolean;
     emailTransport: string;
     submittedAt: string;
-    emailjsNote?: string | null;
   } | null>(null);
 
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -815,18 +813,6 @@ export const CareerSalesMarketingPage: React.FC = () => {
       submissionDate: now.toLocaleString()
     };
 
-    let emailjsResultNotice: string | null = null;
-    if (isEmailJSConfigured()) {
-      try {
-        const ejsResult = await sendEmailJSCareerNotification(candidatePayload);
-        if (ejsResult.success) {
-          emailjsResultNotice = 'Live email notifications dispatched to HR via EmailJS recruitment gateway.';
-        }
-      } catch {
-        // Handled via server recruitment gateway
-      }
-    }
-
     let workspaceAccessToken: string | undefined;
     let spreadsheetId: string | undefined;
     try {
@@ -867,9 +853,8 @@ export const CareerSalesMarketingPage: React.FC = () => {
         hrEmails: data.hrEmails || ['career@elawyersbd.com', 'ekram.elawyersbd@gmail.com'],
         hrNotified: data.hrNotified === true,
         candidateNotified: data.candidateNotified === true,
-        emailTransport: data.emailTransport || (emailjsResultNotice ? 'EmailJS recruitment mailer active' : 'Application endpoint accepted request'),
-        submittedAt: now.toLocaleString(),
-        emailjsNote: emailjsResultNotice
+        emailTransport: data.emailTransport || 'Application endpoint accepted request',
+        submittedAt: now.toLocaleString()
       });
 
       showActionFeedback(
@@ -2400,11 +2385,6 @@ export const CareerSalesMarketingPage: React.FC = () => {
                   <p>
                     Our recruitment team will review your qualifications and contact you at <strong>{submissionReceipt.candidateEmail}</strong> for the next interview and sales pitch assessment phase.
                   </p>
-                  {submissionReceipt.emailjsNote && (
-                    <p className="text-[11px] text-teal-800 font-semibold pt-1">
-                      ℹ️ {submissionReceipt.emailjsNote}
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex items-center gap-3">

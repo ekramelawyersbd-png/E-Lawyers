@@ -34,9 +34,7 @@ import { getAccessToken } from '../services/workspaceAuth';
 import { getStoredShopSheetId, appendShopOrderToSheet } from '../services/shopSheetsSync';
 import {
   sendShopOrderConfirmationEmail,
-  EMAILJS_SHOP_ORDER_HTML_TEMPLATE,
-  getStoredEmailJSConfig,
-  saveStoredEmailJSConfig,
+  SHOP_ORDER_HTML_TEMPLATE,
   type OrderConfirmationEmailResult
 } from '../utils/emailService';
 import { generateShopOrderEmailHtml } from '../utils/shopOrderEmailTemplate';
@@ -192,9 +190,6 @@ export const CheckoutPage: React.FC = () => {
     text: string;
     previewUrl?: string;
   } | null>(null);
-  const [showEmailJsSettings, setShowEmailJsSettings] = useState(false);
-  const [emailJsConfig, setEmailJsConfig] = useState(() => getStoredEmailJSConfig());
-  const [emailJsConfigSaved, setEmailJsConfigSaved] = useState(false);
 
   const liveEmailPreview = useMemo(() => {
     const activeItems =
@@ -248,8 +243,8 @@ export const CheckoutPage: React.FC = () => {
     company
   ]);
 
-  const handleCopyEmailJsTemplate = () => {
-    navigator.clipboard.writeText(EMAILJS_SHOP_ORDER_HTML_TEMPLATE);
+  const handleCopyEmailTemplate = () => {
+    navigator.clipboard.writeText(SHOP_ORDER_HTML_TEMPLATE);
     setCopiedTemplate(true);
     setTimeout(() => setCopiedTemplate(false), 2500);
   };
@@ -258,25 +253,20 @@ export const CheckoutPage: React.FC = () => {
     if (!completedOrderSnapshot || !completedOrderNumber) return;
     setResendingEmail(true);
     try {
-      const emailRes = await sendShopOrderConfirmationEmail(
-        {
-          orderId: completedOrderNumber,
-          customerName: fullName.trim() || 'Valued Client',
-          customerEmail: email.trim().toLowerCase(),
-          customerPhone: phone.trim(),
-          companyName: company.trim() || 'Direct Individual Client',
-          items: completedOrderSnapshot.items,
-          subtotal: completedOrderSnapshot.subtotal,
-          discount: completedOrderSnapshot.discount,
-          totalCost: completedOrderSnapshot.total,
-          paymentMethod: completedOrderSnapshot.paymentMethod,
-          trxId: completedOrderSnapshot.trxId,
-          authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
-        },
-        emailJsConfig.serviceId && emailJsConfig.templateId && emailJsConfig.publicKey
-          ? emailJsConfig
-          : undefined
-      );
+      const emailRes = await sendShopOrderConfirmationEmail({
+        orderId: completedOrderNumber,
+        customerName: fullName.trim() || 'Valued Client',
+        customerEmail: email.trim().toLowerCase(),
+        customerPhone: phone.trim(),
+        companyName: company.trim() || 'Direct Individual Client',
+        items: completedOrderSnapshot.items,
+        subtotal: completedOrderSnapshot.subtotal,
+        discount: completedOrderSnapshot.discount,
+        totalCost: completedOrderSnapshot.total,
+        paymentMethod: completedOrderSnapshot.paymentMethod,
+        trxId: completedOrderSnapshot.trxId,
+        authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
+      });
       setOrderEmailResult(emailRes);
     } finally {
       setResendingEmail(false);
@@ -287,12 +277,6 @@ export const CheckoutPage: React.FC = () => {
     navigator.clipboard.writeText('01744883636');
     setCopiedBkash(true);
     setTimeout(() => setCopiedBkash(false), 2000);
-  };
-
-  const handleSaveEmailJsSettings = () => {
-    saveStoredEmailJSConfig(emailJsConfig);
-    setEmailJsConfigSaved(true);
-    setTimeout(() => setEmailJsConfigSaved(false), 2500);
   };
 
   const handleSendTestOrderEmail = async () => {
@@ -332,25 +316,20 @@ export const CheckoutPage: React.FC = () => {
         lineTotal: item.product.price * item.quantity
       }));
 
-      const res = await sendShopOrderConfirmationEmail(
-        {
-          orderId: sampleOrderNum,
-          customerName: fullName.trim() || 'Valued Client',
-          customerEmail: targetEmail,
-          customerPhone: phone.trim() || '+880 17XX-XXXXXX',
-          companyName: company.trim() || 'Direct Individual Client',
-          items: itemsList,
-          subtotal: orderSubtotal,
-          discount: orderDiscount,
-          totalCost: orderTotal,
-          paymentMethod: methodLabel,
-          trxId: resolvedTrxId,
-          authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
-        },
-        emailJsConfig.serviceId && emailJsConfig.templateId && emailJsConfig.publicKey
-          ? emailJsConfig
-          : undefined
-      );
+      const res = await sendShopOrderConfirmationEmail({
+        orderId: sampleOrderNum,
+        customerName: fullName.trim() || 'Valued Client',
+        customerEmail: targetEmail,
+        customerPhone: phone.trim() || '+880 17XX-XXXXXX',
+        companyName: company.trim() || 'Direct Individual Client',
+        items: itemsList,
+        subtotal: orderSubtotal,
+        discount: orderDiscount,
+        totalCost: orderTotal,
+        paymentMethod: methodLabel,
+        trxId: resolvedTrxId,
+        authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
+      });
 
       setOrderEmailResult(res);
       setTestEmailFeedback({
@@ -490,30 +469,25 @@ export const CheckoutPage: React.FC = () => {
       // Non-blocking order ledger fallback
     }
 
-    // Automatically trigger EmailJS Order Confirmation Email with itemized products & total cost
+    // Automatically trigger Order Confirmation Email with itemized products & total cost
     try {
-      const emailConfirmation = await sendShopOrderConfirmationEmail(
-        {
-          orderId: orderNum,
-          customerName: fullName.trim(),
-          customerEmail: email.trim().toLowerCase(),
-          customerPhone: phone.trim(),
-          companyName: company.trim() || 'Direct Individual Client',
-          items: orderItemsPayload,
-          subtotal: orderSubtotal,
-          discount: orderDiscount,
-          totalCost: orderTotal,
-          paymentMethod: methodLabel,
-          trxId: resolvedTrxId,
-          authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
-        },
-        emailJsConfig.serviceId && emailJsConfig.templateId && emailJsConfig.publicKey
-          ? emailJsConfig
-          : undefined
-      );
+      const emailConfirmation = await sendShopOrderConfirmationEmail({
+        orderId: orderNum,
+        customerName: fullName.trim(),
+        customerEmail: email.trim().toLowerCase(),
+        customerPhone: phone.trim(),
+        companyName: company.trim() || 'Direct Individual Client',
+        items: orderItemsPayload,
+        subtotal: orderSubtotal,
+        discount: orderDiscount,
+        totalCost: orderTotal,
+        paymentMethod: methodLabel,
+        trxId: resolvedTrxId,
+        authProvider: activeProvider === 'facebook' ? 'facebook' : 'google'
+      });
       setOrderEmailResult(emailConfirmation);
     } catch {
-      // Non-blocking EmailJS confirmation fallback
+      // Non-blocking order confirmation fallback
     }
 
     setCompletedOrderSnapshot({
@@ -687,15 +661,15 @@ Contact & Advisory: https://blog.accounticca.com/contact
                 >
                   <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>
-                    {orderEmailResult?.transport === 'emailjs-live'
-                      ? `EmailJS Confirmation Sent to ${email}`
-                      : `EmailJS Order Confirmation Triggered (${email})`}
+                    {orderEmailResult?.transport === 'server-smtp'
+                      ? `Order Confirmation Sent to ${email}`
+                      : `Order Confirmation Prepared (${email})`}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* EmailJS Order Confirmation Email Panel */}
+            {/* Order Confirmation Email Panel */}
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -704,7 +678,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   </div>
                   <div>
                     <div className="text-xs font-extrabold text-slate-900 flex items-center gap-2">
-                      <span>Automated EmailJS Order Confirmation</span>
+                      <span>Automated Order Confirmation</span>
                       <span className="text-[11px] font-semibold text-emerald-700">
                         · {completedOrderSnapshot?.items.length || purchasedProducts.length} Item(s) · BDT {(completedOrderSnapshot?.total ?? orderTotal).toLocaleString('en-IN')}
                       </span>
@@ -732,7 +706,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>{resendingEmail ? 'Sending...' : 'Resend via EmailJS'}</span>
+                    <span>{resendingEmail ? 'Sending...' : 'Resend Confirmation'}</span>
                   </button>
                 </div>
               </div>
@@ -761,18 +735,18 @@ Contact & Advisory: https://blog.accounticca.com/contact
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
-                        EmailJS HTML Template
+                        HTML Template
                       </button>
                     </div>
 
                     {emailPreviewTab === 'template' && (
                       <button
                         type="button"
-                        onClick={handleCopyEmailJsTemplate}
+                        onClick={handleCopyEmailTemplate}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
                       >
                         <Copy className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{copiedTemplate ? 'Copied HTML Template!' : 'Copy EmailJS HTML'}</span>
+                        <span>{copiedTemplate ? 'Copied HTML Template!' : 'Copy HTML Template'}</span>
                       </button>
                     )}
                   </div>
@@ -798,8 +772,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   ) : (
                     <div className="space-y-2">
                       <div className="text-[11px] text-slate-600">
-                        Paste this HTML template into your EmailJS Dashboard (Template ID:{' '}
-                        <code className="font-mono font-bold text-slate-900">VITE_EMAILJS_ORDER_TEMPLATE_ID</code>). Dynamic variables include{' '}
+                        Dynamic variables include{' '}
                         <code className="font-mono text-emerald-700">{'{{order_id}}'}</code>,{' '}
                         <code className="font-mono text-emerald-700">{'{{to_name}}'}</code>,{' '}
                         <code className="font-mono text-emerald-700">{'{{{items_rows_html}}}'}</code>,{' '}
@@ -808,7 +781,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         <code className="font-mono text-emerald-700">{'{{total_cost_bdt}}'}</code>.
                       </div>
                       <pre className="p-4 rounded-xl bg-slate-900 text-slate-100 text-[11px] font-mono overflow-x-auto max-h-80 leading-relaxed">
-                        {EMAILJS_SHOP_ORDER_HTML_TEMPLATE}
+                        {SHOP_ORDER_HTML_TEMPLATE}
                       </pre>
                     </div>
                   )}
@@ -1148,7 +1121,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           <div className="text-xs font-extrabold text-emerald-950 flex flex-wrap items-center gap-1.5">
                             <span>Automated Order Confirmation Email</span>
                             <span className="text-[10px] px-2 py-0.5 rounded-md bg-white border border-emerald-200 text-emerald-800 font-bold">
-                              EmailJS + SMTP Active
+                              SMTP Active
                             </span>
                           </div>
                           <p className="text-[11px] text-emerald-800 mt-0.5 truncate">
@@ -1168,14 +1141,6 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         >
                           <Send className="w-3 h-3" />
                           <span>{testEmailSending ? 'Sending...' : 'Send Confirmation Mail'}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowEmailJsSettings((prev) => !prev)}
-                          className="px-2.5 py-2 rounded-xl bg-white hover:bg-emerald-100/60 border border-emerald-200 text-emerald-900 text-[11px] font-bold transition-colors cursor-pointer"
-                          title="Configure EmailJS Service & Template IDs"
-                        >
-                          {showEmailJsSettings ? 'Hide Setup' : 'EmailJS Config'}
                         </button>
                       </div>
                     </div>
@@ -1218,46 +1183,6 @@ Contact & Advisory: https://blog.accounticca.com/contact
                               <ExternalLink className="w-3 h-3" />
                             </a>
                           )}
-                        </div>
-                      </div>
-                    )}
-
-                    {showEmailJsSettings && (
-                      <div className="p-3 bg-white rounded-xl border border-emerald-200 space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-extrabold text-slate-800">
-                            Optional Custom EmailJS Credentials (Overrides Default Mailer)
-                          </span>
-                          <button
-                            type="button"
-                            onClick={handleSaveEmailJsSettings}
-                            className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold cursor-pointer"
-                          >
-                            {emailJsConfigSaved ? 'Saved ✓' : 'Save Keys'}
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                          <input
-                            type="text"
-                            value={emailJsConfig.serviceId}
-                            onChange={(e) => setEmailJsConfig((p) => ({ ...p, serviceId: e.target.value }))}
-                            placeholder="Service ID (service_xxx)"
-                            className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
-                          />
-                          <input
-                            type="text"
-                            value={emailJsConfig.templateId}
-                            onChange={(e) => setEmailJsConfig((p) => ({ ...p, templateId: e.target.value }))}
-                            placeholder="Template ID (template_xxx)"
-                            className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
-                          />
-                          <input
-                            type="text"
-                            value={emailJsConfig.publicKey}
-                            onChange={(e) => setEmailJsConfig((p) => ({ ...p, publicKey: e.target.value }))}
-                            placeholder="Public Key (user_xxx)"
-                            className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
-                          />
                         </div>
                       </div>
                     )}
@@ -1463,7 +1388,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
 
               </div>
 
-              {/* EmailJS Order Confirmation Template Inspector & Live Preview */}
+              {/* Order Confirmation Template Inspector & Live Preview */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -1472,7 +1397,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     </div>
                     <div>
                       <h3 className="text-xs font-extrabold text-slate-900">
-                        Automated EmailJS Order Confirmation
+                        Automated Order Confirmation
                       </h3>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
                         Triggers automatically on submission to confirm your {checkoutItems.length} item(s) and{' '}
@@ -1514,14 +1439,14 @@ Contact & Advisory: https://blog.accounticca.com/contact
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          EmailJS HTML Source
+                          HTML Source
                         </button>
                       </div>
 
                       {emailPreviewTab === 'template' && (
                         <button
                           type="button"
-                          onClick={handleCopyEmailJsTemplate}
+                          onClick={handleCopyEmailTemplate}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition-colors cursor-pointer"
                         >
                           <Copy className="w-3 h-3 text-emerald-400" />
@@ -1542,7 +1467,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                       </div>
                     ) : (
                       <pre className="p-3 rounded-xl bg-slate-900 text-slate-100 text-[10px] font-mono overflow-x-auto max-h-72 leading-relaxed">
-                        {EMAILJS_SHOP_ORDER_HTML_TEMPLATE}
+                        {SHOP_ORDER_HTML_TEMPLATE}
                       </pre>
                     )}
                   </div>

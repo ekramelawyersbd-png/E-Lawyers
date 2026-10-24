@@ -178,12 +178,80 @@ function validateForm(form: InquiryFormData): FieldErrors {
   }, {});
 }
 
+type InquiryStep = 1 | 2 | 3;
+
+type StepDefinition = {
+  step: InquiryStep;
+  key: 'inquiry_details' | 'client_info' | 'final_review';
+  title: string;
+  subtitle: string;
+  fields: FormField[];
+  requiredFields: FormField[];
+};
+
+const INQUIRY_STEPS: StepDefinition[] = [
+  {
+    step: 1,
+    key: 'inquiry_details',
+    title: 'Inquiry Details',
+    subtitle: 'Practice area & brief',
+    fields: ['service', 'message'],
+    requiredFields: ['service', 'message'],
+  },
+  {
+    step: 2,
+    key: 'client_info',
+    title: 'Client Info',
+    subtitle: 'Contact & organization',
+    fields: ['firstName', 'lastName', 'email', 'phone', 'companyName'],
+    requiredFields: ['firstName', 'lastName', 'email', 'phone'],
+  },
+  {
+    step: 3,
+    key: 'final_review',
+    title: 'Final Review',
+    subtitle: 'Verify & submit',
+    fields: ['service', 'message', 'firstName', 'lastName', 'email', 'phone', 'companyName'],
+    requiredFields: ['service', 'message', 'firstName', 'lastName', 'email', 'phone'],
+  },
+];
+
+const STEP_FIELDS: Record<InquiryStep, FormField[]> = {
+  1: ['service', 'message'],
+  2: ['firstName', 'lastName', 'email', 'phone', 'companyName'],
+  3: ['service', 'message', 'firstName', 'lastName', 'email', 'phone', 'companyName'],
+};
+
+const FIELD_ELEMENT_IDS: Record<FormField, string> = {
+  firstName: 'contact-first-name',
+  lastName: 'contact-last-name',
+  email: 'contact-email',
+  phone: 'contact-phone',
+  companyName: 'contact-company-name',
+  service: 'contact-service',
+  message: 'contact-message',
+};
+
+function validateStepFields(step: InquiryStep, form: InquiryFormData): FieldErrors {
+  return STEP_FIELDS[step].reduce<FieldErrors>((stepErrors, field) => {
+    const error = validateField(field, form[field]);
+    if (error) stepErrors[field] = error;
+    return stepErrors;
+  }, {});
+}
+
+function isStepCompleteAndValid(step: InquiryStep, form: InquiryFormData): boolean {
+  const stepErrors = validateStepFields(step, form);
+  return Object.keys(stepErrors).length === 0;
+}
+
 type TextFieldProps = {
   id: string;
   label: string;
   name: string;
   value: string;
   type?: 'text' | 'email' | 'tel';
+  required?: boolean;
   autoComplete?: string;
   placeholder?: string;
   helper?: string;
@@ -200,6 +268,7 @@ function TextField({
   name,
   value,
   type = 'text',
+  required = true,
   autoComplete,
   placeholder,
   helper,
@@ -215,7 +284,7 @@ function TextField({
   return (
     <div className="min-w-0">
       <label htmlFor={id} className="mb-2 block text-sm font-semibold text-slate-800">
-        {label} <span className="text-emerald-700">*</span>
+        {label} {required && <span className="text-emerald-700">*</span>}
       </label>
       <input
         id={id}
@@ -264,12 +333,12 @@ function MessageField({ value, error, showError, onChange, onBlur }: MessageFiel
         <label htmlFor="contact-message" className="text-sm font-semibold text-slate-800">
           Matter description <span className="text-emerald-700">*</span>
         </label>
-        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+        <span className={`text-xs font-medium tabular-nums ${
           value.trim().length >= 15
-            ? 'bg-emerald-50 text-emerald-800'
-            : 'bg-slate-100 text-slate-500'
+            ? 'text-emerald-800'
+            : 'text-slate-500'
         }`}>
-          {value.trim().length}/15 minimum
+          {value.trim().length}/15 minimum characters
         </span>
       </div>
       <textarea
@@ -330,15 +399,31 @@ const SOCIAL_GROUPS: SocialGroup[] = [
   },
 ];
 
+type InquiryFormState = {
+  currentStep: InquiryStep;
+  data: InquiryFormData;
+  touched: Partial<Record<FormField, boolean>>;
+  attemptedSteps: Partial<Record<InquiryStep, boolean>>;
+  submitAttempted: boolean;
+  stepValidationMessage: string | null;
+};
+
+const INITIAL_INQUIRY_STATE: InquiryFormState = {
+  currentStep: 1,
+  data: INITIAL_FORM,
+  touched: {},
+  attemptedSteps: {},
+  submitAttempted: false,
+  stepValidationMessage: null,
+};
+
 export function Contact() {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ContactTab>(() =>
     getRequestedTab(location.search, location.hash),
   );
-  const [form, setForm] = useState<InquiryFormData>(INITIAL_FORM);
-  const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({});
-  const [formAttempted, setFormAttempted] = useState(false);
+  const [inquiryState, setInquiryState] = useState<InquiryFormState>(INITIAL_INQUIRY_STATE);
   const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null);
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
   const [submittedInquiryRef, setSubmittedInquiryRef] = useState<string | null>(null);
@@ -346,22 +431,135 @@ export function Contact() {
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
 
+  const { currentStep, data: form, touched, attemptedSteps, submitAttempted, stepValidationMessage } =
+    inquiryState;
+
   useEffect(() => {
     setActiveTab(getRequestedTab(location.search, location.hash));
   }, [location.search, location.hash]);
 
   const errors = useMemo(() => validateForm(form), [form]);
-  const requiredFields: FormField[] = ['firstName', 'lastName', 'email', 'phone', 'message'];
+  const step1Errors = useMemo(() => validateStepFields(1, form), [form]);
+  const step2Errors = useMemo(() => validateStepFields(2, form), [form]);
+
+  const isStep1Valid = Object.keys(step1Errors).length === 0;
+  const isStep2Valid = Object.keys(step2Errors).length === 0;
+  const hasErrors = Object.keys(errors).length > 0;
+
+  const requiredFields: FormField[] = ['service', 'message', 'firstName', 'lastName', 'email', 'phone'];
   const completedRequiredFields = requiredFields.filter(
     (field) => form[field].trim().length > 0 && !validateField(field, form[field]),
   ).length;
   const completionPercentage = Math.round((completedRequiredFields / requiredFields.length) * 100);
-  const hasErrors = Object.keys(errors).length > 0;
+
+  const currentStepDefinition = INQUIRY_STEPS.find((item) => item.step === currentStep) ?? INQUIRY_STEPS[0];
+  const currentStepValid =
+    currentStep === 1 ? isStep1Valid : currentStep === 2 ? isStep2Valid : !hasErrors;
+
+  const isJointInquiry = form.service === 'Integrated Joint Ecosystem Consultation';
+  const assignedDivision = isJointInquiry
+    ? 'Accounticca × E-Lawyers'
+    : LEGAL_SERVICES.has(form.service)
+      ? 'E-Lawyers Chambers'
+      : 'Accounticca Advisory';
 
   const updateField = (field: FormField, value: string) => {
-    setForm((previous) => ({ ...previous, [field]: value }));
+    setInquiryState((prev) => ({
+      ...prev,
+      data: { ...prev.data, [field]: value },
+      stepValidationMessage: null,
+    }));
     setEmailDraftUrl(null);
     setSubmittedInquiryRef(null);
+  };
+
+  const markTouched = (field: FormField) => {
+    setInquiryState((prev) => ({
+      ...prev,
+      touched: { ...prev.touched, [field]: true },
+    }));
+  };
+
+  const focusField = (field: FormField) => {
+    window.setTimeout(() => {
+      const element = document.getElementById(FIELD_ELEMENT_IDS[field]);
+      element?.focus();
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+  };
+
+  const canAccessStep = (targetStep: InquiryStep): boolean => {
+    if (targetStep === 1) return true;
+    if (targetStep === 2) return isStep1Valid;
+    return isStep1Valid && isStep2Valid;
+  };
+
+  const goToStep = (targetStep: InquiryStep) => {
+    if (targetStep === currentStep) return;
+
+    // Going backwards is always allowed
+    if (targetStep < currentStep) {
+      setInquiryState((prev) => ({
+        ...prev,
+        currentStep: targetStep,
+        stepValidationMessage: null,
+      }));
+      return;
+    }
+
+    // Going forward requires validating each step prior to targetStep
+    if (!isStep1Valid) {
+      const firstInvalid = STEP_FIELDS[1].find((f) => step1Errors[f]);
+      setInquiryState((prev) => ({
+        ...prev,
+        currentStep: 1,
+        attemptedSteps: { ...prev.attemptedSteps, 1: true },
+        touched: { ...prev.touched, service: true, message: true },
+        stepValidationMessage:
+          'Please complete all required Inquiry Details fields before advancing to the next step.',
+      }));
+      if (firstInvalid) focusField(firstInvalid);
+      return;
+    }
+
+    if (targetStep === 3 && !isStep2Valid) {
+      const firstInvalid = STEP_FIELDS[2].find((f) => step2Errors[f]);
+      setInquiryState((prev) => ({
+        ...prev,
+        currentStep: 2,
+        attemptedSteps: { ...prev.attemptedSteps, 2: true },
+        touched: {
+          ...prev.touched,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          companyName: true,
+        },
+        stepValidationMessage:
+          'Please complete all required Client Info fields before proceeding to Final Review.',
+      }));
+      if (firstInvalid) focusField(firstInvalid);
+      return;
+    }
+
+    setInquiryState((prev) => ({
+      ...prev,
+      currentStep: targetStep,
+      stepValidationMessage: null,
+    }));
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < 3) {
+      goToStep((currentStep + 1) as InquiryStep);
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStep > 1) {
+      goToStep((currentStep - 1) as InquiryStep);
+    }
   };
 
   const selectTab = (tab: ContactTab) => {
@@ -388,14 +586,6 @@ export function Contact() {
     }, 0);
   };
 
-  const markTouched = (field: FormField) => {
-    setTouched((previous) => ({ ...prevOrEmpty(previous), [field]: true }));
-  };
-
-  function prevOrEmpty(prev: Partial<Record<FormField, boolean>>) {
-    return prev || {};
-  }
-
   const handleCopy = async (value: string, label: string) => {
     setCopyError(null);
     try {
@@ -410,39 +600,40 @@ export function Contact() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFormAttempted(true);
-    setTouched({
-      firstName: true,
-      lastName: true,
-      email: true,
-      phone: true,
-      companyName: true,
-      service: true,
-      message: true,
-    });
+
+    if (currentStep < 3) {
+      handleNextStep();
+      return;
+    }
+
+    setInquiryState((prev) => ({
+      ...prev,
+      submitAttempted: true,
+      attemptedSteps: { 1: true, 2: true, 3: true },
+      touched: {
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        companyName: true,
+        service: true,
+        message: true,
+      },
+      stepValidationMessage: null,
+    }));
     setEmailDraftUrl(null);
     setSubmittedInquiryRef(null);
 
     if (hasErrors) {
-      const orderedFields: FormField[] = [
-        'firstName', 'lastName', 'email', 'phone', 'companyName', 'service', 'message',
-      ];
-      const firstInvalid = orderedFields.find((field) => errors[field]);
-      const ids: Record<FormField, string> = {
-        firstName: 'contact-first-name',
-        lastName: 'contact-last-name',
-        email: 'contact-email',
-        phone: 'contact-phone',
-        companyName: 'contact-company-name',
-        service: 'contact-service',
-        message: 'contact-message',
-      };
-      if (firstInvalid) {
-        window.setTimeout(() => {
-          const element = document.getElementById(ids[firstInvalid]);
-          element?.focus();
-          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 0);
+      const firstInvalidStep1 = STEP_FIELDS[1].find((field) => errors[field]);
+      if (firstInvalidStep1) {
+        goToStep(1);
+        return;
+      }
+      const firstInvalidStep2 = STEP_FIELDS[2].find((field) => errors[field]);
+      if (firstInvalidStep2) {
+        goToStep(2);
+        return;
       }
       return;
     }
@@ -451,17 +642,12 @@ export function Contact() {
     const refNumber = Math.floor(10000 + Math.random() * 90000);
     const referenceId = `INQ-2026-${refNumber}`;
 
-    const isJointInquiry = form.service === 'Integrated Joint Ecosystem Consultation';
     const recipient = isJointInquiry
       ? ACCOUNTICCA_EMAIL
       : LEGAL_SERVICES.has(form.service)
         ? ELAWYERS_EMAIL
         : ACCOUNTICCA_EMAIL;
-    const division = isJointInquiry
-      ? 'Accounticca × E-Lawyers'
-      : LEGAL_SERVICES.has(form.service)
-        ? 'E-Lawyers Chambers'
-        : 'Accounticca Advisory';
+    const division = assignedDivision;
 
     const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
 
@@ -546,15 +732,321 @@ export function Contact() {
   };
 
   const resetForm = () => {
-    setForm(INITIAL_FORM);
-    setTouched({});
-    setFormAttempted(false);
+    setInquiryState(INITIAL_INQUIRY_STATE);
     setEmailDraftUrl(null);
     setSubmittedInquiryRef(null);
     setInquirySheetSynced(false);
   };
 
-  const inputError = (field: FormField) => Boolean((touched[field] || formAttempted) && errors[field]);
+  const inputError = (field: FormField, step: InquiryStep) =>
+    Boolean((touched[field] || attemptedSteps[step] || submitAttempted) && errors[field]);
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-5" data-step="inquiry-details">
+            <div>
+              <label htmlFor="contact-service" className="mb-2 block text-sm font-semibold text-slate-800">
+                Service area <span className="text-emerald-700">*</span>
+              </label>
+              <select
+                id="contact-service"
+                name="service"
+                value={form.service}
+                onChange={(event) => updateField('service', event.target.value)}
+                onBlur={() => markTouched('service')}
+                aria-invalid={inputError('service', 1)}
+                aria-describedby={inputError('service', 1) ? 'contact-service-error' : 'contact-service-routing'}
+                className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-4 ${
+                  inputError('service', 1)
+                    ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+                    : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
+                }`}
+              >
+                {SERVICES.map((service) => (
+                  <option key={service} value={service}>
+                    {service}
+                  </option>
+                ))}
+              </select>
+              {inputError('service', 1) ? (
+                <p id="contact-service-error" role="alert" className="mt-1.5 text-xs font-medium text-rose-700">
+                  {errors.service}
+                </p>
+              ) : (
+                <p id="contact-service-routing" className="mt-1.5 text-xs text-slate-500">
+                  Routed to <span className="font-semibold text-slate-700">{assignedDivision}</span>
+                </p>
+              )}
+            </div>
+
+            <MessageField
+              value={form.message}
+              error={errors.message}
+              showError={inputError('message', 1)}
+              onChange={(value) => updateField('message', value)}
+              onBlur={() => markTouched('message')}
+            />
+
+            <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-slate-500">
+                {isStep1Valid
+                  ? 'Step 1 validated — ready to enter your contact details.'
+                  : 'Complete your service area and brief (min. 15 characters) to continue.'}
+              </p>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                aria-disabled={!isStep1Valid}
+                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 ${
+                  isStep1Valid
+                    ? 'bg-[#0b5e48] text-white shadow-sm hover:bg-[#084b3a]'
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300/80'
+                }`}
+              >
+                Continue to Client Info
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-5" data-step="client-info">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField
+                id="contact-first-name"
+                label="First name"
+                name="firstName"
+                value={form.firstName}
+                autoComplete="given-name"
+                placeholder="Your first name"
+                maxLength={80}
+                error={errors.firstName}
+                showError={inputError('firstName', 2)}
+                onChange={(value) => updateField('firstName', value)}
+                onBlur={() => markTouched('firstName')}
+              />
+              <TextField
+                id="contact-last-name"
+                label="Last name"
+                name="lastName"
+                value={form.lastName}
+                autoComplete="family-name"
+                placeholder="Your last name"
+                maxLength={80}
+                error={errors.lastName}
+                showError={inputError('lastName', 2)}
+                onChange={(value) => updateField('lastName', value)}
+                onBlur={() => markTouched('lastName')}
+              />
+              <TextField
+                id="contact-email"
+                label="Work or personal email"
+                name="email"
+                type="email"
+                value={form.email}
+                autoComplete="email"
+                placeholder="you@company.com"
+                maxLength={254}
+                error={errors.email}
+                showError={inputError('email', 2)}
+                onChange={(value) => updateField('email', value)}
+                onBlur={() => markTouched('email')}
+              />
+              <TextField
+                id="contact-phone"
+                label="Phone or WhatsApp"
+                name="phone"
+                type="tel"
+                value={form.phone}
+                autoComplete="tel"
+                placeholder="+880 1XXX-XXXXXX"
+                maxLength={24}
+                error={errors.phone}
+                showError={inputError('phone', 2)}
+                onChange={(value) => updateField('phone', value)}
+                onBlur={() => markTouched('phone')}
+              />
+              <div className="sm:col-span-2">
+                <TextField
+                  id="contact-company-name"
+                  label="Company name (optional)"
+                  name="companyName"
+                  required={false}
+                  value={form.companyName}
+                  autoComplete="organization"
+                  placeholder="Company or organization"
+                  maxLength={120}
+                  helper="Leave blank if you are contacting us as an individual."
+                  error={errors.companyName}
+                  showError={inputError('companyName', 2)}
+                  onChange={(value) => updateField('companyName', value)}
+                  onBlur={() => markTouched('companyName')}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                type="button"
+                onClick={handlePreviousStep}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              >
+                Back to Inquiry Details
+              </button>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                aria-disabled={!isStep2Valid}
+                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 ${
+                  isStep2Valid
+                    ? 'bg-[#0b5e48] text-white shadow-sm hover:bg-[#084b3a]'
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300/80'
+                }`}
+              >
+                Continue to Final Review
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-5" data-step="final-review">
+            <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-slate-50/60">
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">01. Inquiry Details</p>
+                    <h4 className="mt-0.5 text-sm font-semibold text-slate-900">{form.service}</h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => goToStep(1)}
+                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950"
+                  >
+                    Edit details
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">Assigned division: {assignedDivision}</p>
+                <div className="mt-3 rounded-xl border border-slate-200/80 bg-white p-3.5 text-sm leading-6 text-slate-700 whitespace-pre-wrap">
+                  {form.message.trim()}
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">02. Client Info</p>
+                    <h4 className="mt-0.5 text-sm font-semibold text-slate-900">
+                      {form.firstName.trim()} {form.lastName.trim()}
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => goToStep(2)}
+                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950"
+                  >
+                    Edit client info
+                  </button>
+                </div>
+                <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="text-xs text-slate-500">Email address</dt>
+                    <dd className="mt-0.5 break-all font-medium text-slate-900">{form.email.trim()}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-slate-500">Phone / WhatsApp</dt>
+                    <dd className="mt-0.5 font-medium tabular-nums text-slate-900">{form.phone.trim()}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-slate-500">Organization</dt>
+                    <dd className="mt-0.5 font-medium text-slate-900">
+                      {form.companyName.trim() || 'Direct Client / Individual'}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            {submitAttempted && hasErrors && (
+              <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>Please review the highlighted fields before submitting your inquiry.</span>
+              </div>
+            )}
+
+            {emailDraftUrl && (
+              <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
+                    <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="font-semibold text-emerald-950">Inquiry Submitted &amp; Dispatched</h4>
+                      {submittedInquiryRef && (
+                        <span className="font-mono text-xs font-bold tabular-nums text-emerald-900">
+                          · {submittedInquiryRef}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800">
+                        · <FileSpreadsheet className="h-3.5 w-3.5" aria-hidden="true" />
+                        {inquirySheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-emerald-900/80">
+                      Your inquiry has been logged to our advisory desk ledger
+                      {inquirySheetSynced ? ' and automatically appended to our Google Sheet' : ''}. You may also open a direct email draft below if you wish to attach files.
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <a
+                        href={emailDraftUrl}
+                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20"
+                      >
+                        Open email draft (attach files) <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={resetForm}
+                        className="inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950"
+                      >
+                        Start a new inquiry
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                type="button"
+                onClick={handlePreviousStep}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              >
+                Back to Client Info
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmittingInquiry}
+                className="group inline-flex min-h-12 flex-1 items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20 disabled:opacity-60"
+              >
+                {isSubmittingInquiry ? 'Submitting inquiry & syncing...' : 'Submit inquiry & prepare email'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </button>
+            </div>
+            <p className="text-center text-xs leading-5 text-slate-500">
+              Submitting saves your inquiry directly to our Workspace Contact Ledger &amp; Google Sheet and prepares an optional direct email draft.
+            </p>
+          </div>
+        );
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#f5f7f4] pb-16 text-slate-900">
@@ -772,133 +1264,98 @@ export function Contact() {
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 className="text-xl font-semibold text-slate-950">Send your matter brief</h3>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">Fields marked with an asterisk are required.</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      Step {currentStep} of 3: {currentStepDefinition.title} — {currentStepDefinition.subtitle}
+                    </p>
                   </div>
-                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-900">
-                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Private inquiry
+                  <span className="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-emerald-900">
+                    <ShieldCheck className="h-4 w-4 text-emerald-700" aria-hidden="true" />
+                    <span>{currentStepValid ? 'Current step ready' : 'Validation required'}</span>
                   </span>
                 </div>
 
-                <div className="mb-6 rounded-xl bg-slate-50 p-4">
-                  <div className="mb-2 flex items-center justify-between gap-3 text-xs">
-                    <span className="font-semibold text-slate-700">Required fields completed</span>
-                    <span className="font-bold tabular-nums text-slate-800">{completedRequiredFields} of {requiredFields.length} · {completionPercentage}%</span>
+                {/* Targeted Stepper & Progress Container (div:nth-of-type(2)) */}
+                <div className="mb-6 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3 text-xs">
+                    <span className="font-semibold text-slate-700">
+                      Step {currentStep} of 3 · {currentStepDefinition.title}
+                    </span>
+                    <span className="font-bold tabular-nums text-slate-800">
+                      {completedRequiredFields} of {requiredFields.length} required fields valid · {completionPercentage}%
+                    </span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="Required fields completed" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completionPercentage}>
-                    <div className="h-full rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${completionPercentage}%` }} />
+                  <div
+                    className="mb-4 h-1.5 overflow-hidden rounded-full bg-slate-200"
+                    role="progressbar"
+                    aria-label="Required fields completed"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={completionPercentage}
+                  >
+                    <div
+                      className="h-full rounded-full bg-emerald-600 transition-all duration-300"
+                      style={{ width: `${completionPercentage}%` }}
+                    />
                   </div>
+
+                  <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-3" aria-label="Inquiry form steps">
+                    {INQUIRY_STEPS.map(({ step, title, subtitle }) => {
+                      const isActive = currentStep === step;
+                      const stepValid = isStepCompleteAndValid(step, form);
+                      const isCompleted =
+                        (step === 1 && stepValid && currentStep > 1) ||
+                        (step === 2 && stepValid && currentStep > 2) ||
+                        Boolean(emailDraftUrl);
+                      const unlocked = canAccessStep(step);
+
+                      return (
+                        <li key={step}>
+                          <button
+                            type="button"
+                            onClick={() => goToStep(step)}
+                            aria-current={isActive ? 'step' : undefined}
+                            aria-disabled={!unlocked && step > currentStep}
+                            className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition focus:outline-none focus:ring-4 focus:ring-emerald-600/15 ${
+                              isActive
+                                ? 'border-emerald-700 bg-white text-slate-950 shadow-xs'
+                                : isCompleted
+                                  ? 'border-emerald-200 bg-white text-slate-900 hover:border-emerald-400'
+                                  : unlocked
+                                    ? 'border-slate-200 bg-white/70 text-slate-700 hover:border-slate-300 hover:bg-white'
+                                    : 'border-slate-200/70 bg-slate-100/70 text-slate-400'
+                            }`}
+                          >
+                            <span
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums transition ${
+                                isActive
+                                  ? 'bg-emerald-700 text-white'
+                                  : isCompleted
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-slate-200/80 text-slate-700'
+                              }`}
+                            >
+                              {isCompleted ? <Check className="h-4 w-4" aria-hidden="true" /> : `0${step}`}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs font-bold text-slate-900">{title}</p>
+                              <p className="truncate text-[11px] text-slate-500">{subtitle}</p>
+                            </div>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ol>
                 </div>
 
-                <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <TextField
-                      id="contact-first-name" label="First name" name="firstName" value={form.firstName}
-                      autoComplete="given-name" placeholder="Your first name" maxLength={80}
-                      error={errors.firstName} showError={inputError('firstName')}
-                      onChange={(value) => updateField('firstName', value)} onBlur={() => markTouched('firstName')}
-                    />
-                    <TextField
-                      id="contact-last-name" label="Last name" name="lastName" value={form.lastName}
-                      autoComplete="family-name" placeholder="Your last name" maxLength={80}
-                      error={errors.lastName} showError={inputError('lastName')}
-                      onChange={(value) => updateField('lastName', value)} onBlur={() => markTouched('lastName')}
-                    />
-                    <TextField
-                      id="contact-email" label="Work or personal email" name="email" type="email" value={form.email}
-                      autoComplete="email" placeholder="you@company.com" maxLength={254}
-                      error={errors.email} showError={inputError('email')}
-                      onChange={(value) => updateField('email', value)} onBlur={() => markTouched('email')}
-                    />
-                    <TextField
-                      id="contact-phone" label="Phone or WhatsApp" name="phone" type="tel" value={form.phone}
-                      autoComplete="tel" placeholder="+880 1XXX-XXXXXX" maxLength={24}
-                      error={errors.phone} showError={inputError('phone')}
-                      onChange={(value) => updateField('phone', value)} onBlur={() => markTouched('phone')}
-                    />
-                    <TextField
-                      id="contact-company-name" label="Company name (optional)" name="companyName" value={form.companyName}
-                      autoComplete="organization" placeholder="Company or organization" maxLength={120}
-                      helper="Leave blank if you are contacting us as an individual."
-                      error={errors.companyName} showError={inputError('companyName')}
-                      onChange={(value) => updateField('companyName', value)} onBlur={() => markTouched('companyName')}
-                    />
-                    <div>
-                      <label htmlFor="contact-service" className="mb-2 block text-sm font-semibold text-slate-800">Service area <span className="text-emerald-700">*</span></label>
-                      <select
-                        id="contact-service"
-                        name="service"
-                        value={form.service}
-                        onChange={(event) => updateField('service', event.target.value)}
-                        onBlur={() => markTouched('service')}
-                        aria-invalid={inputError('service')}
-                        aria-describedby={inputError('service') ? 'contact-service-error' : undefined}
-                        className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-4 ${inputError('service') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'}`}
-                      >
-                        {SERVICES.map((service) => <option key={service} value={service}>{service}</option>)}
-                      </select>
-                      {inputError('service') && <p id="contact-service-error" role="alert" className="mt-1.5 text-xs font-medium text-rose-700">{errors.service}</p>}
-                    </div>
+                {stepValidationMessage && (
+                  <div role="alert" className="mb-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{stepValidationMessage}</span>
                   </div>
+                )}
 
-                  <MessageField
-                    value={form.message}
-                    error={errors.message}
-                    showError={inputError('message')}
-                    onChange={(value) => updateField('message', value)}
-                    onBlur={() => markTouched('message')}
-                  />
-
-                  {formAttempted && hasErrors && (
-                    <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                      <span>Please review the highlighted fields before preparing your email.</span>
-                    </div>
-                  )}
-
-                  {emailDraftUrl && (
-                    <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
-                      <div className="flex items-start gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /></span>
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="font-semibold text-emerald-950">Inquiry Submitted &amp; Recorded</h4>
-                            {submittedInquiryRef && (
-                              <span className="rounded-md bg-white px-2 py-0.5 font-mono text-xs font-bold text-emerald-900 border border-emerald-200">
-                                {submittedInquiryRef}
-                              </span>
-                            )}
-                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
-                              <FileSpreadsheet className="h-3 w-3" aria-hidden="true" />
-                              {inquirySheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}
-                            </span>
-                          </div>
-                          <p className="mt-1 text-sm leading-6 text-emerald-900/80">
-                            Your inquiry has been logged to our advisory desk ledger{inquirySheetSynced ? ' and automatically appended to our Google Sheet' : ''}. You may also open a direct email draft below if you wish to attach files.
-                          </p>
-                          <div className="mt-3 flex flex-wrap items-center gap-3">
-                            <a href={emailDraftUrl} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20">
-                              Open email draft <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                            </a>
-                            <button type="button" onClick={resetForm} className="inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950">
-                              Start a new inquiry
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmittingInquiry}
-                    className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20 disabled:opacity-60"
-                  >
-                    {isSubmittingInquiry ? 'Submitting inquiry & syncing...' : 'Submit inquiry & prepare email'}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-                  </button>
-                  <p className="text-center text-xs leading-5 text-slate-500">
-                    Submitting saves your inquiry directly to our Workspace Contact Ledger &amp; Google Sheet and prepares an optional direct email draft.
-                  </p>
+                <form onSubmit={handleSubmit} noValidate className="space-y-6">
+                  {renderStepContent()}
                 </form>
               </div>
             )}

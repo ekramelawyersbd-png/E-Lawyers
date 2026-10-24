@@ -33,7 +33,6 @@ import {
   Loader2,
   TrendingUp
 } from 'lucide-react';
-import { sendEmailJSCareerNotification, isEmailJSConfigured } from '../utils/emailjsService';
 import type { CareerApplicationData } from '../utils/careerEmailTemplate';
 
 interface FileMeta {
@@ -273,7 +272,6 @@ export const CareerAccountantPage: React.FC = () => {
     candidateNotified: boolean;
     emailTransport: string;
     submittedAt: string;
-    emailjsNote?: string | null;
   } | null>(null);
 
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -909,18 +907,7 @@ export const CareerAccountantPage: React.FC = () => {
       submissionDate: now.toLocaleString()
     };
 
-    // 1. Attempt EmailJS integration if service variables are configured
-    let emailjsResultNotice: string | null = null;
-    try {
-      const emailjsResult = await sendEmailJSCareerNotification(candidatePayload);
-      if (emailjsResult.attempted && emailjsResult.success) {
-        emailjsResultNotice = 'EmailJS automated notification successfully triggered.';
-      }
-    } catch {
-      // Handled via server recruitment gateway
-    }
-
-    // 2. Transmit to server endpoint for persistence, SMTP dispatch, and registry log
+    // Transmit to server endpoint for persistence, SMTP dispatch, and registry log
     let workspaceAccessToken: string | undefined;
     let spreadsheetId: string | undefined;
     try {
@@ -951,9 +938,8 @@ export const CareerAccountantPage: React.FC = () => {
         hrEmails: data.hrEmails || ['career@elawyersbd.com', 'ekram.elawyersbd@gmail.com'],
         hrNotified: true,
         candidateNotified: true,
-        emailTransport: data.emailTransport || (emailjsResultNotice ? 'EmailJS & E-Lawyers Mailer Hub' : 'E-Lawyers Cloud Recruitment Gateway'),
-        submittedAt: now.toLocaleString(),
-        emailjsNote: emailjsResultNotice
+        emailTransport: data.emailTransport || 'E-Lawyers Cloud Recruitment Gateway',
+        submittedAt: now.toLocaleString()
       });
 
       showActionFeedback(
@@ -974,8 +960,7 @@ export const CareerAccountantPage: React.FC = () => {
         hrNotified: true,
         candidateNotified: true,
         emailTransport: 'Client Verified Submission & Queued Dispatch',
-        submittedAt: now.toLocaleString(),
-        emailjsNote: emailjsResultNotice
+        submittedAt: now.toLocaleString()
       });
       showActionFeedback(`Application ${currentRefId} recorded and verified.`);
       setTimeout(() => {
@@ -2871,7 +2856,7 @@ export const CareerAccountantPage: React.FC = () => {
                             Applicant: <strong className="font-semibold text-[#10243a]">{formState.email}</strong>
                           </div>
                           <div className="text-[#526276] text-xs">
-                            Transport: {submissionReceipt?.emailTransport || 'EmailJS & E-Lawyers Mailer Hub'}
+                            Transport: {submissionReceipt?.emailTransport || 'E-Lawyers Mailer Hub'}
                           </div>
                           <div className="text-[#16734b] text-[11.5px] font-medium flex items-center gap-1 pt-0.5">
                             <CheckCircle2 className="w-3.5 h-3.5" />

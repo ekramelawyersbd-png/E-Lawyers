@@ -41,10 +41,9 @@ function formatBdt(amount: number): string {
 }
 
 /**
- * Raw EmailJS HTML Template with Mustache placeholders ({{variable}})
- * Ready to paste directly into the EmailJS Dashboard -> Email Templates -> HTML Editor.
+ * Raw Order Confirmation HTML Template with Mustache placeholders ({{variable}})
  */
-export const EMAILJS_SHOP_ORDER_HTML_TEMPLATE = `<!DOCTYPE html>
+export const SHOP_ORDER_HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -189,7 +188,7 @@ export const EMAILJS_SHOP_ORDER_HTML_TEMPLATE = `<!DOCTYPE html>
 
 /**
  * Generates the rendered HTML, plain-text summary, itemized HTML rows, and complete
- * EmailJS template parameter map for a customer's Shop order.
+ * template parameter map for a customer's Shop order.
  */
 export function generateShopOrderEmailHtml(order: ShopOrderEmailData): {
   subject: string;
@@ -281,7 +280,7 @@ Support: ${supportEmail} | Hotline: ${supportPhone}
 ====================================================
 `.trim();
 
-  const html = EMAILJS_SHOP_ORDER_HTML_TEMPLATE.replace(/\{\{order_id\}\}/g, escapeHtml(order.orderId))
+  const html = SHOP_ORDER_HTML_TEMPLATE.replace(/\{\{order_id\}\}/g, escapeHtml(order.orderId))
     .replace(/\{\{order_date\}\}/g, escapeHtml(orderDate))
     .replace(/\{\{to_name\}\}/g, escapeHtml(order.customerName))
     .replace(/\{\{to_email\}\}/g, escapeHtml(order.customerEmail))
@@ -299,7 +298,7 @@ Support: ${supportEmail} | Hotline: ${supportPhone}
     .replace(/\{\{support_phone\}\}/g, supportPhone);
 
   const templateParams: Record<string, string | number> = {
-    // Standard EmailJS recipient & sender variables
+    // Standard recipient & sender variables
     to_name: order.customerName,
     to_email: order.customerEmail,
     customer_name: order.customerName,

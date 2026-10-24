@@ -977,7 +977,12 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
               </div>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
-                <span>Confirmation dispatched to: <strong>{confirmedBooking.email}</strong></span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>
+                    Confirmation dispatched to: <strong>{confirmedBooking.email}</strong>
+                  </span>
+                </span>
                 <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-emerald-700 font-bold">
                   <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{bookingSheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}</span>

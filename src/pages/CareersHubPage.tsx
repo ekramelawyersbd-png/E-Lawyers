@@ -53,7 +53,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'How will I know if my application was successfully received?',
-    a: 'Upon submitting your application form online, you will instantly receive a unique Reference ID (e.g., ELAW-ACC-2026-XXXX or ELAW-CCE-2026-XXXX) on the screen. If EmailJS is active, an automated confirmation email is also dispatched. You can check your application status anytime using our self-service status desk on this page.'
+    a: 'Upon submitting your application form online, you will instantly receive a unique Reference ID (e.g., ELAW-ACC-2026-XXXX or ELAW-CCE-2026-XXXX) on the screen along with an automated confirmation receipt. You can check your application status anytime using our self-service status desk on this page.'
   },
   {
     q: 'What is the selection and interview timeline?',
