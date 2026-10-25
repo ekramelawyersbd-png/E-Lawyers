@@ -7,6 +7,7 @@ import { calculateReadingTime } from '../utils/readingTime';
 import { Search as SearchIcon, History, X, Clock, Calendar, ExternalLink, Calculator, ArrowRight, Sparkles, BookOpen, FileText } from 'lucide-react';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 import { searchableTaxTools, SearchableTool } from '../data/searchableTools';
+import { SEO } from '../components/SEO';
 
 const RECENT_SEARCHES_KEY = 'elawyers_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
@@ -150,6 +151,19 @@ export function Search() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <SEO
+        title={
+          query
+            ? `Search Results for "${query}" | Accounticca & E-Lawyers Knowledge Hub`
+            : 'Search Legal, Tax, VAT & RJSC Guides and Calculators | Accounticca'
+        }
+        description={
+          query
+            ? `Explore articles, statutory guides, and tax calculators matching "${query}" on the Accounticca & E-Lawyers Compliance Hub.`
+            : 'Search across Bangladesh Income Tax Act 2023 guides, VAT compliance resources, RJSC company filing checklists, and interactive calculators.'
+        }
+        canonicalUrl="/search"
+      />
       <div className="mb-12">
         <h1 id="search-page-title" className="text-3xl font-bold text-slate-900 mb-6">Search Results</h1>
         <form 

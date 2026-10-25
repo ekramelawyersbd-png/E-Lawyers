@@ -931,16 +931,42 @@ export const CareerMtoPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 text-teal-900 border border-teal-200 text-xs font-bold mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#167d83]" /> Official Recruitment Circular · 2026 Batch
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 text-teal-900 border border-teal-200 text-xs font-bold mb-3 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-[#167d83]" /> Official Recruitment Circular · 2026 Batch
+              </div>
 
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#10243a] mb-3">
-            Management Trainee Officer (MTO)
-          </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mb-6 leading-relaxed">
-            বিল্ড ইয়োর প্রফেশনাল ক্যারিয়ার উইথ E-Lawyers। একাউন্টস, ট্যাক্সেশন, আরজেএসসি কর্পোরেট কমপ্লায়েন্স, লিগ্যাল সার্ভিসেস ও বিজনেস কনসালটেন্সিতে বাস্তবিক অভিজ্ঞতা অর্জন ও নেতৃত্ব বিকাশের অনন্য সুযোগ।
-          </p>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#10243a] mb-3">
+                Management Trainee Officer (MTO)
+              </h1>
+              <p className="text-lg md:text-xl text-slate-600 max-w-3xl mb-6 leading-relaxed">
+                বিল্ড ইয়োর প্রফেশনাল ক্যারিয়ার উইথ E-Lawyers। একাউন্টস, ট্যাক্সেশন, আরজেএসসি কর্পোরেট কমপ্লায়েন্স, লিগ্যাল সার্ভিসেস ও বিজনেস কনসালটেন্সিতে বাস্তবিক অভিজ্ঞতা অর্জন ও নেতৃত্ব বিকাশের অনন্য সুযোগ।
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('apply')}
+                  className="px-6 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  <span>Apply Online Now (অনলাইন আবেদন)</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl overflow-hidden border-2 border-slate-200/90 shadow-lg bg-white">
+                <img
+                  src="https://i.ibb.co/6hrxrmG/f1096382-e31a-40c8-af4c-fb4a5e7ff605.png"
+                  alt="Management Trainee Officer (MTO) Recruitment Circular - E-Lawyers Legal & Business Consultancy Firm"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Key metadata badges */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">

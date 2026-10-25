@@ -28,6 +28,8 @@ import {
   Globe
 } from 'lucide-react';
 import { useLms } from '../contexts/LmsContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useShopAuth } from '../contexts/ShopAuthContext';
 import {
   requestR2SignedReadUrl,
   R2PresignReadResponse,
@@ -37,6 +39,12 @@ import { R2VideoPlayer } from '../components/lms/R2VideoPlayer';
 import { VideoPlayerErrorBoundary } from '../components/lms/VideoPlayerErrorBoundary';
 import { ProtectedPdfReader } from '../components/lms/ProtectedPdfReader';
 import { ServiceSEO } from '../components/SEO';
+import {
+  workspaceDocsApi,
+  workspaceSlidesApi,
+  workspaceDriveApi
+} from '../services/workspaceService';
+import { getAccessToken } from '../services/workspaceAuth';
 
 export type LearningMaterialMode = 'video' | 'notes' | 'ppt' | 'quiz';
 
@@ -81,6 +89,10 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
     getLessonQuizAttempts,
     updateLessonConfig
   } = useLms();
+
+  const { authUser } = useAuth();
+  const { adminUser, isAuthenticated: isShopAdmin } = useShopAuth();
+  const isAdmin = Boolean(authUser?.role === 'admin' || adminUser || isShopAdmin);
 
   // Resolve active course from URL param
   const resolvedCourse = useMemo(() => {
@@ -160,12 +172,49 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeChapterIdx, setActiveChapterIdx] = useState(0);
 
-  // Notes viewer state
+  // Notes viewer state & Google Docs integration (defaulting to 1Bw-Qs47_lPYuwX9Jv9BUPREp6Uevwz4r0qlbQtmMZSs)
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
+  const [googleDocId, setGoogleDocId] = useState<string>(() => {
+    try {
+      return localStorage.getItem('elaw_workspace_latest_doc_id') || '1Bw-Qs47_lPYuwX9Jv9BUPREp6Uevwz4r0qlbQtmMZSs';
+    } catch {
+      return '1Bw-Qs47_lPYuwX9Jv9BUPREp6Uevwz4r0qlbQtmMZSs';
+    }
+  });
+  const [inputGoogleDocId, setInputGoogleDocId] = useState<string>('');
+  const [notesDisplayMode, setNotesDisplayMode] = useState<'google-doc' | 'statutory-reader'>('google-doc');
+  const [isSyncingGoogleDoc, setIsSyncingGoogleDoc] = useState(false);
 
-  // PPT viewer state
+  // PPT viewer state & Google Slides integration
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [pptZoom, setPptZoom] = useState<number>(100);
+  const [googleSlideId, setGoogleSlideId] = useState<string>(() => {
+    try {
+      return localStorage.getItem('elaw_workspace_latest_slide_id') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [inputGoogleSlideId, setInputGoogleSlideId] = useState<string>('');
+  const [pptDisplayMode, setPptDisplayMode] = useState<'google-slides' | 'interactive-deck'>('google-slides');
+  const [isCreatingGoogleSlides, setIsCreatingGoogleSlides] = useState(false);
+
+  // Auto-discover latest Google Slides presentation from user's Google Drive if signed in
+  useEffect(() => {
+    if (!googleSlideId && getAccessToken()) {
+      workspaceDriveApi
+        .listFiles(5, "mimeType='application/vnd.google-apps.presentation'")
+        .then((files) => {
+          if (files && files.length > 0 && files[0].id) {
+            setGoogleSlideId(files[0].id);
+            try {
+              localStorage.setItem('elaw_workspace_latest_slide_id', files[0].id);
+            } catch {}
+          }
+        })
+        .catch(() => {});
+    }
+  }, [googleSlideId]);
 
   // Quiz state
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>(() =>
@@ -801,7 +850,11 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => handleNavigateMaterialRoute(lesson.lessonId, 'notes')}
+                      onClick={() => {
+                        setNotesDisplayMode('google-doc');
+                        handleNavigateMaterialRoute(lesson.lessonId, 'notes');
+                      }}
+                      title={`Google Doc created! ID: ${googleDocId}`}
                       className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                         mode === 'notes'
                           ? 'bg-emerald-600 text-white'
@@ -809,7 +862,7 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                       }`}
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span>Read Notes</span>
+                      <span>Read Notes (Google Doc)</span>
                       {progress.notesCompleted && (
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
                       )}
@@ -817,7 +870,11 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => handleNavigateMaterialRoute(lesson.lessonId, 'ppt')}
+                      onClick={() => {
+                        setPptDisplayMode('google-slides');
+                        handleNavigateMaterialRoute(lesson.lessonId, 'ppt');
+                      }}
+                      title="Slide deck initialized! Open in Google Slides."
                       className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                         mode === 'ppt'
                           ? 'bg-emerald-600 text-white'
@@ -825,7 +882,7 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                       }`}
                     >
                       <Presentation className="w-3.5 h-3.5" />
-                      <span>View PPT</span>
+                      <span>View PPT (Google Slides)</span>
                     </button>
 
                     <button
@@ -892,8 +949,14 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                   </div>
                 </div>
 
-                {/* Class Completion Progress Strip */}
-                <div className="bg-white border-b border-slate-100 px-5 sm:px-7 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                {/* Class Completion Progress Strip (Admin Only) */}
+                <div
+                  className={
+                    isAdmin
+                      ? 'bg-white border-b border-slate-100 px-5 sm:px-7 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500'
+                      : 'hidden'
+                  }
+                >
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="font-semibold text-slate-700">
                       Class {lesson.classNumber} Status:
@@ -1233,22 +1296,179 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                   {/* 2. CLASS NOTES PAGE VIEW */}
                   {mode === 'notes' && (
                     <div className="space-y-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+                      <div
+                        className={
+                          isAdmin
+                            ? 'flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200'
+                            : 'hidden'
+                        }
+                      >
                         <div>
-                          <div className="text-xs text-slate-500 font-medium">
-                            Read-Only Protected Viewer · Direct file download disabled
+                          <div className="text-xs text-emerald-700 font-bold">
+                            Google Doc created! ID: {googleDocId}
                           </div>
                           <h2 className="text-lg font-bold text-slate-900">
                             {lesson.notesAsset.title}
                           </h2>
                         </div>
-                        <div className="text-xs font-mono tabular-nums text-slate-600">
-                          Reading Checkpoints: {progress.notesSectionsRead.length} of{' '}
-                          {lesson.notesAsset.sections.length} sections read
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button
+                              type="button"
+                              onClick={() => setNotesDisplayMode('google-doc')}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                notesDisplayMode === 'google-doc'
+                                  ? 'bg-emerald-700 text-white shadow-2xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Google Docs Viewer
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNotesDisplayMode('statutory-reader')}
+                              className={`hidden px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                notesDisplayMode === 'statutory-reader'
+                                  ? 'bg-emerald-700 text-white shadow-2xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Protected Statutory Handout
+                            </button>
+                          </div>
+                          <div className="text-xs font-mono tabular-nums text-slate-600">
+                            Reading Checkpoints: {progress.notesSectionsRead.length} of{' '}
+                            {lesson.notesAsset.sections.length} sections read
+                          </div>
                         </div>
                       </div>
 
-                      {/* Protected Interactive PDF Reader (R2 Signed PDF, External PDF, & Multi-Page Statutory Handout) */}
+                      {/* Google Docs Connected Banner & Live Embedded Document (Admin Only) */}
+                      <div
+                        className={
+                          isAdmin
+                            ? 'p-4 sm:p-5 bg-emerald-50/90 border border-emerald-200 rounded-2xl space-y-4'
+                            : 'hidden'
+                        }
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900">
+                              <FileText className="w-4 h-4 text-emerald-700" />
+                              <span>Google Doc created! ID: {googleDocId}</span>
+                            </div>
+                            <p className="text-xs text-emerald-800">
+                              Document ready! View the live Google Doc directly below or open in Google Docs to draft and share.
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <a
+                              href={`https://docs.google.com/document/d/${googleDocId}/edit`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors"
+                            >
+                              <span>Open Document in Google Docs</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                            <button
+                              type="button"
+                              disabled={isSyncingGoogleDoc}
+                              onClick={async () => {
+                                try {
+                                  setIsSyncingGoogleDoc(true);
+                                  const bodyText =
+                                    `CLASS ${lesson.classNumber}: ${lesson.heading.toUpperCase()}\n` +
+                                    `Course: ${resolvedCourse.title}\n\n` +
+                                    lesson.notesAsset.sections
+                                      .map(
+                                        (s, idx) =>
+                                          `${idx + 1}. ${s.heading} (${s.statutoryRef})\n${s.content}\nKey Points:\n- ${s.keyChecklist.join('\n- ')}`
+                                      )
+                                      .join('\n\n') +
+                                    '\n\n';
+                                  await workspaceDocsApi.insertText(googleDocId, bodyText);
+                                  setFeedbackBanner({
+                                    type: 'success',
+                                    text: `Class ${lesson.classNumber} statutory notes synced into Google Doc (${googleDocId})!`
+                                  });
+                                } catch (err: any) {
+                                  setFeedbackBanner({
+                                    type: 'info',
+                                    text: err?.message || 'Viewing connected Google Doc.'
+                                  });
+                                } finally {
+                                  setIsSyncingGoogleDoc(false);
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
+                            >
+                              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGoogleDoc ? 'animate-spin' : ''}`} />
+                              <span>{isSyncingGoogleDoc ? 'Syncing to Doc...' : 'Sync Class Notes to Doc'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleMarkCurrentSectionComplete}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Mark Notes Completed</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Optional Switch Google Doc ID */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-emerald-200/70">
+                          <input
+                            type="text"
+                            value={inputGoogleDocId}
+                            onChange={(e) => setInputGoogleDocId(e.target.value)}
+                            placeholder="Paste another Google Doc ID or URL (default: 1Bw-Qs47_lPYuwX9Jv9BUPREp6Uevwz4r0qlbQtmMZSs)"
+                            className="flex-1 px-3 py-1.5 rounded-xl border border-emerald-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-emerald-600"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const raw = inputGoogleDocId.trim();
+                              if (!raw) return;
+                              const match = raw.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+                              const cleanId = match ? match[1] : raw;
+                              setGoogleDocId(cleanId);
+                              try {
+                                localStorage.setItem('elaw_workspace_latest_doc_id', cleanId);
+                              } catch {}
+                              setInputGoogleDocId('');
+                              setFeedbackBanner({
+                                type: 'success',
+                                text: `Google Doc connected! ID: ${cleanId}`
+                              });
+                            }}
+                            className="px-3.5 py-1.5 rounded-xl bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-900 cursor-pointer whitespace-nowrap"
+                          >
+                            Load Google Doc ID
+                          </button>
+                        </div>
+                      </div>
+
+                      {notesDisplayMode === 'google-doc' ? (
+                        <div className="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-xs">
+                          <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between text-xs">
+                            <span className="font-mono">
+                              docs.google.com/document/d/{googleDocId}/preview
+                            </span>
+                            <span className="text-emerald-400 font-semibold">
+                              Live Google Docs Stream
+                            </span>
+                          </div>
+                          <iframe
+                            src={`https://docs.google.com/document/d/${googleDocId}/preview`}
+                            title={`Google Doc ${googleDocId}`}
+                            className="w-full h-[680px] border-0"
+                            allow="autoplay"
+                          />
+                        </div>
+                      ) : (
+                      /* Protected Interactive PDF Reader (R2 Signed PDF, External PDF, & Multi-Page Statutory Handout) */
                       <ProtectedPdfReader
                         pdfUrl={
                           (lesson.notesAsset.r2ObjectKey && signedReadData?.signedReadUrl) ||
@@ -1294,6 +1514,7 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                           });
                         }}
                       />
+                      )}
 
                       {/* Section Selector Bar (Hidden) */}
                       <div className="hidden">
@@ -1412,18 +1633,49 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                   {/* 3. PPT SLIDES PAGE VIEW */}
                   {mode === 'ppt' && (
                     <div className="space-y-5">
-                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
+                      <div
+                        className={
+                          isAdmin
+                            ? 'flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200'
+                            : 'hidden'
+                        }
+                      >
                         <div>
-                          <div className="text-xs text-slate-500 font-medium">
-                            Interactive Presentation Deck · Reference material (Not a completion blocker)
+                          <div className="text-xs text-emerald-700 font-bold">
+                            Slide deck initialized! Open in Google Slides.
                           </div>
                           <h2 className="text-lg font-bold text-slate-900">
                             {lesson.pptAsset.title}
                           </h2>
                         </div>
 
-                        {/* Zoom Controls */}
-                        <div className="flex items-center gap-2">
+                        {/* View Switcher & Zoom Controls */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button
+                              type="button"
+                              onClick={() => setPptDisplayMode('google-slides')}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                pptDisplayMode === 'google-slides'
+                                  ? 'bg-emerald-700 text-white shadow-2xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Google Slides Deck
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPptDisplayMode('interactive-deck')}
+                              className={`hidden px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                pptDisplayMode === 'interactive-deck'
+                                  ? 'bg-emerald-700 text-white shadow-2xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Interactive Slide Canvas
+                            </button>
+                          </div>
+
                           <button
                             type="button"
                             onClick={() => setPptZoom((z) => Math.max(85, z - 15))}
@@ -1445,6 +1697,139 @@ export const ClassLearningPage: React.FC<ClassLearningPageProps> = ({
                           </button>
                         </div>
                       </div>
+
+                      {/* Google Slides Initialized Banner & Controls (Admin Only) */}
+                      <div
+                        className={
+                          isAdmin
+                            ? 'p-4 sm:p-5 bg-emerald-50/90 border border-emerald-200 rounded-2xl space-y-4'
+                            : 'hidden'
+                        }
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900">
+                              <Presentation className="w-4 h-4 text-emerald-700" />
+                              <span>
+                                Slide deck initialized! Open in Google Slides.
+                                {googleSlideId ? ` (ID: ${googleSlideId})` : ''}
+                              </span>
+                            </div>
+                            <p className="text-xs text-emerald-800">
+                              Access the Google Slides presentation deck for Class {lesson.classNumber} ({lesson.pptAsset.deckCode}) or initialize a new Google Slides deck in your connected Workspace.
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <a
+                              href={
+                                googleSlideId
+                                  ? `https://docs.google.com/presentation/d/${googleSlideId}/edit`
+                                  : 'https://docs.google.com/presentation/u/0/'
+                              }
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors"
+                            >
+                              <span>Open Presentation</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+
+                            <button
+                              type="button"
+                              disabled={isCreatingGoogleSlides}
+                              onClick={async () => {
+                                try {
+                                  setIsCreatingGoogleSlides(true);
+                                  const pres = await workspaceSlidesApi.createPresentation(
+                                    `Class_${lesson.classNumber}_${lesson.pptAsset.deckCode}_Advisory_Deck`
+                                  );
+                                  setGoogleSlideId(pres.presentationId);
+                                  try {
+                                    localStorage.setItem(
+                                      'elaw_workspace_latest_slide_id',
+                                      pres.presentationId
+                                    );
+                                  } catch {}
+                                  setFeedbackBanner({
+                                    type: 'success',
+                                    text: `Slide deck initialized! Open in Google Slides. (ID: ${pres.presentationId})`
+                                  });
+                                } catch (err: any) {
+                                  setFeedbackBanner({
+                                    type: 'error',
+                                    text:
+                                      err?.message ||
+                                      'Please authorize Google Workspace in /workspace to generate a new Google Slides deck.'
+                                  });
+                                } finally {
+                                  setIsCreatingGoogleSlides(false);
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
+                            >
+                              <RefreshCw className={`w-3.5 h-3.5 ${isCreatingGoogleSlides ? 'animate-spin' : ''}`} />
+                              <span>
+                                {isCreatingGoogleSlides
+                                  ? 'Initializing Slide Deck...'
+                                  : 'Initialize New Google Slides Deck'}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Paste / Connect Google Slides Presentation ID or URL */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-emerald-200/70">
+                          <input
+                            type="text"
+                            value={inputGoogleSlideId}
+                            onChange={(e) => setInputGoogleSlideId(e.target.value)}
+                            placeholder="Paste Google Slides Presentation ID or URL (https://docs.google.com/presentation/d/...)"
+                            className="flex-1 px-3 py-1.5 rounded-xl border border-emerald-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-emerald-600"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const raw = inputGoogleSlideId.trim();
+                              if (!raw) return;
+                              const match = raw.match(/\/presentation\/d\/([a-zA-Z0-9-_]+)/);
+                              const cleanId = match ? match[1] : raw;
+                              setGoogleSlideId(cleanId);
+                              try {
+                                localStorage.setItem('elaw_workspace_latest_slide_id', cleanId);
+                              } catch {}
+                              setInputGoogleSlideId('');
+                              setFeedbackBanner({
+                                type: 'success',
+                                text: `Slide deck initialized! Open in Google Slides. (ID: ${cleanId})`
+                              });
+                            }}
+                            className="px-3.5 py-1.5 rounded-xl bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-900 cursor-pointer whitespace-nowrap"
+                          >
+                            Connect Google Slides ID
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Embedded Google Slides Viewer when googleSlideId is connected */}
+                      {pptDisplayMode === 'google-slides' && googleSlideId && (
+                        <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-950 shadow-xs">
+                          <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between text-xs border-b border-slate-800">
+                            <span className="font-mono">
+                              docs.google.com/presentation/d/{googleSlideId}/embed
+                            </span>
+                            <span className="text-emerald-400 font-semibold">
+                              Slide deck initialized! Open in Google Slides.
+                            </span>
+                          </div>
+                          <iframe
+                            src={`https://docs.google.com/presentation/d/${googleSlideId}/embed?start=false&loop=false&delayms=5000`}
+                            title={`Google Slides ${googleSlideId}`}
+                            className="w-full h-[540px] border-0"
+                            allowFullScreen
+                          />
+                        </div>
+                      )}
 
                       {/* Protected PDF / Presentation Deck Reader (when uploaded in R2 or External URL) */}
                       {(lesson.pptAsset.r2ObjectKey || lesson.pptAsset.externalUrl) && (

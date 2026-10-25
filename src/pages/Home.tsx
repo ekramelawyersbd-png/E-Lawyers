@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check, ThumbsUp, MessageCircle, HelpCircle, Star, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check, ThumbsUp, MessageCircle, HelpCircle, Star, CheckCircle2, MapPin } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { INITIAL_EXPERTS, INITIAL_QUESTIONS } from '../data/communityData';
 import { format } from 'date-fns';
@@ -950,6 +950,128 @@ export function Home() {
                   <span>Meet Experts</span>
                 </Link>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Careers Highlight Section — E-Lawyers */}
+      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#c7a76b]/50 bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#16445a]">
+
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-[#c7a76b]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+
+                {/* LEFT: Copy + CTA */}
+                <div className="lg:w-[52%]">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>We're Hiring · 4 Career Tracks Open</span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                    Build Your Career at{' '}
+                    <span className="bg-gradient-to-r from-[#ddc38f] via-[#c7a76b] to-[#ddc38f] bg-clip-text text-transparent">
+                      E-Lawyers
+                    </span>
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                    Join a premier corporate legal &amp; business consultancy in Dhaka. 4 career
+                    tracks now open for fresh graduates &amp; experienced professionals.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link to="/Careers"
+                       className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c7a76b] via-[#d5b67b] to-[#c7a76b] hover:from-[#d5b67b] hover:to-[#c7a76b] text-[#10243a] font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all">
+                      <span>Explore All Careers</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                      <Clock className="w-3.5 h-3.5" />
+                      Deadline: Oct 31, 2026
+                    </span>
+                  </div>
+                </div>
+
+                {/* RIGHT: 4 Role Mini-Cards */}
+                <div className="lg:w-[48%]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+                    {/* Role 1: MTO */}
+                    <Link to="/Careers/mto"
+                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Award className="w-5 h-5 text-amber-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">MTO Trainee</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 2: Sales & Marketing */}
+                    <Link to="/Careers/sales-marketing"
+                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <LineChart className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Sales &amp; Marketing</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 3: Accountant */}
+                    <Link to="/Careers/accountant"
+                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Calculator className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Accountant</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Accounts Division)</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 4: Customer Care */}
+                    <Link to="/Careers/customer-care"
+                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c7a76b] backdrop-blur-sm transition-all">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Users className="w-5 h-5 text-[#10243a]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Customer Care</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Female Only)</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Strip */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-[#c7a76b]" />
+                  Panthapath, Dhaka · Full-Time In-Person Positions
+                </span>
+                <Link to="/Careers#check-status"
+                   className="text-[#ddc38f] font-bold hover:text-white flex items-center gap-1 transition-colors">
+                  Already applied? Check Status
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+
             </div>
           </div>
         </div>

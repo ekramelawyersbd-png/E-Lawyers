@@ -5,6 +5,7 @@ import { Search, BookOpen, AlertCircle, FileText, Loader2, Bookmark, Calendar, A
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { ToolSEO } from '../components/SEO';
 
 export function TaxPolicyAnalysis() {
   
@@ -83,6 +84,15 @@ export function TaxPolicyAnalysis() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <ToolSEO
+        title={
+          lastQuery
+            ? `${lastQuery} – Bangladesh Tax Policy Analysis | Accounticca`
+            : 'Bangladesh Tax Policy & Finance Act Analysis Tool | Accounticca & E-Lawyers'
+        }
+        description="Analyze Bangladesh Finance Act updates, Income Tax Act 2023 statutory provisions, NBR SROs, and historical fiscal policy trends."
+        canonicalUrl="/policy-analysis"
+      />
       <Breadcrumbs items={[{ label: 'Tools' }, { label: 'Tax Policy Analysis' }]} />
       
       <div className="mb-10">

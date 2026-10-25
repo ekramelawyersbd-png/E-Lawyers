@@ -1,6 +1,0 @@
-{
-  "summary":  "Implementation plan for synchronizing all /shop data (Customer Orders & Checkout Transactions alongside Product Catalog & Pricing Inventory) into a single unified Google Sheet tab in /workspace with real-time order/catalog append and deduplicated batch synchronization.",
-  "updatedAt":  "2026-10-23T15:23:41.282993843Z",
-  "requestFeedback":  true,
-  "userFacing":  true
-}

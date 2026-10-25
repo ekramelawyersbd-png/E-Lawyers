@@ -539,7 +539,7 @@ export const UserBadgesSection: React.FC = () => {
   };
 
   return (
-    <div id="user-achievements-system-card" className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-8">
+    <div id="user-achievements-system-card" className="hidden bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-8">
       {/* Newly Unlocked Celebration Toast Modal */}
       {newlyUnlockedBadge && (
         <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-emerald-600 text-white rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in border border-amber-300">

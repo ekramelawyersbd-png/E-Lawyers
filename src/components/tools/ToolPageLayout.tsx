@@ -23,6 +23,7 @@ import { searchableTaxTools, SearchableTool } from '../../data/searchableTools';
 import { SHOP_PRODUCTS } from '../../data/shopProducts';
 import { usePurchases } from '../../contexts/PurchaseContext';
 import { buildAppointmentUrl } from '../../utils/appointmentRedirect';
+import { ToolSEO } from '../SEO';
 
 interface ToolPageLayoutProps {
   toolId: string;
@@ -83,9 +84,21 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
 
   // Filter related tools (other tools in same or related category)
   const relatedTools = allTools.filter(t => t.id !== toolId).slice(0, 4);
+  const currentToolRoute = getToolRoute(toolId);
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-16 pt-6">
+      <ToolSEO
+        title={`${title} – ${category} | Accounticca & E-Lawyers`}
+        description={description}
+        canonicalUrl={currentToolRoute}
+        keywords={[title, category, 'Bangladesh Tax Calculator', 'RJSC Compliance', 'Income Tax Act 2023']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Tools Hub', url: '/tools' },
+          { name: title, url: currentToolRoute }
+        ]}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* Header & Navigation Bar */}

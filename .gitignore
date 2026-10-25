@@ -1,4 +1,7 @@
 node_modules/
+functions/node_modules/
+functions/lib/
+.aistudio/
 build/
 dist/
 coverage/
@@ -6,3 +9,5 @@ coverage/
 *.log
 .env*
 !.env.example
+public/assets/aistudio/
+

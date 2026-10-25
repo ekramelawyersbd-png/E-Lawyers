@@ -438,14 +438,14 @@ export function Shop() {
                   ACCOUNTICCA <span className="text-amber-400">×</span> E-LAWYERS • Official Repository
                 </div>
 
-                <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl font-serif">
+                <h1 className="max-w-3xl text-[31px] font-semibold leading-tight tracking-tight text-white font-serif">
                   Practitioner-vetted legal & tax toolkits.
                   <span className="mt-2 block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 font-sans font-bold">
                     Ready for immediate execution.
                   </span>
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+                <p className="mt-6 max-w-2xl text-[15px] leading-7 text-slate-300">
                   Supreme Court advocate-drafted contracts, automated NBR tax & VAT calculators for FY 2026–27, RJSC compliance formats, and on-demand legal counsel vouchers.
                 </p>
 

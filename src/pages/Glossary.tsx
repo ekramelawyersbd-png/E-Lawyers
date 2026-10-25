@@ -33,6 +33,7 @@ import { GlossaryQuiz } from '../components/glossary/GlossaryQuiz';
 import { TermDetailModal } from '../components/glossary/TermDetailModal';
 import { InteractiveKeyTermsEducator } from '../components/glossary/InteractiveKeyTermsEducator';
 import { Link } from 'react-router-dom';
+import { SEO } from '../components/SEO';
 
 const BOOKMARKS_STORAGE_KEY = 'elawyers_glossary_bookmarks';
 
@@ -128,6 +129,23 @@ export function Glossary() {
 
   return (
     <div className="min-h-screen bg-slate-50/60 pb-20">
+      <SEO
+        title={
+          selectedTermForModal
+            ? `${selectedTermForModal.term} – Statutory Definition | Accounting & Tax Glossary`
+            : 'Bangladesh Accounting, Income Tax, VAT & RJSC Legal Glossary | Accounticca'
+        }
+        description={
+          selectedTermForModal
+            ? selectedTermForModal.definition
+            : 'Comprehensive statutory dictionary of Bangladesh Income Tax Act 2023, VAT & SD Act 2012, RJSC Companies Act 1994, and IFRS accounting terminology.'
+        }
+        canonicalUrl="/glossary"
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Glossary & Terminology', url: '/glossary' }
+        ]}
+      />
       {/* Top Breadcrumb & Hero */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">

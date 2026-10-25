@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { EnrollmentModal } from '../components/training/EnrollmentModal';
 import { teamMembers } from '../data/teamData';
+import { CourseSEO } from '../components/SEO';
 
 export function PersonalIncomeTaxCourse() {
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
@@ -278,6 +279,17 @@ export function PersonalIncomeTaxCourse() {
 
   return (
     <div className="bg-white text-slate-950 font-sans selection:bg-emerald-100 selection:text-emerald-800">
+      <CourseSEO
+        title="Practical Personal Income Tax Assessment & Return Filing Course (ITA 2023) | E-Lawyers Academy"
+        description="Master personal income tax computation, investment tax rebates, and online e-Return filing under the Income Tax Act 2023 across 10 live interactive classes."
+        canonicalUrl="/course/personal-income-tax"
+        keywords={['Personal Income Tax Course Bangladesh', 'ITA 2023 Training', 'Tax Return Filing Course', 'E-Lawyers Academy']}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Training Hub', url: '/training' },
+          { name: 'Personal Income Tax Course', url: '/course/personal-income-tax' }
+        ]}
+      />
       
       {/* Announcement Bar */}
       <div className="bg-slate-900 text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800 flex items-center justify-center gap-2">

@@ -33,7 +33,6 @@ import {
   AlertCircle,
   Activity,
   BarChart2,
-  BarChart3,
   Settings,
   MessageSquarePlus,
   FileSpreadsheet,
@@ -45,7 +44,6 @@ import { ComplianceChecklist } from '../components/dashboard/ComplianceChecklist
 import { ServiceWorkloadDonutChart } from '../components/dashboard/ServiceWorkloadDonutChart';
 import { ClientActivityFeed } from '../components/dashboard/ClientActivityFeed';
 import { InvoiceReminderManager } from '../components/dashboard/InvoiceReminderManager';
-import { UserActivityDashboard } from '../components/dashboard/UserActivityDashboard';
 import { DailyGoalTracker } from '../components/dashboard/DailyGoalTracker';
 import { GoalReminderToast } from '../components/dashboard/GoalReminderToast';
 import { UserBadgesSection } from '../components/dashboard/UserBadgesSection';
@@ -60,6 +58,7 @@ import { ExportDataModal } from '../components/dashboard/ExportDataModal';
 import { DashboardQuickActions } from '../components/dashboard/DashboardQuickActions';
 import { WeeklyActivityTrendChart } from '../components/dashboard/WeeklyActivityTrendChart';
 import { AnnualActivityHeatmap } from '../components/dashboard/AnnualActivityHeatmap';
+import { SEO } from '../components/SEO';
 import { checkAndDispatchDeadlineNotifications } from '../services/smartNotificationService';
 import { generateComplianceSummaryPDF } from '../utils/pdfGenerator';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -86,11 +85,10 @@ export function Dashboard() {
   
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [profileSubTab, setProfileSubTab] = useState<
-    'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'analytics' | 'achievements'
+    'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'achievements'
   >(() => {
     const target = sectionParam || tabParam;
     if (target === 'achievements' || target === 'badges') return 'achievements';
-    if (target === 'analytics' || target === 'charts') return 'analytics';
     if (target === 'activity') return 'activity';
     if (target === 'reminders' || target === 'invoices') return 'reminders';
     if (target === 'payments') return 'payments';
@@ -195,9 +193,6 @@ export function Dashboard() {
     } else if (target === 'achievements' || target === 'badges') {
       setActiveTab('profile');
       setProfileSubTab('achievements');
-    } else if (target === 'analytics' || target === 'charts') {
-      setActiveTab('profile');
-      setProfileSubTab('analytics');
     } else if (target === 'activity') {
       setActiveTab('profile');
       setProfileSubTab('activity');
@@ -220,7 +215,7 @@ export function Dashboard() {
   }, [tabParam, sectionParam]);
 
   const switchProfileSubTab = (
-    subTab: 'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'analytics' | 'achievements'
+    subTab: 'overview' | 'saved' | 'applications' | 'payments' | 'reminders' | 'activity' | 'achievements'
   ) => {
     setActiveTab('profile');
     setProfileSubTab(subTab);
@@ -231,17 +226,16 @@ export function Dashboard() {
     }
   };
 
-  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'analytics' | 'purchases' | 'feedback' | 'achievements' | 'deadlines') => {
+  const switchTab = (tab: 'saved' | 'articles' | 'profile' | 'applications' | 'payments' | 'activity' | 'reminders' | 'purchases' | 'feedback' | 'achievements' | 'deadlines') => {
     if (
       tab === 'achievements' ||
-      tab === 'analytics' ||
       tab === 'activity' ||
       tab === 'reminders' ||
       tab === 'payments' ||
       tab === 'saved' ||
       tab === 'applications'
     ) {
-      switchProfileSubTab(tab);
+      switchProfileSubTab(tab as any);
       return;
     }
     setActiveTab(tab);
@@ -390,6 +384,12 @@ export function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-20 flex flex-col md:flex-row items-start gap-8">
+      <SEO
+        title="Client & Compliance Dashboard – Deadlines, Bookmarks & Filings | Accounticca"
+        description="Manage your statutory compliance calendar, saved tax scenarios, bookmarked legal guides, and filing reminders on your Accounticca Dashboard."
+        canonicalUrl="/dashboard"
+        type="webapp"
+      />
       {/* Sidebar */}
       <aside className="w-full md:w-64 shrink-0 md:sticky md:top-24">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-6">
@@ -453,7 +453,6 @@ export function Dashboard() {
                     { id: 'payments', label: 'Payment Status', badge: null },
                     { id: 'reminders', label: 'Invoice Reminders', badge: pendingInvoicesCount },
                     { id: 'activity', label: 'Activity Feed', badge: null },
-                    { id: 'analytics', label: 'Activity Analytics', badge: null },
                     { id: 'achievements', label: 'Achievements & Badges', badge: null },
                   ].map((item) => (
                     <button
@@ -623,7 +622,7 @@ export function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 min-w-0 w-full space-y-8">
         {/* Dashboard Title & Quick Actions Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div className="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl font-bold text-slate-900">Compliance & Advisory Dashboard</h1>
@@ -650,7 +649,7 @@ export function Dashboard() {
         </div>
 
         {/* KPI Summary Row Cards (Current Month) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Revenue</p>
@@ -736,11 +735,7 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Workflow Quick Links & Floating Action System */}
-        <DashboardQuickActions 
-          onOpenExportModal={() => setShowExportModal(true)} 
-          onNavigateTab={(tab) => switchTab(tab as any)} 
-        />
+        {/* Quick links removed per user request */}
 
         {activeTab === 'deadlines' ? (
           <ComplianceDeadlinesCalendarView />
@@ -879,19 +874,7 @@ export function Dashboard() {
                   <span>Activity Feed</span>
                 </button>
 
-                <button
-                  id="profile-subtab-analytics"
-                  type="button"
-                  onClick={() => switchProfileSubTab('analytics')}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    profileSubTab === 'analytics'
-                      ? 'bg-emerald-700 text-white shadow-xs'
-                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
-                  }`}
-                >
-                  <BarChart3 className="w-3.5 h-3.5" />
-                  <span>Activity Analytics</span>
-                </button>
+
 
                 <button
                   id="profile-subtab-achievements"
@@ -915,8 +898,6 @@ export function Dashboard() {
               <PaymentStatusWidget onNavigateReminders={() => switchProfileSubTab('reminders')} />
             ) : profileSubTab === 'activity' ? (
               <ClientActivityFeed />
-            ) : profileSubTab === 'analytics' ? (
-              <UserActivityDashboard onNavigateTab={(tab) => switchTab(tab)} />
             ) : profileSubTab === 'reminders' ? (
               <InvoiceReminderManager onViewPayments={() => switchProfileSubTab('payments')} />
             ) : profileSubTab === 'achievements' ? (

@@ -34,7 +34,7 @@ import { SortableTable } from '../components/SortableTable';
 import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
-import { Helmet } from 'react-helmet-async';
+import { ArticleSEO } from '../components/SEO';
 import { BlogDisclaimer } from '../components/BlogDisclaimer';
 import { ContactELawyers } from '../components/ContactELawyers';
 import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
@@ -184,35 +184,9 @@ export function TaxRefundGuide() {
     table: ({ node, children, ...props }: any) => <SortableTable {...props}>{children}</SortableTable>
   }), [article.id]);
 
-  const pageUrl = `${window.location.origin}/tax-refund-guide`;
-
   return (
     <>
-      <Helmet>
-        <title>{article.metaTitle || `${article.title} | Accounticca E-Lawyers`}</title>
-        <meta name="description" content={article.metaDescription || article.excerpt} />
-        
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={pageUrl} />
-        <meta property="og:title" content={article.metaTitle || article.title} />
-        <meta property="og:description" content={article.metaDescription || article.excerpt} />
-        <meta property="og:image" content={article.imageUrl} />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={pageUrl} />
-        <meta property="twitter:title" content={article.metaTitle || article.title} />
-        <meta property="twitter:description" content={article.metaDescription || article.excerpt} />
-        <meta property="twitter:image" content={article.imageUrl} />
-
-        {/* Article specific metadata */}
-        <meta property="article:published_time" content={article.publishedAt} />
-        <meta property="article:author" content={article.author.name} />
-        {article.tags?.map(tag => (
-          <meta property="article:tag" content={tag} key={tag} />
-        ))}
-      </Helmet>
+      <ArticleSEO article={article} canonicalUrl="/tax-refund-guide" />
       <ReadProgress />
 
       {/* Floating Left Social Share Rail for Desktop */}

@@ -40,6 +40,7 @@ import {
   calculateCustomsDuties, 
   DutyCalculationInputs 
 } from '../../data/nationalRateDatabase';
+import { ToolSEO } from '../../components/SEO';
 
 export function RateFinderPage() {
   // Navigation tab states
@@ -260,6 +261,16 @@ Effective Total Tax Incidence (TTI): ${dutyBreakdown.effectiveTotalTaxIncidenceP
 
   return (
     <div className="min-h-screen bg-slate-50 pt-6 pb-16">
+      <ToolSEO
+        title={
+          selectedItem
+            ? `${selectedItem.title} (${selectedItem.codeOrSection}) – National Rate Finder | Accounticca`
+            : 'Bangladesh National Tax, VAT, TDS, VDS & Customs Duty Rate Finder | Accounticca'
+        }
+        description="Search statutory VAT schedules, TDS/VDS withholding sections, and HS Code customs import duty rates under Bangladesh Finance Act 2026."
+        canonicalUrl="/tools/rate-finder"
+        keywords={['Bangladesh VAT Rate Finder', 'TDS VDS Rate Schedule', 'HS Code Duty Calculator Bangladesh', 'NBR Rate Finder']}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb Navigation */}

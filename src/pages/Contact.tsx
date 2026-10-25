@@ -7,7 +7,9 @@ import {
   CalendarDays,
   Check,
   CheckCircle2,
+  AlertCircle,
   ChevronRight,
+  ChevronDown,
   Clock3,
   Copy,
   ExternalLink,
@@ -20,11 +22,10 @@ import {
   MessageCircle,
   Phone,
   ShieldCheck,
-  Sparkles,
   Youtube,
   Facebook,
   Scale,
-  FileSpreadsheet,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -34,6 +35,8 @@ import { getStoredContactSheetId } from '../services/contactSheetsSync';
 import { AppointmentBookingForm } from '../components/AppointmentBookingForm';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
+import { FormSuccessAnimation } from '../components/FormSuccessAnimation';
+import { ServiceSEO } from '../components/SEO';
 
 type ContactTab = 'inquiry' | 'appointment';
 type FormField =
@@ -47,6 +50,7 @@ type FormField =
 
 type InquiryFormData = Record<FormField, string>;
 type FieldErrors = Partial<Record<FormField, string>>;
+type UrgencyLevel = 'Standard Advisory (24–48h)' | 'Approaching Deadline (< 7 Days)' | 'Urgent Notice / Hearing';
 
 const PRIMARY_PHONE = '+880 1335-230170';
 const RAW_PHONE = '+8801335230170';
@@ -80,6 +84,101 @@ const LEGAL_SERVICES = new Set([
   'BIDA Approvals & Foreign Direct Investment',
   'Commercial Contracts & IP Protection',
 ]);
+
+const MATTER_TEMPLATES: {
+  label: string;
+  service: string;
+  template: string;
+}[] = [
+  {
+    label: 'RJSC Incorporation & Returns',
+    service: 'Corporate Law & RJSC Compliance',
+    template:
+      'We require assistance with RJSC company formation / annual statutory filing (Schedule X & Form XII) and corporate structuring in Bangladesh. Key details and timeline:',
+  },
+  {
+    label: 'Corporate & Personal Tax',
+    service: 'Corporate Tax, VAT & Statutory Audit',
+    template:
+      'We need advisory support regarding NBR Income Tax return preparation, withholding tax (TDS) compliance, or tax assessment representation for Assessment Year 2026–27:',
+  },
+  {
+    label: 'VAT (Mushak 9.1 & Audit)',
+    service: 'Corporate Tax, VAT & Statutory Audit',
+    template:
+      'We are seeking VAT consultancy regarding BIN registration, monthly Mushak 9.1 return filing, VDS reconciliation, or input-output coefficient (Mushak 4.3) declarations:',
+  },
+  {
+    label: 'BIDA & Foreign Investment',
+    service: 'BIDA Approvals & Foreign Direct Investment',
+    template:
+      'We are an international / joint-venture entity looking for BIDA registration, branch/liaison office setup, work permit processing, or outward remittance compliance:',
+  },
+  {
+    label: 'Contract Drafting & Vetting',
+    service: 'Commercial Contracts & IP Protection',
+    template:
+      'We need legal drafting or vetting for commercial agreements, shareholder agreements, vendor SLAs, or trademark/IP registration in Bangladesh:',
+  },
+];
+
+const PRACTICE_DESKS = [
+  {
+    desk: 'Corporate Structuring & Tax Strategy',
+    lead: 'Ekramul Islam Khandaker',
+    role: 'Founding Member',
+    service: 'Integrated Joint Ecosystem Consultation',
+    focus: 'Entity formation, strategic tax planning, and multi-regulatory governance',
+    imgSrc: 'https://i.ibb.co/tTskLmG0/17-removebg-preview.png',
+  },
+  {
+    desk: 'Commercial Law & Litigation',
+    lead: 'Advocate Anamul Haque',
+    role: 'Founding Member',
+    service: 'Corporate Law & RJSC Compliance',
+    focus: 'Contract vetting, RJSC compliance, commercial disputes, and regulatory vetting',
+    imgSrc: 'https://i.ibb.co/GQvnZKpX/13.png',
+  },
+  {
+    desk: 'Audit, IFRS & ACCA Advisory',
+    lead: 'Muhammad Abdul Kader ACCA',
+    role: 'Senior Consultant',
+    service: 'Fractional CFO & Financial Modeling',
+    focus: 'Financial reporting, statutory audit readiness, and internal control systems',
+    imgSrc: 'https://i.ibb.co/2YPhyMYW/19.png',
+  },
+  {
+    desk: 'NBR Income Tax & VAT Compliance',
+    lead: 'Zohir Uddin',
+    role: 'Partner',
+    service: 'Corporate Tax, VAT & Statutory Audit',
+    focus: 'Corporate & individual tax returns, Mushak compliance, and tribunal defense',
+    imgSrc: 'https://i.ibb.co/FLDh8Wcx/3.png',
+  },
+];
+
+const CONTACT_FAQS = [
+  {
+    question: 'How does routing between Accounticca and E-Lawyers work?',
+    answer:
+      'When you select a service area or submit an inquiry, our intake ledger automatically assigns your brief to E-Lawyers Chambers (for corporate law, RJSC, BIDA, and contracts), Accounticca Advisory (for tax, VAT, audit, and CFO services), or a joint partner desk when your matter spans both legal and financial regulations.',
+  },
+  {
+    question: 'What documents should I prepare before an initial consultation?',
+    answer:
+      'For tax or VAT matters, having your latest TIN/BIN certificate, prior assessment orders, or Mushak 9.1 summaries is helpful. For corporate or RJSC matters, bring your Memorandum & Articles of Association, trade license, or draft commercial agreement. However, no documents are mandatory for an exploratory call.',
+  },
+  {
+    question: 'Do you offer virtual consultations for overseas or FDI clients?',
+    answer:
+      'Yes. In addition to in-person meetings at our Panthapath, Dhaka chambers (BTI Centara Grand), we conduct scheduled consultations via Google Meet, Zoom, and WhatsApp for international investors, NRBs, and corporate teams outside Dhaka.',
+  },
+  {
+    question: 'How quickly can the chamber respond to urgent NBR or RJSC notices?',
+    answer:
+      'For time-sensitive statutory show-cause notices, hearing dates, or withholding tax audits, select "Urgent Notice / Hearing" in Step 1 of the inquiry form or call our direct desk at +880 1335-230170 during chamber hours (Sunday–Thursday).',
+  },
+];
 
 function getRequestedTab(search: string, hash: string): ContactTab {
   const params = new URLSearchParams(search);
@@ -127,11 +226,14 @@ function validateField(field: FormField, value: string): string | undefined {
       ) {
         return 'Check the username portion of your email address.';
       }
-      const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-      if (!emailPattern.test(trimmed)) return 'Enter a valid email address, such as name@company.com.';
+      const emailPattern =
+        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+      if (!emailPattern.test(trimmed))
+        return 'Enter a valid email address, such as name@company.com.';
       const domainLabels = domain.split('.');
       if (domainLabels.some((label) => !label)) return 'Check the domain in your email address.';
-      if ((domainLabels.at(-1) ?? '').length < 2) return 'Email domain extension must contain at least 2 characters.';
+      if ((domainLabels.at(-1) ?? '').length < 2)
+        return 'Email domain extension must contain at least 2 characters.';
       return undefined;
     }
     case 'phone': {
@@ -151,7 +253,8 @@ function validateField(field: FormField, value: string): string | undefined {
       return undefined;
     case 'message':
       if (!trimmed) return 'Please describe your matter.';
-      if (trimmed.length < 15) return `Please provide at least 15 characters (${trimmed.length}/15).`;
+      if (trimmed.length < 15)
+        return `Please provide at least 15 characters (${trimmed.length}/15).`;
       if (trimmed.length > 3000) return 'Please keep your description under 3,000 characters.';
       return undefined;
     case 'service':
@@ -280,36 +383,56 @@ function TextField({
 }: TextFieldProps) {
   const helpId = `${id}-help`;
   const errorId = `${id}-error`;
+  const hasContent = value.trim().length > 0;
+  const isValid = hasContent && !error;
 
   return (
     <div className="min-w-0">
       <label htmlFor={id} className="mb-2 block text-sm font-semibold text-slate-800">
         {label} {required && <span className="text-emerald-700">*</span>}
       </label>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        autoComplete={autoComplete}
-        maxLength={maxLength}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        aria-invalid={showError}
-        aria-describedby={showError ? errorId : helper ? helpId : undefined}
-        className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
-          showError
-            ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
-            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
-        }`}
-      />
+      <div className="relative">
+        <input
+          id={id}
+          name={name}
+          type={type}
+          autoComplete={autoComplete}
+          maxLength={maxLength}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          aria-invalid={showError}
+          aria-describedby={showError ? errorId : helper ? helpId : undefined}
+          className={`w-full rounded-xl border bg-white px-4 py-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+            showError
+              ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+              : isValid
+              ? 'border-emerald-400 focus:border-emerald-600 focus:ring-emerald-600/10'
+              : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
+          }`}
+        />
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none">
+          {isValid ? (
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+          ) : showError && error ? (
+            <AlertCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
+          ) : null}
+        </div>
+      </div>
       {showError ? (
-        <p id={errorId} className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700" role="alert">
-          <span aria-hidden="true">•</span><span>{error}</span>
+        <p
+          id={errorId}
+          className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700"
+          role="alert"
+        >
+          <span aria-hidden="true">•</span>
+          <span>{error}</span>
         </p>
       ) : helper ? (
-        <p id={helpId} className="mt-1.5 text-xs text-slate-500">{helper}</p>
+        <p id={helpId} className="mt-1.5 text-xs text-slate-500">
+          {helper}
+        </p>
       ) : null}
     </div>
   );
@@ -326,6 +449,8 @@ type MessageFieldProps = {
 function MessageField({ value, error, showError, onChange, onBlur }: MessageFieldProps) {
   const errorId = 'contact-message-error';
   const helpId = 'contact-message-help';
+  const hasValidLength = value.trim().length >= 15;
+  const isValid = hasValidLength && !error;
 
   return (
     <div>
@@ -333,38 +458,54 @@ function MessageField({ value, error, showError, onChange, onBlur }: MessageFiel
         <label htmlFor="contact-message" className="text-sm font-semibold text-slate-800">
           Matter description <span className="text-emerald-700">*</span>
         </label>
-        <span className={`text-xs font-medium tabular-nums ${
-          value.trim().length >= 15
-            ? 'text-emerald-800'
-            : 'text-slate-500'
-        }`}>
+        <span
+          className={`text-xs font-medium tabular-nums ${
+            hasValidLength ? 'text-emerald-800' : 'text-slate-500'
+          }`}
+        >
           {value.trim().length}/15 minimum characters
         </span>
       </div>
-      <textarea
-        id="contact-message"
-        name="message"
-        rows={5}
-        maxLength={3000}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onBlur={onBlur}
-        placeholder="Tell us briefly about your business, legal, tax, or compliance needs..."
-        aria-invalid={showError}
-        aria-describedby={showError ? errorId : helpId}
-        className={`w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
-          showError
-            ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
-            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
-        }`}
-      />
+      <div className="relative">
+        <textarea
+          id="contact-message"
+          name="message"
+          rows={5}
+          maxLength={3000}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
+          placeholder="Tell us briefly about your business, legal, tax, or compliance needs..."
+          aria-invalid={showError}
+          aria-describedby={showError ? errorId : helpId}
+          className={`w-full resize-y rounded-xl border bg-white px-4 py-3 pr-11 leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+            showError
+              ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+              : isValid
+              ? 'border-emerald-400 focus:border-emerald-600 focus:ring-emerald-600/10'
+              : 'border-slate-200 hover:border-slate-300 focus:border-emerald-600 focus:ring-emerald-600/10'
+          }`}
+        />
+        <div className="absolute top-3.5 right-3.5 pointer-events-none">
+          {isValid ? (
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+          ) : showError && error ? (
+            <AlertCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
+          ) : null}
+        </div>
+      </div>
       {showError ? (
-        <p id={errorId} className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700" role="alert">
-          <span aria-hidden="true">•</span><span>{error}</span>
+        <p
+          id={errorId}
+          className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-700"
+          role="alert"
+        >
+          <span aria-hidden="true">•</span>
+          <span>{error}</span>
         </p>
       ) : (
         <p id={helpId} className="mt-1.5 text-xs text-slate-500">
-          Please avoid including passwords or other sensitive account credentials.
+          Include relevant assessment years, RJSC entity type, or statutory notice deadlines if applicable.
         </p>
       )}
     </div>
@@ -373,13 +514,18 @@ function MessageField({ value, error, showError, onChange, onBlur }: MessageFiel
 
 type SocialLink = { label: string; href: string; Icon: LucideIcon };
 
-type SocialGroup = { brand: string; description: string; color: 'emerald' | 'teal'; links: SocialLink[] };
+type SocialGroup = {
+  brand: string;
+  description: string;
+  color: 'blue' | 'emerald';
+  links: SocialLink[];
+};
 
 const SOCIAL_GROUPS: SocialGroup[] = [
   {
     brand: 'ACCOUNTICCA',
     description: 'Tax, finance and business advisory',
-    color: 'emerald',
+    color: 'blue',
     links: [
       { label: 'LinkedIn', href: 'https://linkedin.com/company/accounticca', Icon: Linkedin },
       { label: 'Facebook', href: 'https://facebook.com/accounticca', Icon: Facebook },
@@ -389,7 +535,7 @@ const SOCIAL_GROUPS: SocialGroup[] = [
   {
     brand: 'E-LAWYERS',
     description: 'Corporate law and compliance',
-    color: 'teal',
+    color: 'emerald',
     links: [
       { label: 'LinkedIn', href: 'https://linkedin.com/company/elawyersbd', Icon: Linkedin },
       { label: 'Facebook', href: 'https://facebook.com/elawyersbd', Icon: Facebook },
@@ -424,15 +570,23 @@ export function Contact() {
     getRequestedTab(location.search, location.hash),
   );
   const [inquiryState, setInquiryState] = useState<InquiryFormState>(INITIAL_INQUIRY_STATE);
+  const [urgency, setUrgency] = useState<UrgencyLevel>('Standard Advisory (24–48h)');
   const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null);
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
   const [submittedInquiryRef, setSubmittedInquiryRef] = useState<string | null>(null);
   const [inquirySheetSynced, setInquirySheetSynced] = useState(false);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const { currentStep, data: form, touched, attemptedSteps, submitAttempted, stepValidationMessage } =
-    inquiryState;
+  const {
+    currentStep,
+    data: form,
+    touched,
+    attemptedSteps,
+    submitAttempted,
+    stepValidationMessage,
+  } = inquiryState;
 
   useEffect(() => {
     setActiveTab(getRequestedTab(location.search, location.hash));
@@ -446,13 +600,23 @@ export function Contact() {
   const isStep2Valid = Object.keys(step2Errors).length === 0;
   const hasErrors = Object.keys(errors).length > 0;
 
-  const requiredFields: FormField[] = ['service', 'message', 'firstName', 'lastName', 'email', 'phone'];
+  const requiredFields: FormField[] = [
+    'service',
+    'message',
+    'firstName',
+    'lastName',
+    'email',
+    'phone',
+  ];
   const completedRequiredFields = requiredFields.filter(
     (field) => form[field].trim().length > 0 && !validateField(field, form[field]),
   ).length;
-  const completionPercentage = Math.round((completedRequiredFields / requiredFields.length) * 100);
+  const completionPercentage = Math.round(
+    (completedRequiredFields / requiredFields.length) * 100,
+  );
 
-  const currentStepDefinition = INQUIRY_STEPS.find((item) => item.step === currentStep) ?? INQUIRY_STEPS[0];
+  const currentStepDefinition =
+    INQUIRY_STEPS.find((item) => item.step === currentStep) ?? INQUIRY_STEPS[0];
   const currentStepValid =
     currentStep === 1 ? isStep1Valid : currentStep === 2 ? isStep2Valid : !hasErrors;
 
@@ -471,6 +635,47 @@ export function Contact() {
     }));
     setEmailDraftUrl(null);
     setSubmittedInquiryRef(null);
+  };
+
+  const applyMatterTemplate = (service: string, templateText: string) => {
+    setInquiryState((prev) => ({
+      ...prev,
+      currentStep: 1,
+      data: {
+        ...prev.data,
+        service,
+        message: prev.data.message.trim()
+          ? prev.data.message
+          : `${templateText} `,
+      },
+      stepValidationMessage: null,
+    }));
+    window.setTimeout(() => {
+      const msgEl = document.getElementById('contact-message') as HTMLTextAreaElement | null;
+      msgEl?.focus();
+    }, 50);
+  };
+
+  const routeToSpecialistDesk = (service: string, leadName: string) => {
+    selectTab('inquiry');
+    setInquiryState((prev) => ({
+      ...prev,
+      currentStep: 1,
+      data: {
+        ...prev.data,
+        service,
+        message: prev.data.message.trim()
+          ? prev.data.message
+          : `Attention: ${leadName} Desk — We would like to discuss `,
+      },
+      stepValidationMessage: null,
+    }));
+    window.setTimeout(() => {
+      document.getElementById('contact-form-section')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 50);
   };
 
   const markTouched = (field: FormField) => {
@@ -497,7 +702,6 @@ export function Contact() {
   const goToStep = (targetStep: InquiryStep) => {
     if (targetStep === currentStep) return;
 
-    // Going backwards is always allowed
     if (targetStep < currentStep) {
       setInquiryState((prev) => ({
         ...prev,
@@ -507,7 +711,6 @@ export function Contact() {
       return;
     }
 
-    // Going forward requires validating each step prior to targetStep
     if (!isStep1Valid) {
       const firstInvalid = STEP_FIELDS[1].find((f) => step1Errors[f]);
       setInquiryState((prev) => ({
@@ -594,7 +797,9 @@ export function Contact() {
       setCopyStatus(label);
       window.setTimeout(() => setCopyStatus(null), 2200);
     } catch {
-      setCopyError('Copy is unavailable in this browser. Please select the contact detail and copy it manually.');
+      setCopyError(
+        'Copy is unavailable in this browser. Please select the contact detail and copy it manually.',
+      );
     }
   };
 
@@ -650,6 +855,7 @@ export function Contact() {
     const division = assignedDivision;
 
     const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
+    const enrichedMessage = `[Urgency: ${urgency}]\n${form.message.trim()}`;
 
     // 1. Best-effort Firestore save
     try {
@@ -662,8 +868,9 @@ export function Contact() {
         phone: form.phone.trim(),
         companyName: form.companyName.trim() || 'Direct Client / Individual',
         service: form.service,
+        urgency,
         division,
-        message: form.message.trim(),
+        message: enrichedMessage,
         status: 'new',
         createdAt: serverTimestamp(),
       });
@@ -688,12 +895,12 @@ export function Contact() {
           phone: form.phone.trim(),
           companyName: form.companyName.trim() || 'Direct Client / Individual',
           serviceArea: form.service,
-          expertiseTopic: 'General Service Inquiry',
+          expertiseTopic: `General Service Inquiry (${urgency})`,
           consultationMode: 'N/A (Written Inquiry)',
           preferredDate: 'Immediate / Written',
           preferredTimeSlot: 'N/A',
           assignedPartner: `${division} (${recipient})`,
-          messageOrNotes: form.message.trim(),
+          messageOrNotes: enrichedMessage,
           status: 'New Inquiry',
           workspaceAccessToken: workspaceAccessToken || undefined,
           spreadsheetId: spreadsheetId || undefined,
@@ -711,6 +918,7 @@ export function Contact() {
     const subject = `[${referenceId}] Consultation Inquiry — ${form.service}`;
     const body = [
       `Reference ID: ${referenceId}`,
+      `Priority / Urgency: ${urgency}`,
       'New consultation inquiry',
       '',
       `Name: ${fullName}`,
@@ -733,6 +941,7 @@ export function Contact() {
 
   const resetForm = () => {
     setInquiryState(INITIAL_INQUIRY_STATE);
+    setUrgency('Standard Advisory (24–48h)');
     setEmailDraftUrl(null);
     setSubmittedInquiryRef(null);
     setInquirySheetSynced(false);
@@ -746,8 +955,34 @@ export function Contact() {
       case 1:
         return (
           <div className="space-y-5" data-step="inquiry-details">
+            {/* Quick Matter Templates */}
             <div>
-              <label htmlFor="contact-service" className="mb-2 block text-sm font-semibold text-slate-800">
+              <p className="mb-2 text-xs font-semibold text-slate-600">
+                Quick-fill matter template (optional):
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {MATTER_TEMPLATES.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => applyMatterTemplate(item.service, item.template)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
+                      form.service === item.service && form.message.includes(item.template.slice(0, 25))
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-semibold'
+                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-emerald-300 hover:bg-white'
+                    }`}
+                  >
+                    + {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="contact-service"
+                className="mb-2 block text-sm font-semibold text-slate-800"
+              >
                 Service area <span className="text-emerald-700">*</span>
               </label>
               <select
@@ -757,7 +992,9 @@ export function Contact() {
                 onChange={(event) => updateField('service', event.target.value)}
                 onBlur={() => markTouched('service')}
                 aria-invalid={inputError('service', 1)}
-                aria-describedby={inputError('service', 1) ? 'contact-service-error' : 'contact-service-routing'}
+                aria-describedby={
+                  inputError('service', 1) ? 'contact-service-error' : 'contact-service-routing'
+                }
                 className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-4 ${
                   inputError('service', 1)
                     ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
@@ -771,7 +1008,11 @@ export function Contact() {
                 ))}
               </select>
               {inputError('service', 1) ? (
-                <p id="contact-service-error" role="alert" className="mt-1.5 text-xs font-medium text-rose-700">
+                <p
+                  id="contact-service-error"
+                  role="alert"
+                  className="mt-1.5 text-xs font-medium text-rose-700"
+                >
                   {errors.service}
                 </p>
               ) : (
@@ -779,6 +1020,35 @@ export function Contact() {
                   Routed to <span className="font-semibold text-slate-700">{assignedDivision}</span>
                 </p>
               )}
+            </div>
+
+            {/* Urgency / Timeline Selector */}
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-800">
+                Timeline &amp; statutory urgency
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {(
+                  [
+                    'Standard Advisory (24–48h)',
+                    'Approaching Deadline (< 7 Days)',
+                    'Urgent Notice / Hearing',
+                  ] as UrgencyLevel[]
+                ).map((level) => (
+                  <button
+                    key={level}
+                    type="button"
+                    onClick={() => setUrgency(level)}
+                    className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold text-left transition cursor-pointer ${
+                      urgency === level
+                        ? 'border-emerald-700 bg-emerald-50/70 text-emerald-950 shadow-2xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                    }`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <MessageField
@@ -799,14 +1069,17 @@ export function Contact() {
                 type="button"
                 onClick={handleNextStep}
                 aria-disabled={!isStep1Valid}
-                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 ${
+                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 cursor-pointer ${
                   isStep1Valid
                     ? 'bg-[#0b5e48] text-white shadow-sm hover:bg-[#084b3a]'
                     : 'bg-slate-200 text-slate-600 hover:bg-slate-300/80'
                 }`}
               >
                 Continue to Client Info
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </div>
@@ -873,14 +1146,14 @@ export function Contact() {
               <div className="sm:col-span-2">
                 <TextField
                   id="contact-company-name"
-                  label="Company name (optional)"
+                  label="Company or organization name (optional)"
                   name="companyName"
                   required={false}
                   value={form.companyName}
                   autoComplete="organization"
-                  placeholder="Company or organization"
+                  placeholder="Company, startup, or organization name"
                   maxLength={120}
-                  helper="Leave blank if you are contacting us as an individual."
+                  helper="Leave blank if you are contacting us as an individual taxpayer or private client."
                   error={errors.companyName}
                   showError={inputError('companyName', 2)}
                   onChange={(value) => updateField('companyName', value)}
@@ -893,7 +1166,7 @@ export function Contact() {
               <button
                 type="button"
                 onClick={handlePreviousStep}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
               >
                 Back to Inquiry Details
               </button>
@@ -901,38 +1174,62 @@ export function Contact() {
                 type="button"
                 onClick={handleNextStep}
                 aria-disabled={!isStep2Valid}
-                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 ${
+                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/20 cursor-pointer ${
                   isStep2Valid
                     ? 'bg-[#0b5e48] text-white shadow-sm hover:bg-[#084b3a]'
                     : 'bg-slate-200 text-slate-600 hover:bg-slate-300/80'
                 }`}
               >
                 Continue to Final Review
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </div>
         );
 
       case 3:
+        if (submittedInquiryRef) {
+          return (
+            <div data-step="success-animation">
+              <FormSuccessAnimation
+                referenceId={submittedInquiryRef}
+                clientName={`${form.firstName.trim()} ${form.lastName.trim()}`.trim()}
+                email={form.email.trim()}
+                phone={form.phone.trim()}
+                service={form.service}
+                division={assignedDivision}
+                message={form.message.trim()}
+                inquirySheetSynced={inquirySheetSynced}
+                emailDraftUrl={emailDraftUrl}
+                onReset={resetForm}
+              />
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-5" data-step="final-review">
             <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-slate-50/60">
               <div className="p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">01. Inquiry Details</p>
+                    <p className="text-xs font-semibold text-emerald-800">01. Inquiry Details</p>
                     <h4 className="mt-0.5 text-sm font-semibold text-slate-900">{form.service}</h4>
                   </div>
                   <button
                     type="button"
                     onClick={() => goToStep(1)}
-                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950"
+                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950 cursor-pointer"
                   >
                     Edit details
                   </button>
                 </div>
-                <p className="mt-1 text-xs text-slate-500">Assigned division: {assignedDivision}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Assigned division: {assignedDivision} · Priority: {urgency}
+                </p>
                 <div className="mt-3 rounded-xl border border-slate-200/80 bg-white p-3.5 text-sm leading-6 text-slate-700 whitespace-pre-wrap">
                   {form.message.trim()}
                 </div>
@@ -941,7 +1238,7 @@ export function Contact() {
               <div className="p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">02. Client Info</p>
+                    <p className="text-xs font-semibold text-emerald-800">02. Client Info</p>
                     <h4 className="mt-0.5 text-sm font-semibold text-slate-900">
                       {form.firstName.trim()} {form.lastName.trim()}
                     </h4>
@@ -949,7 +1246,7 @@ export function Contact() {
                   <button
                     type="button"
                     onClick={() => goToStep(2)}
-                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950"
+                    className="text-xs font-semibold text-emerald-800 underline underline-offset-4 hover:text-emerald-950 cursor-pointer"
                   >
                     Edit client info
                   </button>
@@ -957,11 +1254,15 @@ export function Contact() {
                 <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
                   <div>
                     <dt className="text-xs text-slate-500">Email address</dt>
-                    <dd className="mt-0.5 break-all font-medium text-slate-900">{form.email.trim()}</dd>
+                    <dd className="mt-0.5 break-all font-medium text-slate-900">
+                      {form.email.trim()}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-slate-500">Phone / WhatsApp</dt>
-                    <dd className="mt-0.5 font-medium tabular-nums text-slate-900">{form.phone.trim()}</dd>
+                    <dd className="mt-0.5 font-medium tabular-nums text-slate-900">
+                      {form.phone.trim()}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-slate-500">Organization</dt>
@@ -974,52 +1275,12 @@ export function Contact() {
             </div>
 
             {submitAttempted && hasErrors && (
-              <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+              <div
+                role="alert"
+                className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+              >
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <span>Please review the highlighted fields before submitting your inquiry.</span>
-              </div>
-            )}
-
-            {emailDraftUrl && (
-              <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
-                    <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-semibold text-emerald-950">Inquiry Submitted &amp; Dispatched</h4>
-                      {submittedInquiryRef && (
-                        <span className="font-mono text-xs font-bold tabular-nums text-emerald-900">
-                          · {submittedInquiryRef}
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800">
-                        · <FileSpreadsheet className="h-3.5 w-3.5" aria-hidden="true" />
-                        {inquirySheetSynced ? 'Synced to Workspace Google Sheet' : 'Saved to Workspace Ledger'}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm leading-6 text-emerald-900/80">
-                      Your inquiry has been logged to our advisory desk ledger
-                      {inquirySheetSynced ? ' and automatically appended to our Google Sheet' : ''}. You may also open a direct email draft below if you wish to attach files.
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <a
-                        href={emailDraftUrl}
-                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-700/20"
-                      >
-                        Open email draft (attach files) <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                      </a>
-                      <button
-                        type="button"
-                        onClick={resetForm}
-                        className="inline-flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 hover:text-emerald-950"
-                      >
-                        Start a new inquiry
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -1027,17 +1288,22 @@ export function Contact() {
               <button
                 type="button"
                 onClick={handlePreviousStep}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
               >
                 Back to Client Info
               </button>
               <button
                 type="submit"
                 disabled={isSubmittingInquiry}
-                className="group inline-flex min-h-12 flex-1 items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20 disabled:opacity-60"
+                className="group inline-flex min-h-12 flex-1 items-center justify-center gap-2.5 rounded-xl bg-[#0b5e48] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-900/10 transition hover:bg-[#084b3a] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-600/20 disabled:opacity-60 cursor-pointer"
               >
-                {isSubmittingInquiry ? 'Submitting inquiry & syncing...' : 'Submit inquiry & prepare email'}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                {isSubmittingInquiry
+                  ? 'Submitting inquiry & syncing...'
+                  : 'Submit inquiry & prepare email'}
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </button>
             </div>
             <p className="text-center text-xs leading-5 text-slate-500">
@@ -1050,39 +1316,59 @@ export function Contact() {
 
   return (
     <main className="min-h-screen bg-[#f5f7f4] pb-16 text-slate-900">
-      {/* Hero */}
+      <ServiceSEO
+        title={
+          activeTab === 'appointment'
+            ? 'Book a Legal, Tax or RJSC Consultation | E-Lawyers & Accounticca Chambers'
+            : 'Contact Chambers – Legal, Tax, VAT & Corporate Advisory | Accounticca & E-Lawyers'
+        }
+        description="Schedule a 1-on-1 legal, income tax, VAT, or RJSC company compliance consultation at E-Lawyers & Accounticca Chambers in Panthapath, Dhaka."
+        serviceType="Legal, Tax & Corporate Compliance Advisory"
+        canonicalUrl="/contact"
+      />
+      {/* 1. Hero Section */}
       <section className="px-4 pb-10 pt-5 sm:px-6 lg:px-8">
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/60 to-teal-50/40 text-slate-900 shadow-xl shadow-emerald-950/5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(16,185,129,0.12),transparent_42%),radial-gradient(ellipse_at_0%_100%,rgba(20,184,166,0.10),transparent_38%)]" />
-          <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full border border-emerald-900/10" />
-          <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full border border-emerald-900/10" />
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/50 to-teal-50/30 text-slate-900 shadow-lg shadow-emerald-950/5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(16,185,129,0.10),transparent_42%),radial-gradient(ellipse_at_0%_100%,rgba(20,184,166,0.08),transparent_38%)]" />
 
           <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
-            <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-sm text-slate-600">
-              <Link to="/" className="transition hover:text-emerald-800">Home</Link>
+            <nav
+              aria-label="Breadcrumb"
+              className="mb-8 flex items-center gap-2 text-sm text-slate-600"
+            >
+              <Link to="/" className="transition hover:text-emerald-800">
+                Home
+              </Link>
               <ChevronRight className="h-4 w-4 text-slate-400" aria-hidden="true" />
-              <span className="font-semibold text-slate-900">Contact</span>
+              <span className="font-semibold text-slate-900">Contact &amp; Chambers</span>
             </nav>
 
-            <div className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
+            <div className="grid gap-10 lg:grid-cols-[1.28fr_0.72fr] lg:items-end">
               <div>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold tracking-wide text-emerald-900">
-                  <Sparkles className="h-4 w-4 text-emerald-600" aria-hidden="true" />
-                  ACCOUNTICCA <span className="text-emerald-600">×</span> E-LAWYERS
-                </div>
-                <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-                  One point of contact.
-                  <span className="mt-1 block text-emerald-700">Complete business support.</span>
-                </h1>
-                <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                  Corporate law, tax, VAT, audit, and business advisory—connected through one coordinated team.
-                  Tell us what you need, and we’ll help you identify the right next step.
+                <p className="mb-3 text-xs sm:text-sm font-semibold text-emerald-800">
+                  Accounticca × E-Lawyers · Joint Advisory Chambers · Dhaka, Bangladesh
                 </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+                  One point of contact.
+                  <span className="mt-1 block text-emerald-700">Complete legal &amp; tax support.</span>
+                </h1>
+                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                  Corporate law, RJSC compliance, NBR income tax, VAT, statutory audit, and BIDA foreign investment advisory—connected through one coordinated chamber.
+                </p>
+
+                <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-500">
+                  <span className="font-semibold text-slate-800">Sunday–Thursday (10:00 AM – 7:00 PM)</span>
+                  <span aria-hidden="true">·</span>
+                  <span>In-Chamber &amp; Virtual Consultations</span>
+                  <span aria-hidden="true">·</span>
+                  <span>Panthapath, Dhaka</span>
+                </div>
+
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => scrollToForm('appointment')}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-600/20"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-600/20 cursor-pointer"
                   >
                     <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a consultation
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -1090,26 +1376,63 @@ export function Contact() {
                   <button
                     type="button"
                     onClick={() => scrollToForm('inquiry')}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-xs transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-600/15"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-xs transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-950 focus:outline-none focus:ring-4 focus:ring-emerald-600/15 cursor-pointer"
                   >
-                    <MessageCircle className="h-4 w-4 text-emerald-700" aria-hidden="true" /> Send an inquiry
+                    <MessageCircle className="h-4 w-4 text-emerald-700" aria-hidden="true" /> Send a written brief
                   </button>
+                  <Link
+                    to="/team"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white/80 hover:text-emerald-800"
+                  >
+                    <Users className="h-4 w-4 text-emerald-700" aria-hidden="true" /> View 21 Advisors
+                  </Link>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-emerald-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Speak with our team</p>
-                <a href={`tel:${RAW_PHONE}`} className="mt-3 flex items-center gap-3 text-2xl font-semibold tracking-tight text-slate-950 transition hover:text-emerald-700 sm:text-3xl">
+              <div className="rounded-2xl border border-emerald-200/80 bg-white/95 p-5 shadow-sm backdrop-blur-sm sm:p-6">
+                <p className="text-xs font-semibold text-emerald-800">Direct Chamber Hotline</p>
+                <a
+                  href={`tel:${RAW_PHONE}`}
+                  className="mt-2.5 flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-950 transition hover:text-emerald-700 sm:text-3xl tabular-nums"
+                >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
                     <Phone className="h-5 w-5" aria-hidden="true" />
                   </span>
                   {PRIMARY_PHONE}
                 </a>
-                <p className="mt-3 text-sm leading-6 text-slate-600">Sunday–Thursday · Corporate consultations and business inquiries</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  Immediate routing for corporate retainers, tax assessments, and RJSC filings.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={`https://wa.me/8801335230170`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    <span>WhatsApp Desk</span>
+                    <ExternalLink className="h-3 w-3 opacity-75" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopy(RAW_PHONE, 'hero-phone')}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    {copyStatus === 'hero-phone' ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-700" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5 text-slate-500" />
+                    )}
+                    <span>{copyStatus === 'hero-phone' ? 'Copied' : 'Copy Number'}</span>
+                  </button>
+                </div>
                 <div className="mt-5 border-t border-slate-200 pt-4">
                   <p className="flex items-start gap-2 text-sm leading-6 text-slate-700">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-                    Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205
+                    <MapPin className="mt-1 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                    <span>
+                      Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205
+                    </span>
                   </p>
                 </div>
               </div>
@@ -1117,125 +1440,311 @@ export function Contact() {
 
             <div className="mt-10 grid gap-3 border-t border-emerald-200/70 pt-6 sm:grid-cols-3">
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><ShieldCheck className="h-4 w-4" aria-hidden="true" /></span>
-                Coordinated advisory support
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800">
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                </span>
+                Strict attorney-client &amp; financial confidentiality
               </div>
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><Scale className="h-4 w-4" aria-hidden="true" /></span>
-                Legal and financial expertise
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800">
+                  <Scale className="h-4 w-4" aria-hidden="true" />
+                </span>
+                Integrated High Court Advocates &amp; ACCA Advisors
               </div>
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800"><Clock3 className="h-4 w-4" aria-hidden="true" /></span>
-                Clear next steps, without the runaround
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-800">
+                  <Clock3 className="h-4 w-4" aria-hidden="true" />
+                </span>
+                Direct docket reference &amp; partner assignment
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Direct contact cards */}
+      {/* 2. Direct Contact Channels */}
       <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-6 max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Direct contact</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Reach the right team</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Choose the contact channel that works best for you.</p>
+          <p className="text-xs font-semibold text-emerald-800">Direct Contact Channels</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            Reach the right desk directly
+          </h2>
+          <p className="mt-1.5 text-sm leading-6 text-slate-600">
+            Connect with our Dhaka chambers by phone, WhatsApp, or practice-specific email desks.
+          </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><MapPin className="h-5 w-5" aria-hidden="true" /></span>
-            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Head office</p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-950">ACCOUNTICCA × E-LAWYERS</h3>
-            <address className="mt-3 not-italic text-sm leading-6 text-slate-600">
-              Suite G-5, BTI Centara Grand<br />
-              144–144/1 Green Road, Panthapath<br />
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs transition duration-200 hover:border-emerald-300 hover:shadow-md">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+              <MapPin className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-xs font-semibold text-emerald-800">01. Principal Chambers</p>
+            <h3 className="mt-1 text-lg font-bold text-slate-950">ACCOUNTICCA × E-LAWYERS</h3>
+            <address className="mt-2.5 not-italic text-sm leading-6 text-slate-600">
+              Suite G-5, BTI Centara Grand
+              <br />
+              144–144/1 Green Road, Panthapath
+              <br />
               Dhaka–1205, Bangladesh
             </address>
-            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 transition hover:text-emerald-950">
-              Get directions <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 transition hover:text-emerald-950"
+            >
+              Open in Google Maps <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </article>
 
-          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Phone className="h-5 w-5" aria-hidden="true" /></span>
-            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Telephone desk</p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-950">Call or WhatsApp</h3>
-            <a href={`tel:${RAW_PHONE}`} className="mt-3 block text-xl font-semibold tracking-tight text-slate-900 hover:text-emerald-800">{PRIMARY_PHONE}</a>
-            <button type="button" onClick={() => void handleCopy(RAW_PHONE, 'phone')} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50" aria-label="Copy phone number">
-              {copyStatus === 'phone' ? <Check className="h-3.5 w-3.5 text-emerald-700" /> : <Copy className="h-3.5 w-3.5" />}
-              {copyStatus === 'phone' ? 'Copied' : 'Copy number'}
-            </button>
-            <p className="mt-5 text-sm leading-6 text-slate-500">Sunday to Thursday for corporate consultations and inquiries.</p>
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs transition duration-200 hover:border-emerald-300 hover:shadow-md">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+              <Phone className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-xs font-semibold text-emerald-800">02. Telephone &amp; WhatsApp</p>
+            <h3 className="mt-1 text-lg font-bold text-slate-950">Direct Advisory Line</h3>
+            <a
+              href={`tel:${RAW_PHONE}`}
+              className="mt-2.5 block text-xl font-bold tracking-tight text-slate-900 hover:text-emerald-800 tabular-nums"
+            >
+              {PRIMARY_PHONE}
+            </a>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void handleCopy(RAW_PHONE, 'phone')}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 cursor-pointer"
+                aria-label="Copy phone number"
+              >
+                {copyStatus === 'phone' ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-700" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+                {copyStatus === 'phone' ? 'Copied' : 'Copy number'}
+              </button>
+              <a
+                href="https://wa.me/8801335230170"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                WhatsApp Chat
+              </a>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-slate-500">
+              Available Sunday to Thursday for corporate consultations and urgent statutory filings.
+            </p>
           </article>
 
-          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg hover:shadow-slate-900/5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Mail className="h-5 w-5" aria-hidden="true" /></span>
-            <p className="mt-5 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">Email desks</p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-950">Contact by email</h3>
-            <div className="mt-4 space-y-4">
+          <article className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs transition duration-200 hover:border-emerald-300 hover:shadow-md">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+              <Mail className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-xs font-semibold text-emerald-800">03. Practice Email Desks</p>
+            <h3 className="mt-1 text-lg font-bold text-slate-950">Official Dispatch Desks</h3>
+            <div className="mt-3.5 space-y-3.5">
               <div>
                 <p className="text-xs font-medium text-slate-500">Finance, tax, VAT and audit</p>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                  <a href={`mailto:${ACCOUNTICCA_EMAIL}`} className="break-all text-sm font-semibold text-emerald-800 hover:underline">{ACCOUNTICCA_EMAIL}</a>
-                  <button type="button" onClick={() => void handleCopy(ACCOUNTICCA_EMAIL, ACCOUNTICCA_EMAIL)} aria-label="Copy Accounticca email" className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-emerald-50 hover:text-emerald-800">
-                    {copyStatus === ACCOUNTICCA_EMAIL ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  <a
+                    href={`mailto:${ACCOUNTICCA_EMAIL}`}
+                    className="break-all text-sm font-semibold text-emerald-800 hover:underline"
+                  >
+                    {ACCOUNTICCA_EMAIL}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopy(ACCOUNTICCA_EMAIL, ACCOUNTICCA_EMAIL)}
+                    aria-label="Copy Accounticca email"
+                    className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
+                  >
+                    {copyStatus === ACCOUNTICCA_EMAIL ? (
+                      <Check className="h-4 w-4 text-emerald-700" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
-              <div>
+              <div className="pt-2 border-t border-slate-100">
                 <p className="text-xs font-medium text-slate-500">Corporate law and compliance</p>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                  <a href={`mailto:${ELAWYERS_EMAIL}`} className="break-all text-sm font-semibold text-teal-800 hover:underline">{ELAWYERS_EMAIL}</a>
-                  <button type="button" onClick={() => void handleCopy(ELAWYERS_EMAIL, ELAWYERS_EMAIL)} aria-label="Copy E-Lawyers email" className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-teal-50 hover:text-teal-800">
-                    {copyStatus === ELAWYERS_EMAIL ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  <a
+                    href={`mailto:${ELAWYERS_EMAIL}`}
+                    className="break-all text-sm font-semibold text-teal-800 hover:underline"
+                  >
+                    {ELAWYERS_EMAIL}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopy(ELAWYERS_EMAIL, ELAWYERS_EMAIL)}
+                    aria-label="Copy E-Lawyers email"
+                    className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-teal-50 hover:text-teal-800 cursor-pointer"
+                  >
+                    {copyStatus === ELAWYERS_EMAIL ? (
+                      <Check className="h-4 w-4 text-teal-700" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
             </div>
           </article>
         </div>
-        {copyError && <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{copyError}</p>}
+        {copyError && (
+          <p
+            role="status"
+            className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            {copyError}
+          </p>
+        )}
       </section>
 
-      {/* Inquiry and appointment */}
-      <section id="contact-form-section" className="mx-auto max-w-7xl scroll-mt-6 px-4 py-12 sm:px-6 lg:px-8">
+      {/* 3. Specialist Practice Desks Routing Strip */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <div>
+              <p className="text-xs font-semibold text-emerald-800">Practice Leadership Routing</p>
+              <h2 className="mt-1 text-xl sm:text-2xl font-bold text-slate-950">
+                Route your inquiry directly to a specialist partner desk
+              </h2>
+            </div>
+            <Link
+              to="/team"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950"
+            >
+              <span>Meet all 21 team members</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PRACTICE_DESKS.map((item) => (
+              <article
+                key={item.lead}
+                className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 hover:bg-white hover:border-emerald-300 hover:shadow-xs transition"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={item.imgSrc}
+                      alt={item.lead}
+                      loading="lazy"
+                      className="h-12 w-12 rounded-full object-cover object-top border border-slate-200 bg-white shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{item.lead}</h3>
+                      <p className="text-xs font-medium text-emerald-700">{item.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{item.desk}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-4">{item.focus}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => routeToSpecialistDesk(item.service, item.lead)}
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-emerald-700 text-emerald-800 hover:text-white border border-slate-200 hover:border-emerald-700 text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Route Brief to Desk</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Inquiry Wizard & Appointment Booking Section */}
+      <section
+        id="contact-form-section"
+        className="mx-auto max-w-7xl scroll-mt-6 px-4 py-10 sm:px-6 lg:px-8"
+      >
         <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
           <div className="lg:sticky lg:top-8">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Let’s get started</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">Tell us what you’re working on.</h2>
-            <p className="mt-4 text-base leading-7 text-slate-600">
-              Book a consultation or send a written brief. Share enough context for our team to understand your needs and identify the appropriate practice area.
+            <p className="text-xs font-semibold text-emerald-800">Consultation &amp; Intake Desk</p>
+            <h2 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-4xl">
+              Tell us what you’re working on.
+            </h2>
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              Submit a structured written brief or schedule a consultation slot. Every submission receives an official docket reference and is routed to the appropriate practice lead.
             </p>
 
-            <div className="mt-7 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mt-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><ShieldCheck className="h-5 w-5" aria-hidden="true" /></span>
-                <div><h3 className="text-sm font-semibold text-slate-900">Thoughtful, coordinated support</h3><p className="mt-1 text-sm leading-6 text-slate-600">Your selected service helps route the inquiry to the relevant team.</p></div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Coordinated legal &amp; tax review
+                  </h3>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Your selected service routes your brief to E-Lawyers Chambers, Accounticca Advisory, or both.
+                  </p>
+                </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><BriefcaseBusiness className="h-5 w-5" aria-hidden="true" /></span>
-                <div><h3 className="text-sm font-semibold text-slate-900">Business-first context</h3><p className="mt-1 text-sm leading-6 text-slate-600">Tell us what decision, deadline, or challenge you need help with.</p></div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                  <BriefcaseBusiness className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Quick-fill statutory templates
+                  </h3>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Use the one-click templates in Step 1 to structure RJSC, NBR tax, VAT, or BIDA inquiries effortlessly.
+                  </p>
+                </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800"><Clock3 className="h-5 w-5" aria-hidden="true" /></span>
-                <div><h3 className="text-sm font-semibold text-slate-900">Clear next steps</h3><p className="mt-1 text-sm leading-6 text-slate-600">We’ll use your details to understand the best way to follow up.</p></div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                  <Clock3 className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Priority statutory response
+                  </h3>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Flag approaching deadlines or hearing dates so our partners can prioritize your file.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950">
-              Visit our Dhaka office <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+            >
+              Directions to BTI Centara Grand, Panthapath <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
             <div className="border-b border-slate-100 p-3 sm:p-4">
-              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5" role="tablist" aria-label="Contact options">
+              <div
+                className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5"
+                role="tablist"
+                aria-label="Contact options"
+              >
                 <button
                   type="button"
                   role="tab"
                   aria-selected={activeTab === 'inquiry'}
                   onClick={() => selectTab('inquiry')}
-                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 ${activeTab === 'inquiry' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-600 hover:text-slate-950'}`}
+                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 cursor-pointer ${
+                    activeTab === 'inquiry'
+                      ? 'bg-white text-slate-950 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
                 >
                   <FileText className="h-4 w-4" aria-hidden="true" /> Send an inquiry
                 </button>
@@ -1244,7 +1753,11 @@ export function Contact() {
                   role="tab"
                   aria-selected={activeTab === 'appointment'}
                   onClick={() => selectTab('appointment')}
-                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 ${activeTab === 'appointment' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-600 hover:text-slate-950'}`}
+                  className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-emerald-600/10 cursor-pointer ${
+                    activeTab === 'appointment'
+                      ? 'bg-white text-slate-950 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
                 >
                   <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book appointment
                 </button>
@@ -1255,7 +1768,9 @@ export function Contact() {
               <div className="p-5 sm:p-8" role="tabpanel">
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-slate-950">Book a consultation</h3>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">Choose an available option in the appointment form below.</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    Choose your preferred advisor, consultation mode, and time slot below.
+                  </p>
                 </div>
                 <AppointmentBookingForm />
               </div>
@@ -1263,25 +1778,39 @@ export function Contact() {
               <div className="p-5 sm:p-8" role="tabpanel">
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Send your matter brief</h3>
+                    <h3 className="text-xl font-semibold text-slate-950">
+                      {submittedInquiryRef ? 'Inquiry Registered' : 'Send your matter brief'}
+                    </h3>
                     <p className="mt-1 text-sm leading-6 text-slate-600">
-                      Step {currentStep} of 3: {currentStepDefinition.title} — {currentStepDefinition.subtitle}
+                      {submittedInquiryRef
+                        ? `Official Docket Reference: ${submittedInquiryRef}`
+                        : `Step ${currentStep} of 3: ${currentStepDefinition.title} — ${currentStepDefinition.subtitle}`}
                     </p>
                   </div>
                   <span className="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-emerald-900">
                     <ShieldCheck className="h-4 w-4 text-emerald-700" aria-hidden="true" />
-                    <span>{currentStepValid ? 'Current step ready' : 'Validation required'}</span>
+                    <span>
+                      {submittedInquiryRef
+                        ? '100% Complete · Dispatched'
+                        : currentStepValid
+                          ? 'Current step ready'
+                          : 'Validation required'}
+                    </span>
                   </span>
                 </div>
 
-                {/* Targeted Stepper & Progress Container (div:nth-of-type(2)) */}
+                {/* Stepper & Progress Container */}
                 <div className="mb-6 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
                   <div className="mb-3 flex items-center justify-between gap-3 text-xs">
                     <span className="font-semibold text-slate-700">
-                      Step {currentStep} of 3 · {currentStepDefinition.title}
+                      {submittedInquiryRef
+                        ? 'All Steps Complete'
+                        : `Step ${currentStep} of 3 · ${currentStepDefinition.title}`}
                     </span>
                     <span className="font-bold tabular-nums text-slate-800">
-                      {completedRequiredFields} of {requiredFields.length} required fields valid · {completionPercentage}%
+                      {submittedInquiryRef
+                        ? 'Inquiry Confirmed · 100%'
+                        : `${completedRequiredFields} of ${requiredFields.length} required fields valid · ${completionPercentage}%`}
                     </span>
                   </div>
                   <div
@@ -1290,32 +1819,42 @@ export function Contact() {
                     aria-label="Required fields completed"
                     aria-valuemin={0}
                     aria-valuemax={100}
-                    aria-valuenow={completionPercentage}
+                    aria-valuenow={submittedInquiryRef ? 100 : completionPercentage}
                   >
                     <div
                       className="h-full rounded-full bg-emerald-600 transition-all duration-300"
-                      style={{ width: `${completionPercentage}%` }}
+                      style={{ width: `${submittedInquiryRef ? 100 : completionPercentage}%` }}
                     />
                   </div>
 
-                  <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-3" aria-label="Inquiry form steps">
+                  <ol
+                    className="grid grid-cols-1 gap-2.5 sm:grid-cols-3"
+                    aria-label="Inquiry form steps"
+                  >
                     {INQUIRY_STEPS.map(({ step, title, subtitle }) => {
-                      const isActive = currentStep === step;
+                      const isActive = !submittedInquiryRef && currentStep === step;
                       const stepValid = isStepCompleteAndValid(step, form);
                       const isCompleted =
+                        Boolean(submittedInquiryRef) ||
                         (step === 1 && stepValid && currentStep > 1) ||
-                        (step === 2 && stepValid && currentStep > 2) ||
-                        Boolean(emailDraftUrl);
-                      const unlocked = canAccessStep(step);
+                        (step === 2 && stepValid && currentStep > 2);
+                      const unlocked = !submittedInquiryRef && canAccessStep(step);
 
                       return (
                         <li key={step}>
                           <button
                             type="button"
-                            onClick={() => goToStep(step)}
+                            onClick={() => {
+                              if (submittedInquiryRef) {
+                                resetForm();
+                                goToStep(step);
+                              } else {
+                                goToStep(step);
+                              }
+                            }}
                             aria-current={isActive ? 'step' : undefined}
-                            aria-disabled={!unlocked && step > currentStep}
-                            className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition focus:outline-none focus:ring-4 focus:ring-emerald-600/15 ${
+                            aria-disabled={!unlocked && step > currentStep && !submittedInquiryRef}
+                            className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition focus:outline-none focus:ring-4 focus:ring-emerald-600/15 cursor-pointer ${
                               isActive
                                 ? 'border-emerald-700 bg-white text-slate-950 shadow-xs'
                                 : isCompleted
@@ -1334,7 +1873,11 @@ export function Contact() {
                                     : 'bg-slate-200/80 text-slate-700'
                               }`}
                             >
-                              {isCompleted ? <Check className="h-4 w-4" aria-hidden="true" /> : `0${step}`}
+                              {isCompleted ? (
+                                <Check className="h-4 w-4" aria-hidden="true" />
+                              ) : (
+                                `0${step}`
+                              )}
                             </span>
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-xs font-bold text-slate-900">{title}</p>
@@ -1348,7 +1891,10 @@ export function Contact() {
                 </div>
 
                 {stepValidationMessage && (
-                  <div role="alert" className="mb-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                  <div
+                    role="alert"
+                    className="mb-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+                  >
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                     <span>{stepValidationMessage}</span>
                   </div>
@@ -1363,64 +1909,192 @@ export function Contact() {
         </div>
       </section>
 
-      {/* Portals */}
+      {/* 5. Pre-Consultation FAQ Section */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-9 shadow-xs">
+          <div className="max-w-2xl mb-6">
+            <p className="text-xs font-semibold text-emerald-800">Client Intake Guidance</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+              Frequently asked questions before booking
+            </h2>
+          </div>
+
+          <div className="divide-y divide-slate-200 border-t border-slate-200">
+            {CONTACT_FAQS.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div key={faq.question} className="py-4">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    aria-expanded={isOpen}
+                    className="flex w-full items-center justify-between gap-4 text-left py-1 text-sm sm:text-base font-semibold text-slate-900 hover:text-emerald-800 transition cursor-pointer"
+                  >
+                    <span>{faq.question}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-emerald-700' : ''
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <p className="mt-2.5 text-sm leading-relaxed text-slate-600 pr-8">
+                      {faq.answer}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Portals */}
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-9">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-9">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Our ecosystem</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Explore our portals</h2>
+              <p className="text-xs font-semibold text-emerald-800">Our Advisory Ecosystem</p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+                Explore our specialist portals
+              </h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-slate-600">Find the right specialist practice for your business and compliance needs.</p>
+            <p className="max-w-xl text-sm leading-6 text-slate-600">
+              Find the right specialist practice for your corporate law, taxation, and compliance needs.
+            </p>
           </div>
           <div className="mt-7 grid gap-4 md:grid-cols-2">
-            <a href="https://accounticca.com" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 transition hover:border-emerald-300 hover:bg-emerald-50">
+            <a
+              href="https://accounticca.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-between gap-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-5 transition hover:border-blue-300 hover:bg-blue-50"
+            >
               <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-800 text-lg font-bold text-white">A</span>
-                <div><h3 className="font-semibold text-slate-950">ACCOUNTICCA</h3><p className="mt-1 text-sm text-slate-600">Accounting, tax, VAT, audit and finance</p><span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800">accounticca.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></span></div>
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-700 text-lg font-bold text-white">
+                  A
+                </span>
+                <div>
+                  <h3 className="font-semibold text-slate-950">ACCOUNTICCA</h3>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Accounting, tax, VAT, audit and finance
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700">
+                    accounticca.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
+                </div>
               </div>
-              <ArrowUpRight className="h-5 w-5 shrink-0 text-emerald-800 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+              <ArrowUpRight
+                className="h-5 w-5 shrink-0 text-blue-700 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </a>
-            <a href="https://elawyersbd.com" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-2xl border border-teal-100 bg-teal-50/50 p-5 transition hover:border-teal-300 hover:bg-teal-50">
+            <a
+              href="https://elawyersbd.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-between gap-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 transition hover:border-emerald-300 hover:bg-emerald-50"
+            >
               <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-800 text-lg font-bold text-white">E</span>
-                <div><h3 className="font-semibold text-slate-950">E-LAWYERS</h3><p className="mt-1 text-sm text-slate-600">Corporate law, litigation and compliance</p><span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-800">elawyersbd.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></span></div>
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-700 text-lg font-bold text-white">
+                  E
+                </span>
+                <div>
+                  <h3 className="font-semibold text-slate-950">E-LAWYERS</h3>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Corporate law, litigation and compliance
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700">
+                    elawyersbd.com <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
+                </div>
               </div>
-              <ArrowUpRight className="h-5 w-5 shrink-0 text-teal-800 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+              <ArrowUpRight
+                className="h-5 w-5 shrink-0 text-emerald-700 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </a>
-            <a href="https://blog.accounticca.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-emerald-200 hover:bg-slate-50">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><FileText className="h-5 w-5" aria-hidden="true" /></span>
-              <div><h3 className="text-sm font-semibold text-slate-900">Accounticca Advisory Blog</h3><p className="mt-1 text-xs text-slate-500">Guides, updates and business insights</p></div>
+            <a
+              href="https://blog.accounticca.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                <FileText className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">Accounticca Advisory Blog</h3>
+                <p className="mt-1 text-xs text-slate-500">Guides, updates and business insights</p>
+              </div>
               <ExternalLink className="ml-auto h-4 w-4 text-slate-400" aria-hidden="true" />
             </a>
-            <a href="https://elawyersbd.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-teal-200 hover:bg-slate-50">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><Globe2 className="h-5 w-5" aria-hidden="true" /></span>
-              <div><h3 className="text-sm font-semibold text-slate-900">E-Lawyers Legal Portal</h3><p className="mt-1 text-xs text-slate-500">Legal services and compliance support</p></div>
+            <a
+              href="https://elawyersbd.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-emerald-200 hover:bg-emerald-50"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                <Globe2 className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">E-Lawyers Legal Portal</h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  Legal services and compliance support
+                </p>
+              </div>
               <ExternalLink className="ml-auto h-4 w-4 text-slate-400" aria-hidden="true" />
             </a>
           </div>
         </div>
       </section>
 
-      {/* Social links */}
+      {/* 7. Social Channels */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Stay connected</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Follow our channels</h2>
+          <p className="text-xs font-semibold text-emerald-800">Official Publications &amp; Channels</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            Follow our regulatory updates
+          </h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {SOCIAL_GROUPS.map((group) => {
-            const accent = group.color === 'emerald' ? 'text-emerald-800 bg-emerald-50' : 'text-teal-800 bg-teal-50';
+            const accent =
+              group.color === 'blue'
+                ? 'text-blue-700 bg-blue-50'
+                : 'text-emerald-700 bg-emerald-50';
+            const hoverClass =
+              group.color === 'blue'
+                ? 'hover:border-blue-200 hover:bg-blue-50 hover:text-blue-900'
+                : 'hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-900';
             return (
-              <article key={group.brand} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <article
+                key={group.brand}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6"
+              >
                 <div className="flex items-center gap-3">
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl text-sm font-black ${accent}`}>{group.brand === 'ACCOUNTICCA' ? 'A' : 'E'}</span>
-                  <div><h3 className="font-semibold text-slate-950">{group.brand}</h3><p className="mt-0.5 text-xs text-slate-500">{group.description}</p></div>
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl text-sm font-black ${accent}`}
+                  >
+                    {group.brand === 'ACCOUNTICCA' ? 'A' : 'E'}
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-slate-950">{group.brand}</h3>
+                    <p className="mt-0.5 text-xs text-slate-500">{group.description}</p>
+                  </div>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {group.links.map(({ label, href, Icon }) => (
-                    <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-900">
-                      <Icon className="h-4 w-4" aria-hidden="true" /> {label} <ArrowUpRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 transition ${hoverClass}`}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" /> {label}{' '}
+                      <ArrowUpRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
                     </a>
                   ))}
                 </div>
@@ -1430,13 +2104,15 @@ export function Contact() {
         </div>
       </section>
 
-      {/* One map instance */}
+      {/* 8. Office Map */}
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="mb-4">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Find us</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Visit our Dhaka office</h2>
+          <p className="text-xs font-semibold text-emerald-800">Dhaka Chambers Location</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            Visit our Panthapath office
+          </h2>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
           <OfficeLocationMap primaryPhone={PRIMARY_PHONE} rawTelNumber={RAW_PHONE} />
         </div>
       </section>

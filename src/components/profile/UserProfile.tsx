@@ -560,7 +560,7 @@ Note: This is a system-generated computer invoice and serves as official proof o
     <div className="space-y-6">
       
       {/* Profile Header Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs relative overflow-hidden">
+      <div className="hidden bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           
           <div className="flex items-center gap-4 sm:gap-5">
@@ -627,7 +627,7 @@ Note: This is a system-generated computer invoice and serves as official proof o
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-px overflow-x-auto">
+      <div id="profile-consolidated-subnav" className="hidden flex items-center gap-2 border-b border-slate-200/80 pb-px overflow-x-auto">
         <button
           type="button"
           onClick={() => {

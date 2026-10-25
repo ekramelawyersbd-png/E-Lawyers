@@ -26,6 +26,7 @@ import { EarlyFilingIncentive } from '../components/tax/EarlyFilingIncentive';
 import { TaxCategory, TaxLocation, TaxScenario, TaxScenarioInputs } from '../types/taxScenario';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 import { parseTaxScenarioFromUrl } from '../utils/taxShareUtils';
+import { ToolSEO } from '../components/SEO';
 
 type Category = TaxCategory;
 type Location = TaxLocation;
@@ -215,6 +216,12 @@ export function TaxPlanner() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <ToolSEO
+        title="Individual Income Tax Planner & Scenario Simulator (2026–2027) | Accounticca"
+        description="Estimate your annual individual income tax liability, Section 78 investment tax rebate, TDS credit, and wealth surcharge under Bangladesh Finance Act 2026."
+        canonicalUrl="/tax-planner"
+        keywords={['Bangladesh Income Tax Planner', 'Individual Tax Calculator 2026', 'Section 78 Rebate', 'Wealth Surcharge']}
+      />
       
       <div className="text-center max-w-3xl mx-auto mb-8">
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">

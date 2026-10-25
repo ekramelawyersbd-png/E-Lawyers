@@ -179,60 +179,77 @@ export const CareersHubPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Hero Main Copy */}
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold mb-4 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-700" /> 2026 Corporate Recruitment Drive
+          {/* Hero Main Copy & Featured MTO Circular Poster */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold mb-4 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" /> 2026 Corporate Recruitment Drive
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#10243a] mb-4 leading-[1.15]">
+                Advance Your Career at <span className="text-[#167d83]">E-Lawyers</span>
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-6 font-normal">
+                E-Lawyers is a premier corporate legal and business consultancy firm in Dhaka. We are actively hiring dynamic professionals to join our corporate accounts division and client care team. Explore our open positions and submit your application online directly.
+              </p>
+
+              {/* Quick 1-Click Action Buttons to Form */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                <Link
+                  to="/Careers/mto?tab=apply"
+                  className="px-4 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>MTO Trainee (একাধিক পদ)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <Link
+                  to="/Careers/sales-marketing?tab=apply"
+                  className="px-4 py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-emerald-500/40"
+                >
+                  <TrendingUp className="w-4 h-4 text-emerald-300" />
+                  <span>Sales &amp; Marketing (একাধিক পদ)</span>
+                </Link>
+
+                <Link
+                  to="/Careers/accountant?tab=apply"
+                  className="px-4 py-3 bg-[#167d83] hover:bg-[#136a70] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-teal-600/30"
+                >
+                  <Briefcase className="w-4 h-4 text-emerald-200" />
+                  <span>Accountant (২ জন)</span>
+                </Link>
+
+                <Link
+                  to="/Careers/customer-care?tab=apply"
+                  className="px-4 py-3 bg-white hover:bg-amber-50/70 text-amber-900 font-bold rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm border border-amber-300"
+                >
+                  <Headphones className="w-4 h-4 text-amber-800" />
+                  <span>Customer Care (Female - ২ জন)</span>
+                </Link>
+
+                <a
+                  href="#check-status"
+                  className="px-3.5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5"
+                >
+                  <Search className="w-4 h-4 text-[#167d83]" />
+                  <span>Status Desk</span>
+                </a>
+              </div>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#10243a] mb-4 leading-[1.15]">
-              Advance Your Career at <span className="text-[#167d83]">E-Lawyers</span>
-            </h1>
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-6 font-normal">
-              E-Lawyers is a premier corporate legal and business consultancy firm in Dhaka. We are actively hiring dynamic professionals to join our corporate accounts division and client care team. Explore our open positions and submit your application online directly.
-            </p>
 
-            {/* Quick 1-Click Action Buttons to Form */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+            <div className="lg:col-span-5">
               <Link
-                to="/Careers/mto?tab=apply"
-                className="px-4 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40"
+                to="/Careers/mto"
+                className="block rounded-2xl overflow-hidden border-2 border-slate-200/90 hover:border-amber-400 shadow-lg hover:shadow-xl transition-all bg-white group"
+                title="View Management Trainee Officer (MTO) Circular & Apply Online"
               >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>MTO Trainee (একাধিক পদ)</span>
-                <ArrowRight className="w-4 h-4" />
+                <img
+                  src="https://i.ibb.co/6hrxrmG/f1096382-e31a-40c8-af4c-fb4a5e7ff605.png"
+                  alt="Management Trainee Officer (MTO) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-300"
+                />
               </Link>
-
-              <Link
-                to="/Careers/sales-marketing?tab=apply"
-                className="px-4 py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-emerald-500/40"
-              >
-                <TrendingUp className="w-4 h-4 text-emerald-300" />
-                <span>Sales &amp; Marketing (একাধিক পদ)</span>
-              </Link>
-
-              <Link
-                to="/Careers/accountant?tab=apply"
-                className="px-4 py-3 bg-[#167d83] hover:bg-[#136a70] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-teal-600/30"
-              >
-                <Briefcase className="w-4 h-4 text-emerald-200" />
-                <span>Accountant (২ জন)</span>
-              </Link>
-
-              <Link
-                to="/Careers/customer-care?tab=apply"
-                className="px-4 py-3 bg-white hover:bg-amber-50/70 text-amber-900 font-bold rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm border border-amber-300"
-              >
-                <Headphones className="w-4 h-4 text-amber-800" />
-                <span>Customer Care (Female - ২ জন)</span>
-              </Link>
-
-              <a
-                href="#check-status"
-                className="px-3.5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5"
-              >
-                <Search className="w-4 h-4 text-[#167d83]" />
-                <span>Status Desk</span>
-              </a>
             </div>
           </div>
 
@@ -694,6 +711,31 @@ export const CareersHubPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Official Role Infographic Picture Preview */}
+                <div className="px-5 pt-5 bg-slate-50">
+                  <Link
+                    to="/Careers/customer-care"
+                    className="block relative rounded-2xl overflow-hidden border border-slate-200 hover:border-amber-400 shadow-xs hover:shadow-md transition-all group/banner"
+                    title="View Official Customer Care Recruitment Banner"
+                  >
+                    <img
+                      src="https://i.ibb.co/Tqqn8XBt/309a5625-b84f-4412-9326-1c2dd526b57d.png"
+                      alt="Customer Care Executive (Female) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
+                      referrerPolicy="no-referrer"
+                      className="w-full h-auto object-cover group-hover/banner:scale-[1.015] transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-end justify-between p-3.5">
+                      <span className="text-white text-xs font-bold flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        View Full Announcement &amp; Circular
+                      </span>
+                      <span className="text-xs bg-[#c7a76b] text-[#10243a] px-2.5 py-1 rounded-lg font-black shadow-sm">
+                        Read Details
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+
                 {/* 4-Tile Quick Specs Matrix */}
                 <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50 border-b border-slate-200">
                   <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
@@ -779,32 +821,6 @@ export const CareersHubPage: React.FC = () => {
                         </span>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Official Role Infographic Picture Preview */}
-                  <div className="pt-1">
-                    <Link
-                      to="/Careers/customer-care"
-                      className="block relative rounded-2xl overflow-hidden border border-slate-200 hover:border-amber-400 shadow-xs hover:shadow-md transition-all group/banner"
-                      title="View Official Customer Care Recruitment Banner"
-                    >
-                      <img
-                        src="/customer-care-executive-recruitment.png"
-                        alt="Customer Care Executive (Female) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-auto object-cover group-hover/banner:scale-[1.015] transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-end justify-between p-3.5">
-                        <span className="text-white text-xs font-bold flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                          View Full Announcement &amp; Circular
-                        </span>
-                        <span className="text-xs bg-[#c7a76b] text-[#10243a] px-2.5 py-1 rounded-lg font-black shadow-sm">
-                          Read Details
-                        </span>
-                      </div>
-                    </Link>
                   </div>
                 </div>
               </div>
@@ -957,6 +973,32 @@ export const CareersHubPage: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Official Role Infographic Picture Preview */}
+                  <div className="pt-1">
+                    <Link
+                      to="/Careers/mto"
+                      className="block relative rounded-2xl overflow-hidden border border-slate-200 hover:border-amber-400 shadow-xs hover:shadow-md transition-all group/banner"
+                      title="View Official MTO Recruitment Banner"
+                    >
+                      <img
+                        src="https://i.ibb.co/6hrxrmG/f1096382-e31a-40c8-af4c-fb4a5e7ff605.png"
+                        alt="Management Trainee Officer (MTO) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-auto object-cover group-hover/banner:scale-[1.015] transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-end justify-between p-3.5">
+                        <span className="text-white text-xs font-bold flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                          View Full Announcement &amp; Circular
+                        </span>
+                        <span className="text-xs bg-[#c7a76b] text-[#10243a] px-2.5 py-1 rounded-lg font-black shadow-sm">
+                          Read Details
+                        </span>
+                      </div>
+                    </Link>
                   </div>
 
                   {/* Mentorship Box */}

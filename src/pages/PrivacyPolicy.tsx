@@ -1,9 +1,15 @@
 import React from 'react';
 import { Shield, Lock, Eye, FileText, CheckCircle2 } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+      <SEO
+        title="Privacy Policy – Data Protection & Client Confidentiality | Accounticca & E-Lawyers"
+        description="Read the Privacy Policy of Accounticca & E-Lawyers BD regarding client confidentiality, personal data protection, and corporate compliance records."
+        canonicalUrl="/privacy"
+      />
       <div className="mb-12">
         <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
           Privacy <span className="text-emerald-600">Policy</span>

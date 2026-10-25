@@ -1,6 +1,6 @@
 import React from 'react';
 import { Article } from '../types';
-import { ArticleSEO, SEO, ServiceSEO } from './SEO';
+import { ArticleSEO, SEO, ServiceSEO, ToolSEO, CourseSEO, SEOMeta, PageSEO } from './SEO';
 
 export interface BlogSEOProps {
   article: Article;
@@ -41,4 +41,5 @@ export function BlogSEO({ article, canonicalUrl, siteName, customSchema }: BlogS
 }
 
 // Re-export core SEO utilities from this file as well for convenience
-export { SEO, ArticleSEO, ServiceSEO };
+export { SEO, ArticleSEO, ServiceSEO, ToolSEO, CourseSEO, SEOMeta, PageSEO };
+export default BlogSEO;

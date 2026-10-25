@@ -1088,217 +1088,94 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
         </div>
       ) : (
         <form onSubmit={handleBookAppointment} className="space-y-8">
-          {/* 1. Practice Area Selection with Dynamic Filtering */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">1</span>
-                <span>Select Practice Area (Dynamic Routing) *</span>
-              </label>
-              
-              {/* Category Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                <span className="text-[11px] text-slate-400 font-bold flex items-center gap-1 mr-1">
-                  <Filter className="w-3 h-3" />
-                  <span>Filter:</span>
+          {/* 1. Practice Area Selection (Dropdown) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <label
+                htmlFor="booking-practice-area"
+                className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5"
+              >
+                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">
+                  1
                 </span>
-                {['All', 'Tax & VAT'].map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                      selectedCategory === cat
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Practice Area Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              {filteredPractices.map((practice) => {
-                const Icon = practice.icon;
-                const isSelected = activePractice.id === practice.id;
-                return (
-                  <button
-                    key={practice.id}
-                    type="button"
-                    onClick={() => handleSelectPractice(practice)}
-                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3.5 relative group ${
-                      isSelected 
-                        ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/30 shadow-xs' 
-                        : 'border-slate-200 bg-slate-50/60 hover:bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all ${
-                      isSelected ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-600 border-slate-200 group-hover:border-slate-300'
-                    }`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 pr-6">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${practice.badgeColor}`}>
-                          {practice.division}
-                        </span>
-                        <span className="text-[10px] font-bold text-slate-400">
-                          {practice.expertiseAreas.length} Areas of Expertise
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-bold text-slate-900 leading-snug">
-                        {practice.title}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                        {practice.description}
-                      </p>
-                    </div>
-                    {isSelected && (
-                      <div className="absolute top-3.5 right-3.5 text-emerald-600 animate-in fade-in zoom-in-75 duration-150">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Dynamic Chamber Routing & Lead Partner Card */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800 animate-in fade-in duration-200">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
-                    Dynamic Practice Routing Active
-                  </span>
-                  <span className="text-slate-500 text-xs">•</span>
-                  <span className="text-[11px] text-slate-300 font-medium">{activePractice.leadPartner.desk}</span>
-                </div>
-                <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
-                  <span>Routing to: {activePractice.leadPartner.name}</span>
-                </h4>
-                <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                  {activePartnerDescription(activePractice)}
-                </p>
-                <div className="text-[11px] text-emerald-300/90 font-medium flex items-center gap-1 pt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{activePractice.leadPartner.chamber}</span>
-                </div>
-              </div>
-
-              <div className="shrink-0 flex md:flex-col items-start md:items-end justify-between border-t md:border-t-0 md:border-l border-slate-700/80 pt-3 md:pt-0 md:pl-4 gap-2">
-                <div className="text-left md:text-right">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Response SLA</span>
-                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{activePractice.leadPartner.sla.split('within')[1]?.trim() ? `< ${activePractice.leadPartner.sla.split('within')[1]?.trim()}` : 'Under 4 Hours'}</span>
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  {activePractice.division}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 1B. Dynamic Area of Expertise Selector */}
-          <div className="space-y-3 pt-2 border-t border-slate-100">
-            <div className="flex items-center justify-between flex-wrap gap-1">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">1B</span>
-                <span>Select Specific Area of Expertise for Appointment *</span>
+                <span>Select Practice Area &amp; Topic *</span>
               </label>
-              <span className="text-[11px] text-slate-500 font-medium">
-                Tailored to {activePractice.shortTitle}
+              <span className="text-[11px] font-semibold text-emerald-800">
+                {activePractice.division}
               </span>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Identify the exact focus of your matter so the chamber team can pull relevant case precedents, statutory tax sections, or RJSC records before your scheduled session.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              {activePractice.expertiseAreas.map((exp) => {
-                const isSelected = !isCustomExpertise && selectedExpertise === exp.name;
-                return (
-                  <button
-                    key={exp.id}
-                    type="button"
-                    onClick={() => {
-                      setIsCustomExpertise(false);
-                      setSelectedExpertise(exp.name);
-                    }}
-                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between relative ${
-                      isSelected
-                        ? 'border-emerald-600 bg-emerald-50/80 ring-1 ring-emerald-500 text-emerald-950 font-bold shadow-2xs'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-1 mb-1">
-                        <span className="text-xs font-bold text-slate-900 leading-snug">
-                          {exp.name}
-                        </span>
-                        {isSelected && (
-                          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
-                        {exp.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom / Other Specific Topic Option */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => setIsCustomExpertise(!isCustomExpertise)}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>{isCustomExpertise ? '− Choose from standard practice areas above' : '+ Need a customized or hybrid multi-practice topic?'}</span>
-              </button>
-
-              {isCustomExpertise && (
-                <div className="mt-2 animate-in fade-in duration-150">
-                  <input
-                    type="text"
-                    value={customExpertiseText}
-                    onChange={(e) => setCustomExpertiseText(e.target.value)}
-                    placeholder={`e.g. Dual High Court Writ and Income Tax Section 180 penalty review...`}
-                    className="w-full bg-slate-50 border border-emerald-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    required
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Your custom matter will be tagged under <strong>{activePractice.title}</strong> for priority partner scoping.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Recommended Document Checklist for Selected Practice */}
-            <div className="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs space-y-1.5">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold">
-                <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Recommended Documents for {activePractice.shortTitle} (Optional to bring/upload):</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="booking-practice-area"
+                  className="block text-xs font-semibold text-slate-600 mb-1.5"
+                >
+                  Practice Area *
+                </label>
+                <select
+                  id="booking-practice-area"
+                  value={activePractice.id}
+                  onChange={(e) => {
+                    const found = PRACTICE_AREAS.find((p) => p.id === e.target.value);
+                    if (found) handleSelectPractice(found);
+                  }}
+                  className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all cursor-pointer"
+                >
+                  {PRACTICE_AREAS.map((practice) => (
+                    <option key={practice.id} value={practice.id}>
+                      {practice.title} ({practice.division})
+                    </option>
+                  ))}
+                </select>
               </div>
-              <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-1 pt-1 text-[11px] text-slate-600">
-                {activePractice.preparationChecklist.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-1.5 bg-white p-2 rounded-lg border border-slate-200/60 shadow-2xs">
-                    <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <span className="leading-snug">{item}</span>
-                  </li>
-                ))}
-              </ul>
+
+              <div>
+                <label
+                  htmlFor="booking-expertise-topic"
+                  className="block text-xs font-semibold text-slate-600 mb-1.5"
+                >
+                  Specific Advisory Topic *
+                </label>
+                <select
+                  id="booking-expertise-topic"
+                  value={isCustomExpertise ? '__custom__' : selectedExpertise}
+                  onChange={(e) => {
+                    if (e.target.value === '__custom__') {
+                      setIsCustomExpertise(true);
+                    } else {
+                      setIsCustomExpertise(false);
+                      setSelectedExpertise(e.target.value);
+                    }
+                  }}
+                  className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all cursor-pointer"
+                >
+                  {activePractice.expertiseAreas.map((exp) => (
+                    <option key={exp.id} value={exp.name}>
+                      {exp.name}
+                    </option>
+                  ))}
+                  <option value="__custom__">+ Custom / Hybrid Multi-Practice Topic</option>
+                </select>
+              </div>
             </div>
+
+            {isCustomExpertise && (
+              <div className="pt-1">
+                <input
+                  type="text"
+                  value={customExpertiseText}
+                  onChange={(e) => setCustomExpertiseText(e.target.value)}
+                  placeholder="Specify your custom legal, tax, or financial matter..."
+                  className="w-full bg-slate-50 border border-emerald-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  required
+                />
+              </div>
+            )}
+
+            <p className="text-xs text-slate-500">
+              Assigned Desk: <strong className="text-slate-800">{activePractice.leadPartner.name}</strong> ({activePractice.leadPartner.chamber})
+            </p>
           </div>
 
           {/* 2. Consultation Mode (Virtual Google Meet vs Chamber In-Person) */}
@@ -1375,75 +1252,64 @@ export function AppointmentBookingForm({ initialPracticeArea }: AppointmentBooki
             </div>
           </div>
 
-          {/* 3. Date & Time Slot Picker */}
-          <div className="space-y-4 pt-2 border-t border-slate-100">
+          {/* 3. Date & Time Slot Picker (Dropdown) */}
+          <div className="space-y-3 pt-2 border-t border-slate-100">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">3</span>
+              <label
+                htmlFor="booking-date-select"
+                className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5"
+              >
+                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">
+                  3
+                </span>
                 <span>Select Date &amp; Time Slot (BST) *</span>
               </label>
-              <span className="text-[11px] text-slate-500 font-mono">Bangladesh Standard Time (UTC+6)</span>
+              <span className="text-[11px] text-slate-500 font-mono">
+                Bangladesh Standard Time (UTC+6)
+              </span>
             </div>
 
-            {/* Date Quick Carousel */}
-            <div>
-              <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Available Chamber Days</span>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {upcomingDates.slice(0, 5).map((d) => {
-                  const isSelected = selectedDate === d.dateStr;
-                  return (
-                    <button
-                      key={d.dateStr}
-                      type="button"
-                      onClick={() => setSelectedDate(d.dateStr)}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                        isSelected 
-                          ? 'border-emerald-600 bg-emerald-600 text-white font-bold shadow-xs' 
-                          : 'border-slate-200 bg-slate-50 hover:bg-white text-slate-700'
-                      }`}
-                    >
-                      <span className="text-[11px] uppercase tracking-wider block opacity-90">{d.displayDay}</span>
-                      <span className="text-sm font-extrabold block">{d.displayDate}</span>
-                      {d.isTomorrow && (
-                        <span className={`text-[9px] uppercase tracking-wider block font-bold mt-0.5 ${isSelected ? 'text-emerald-100' : 'text-emerald-600'}`}>
-                          Tomorrow
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="booking-date-select"
+                  className="block text-xs font-semibold text-slate-600 mb-1.5"
+                >
+                  Preferred Chamber Date *
+                </label>
+                <select
+                  id="booking-date-select"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all cursor-pointer"
+                >
+                  {upcomingDates.map((d) => (
+                    <option key={d.dateStr} value={d.dateStr}>
+                      {d.displayDay}, {d.displayDate} ({d.dateStr}){d.isTomorrow ? ' — Tomorrow' : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
 
-            {/* Time Slot Grid */}
-            <div>
-              <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Select 45-Minute Consultation Window</span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {TIME_SLOTS.map((slot) => {
-                  const isSelected = selectedSlot === slot.time;
-                  return (
-                    <button
-                      key={slot.time}
-                      type="button"
-                      onClick={() => setSelectedSlot(slot.time)}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
-                        isSelected 
-                          ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold ring-1 ring-emerald-500' 
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{slot.period}</span>
-                        <span className="text-xs font-semibold">{slot.time}</span>
-                      </div>
-                      {isSelected ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      ) : (
-                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
+              <div>
+                <label
+                  htmlFor="booking-slot-select"
+                  className="block text-xs font-semibold text-slate-600 mb-1.5"
+                >
+                  45-Minute Consultation Window *
+                </label>
+                <select
+                  id="booking-slot-select"
+                  value={selectedSlot}
+                  onChange={(e) => setSelectedSlot(e.target.value)}
+                  className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all cursor-pointer"
+                >
+                  {TIME_SLOTS.map((slot) => (
+                    <option key={slot.time} value={slot.time}>
+                      {slot.time} ({slot.period})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

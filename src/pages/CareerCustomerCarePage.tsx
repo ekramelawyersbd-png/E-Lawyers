@@ -1054,16 +1054,42 @@ export const CareerCustomerCarePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-700" /> Official Career Circular · 2026 Recruitment
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold mb-3 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" /> Official Career Circular · 2026 Recruitment
+              </div>
 
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#10243a] mb-3">
-            Customer Care Executive (Female)
-          </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mb-6 leading-relaxed">
-            কাস্টমার কেয়ার ও কল সেন্টারে উজ্জ্বল ক্যারিয়ার গড়ুন। আপনার আত্মবিশ্বাস, মার্জিত বাচনভঙ্গি ও যোগাযোগ দক্ষতাকে কাজে লাগিয়ে E-Lawyers-এর ক্লায়েন্টদের বিশ্বস্ত সেবা দিন।
-          </p>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#10243a] mb-3">
+                Customer Care Executive (Female)
+              </h1>
+              <p className="text-lg md:text-xl text-slate-600 max-w-3xl mb-6 leading-relaxed">
+                কাস্টমার কেয়ার ও কল সেন্টারে উজ্জ্বল ক্যারিয়ার গড়ুন। আপনার আত্মবিশ্বাস, মার্জিত বাচনভঙ্গি ও যোগাযোগ দক্ষতাকে কাজে লাগিয়ে E-Lawyers-এর ক্লায়েন্টদের বিশ্বস্ত সেবা দিন।
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('apply')}
+                  className="px-6 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  <span>Apply Online Now (অনলাইন আবেদন)</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl overflow-hidden border-2 border-slate-200/90 shadow-lg bg-white">
+                <img
+                  src="https://i.ibb.co/Kz0BfBPn/65a0c170-51c2-4122-8430-e881e995471f.png"
+                  alt="Customer Care Executive (Female) Recruitment Circular - E-Lawyers Legal & Business Consultancy Firm"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Key metadata badges */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -1173,6 +1199,15 @@ export const CareerCustomerCarePage: React.FC = () => {
 
             {/* Overview Card */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
+              <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
+                <img
+                  src="https://i.ibb.co/Tqqn8XBt/309a5625-b84f-4412-9326-1c2dd526b57d.png"
+                  alt="Customer Care Executive (Female) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+
               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
                 <div className="p-2.5 rounded-xl bg-[#10243a]/5 text-[#10243a]">
                   <Building2 className="w-6 h-6 text-[#10243a]" />

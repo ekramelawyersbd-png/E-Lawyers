@@ -167,8 +167,12 @@ export async function fetchUserCloudSavedItems(userId: string): Promise<SavedIte
 
     return items;
   } catch (error) {
-    console.error('Failed to fetch cloud saved items:', error);
-    handleFirestoreError(error, OperationType.LIST, favoritesPath);
+    console.warn('Failed to fetch cloud saved items:', error);
+    try {
+      handleFirestoreError(error, OperationType.LIST, favoritesPath);
+    } catch {
+      // Fall back to empty array if offline
+    }
     return [];
   }
 }

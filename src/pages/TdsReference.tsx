@@ -7,6 +7,7 @@ import { TdsComparatorSearchFilter, SectionType } from '../components/tds/TdsCom
 import { TdsSearchableSelect } from '../components/tds/TdsSearchableSelect';
 import { HighlightText } from '../components/tds/HighlightText';
 import { QuickTdsCalculator } from '../components/tds/QuickTdsCalculator';
+import { ToolSEO } from '../components/SEO';
 
 export type TdsViewMode = 'database' | 'comparator' | 'calculator' | 'treaty';
 
@@ -269,6 +270,18 @@ export function TdsReference() {
 
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 transition-all ${pinnedItemIds.length > 0 ? 'pb-40 md:pb-48' : ''}`}>
+      <ToolSEO
+        title={
+          viewMode === 'calculator'
+            ? 'Quick TDS Deduction Calculator (Sections 89, 90 & 119) | Accounticca'
+            : viewMode === 'treaty'
+            ? 'DTAA Double Taxation Avoidance Treaty Rates | Accounticca & E-Lawyers'
+            : 'Bangladesh TDS Reference Guide & Rates Database (ITA 2023) | Accounticca'
+        }
+        description="Comprehensive Tax Deducted at Source (TDS) rate lookup, gross-up calculator, and DTAA treaty rates under Sections 89, 90, and 119 of the Income Tax Act 2023."
+        canonicalUrl="/tds-guide"
+        keywords={['Bangladesh TDS Rates', 'Section 89 TDS', 'Section 90 TDS', 'Section 119 Non-Resident Tax', 'ITA 2023 TDS']}
+      />
       
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">

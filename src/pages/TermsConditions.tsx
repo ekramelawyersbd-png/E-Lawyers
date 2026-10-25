@@ -1,9 +1,15 @@
 import React from 'react';
 import { Scale, AlertCircle, FileCheck, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export function TermsConditions() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+      <SEO
+        title="Terms & Conditions – Legal & Advisory Platform | Accounticca & E-Lawyers"
+        description="Review the Terms and Conditions governing the use of Accounticca & E-Lawyers BD legal, tax, VAT, and corporate compliance tools and advisory services."
+        canonicalUrl="/terms"
+      />
       <div className="mb-12">
         <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
           Terms & <span className="text-emerald-600">Conditions</span>

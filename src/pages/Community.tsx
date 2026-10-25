@@ -50,6 +50,7 @@ import { BookConsultationModal } from '../components/community/BookConsultationM
 import { ExpertApplicationModal } from '../components/community/ExpertApplicationModal';
 import { PublishArticleModal } from '../components/community/PublishArticleModal';
 import { buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../utils/appointmentRedirect';
+import { SEO } from '../components/SEO';
 
 interface CommunityProps {
   initialTab?: 'experts' | 'discussions';
@@ -224,6 +225,23 @@ export function Community({ initialTab }: CommunityProps) {
 
   return (
     <div className="bg-slate-50 min-h-screen">
+      <SEO
+        title={
+          initialTab === 'experts'
+            ? 'Verified Legal, Tax & Accounting Experts Directory | Accounticca Community'
+            : initialTab === 'discussions'
+            ? 'Legal, Tax & Corporate Compliance Q&A Forum | Accounticca Community'
+            : 'Professional Network for Legal, Tax & Business Experts | Accounticca & E-Lawyers'
+        }
+        description="Connect with verified Supreme Court Advocates, Chartered Accountants, Income Tax Lawyers, and RJSC Consultants across Bangladesh."
+        canonicalUrl={
+          initialTab === 'experts'
+            ? '/experts'
+            : initialTab === 'discussions'
+            ? '/discussions'
+            : '/community'
+        }
+      />
       {/* 1. Hero Section (Community Landing) */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-emerald-50/40 to-slate-100/70 text-slate-900 pt-16 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80">
         {/* Subtle decorative mesh background */}

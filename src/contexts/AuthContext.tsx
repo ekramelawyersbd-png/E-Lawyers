@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth, fallbackAuth, db } from '../lib/firebase';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { authService, ERPAuthUser } from '../services/authService';
 
 interface AuthContextType {
@@ -65,23 +65,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           };
           setAuthUser(sessionUser);
           localStorage.setItem('erp_auth_user', JSON.stringify(sessionUser));
-        } catch (e) {
-          console.error("Error setting session token", e);
+        } catch {
+          // Fallback session user if token refresh fails while offline
+          const fallbackSession: ERPAuthUser = {
+            uid: currentUser.uid,
+            email: currentEmail,
+            displayName,
+            photoURL: currentUser.photoURL || null,
+            role,
+            roleId,
+            provider: 'google',
+            token: ''
+          };
+          setAuthUser(fallbackSession);
+          localStorage.setItem('erp_auth_user', JSON.stringify(fallbackSession));
         }
 
         try {
           const userRef = doc(db, 'users', currentUser.uid);
-          const docSnap = await getDoc(userRef);
-          if (!docSnap.exists()) {
-            await setDoc(userRef, {
+          await setDoc(
+            userRef,
+            {
               email: currentEmail,
-              displayName: currentUser.displayName,
-              createdAt: serverTimestamp(),
+              displayName: currentUser.displayName || displayName,
+              updatedAt: serverTimestamp(),
               role
-            });
-          }
-        } catch (e) {
-          console.error("Error creating user profile", e);
+            },
+            { merge: true }
+          );
+        } catch {
+          // Client may be operating in offline mode; local cache will sync when online
         }
       } else {
         if (!auth.currentUser && !fallbackAuth.currentUser) {

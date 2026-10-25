@@ -19,7 +19,7 @@ export const ProfilePage: React.FC = () => {
 
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Breadcrumb Header */}
-        <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-500 font-medium">
+        <nav aria-label="Breadcrumb" className="hidden flex items-center text-xs text-slate-500 font-medium">
           <Link to="/" className="hover:text-slate-900 transition-colors flex items-center gap-1">
             <Home className="w-3.5 h-3.5 text-slate-400" />
             <span>Home</span>

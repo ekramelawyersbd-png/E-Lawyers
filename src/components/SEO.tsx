@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation, useInRouterContext } from 'react-router-dom';
 import { Article } from '../types';
 
 export interface BreadcrumbItem {
@@ -18,6 +19,8 @@ export interface ServiceSEOConfig {
   email?: string;
 }
 
+export type SEOPageType = 'website' | 'article' | 'service' | 'webapp' | 'course' | 'product' | 'profile';
+
 export interface SEOProps {
   /** Page or Content Title */
   title: string;
@@ -25,20 +28,29 @@ export interface SEOProps {
   description?: string;
   /** Canonical URL or relative path (e.g. /tools or https://example.com/tools) */
   canonicalUrl?: string;
-  /** Page Type: website, article, or service */
-  type?: 'website' | 'article' | 'service';
+  /** Page Type: website, article, service, webapp, course, product, or profile */
+  type?: SEOPageType;
   /** Featured image URL for Open Graph and Twitter Card */
   imageUrl?: string;
   /** Image Alt text */
   imageAlt?: string;
+  /** Image dimensions for social cards */
+  imageWidth?: number | string;
+  imageHeight?: number | string;
   /** Keywords list or comma-separated string */
   keywords?: string[] | string;
   /** Prevent search engines from indexing this page */
   noindex?: boolean;
   /** Brand / Site Name override */
   siteName?: string;
+  /** Automatically append siteName to title if no brand separator is present (default: true) */
+  appendSiteName?: boolean;
+  /** Twitter Card format (default: summary_large_image) */
+  twitterCard?: 'summary' | 'summary_large_image';
   /** Twitter handle (e.g. @Accounticca) */
   twitterHandle?: string;
+  /** Locale for OpenGraph (default: en_US) */
+  locale?: string;
   /** Author name for article */
   authorName?: string;
   /** Author URL */
@@ -53,6 +65,8 @@ export interface SEOProps {
   tags?: string[];
   /** Service specific configuration */
   service?: ServiceSEOConfig;
+  /** Application category when type === 'webapp' */
+  applicationCategory?: string;
   /** Optional breadcrumbs for Schema.org BreadcrumbList */
   breadcrumbs?: BreadcrumbItem[];
   /** Custom Schema.org object or array of objects to inject */
@@ -62,33 +76,62 @@ export interface SEOProps {
 }
 
 const DEFAULT_SITE_NAME = 'Accounticca & E-Lawyers Compliance Hub';
-const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=1200';
+const DEFAULT_SHORT_BRAND = 'Accounticca & E-Lawyers';
+const DEFAULT_DESCRIPTION =
+  'Legal, Tax, VAT, Accounting & Business Technology Knowledge Platform for Bangladesh by Accounticca & E-Lawyers.';
+const DEFAULT_FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=1200';
 const DEFAULT_FALLBACK_BASE_URL = 'https://accounticca.com';
 
 /**
- * Resolves a full canonical URL from either relative path or absolute URL
+ * Safely reads current router pathname when rendered inside a Router context
  */
-function resolveCanonicalUrl(pathOrUrl?: string): string {
-  if (!pathOrUrl) {
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}${window.location.pathname}`.replace(/\/$/, '') || window.location.origin;
+function useSafePathname(): string {
+  const inRouter = useInRouterContext();
+  // Always call hook unconditionally per React rules; when outside router, fallback to window.location
+  let routerPathname = '/';
+  try {
+    if (inRouter) {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const location = useLocation();
+      routerPathname = location.pathname;
+    } else if (typeof window !== 'undefined') {
+      routerPathname = window.location.pathname;
     }
-    return DEFAULT_FALLBACK_BASE_URL;
+  } catch {
+    if (typeof window !== 'undefined') {
+      routerPathname = window.location.pathname;
+    }
+  }
+  return routerPathname;
+}
+
+/**
+ * Resolves a full canonical URL from either relative path, current route, or absolute URL
+ */
+export function resolveCanonicalUrl(pathOrUrl?: string, fallbackPathname?: string): string {
+  const base = typeof window !== 'undefined' ? window.location.origin : DEFAULT_FALLBACK_BASE_URL;
+
+  if (!pathOrUrl) {
+    const pathname =
+      fallbackPathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
+    const clean = pathname === '/' ? '' : pathname.replace(/\/$/, '');
+    return `${base}${clean}`;
   }
 
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
     return pathOrUrl.replace(/\/$/, '');
   }
 
-  const base = typeof window !== 'undefined' ? window.location.origin : DEFAULT_FALLBACK_BASE_URL;
   const cleanPath = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
-  return `${base}${cleanPath}`.replace(/\/$/, '') || base;
+  const normalized = cleanPath === '/' ? '' : cleanPath.replace(/\/$/, '');
+  return `${base}${normalized}`;
 }
 
 /**
  * Resolves an absolute image URL
  */
-function resolveImageUrl(img?: string): string {
+export function resolveImageUrl(img?: string): string {
   if (!img) return DEFAULT_FALLBACK_IMAGE;
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
   const base = typeof window !== 'undefined' ? window.location.origin : DEFAULT_FALLBACK_BASE_URL;
@@ -96,25 +139,50 @@ function resolveImageUrl(img?: string): string {
 }
 
 /**
- * Universal, Reusable SEO Component
- * Automatically injects:
- * - HTML Title & Meta Description
- * - Dynamic Canonical URLs (<link rel="canonical" />)
- * - Open Graph Tags (Facebook, LinkedIn, Discord, Slack)
- * - Twitter / X Cards
- * - Schema.org JSON-LD Structured Data (Article, Service, BreadcrumbList, WebPage)
+ * Formats page title with brand name if not already branded
+ */
+function formatDocumentTitle(title: string, siteName: string, appendSiteName: boolean): string {
+  const trimmed = title.trim();
+  if (!appendSiteName) return trimmed;
+  // If title already contains a brand separator or brand name, keep as is
+  if (
+    trimmed.includes('|') ||
+    trimmed.includes('–') ||
+    trimmed.includes('—') ||
+    trimmed.toLowerCase().includes('accounticca') ||
+    trimmed.toLowerCase().includes('e-lawyers') ||
+    trimmed.toLowerCase().includes('compliance hub')
+  ) {
+    return trimmed;
+  }
+  return `${trimmed} | ${siteName === DEFAULT_SITE_NAME ? DEFAULT_SHORT_BRAND : siteName}`;
+}
+
+/**
+ * Universal, Reusable SEO Metadata Component (`react-helmet-async`)
+ * Drop into any page component to dynamically update:
+ * - Document `<title>` & `<meta name="description">`
+ * - Route-aware Canonical URLs (`<link rel="canonical" />`)
+ * - Open Graph social sharing tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`)
+ * - Twitter / X Card metadata (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+ * - Schema.org JSON-LD Structured Data (`Article`, `ProfessionalService`, `WebApplication`, `Course`, `BreadcrumbList`)
  */
 export function SEO({
   title,
-  description = 'Legal, Tax, VAT, Accounting & Business Technology Knowledge Platform for Bangladesh by Accounticca & E-Lawyers.',
+  description = DEFAULT_DESCRIPTION,
   canonicalUrl,
   type = 'website',
   imageUrl,
   imageAlt,
+  imageWidth = 1200,
+  imageHeight = 630,
   keywords,
   noindex = false,
   siteName = DEFAULT_SITE_NAME,
+  appendSiteName = true,
+  twitterCard = 'summary_large_image',
   twitterHandle = '@Accounticca',
+  locale = 'en_US',
   authorName,
   authorUrl,
   publishedTime,
@@ -122,20 +190,33 @@ export function SEO({
   section,
   tags,
   service,
+  applicationCategory = 'BusinessApplication',
   breadcrumbs,
   customSchema,
   children
 }: SEOProps) {
-  const fullCanonicalUrl = useMemo(() => resolveCanonicalUrl(canonicalUrl), [canonicalUrl]);
+  const currentPathname = useSafePathname();
+
+  const formattedTitle = useMemo(
+    () => formatDocumentTitle(title, siteName, appendSiteName),
+    [title, siteName, appendSiteName]
+  );
+
+  const fullCanonicalUrl = useMemo(
+    () => resolveCanonicalUrl(canonicalUrl, currentPathname),
+    [canonicalUrl, currentPathname]
+  );
+
   const fullImageUrl = useMemo(() => resolveImageUrl(imageUrl), [imageUrl]);
+  const resolvedImageAlt = imageAlt || formattedTitle;
 
   const formattedKeywords = useMemo(() => {
     if (!keywords) return undefined;
-    if (Array.isArray(keywords)) return keywords.join(', ');
+    if (Array.isArray(keywords)) return keywords.filter(Boolean).join(', ');
     return keywords;
   }, [keywords]);
 
-  // Generate Schemas
+  // Generate Schema.org JSON-LD Structured Data based on page context
   const structuredDataList = useMemo(() => {
     const list: Record<string, any>[] = [];
 
@@ -145,7 +226,7 @@ export function SEO({
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: title,
-        description: description,
+        description,
         image: fullImageUrl,
         mainEntityOfPage: {
           '@type': 'WebPage',
@@ -186,7 +267,7 @@ export function SEO({
         '@context': 'https://schema.org',
         '@type': providerType,
         name: service?.providerName || title,
-        description: description,
+        description,
         url: fullCanonicalUrl,
         image: fullImageUrl,
         serviceType: service?.serviceType || title,
@@ -215,7 +296,46 @@ export function SEO({
       list.push(serviceSchema);
     }
 
-    // 3. Breadcrumbs Schema
+    // 3. WebApplication Schema (for Calculators, Interactive Tools & Dashboards)
+    if (type === 'webapp') {
+      list.push({
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: title,
+        applicationCategory,
+        operatingSystem: 'All',
+        url: fullCanonicalUrl,
+        image: fullImageUrl,
+        description,
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'BDT'
+        },
+        provider: {
+          '@type': 'Organization',
+          name: siteName
+        }
+      });
+    }
+
+    // 4. Course Schema (for LMS & Training Pages)
+    if (type === 'course') {
+      list.push({
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: title,
+        description,
+        url: fullCanonicalUrl,
+        provider: {
+          '@type': 'Organization',
+          name: 'E-Lawyers Academy & Accounticca',
+          sameAs: DEFAULT_FALLBACK_BASE_URL
+        }
+      });
+    }
+
+    // 5. Breadcrumbs Schema
     if (breadcrumbs && breadcrumbs.length > 0) {
       list.push({
         '@context': 'https://schema.org',
@@ -224,12 +344,12 @@ export function SEO({
           '@type': 'ListItem',
           position: index + 1,
           name: crumb.name,
-          item: resolveCanonicalUrl(crumb.url)
+          item: resolveCanonicalUrl(crumb.url, currentPathname)
         }))
       });
     }
 
-    // 4. Custom Schema
+    // 6. Custom Schema
     if (customSchema) {
       if (Array.isArray(customSchema)) {
         list.push(...customSchema);
@@ -252,17 +372,26 @@ export function SEO({
     authorUrl,
     tags,
     service,
+    applicationCategory,
     breadcrumbs,
-    customSchema
+    customSchema,
+    currentPathname
   ]);
 
-  const ogType = type === 'article' ? 'article' : 'website';
+  const ogType =
+    type === 'article'
+      ? 'article'
+      : type === 'product'
+      ? 'product'
+      : type === 'profile'
+      ? 'profile'
+      : 'website';
 
   return (
-    <Helmet>
-      {/* Primary Meta Tags */}
-      <title>{title}</title>
-      <meta name="title" content={title} />
+    <Helmet prioritizeSeoTags>
+      {/* Primary Document Title & Meta Tags */}
+      <title>{formattedTitle}</title>
+      <meta name="title" content={formattedTitle} />
       <meta name="description" content={description} />
       {formattedKeywords && <meta name="keywords" content={formattedKeywords} />}
       {authorName && <meta name="author" content={authorName} />}
@@ -275,20 +404,22 @@ export function SEO({
         }
       />
 
-      {/* Canonical Link */}
+      {/* Dynamic Canonical Link */}
       <link rel="canonical" href={fullCanonicalUrl} />
 
-      {/* Open Graph / Facebook / LinkedIn */}
+      {/* Open Graph / Facebook / LinkedIn / Slack / Discord */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={fullCanonicalUrl} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={formattedTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={fullImageUrl} />
-      {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+      <meta property="og:image:alt" content={resolvedImageAlt} />
+      {imageWidth && <meta property="og:image:width" content={String(imageWidth)} />}
+      {imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}
       <meta property="og:site_name" content={siteName} />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale" content={locale} />
 
-      {/* Article Specific Open Graph */}
+      {/* Article Specific Open Graph Tags */}
       {type === 'article' && publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
       )}
@@ -306,16 +437,16 @@ export function SEO({
         tags.map((tag) => <meta key={tag} property="article:tag" content={tag} />)}
 
       {/* Twitter / X Cards */}
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:url" content={fullCanonicalUrl} />
-      <meta name="twitter:title" content={title} />
+      <meta name="twitter:title" content={formattedTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={fullImageUrl} />
-      {imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
+      <meta name="twitter:image:alt" content={resolvedImageAlt} />
       {twitterHandle && <meta name="twitter:site" content={twitterHandle} />}
       {twitterHandle && <meta name="twitter:creator" content={twitterHandle} />}
 
-      {/* Schema.org Structured Data */}
+      {/* Schema.org JSON-LD Structured Data */}
       {structuredDataList.map((data, idx) => (
         <script key={idx} type="application/ld+json">
           {JSON.stringify(data)}
@@ -326,6 +457,12 @@ export function SEO({
     </Helmet>
   );
 }
+
+/**
+ * Alias for SEO component for semantic usage across page components
+ */
+export const SEOMeta = SEO;
+export const PageSEO = SEO;
 
 /**
  * Dedicated Blog Article SEO Helper Component
@@ -383,6 +520,7 @@ export interface ServiceSEOProps {
   providerType?: 'LegalService' | 'AccountingService' | 'ProfessionalService' | 'Organization';
   areaServed?: string;
   keywords?: string[] | string;
+  noindex?: boolean;
   breadcrumbs?: BreadcrumbItem[];
   customSchema?: Record<string, any> | Array<Record<string, any>>;
 }
@@ -397,6 +535,7 @@ export function ServiceSEO({
   providerType = 'ProfessionalService',
   areaServed = 'Bangladesh',
   keywords,
+  noindex,
   breadcrumbs,
   customSchema
 }: ServiceSEOProps) {
@@ -408,6 +547,7 @@ export function ServiceSEO({
       type="service"
       imageUrl={imageUrl}
       keywords={keywords}
+      noindex={noindex}
       service={{
         serviceType,
         providerName,
@@ -419,3 +559,86 @@ export function ServiceSEO({
     />
   );
 }
+
+/**
+ * Dedicated Interactive Tool / Calculator SEO Helper Component (WebApplication Schema)
+ */
+export interface ToolSEOProps {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  category?: string;
+  imageUrl?: string;
+  keywords?: string[] | string;
+  breadcrumbs?: BreadcrumbItem[];
+  customSchema?: Record<string, any> | Array<Record<string, any>>;
+}
+
+export function ToolSEO({
+  title,
+  description,
+  canonicalUrl,
+  category = 'FinanceApplication',
+  imageUrl,
+  keywords,
+  breadcrumbs,
+  customSchema
+}: ToolSEOProps) {
+  return (
+    <SEO
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      type="webapp"
+      applicationCategory={category}
+      imageUrl={imageUrl}
+      keywords={keywords}
+      breadcrumbs={
+        breadcrumbs || [
+          { name: 'Home', url: '/' },
+          { name: 'Tools Hub', url: '/tools' },
+          { name: title, url: canonicalUrl || '/tools' }
+        ]
+      }
+      customSchema={customSchema}
+    />
+  );
+}
+
+/**
+ * Dedicated Course / LMS SEO Helper Component (Course Schema)
+ */
+export interface CourseSEOProps {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  imageUrl?: string;
+  keywords?: string[] | string;
+  breadcrumbs?: BreadcrumbItem[];
+  customSchema?: Record<string, any> | Array<Record<string, any>>;
+}
+
+export function CourseSEO({
+  title,
+  description,
+  canonicalUrl,
+  imageUrl,
+  keywords,
+  breadcrumbs,
+  customSchema
+}: CourseSEOProps) {
+  return (
+    <SEO
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      type="course"
+      imageUrl={imageUrl}
+      keywords={keywords}
+      breadcrumbs={breadcrumbs}
+      customSchema={customSchema}
+    />
+  );
+}
+
+export default SEO;
