@@ -37,7 +37,7 @@ function escapeHtml(str: string): string {
 }
 
 function formatBdt(amount: number): string {
-  return `BDT ${Number(amount || 0).toLocaleString('en-IN')}`;
+  return `BDT ${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**

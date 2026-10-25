@@ -36,7 +36,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed: CartItem[] = JSON.parse(saved);
+      return Array.isArray(parsed)
+        ? parsed.map((item) => ({
+            ...item,
+            product: { ...item.product, price: 0 }
+          }))
+        : [];
     } catch {
       return [];
     }
@@ -73,16 +80,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [promoCode]);
 
   const addToCart = useCallback((product: ShopProduct, quantity = 1) => {
+    const normalizedProduct: ShopProduct = { ...product, price: 0 };
     setItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const existing = prev.find((item) => item.product.id === normalizedProduct.id);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+          item.product.id === normalizedProduct.id
+            ? { ...item, product: normalizedProduct, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product: normalizedProduct, quantity }];
     });
     setIsCartOpen(true);
   }, []);

@@ -244,6 +244,20 @@ interface LmsContextType {
   recordNotesSectionRead: (courseId: string, lessonId: string, sectionId: string) => void;
   markNotesLessonComplete: (courseId: string, lessonId: string) => { success: boolean; message: string };
   recordPptSlideView: (courseId: string, lessonId: string, slideNumber: number) => void;
+  isLessonCompleted: (courseId: string, lessonId: string) => boolean;
+  toggleLessonCompletion: (courseId: string, lessonId: string, forceCompleted?: boolean) => boolean;
+  lastAccessedCourseId: string;
+  recordCourseAccess: (courseId: string) => void;
+  getFirstUncompletedLesson: (courseId?: string) => {
+    courseId: string;
+    portalCourseId: string;
+    courseTitle: string;
+    lessonId: string;
+    className: string;
+    lessonIndex: number;
+    allCompleted: boolean;
+    routeUrl: string;
+  };
   submitClassQuiz: (
     courseId: string,
     lessonId: string,
@@ -278,7 +292,8 @@ const STORAGE_KEYS = {
   QUIZ_ATTEMPTS: 'elaw_lms_quiz_attempts_v1',
   EXAM_RESULTS: 'elaw_lms_exam_results_v1',
   CERTIFICATES: 'elaw_lms_certificates_v1',
-  AUDIT_LOGS: 'elaw_lms_audit_logs_v1'
+  AUDIT_LOGS: 'elaw_lms_audit_logs_v1',
+  LAST_ACCESSED_COURSE: 'elaw_lms_last_accessed_course_v1'
 };
 
 const DEFAULT_SAMPLE_CERTIFICATES: LmsCertificateRecord[] = [
@@ -355,7 +370,39 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return INITIAL_LMS_COURSES;
   });
 
-  const [activeCourseId, setActiveCourseId] = useState<string>('personal-income-tax');
+  const [activeCourseId, setActiveCourseIdState] = useState<string>('personal-income-tax');
+  const [lastAccessedCourseId, setLastAccessedCourseId] = useState<string>(() => {
+    try {
+      const savedLast = localStorage.getItem(STORAGE_KEYS.LAST_ACCESSED_COURSE);
+      if (savedLast) return savedLast;
+      const savedPortal = localStorage.getItem('lms_active_portal_course_id');
+      if (savedPortal) return savedPortal;
+    } catch {
+      // ignore
+    }
+    return 'academy-course-401';
+  });
+
+  const recordCourseAccess = useCallback((courseId: string) => {
+    const trimmed = (courseId || '').trim();
+    if (!trimmed) return;
+    setLastAccessedCourseId(trimmed);
+    try {
+      localStorage.setItem(STORAGE_KEYS.LAST_ACCESSED_COURSE, trimmed);
+      localStorage.setItem('lms_active_portal_course_id', trimmed);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setActiveCourseId = useCallback(
+    (courseId: string) => {
+      setActiveCourseIdState(courseId);
+      recordCourseAccess(courseId);
+    },
+    [recordCourseAccess]
+  );
+
   const [isFirestoreSyncing, setIsFirestoreSyncing] = useState<boolean>(false);
   const [isFirestoreEnrollmentVerified, setIsFirestoreEnrollmentVerified] = useState<boolean>(false);
 
@@ -394,6 +441,14 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const normalized: Record<string, LessonProgressRecord> = {};
           Object.entries(parsed).forEach(([k, val]) => {
             const rec = val as LessonProgressRecord;
+            // Migrate legacy untouched 6-class seed so Class 02 is the first uncompleted lesson by default
+            if (
+              rec.completedAt === '2026-10-19T12:00:00Z' &&
+              rec.updatedAt === '2026-10-19T12:00:00Z' &&
+              ['cls_02', 'cls_03', 'cls_04', 'cls_05', 'cls_06'].includes(rec.lessonId)
+            ) {
+              return;
+            }
             const isFullyDone =
               Boolean(rec.videoCompleted) &&
               Boolean(rec.notesCompleted) &&
@@ -410,10 +465,10 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-    // Seed initial progress: 6 of 10 classes completed in Firestore, Class 07 In Progress
+    // Seed initial progress: Class 01 completed in Firestore, Class 02 In Progress (first uncompleted lesson)
     const initial: Record<string, LessonProgressRecord> = {};
     const defaultCourse = INITIAL_LMS_COURSES[0];
-    defaultCourse.lessons.slice(0, 6).forEach((lesson) => {
+    defaultCourse.lessons.slice(0, 1).forEach((lesson) => {
       const key = `student_default_user_${defaultCourse.courseId}_${lesson.lessonId}`;
       initial[key] = {
         key,
@@ -437,18 +492,18 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatedAt: '2026-10-19T12:00:00Z'
       };
     });
-    const class7 = defaultCourse.lessons[6];
-    if (class7) {
-      const key7 = `student_default_user_${defaultCourse.courseId}_${class7.lessonId}`;
-      initial[key7] = {
-        key: key7,
+    const class2 = defaultCourse.lessons[1];
+    if (class2) {
+      const key2 = `student_default_user_${defaultCourse.courseId}_${class2.lessonId}`;
+      initial[key2] = {
+        key: key2,
         userId: 'student_default_user',
         courseId: defaultCourse.courseId,
-        lessonId: class7.lessonId,
-        videoWatchPercent: 75,
-        videoCheckpointsReached: class7.videoAsset.chapters.slice(0, 3).map((c) => c.id),
+        lessonId: class2.lessonId,
+        videoWatchPercent: 50,
+        videoCheckpointsReached: class2.videoAsset.chapters.slice(0, 2).map((c) => c.id),
         videoCompleted: false,
-        notesSectionsRead: [class7.notesAsset.sections[0].id],
+        notesSectionsRead: [class2.notesAsset.sections[0].id],
         notesCompleted: false,
         pptViewed: true,
         pptSlidesViewed: [1],
@@ -1365,6 +1420,318 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [canAccessLessonContent, upsertProgressRecord]
   );
 
+  const resolveCourseAndLesson = useCallback(
+    (courseIdInput: string, lessonIdInput: string) => {
+      let normalizedCourseId = (courseIdInput || activeCourseId || 'personal-income-tax').trim();
+      if (normalizedCourseId === 'academy-course-401') {
+        normalizedCourseId = 'personal-income-tax';
+      } else if (normalizedCourseId === 'academy-course-402') {
+        normalizedCourseId = 'rjsc-corporate-compliance';
+      }
+
+      const course =
+        courses.find((c) => c.courseId === normalizedCourseId) ||
+        courses.find((c) => c.courseId === activeCourseId) ||
+        courses[0];
+
+      const rawLesson = (lessonIdInput || 'cls_01').trim();
+      let matchedLesson: LmsLesson | undefined;
+      let normalizedLessonId = rawLesson;
+
+      if (course) {
+        matchedLesson = course.lessons.find(
+          (l) =>
+            l.lessonId.toLowerCase() === rawLesson.toLowerCase() ||
+            l.classNumber === rawLesson ||
+            l.heading.trim().toLowerCase() === rawLesson.toLowerCase()
+        );
+
+        if (!matchedLesson) {
+          const classNumMatch = rawLesson.match(/^(?:class\s*|cls_?\s*)?0*(\d+)$/i);
+          if (classNumMatch) {
+            const num = parseInt(classNumMatch[1], 10);
+            const padded = String(num).padStart(2, '0');
+            matchedLesson = course.lessons.find(
+              (l) =>
+                l.classNumber === padded ||
+                l.classNumber === String(num) ||
+                l.lessonId === `cls_${padded}`
+            );
+            normalizedLessonId = matchedLesson ? matchedLesson.lessonId : `cls_${padded}`;
+          }
+        } else {
+          normalizedLessonId = matchedLesson.lessonId;
+        }
+      }
+
+      return {
+        normalizedCourseId,
+        normalizedLessonId,
+        course,
+        lesson: matchedLesson
+      };
+    },
+    [activeCourseId, courses]
+  );
+
+  const isLessonCompleted = useCallback(
+    (courseId: string, lessonId: string): boolean => {
+      const { normalizedCourseId, normalizedLessonId, lesson } = resolveCourseAndLesson(
+        courseId,
+        lessonId
+      );
+      const progress = getOrCreateLessonProgress(normalizedCourseId, normalizedLessonId);
+      if (lesson) {
+        return (
+          Boolean(progress.completedInFirestore) &&
+          evaluateLessonCompletionCriteria(lesson, progress).allCriteriaMet
+        );
+      }
+      return (
+        Boolean(progress.completedInFirestore) ||
+        (Boolean(progress.videoCompleted) && Boolean(progress.notesCompleted))
+      );
+    },
+    [evaluateLessonCompletionCriteria, getOrCreateLessonProgress, resolveCourseAndLesson]
+  );
+
+  const toggleLessonCompletion = useCallback(
+    (courseId: string, lessonId: string, forceCompleted?: boolean): boolean => {
+      const { normalizedCourseId, normalizedLessonId, lesson } = resolveCourseAndLesson(
+        courseId,
+        lessonId
+      );
+      const currentlyDone = isLessonCompleted(normalizedCourseId, normalizedLessonId);
+      const nextCompleted =
+        typeof forceCompleted === 'boolean' ? forceCompleted : !currentlyDone;
+
+      const userKey = `${currentUserId}_${normalizedCourseId}_${normalizedLessonId}`;
+      const defaultKey = `student_default_user_${normalizedCourseId}_${normalizedLessonId}`;
+
+      setProgressMap((prevMap) => {
+        const nowIso = new Date().toISOString();
+        const base =
+          prevMap[userKey] ||
+          prevMap[defaultKey] || {
+            key: userKey,
+            userId: currentUserId,
+            courseId: normalizedCourseId,
+            lessonId: normalizedLessonId,
+            videoWatchPercent: 0,
+            videoCheckpointsReached: [],
+            videoCompleted: false,
+            notesSectionsRead: [],
+            notesCompleted: false,
+            pptViewed: false,
+            pptSlidesViewed: [],
+            quizPassed: false,
+            quizBestScore: 0,
+            quizAttemptsCount: 0,
+            firestoreValidated: true,
+            completedInFirestore: false,
+            updatedAt: nowIso
+          };
+
+        const updated: LessonProgressRecord = nextCompleted
+          ? {
+              ...base,
+              key: userKey,
+              userId: currentUserId,
+              courseId: normalizedCourseId,
+              lessonId: normalizedLessonId,
+              videoWatchPercent: 100,
+              videoCheckpointsReached: lesson
+                ? lesson.videoAsset.chapters.map((c) => c.id)
+                : base.videoCheckpointsReached,
+              videoCompleted: true,
+              notesSectionsRead: lesson
+                ? lesson.notesAsset.sections.map((s) => s.id)
+                : base.notesSectionsRead,
+              notesCompleted: true,
+              pptViewed: true,
+              pptSlidesViewed: lesson
+                ? lesson.pptAsset.slides.map((s) => s.slideNumber)
+                : [1, 2, 3],
+              quizPassed: true,
+              quizBestScore: Math.max(base.quizBestScore || 0, 100),
+              quizAttemptsCount: Math.max(base.quizAttemptsCount || 0, 1),
+              firestoreValidated: true,
+              firestoreValidatedAt: nowIso,
+              completedInFirestore: true,
+              completedAt: nowIso,
+              updatedAt: nowIso
+            }
+          : {
+              ...base,
+              key: userKey,
+              userId: currentUserId,
+              courseId: normalizedCourseId,
+              lessonId: normalizedLessonId,
+              videoWatchPercent: 0,
+              videoCheckpointsReached: [],
+              videoCompleted: false,
+              notesSectionsRead: [],
+              notesCompleted: false,
+              pptViewed: false,
+              pptSlidesViewed: [],
+              quizPassed: false,
+              firestoreValidated: true,
+              firestoreValidatedAt: nowIso,
+              completedInFirestore: false,
+              completedAt: undefined,
+              updatedAt: nowIso
+            };
+
+        safeSetDoc(doc(db, 'lms_progress', userKey), updated, { merge: true });
+        return {
+          ...prevMap,
+          [userKey]: updated,
+          [defaultKey]: updated
+        };
+      });
+
+      recordCourseAccess(courseId);
+      return nextCompleted;
+    },
+    [currentUserId, isLessonCompleted, recordCourseAccess, resolveCourseAndLesson]
+  );
+
+  const getFirstUncompletedLesson = useCallback(
+    (courseIdInput?: string) => {
+      // 1. Resolve most recently accessed course
+      let candidateCourseId = (courseIdInput || '').trim();
+      if (!candidateCourseId) {
+        try {
+          candidateCourseId =
+            localStorage.getItem(STORAGE_KEYS.LAST_ACCESSED_COURSE) ||
+            localStorage.getItem('lms_active_portal_course_id') ||
+            '';
+        } catch {
+          // ignore
+        }
+      }
+      if (!candidateCourseId) {
+        // Check most recent updatedAt in progressMap for current user
+        const userRecords = Object.values(progressMap).filter(
+          (r) => r.userId === currentUserId || r.userId === 'student_default_user'
+        );
+        if (userRecords.length > 0) {
+          const sorted = [...userRecords].sort(
+            (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+          );
+          if (sorted[0]?.courseId) {
+            candidateCourseId = sorted[0].courseId;
+          }
+        }
+      }
+      if (!candidateCourseId) {
+        candidateCourseId = lastAccessedCourseId || activeCourseId || 'academy-course-401';
+      }
+
+      const { normalizedCourseId, course } = resolveCourseAndLesson(candidateCourseId, 'cls_01');
+      const portalCourseId =
+        candidateCourseId.startsWith('academy-course-') ||
+        candidateCourseId === 'interactive-lms-masterclass'
+          ? candidateCourseId
+          : normalizedCourseId === 'rjsc-corporate-compliance'
+            ? 'academy-course-402'
+            : normalizedCourseId === 'personal-income-tax'
+              ? 'academy-course-401'
+              : candidateCourseId;
+
+      const courseTitle = course?.title || 'Personal Income Tax & Online e-Return Filing Masterclass';
+
+      // 2. Read class keys configured for this course in portal storage
+      let portalClassKeys: string[] = ['Class 01', 'Class 02', 'Class 03'];
+      try {
+        const rawPortal =
+          localStorage.getItem(`lmsData_${portalCourseId}`) ||
+          (portalCourseId === 'academy-course-401' || normalizedCourseId === 'personal-income-tax'
+            ? localStorage.getItem('lmsData')
+            : null);
+        if (rawPortal) {
+          const parsedPortal = JSON.parse(rawPortal);
+          if (parsedPortal && typeof parsedPortal === 'object') {
+            const keys = Object.keys(parsedPortal);
+            if (keys.length > 0) {
+              portalClassKeys = keys;
+            }
+          }
+        }
+      } catch {
+        // Fallback to default class keys
+      }
+
+      // 3. Find first uncompleted class in portalClassKeys
+      for (let idx = 0; idx < portalClassKeys.length; idx++) {
+        const clsName = portalClassKeys[idx];
+        const trimmed = (clsName || '').trim();
+        const lessonId = /^(?:class\s*|cls_?\s*)0*\d+$/i.test(trimmed)
+          ? `cls_${String(parseInt(trimmed.replace(/\D+/g, ''), 10) || idx + 1).padStart(2, '0')}`
+          : `cls_${String(idx + 1).padStart(2, '0')}`;
+
+        if (!isLessonCompleted(portalCourseId, lessonId)) {
+          return {
+            courseId: normalizedCourseId,
+            portalCourseId,
+            courseTitle,
+            lessonId,
+            className: clsName,
+            lessonIndex: idx,
+            allCompleted: false,
+            routeUrl: `/student/dashboard?course=${encodeURIComponent(
+              portalCourseId
+            )}&lesson=${encodeURIComponent(lessonId)}&class=${encodeURIComponent(clsName)}`
+          };
+        }
+      }
+
+      // 4. Fallback if all portal classes are completed: check LmsCourse lessons or wrap to first lesson
+      if (course && Array.isArray(course.lessons)) {
+        for (let idx = 0; idx < course.lessons.length; idx++) {
+          const l = course.lessons[idx];
+          if (!isLessonCompleted(normalizedCourseId, l.lessonId)) {
+            const clsLabel = portalClassKeys[idx] || `Class ${l.classNumber}`;
+            return {
+              courseId: normalizedCourseId,
+              portalCourseId,
+              courseTitle,
+              lessonId: l.lessonId,
+              className: clsLabel,
+              lessonIndex: idx,
+              allCompleted: false,
+              routeUrl: `/student/dashboard?course=${encodeURIComponent(
+                portalCourseId
+              )}&lesson=${encodeURIComponent(l.lessonId)}&class=${encodeURIComponent(clsLabel)}`
+            };
+          }
+        }
+      }
+
+      const fallbackClass = portalClassKeys[0] || 'Class 01';
+      return {
+        courseId: normalizedCourseId,
+        portalCourseId,
+        courseTitle,
+        lessonId: 'cls_01',
+        className: fallbackClass,
+        lessonIndex: 0,
+        allCompleted: true,
+        routeUrl: `/student/dashboard?course=${encodeURIComponent(
+          portalCourseId
+        )}&lesson=cls_01&class=${encodeURIComponent(fallbackClass)}`
+      };
+    },
+    [
+      activeCourseId,
+      currentUserId,
+      isLessonCompleted,
+      lastAccessedCourseId,
+      progressMap,
+      resolveCourseAndLesson
+    ]
+  );
+
   const submitClassQuiz = useCallback(
     (courseId: string, lessonId: string, selectedAnswers: number[]) => {
       const access = canAccessLessonContent(courseId, lessonId, 'quiz');
@@ -1913,6 +2280,11 @@ export const LmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         recordNotesSectionRead,
         markNotesLessonComplete,
         recordPptSlideView,
+        isLessonCompleted,
+        toggleLessonCompletion,
+        lastAccessedCourseId,
+        recordCourseAccess,
+        getFirstUncompletedLesson,
         submitClassQuiz,
         getLessonQuizAttempts,
         submitFinalExam,

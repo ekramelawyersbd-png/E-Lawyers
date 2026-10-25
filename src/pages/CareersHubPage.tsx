@@ -360,10 +360,10 @@ export const CareersHubPage: React.FC = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-5">
             <Link
               to="/Careers/mto?tab=apply"
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-300/80 hover:border-amber-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-300/80 hover:border-amber-400 transition-all duration-300 ease-out shadow-xs hover:shadow-lg hover:shadow-amber-900/10 flex items-center justify-between group hover:-translate-y-1 hover:scale-[1.015] will-change-transform"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] text-amber-300 flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] text-amber-300 flex items-center justify-center font-bold shadow-xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <Sparkles className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
@@ -373,20 +373,20 @@ export const CareersHubPage: React.FC = () => {
                     </span>
                     <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider">MTO Batch</span>
                   </div>
-                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 mt-0.5">
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 transition-colors mt-0.5">
                     MTO Trainee (অনলাইন আবেদন)
                   </div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-amber-800 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ArrowRight className="w-4 h-4 text-amber-800 group-hover:translate-x-1.5 transition-transform duration-300 flex-shrink-0" />
             </Link>
 
             <Link
               to="/Careers/sales-marketing?tab=apply"
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-slate-50 to-white hover:to-emerald-50 border-2 border-emerald-300/80 hover:border-emerald-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-slate-50 to-white hover:to-emerald-50 border-2 border-emerald-300/80 hover:border-emerald-400 transition-all duration-300 ease-out shadow-xs hover:shadow-lg hover:shadow-emerald-900/10 flex items-center justify-between group hover:-translate-y-1 hover:scale-[1.015] will-change-transform"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                   <TrendingUp className="w-5 h-5 text-emerald-300" />
                 </div>
                 <div>
@@ -396,20 +396,20 @@ export const CareersHubPage: React.FC = () => {
                     </span>
                     <span className="text-[11px] text-emerald-900 font-bold uppercase tracking-wider">Growth</span>
                   </div>
-                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-emerald-800 mt-0.5">
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-emerald-800 transition-colors mt-0.5">
                     Sales &amp; Marketing Executive
                   </div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-emerald-800 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ArrowRight className="w-4 h-4 text-emerald-800 group-hover:translate-x-1.5 transition-transform duration-300 flex-shrink-0" />
             </Link>
 
             <Link
               to="/Careers/accountant?tab=apply"
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-teal-50/90 via-slate-50 to-white hover:to-teal-50 border-2 border-teal-200/90 hover:border-teal-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-teal-50/90 via-slate-50 to-white hover:to-teal-50 border-2 border-teal-200/90 hover:border-teal-400 transition-all duration-300 ease-out shadow-xs hover:shadow-lg hover:shadow-teal-900/10 flex items-center justify-between group hover:-translate-y-1 hover:scale-[1.015] will-change-transform"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] text-white flex items-center justify-center font-bold shadow-xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <Briefcase className="w-5 h-5 text-emerald-300" />
                 </div>
                 <div>
@@ -419,20 +419,20 @@ export const CareersHubPage: React.FC = () => {
                     </span>
                     <span className="text-[11px] text-teal-900 font-bold uppercase tracking-wider">Fast-Track</span>
                   </div>
-                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-[#167d83] mt-0.5">
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-[#167d83] transition-colors mt-0.5">
                     Apply as Accountant (হিসাবরক্ষক)
                   </div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-teal-700 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ArrowRight className="w-4 h-4 text-teal-700 group-hover:translate-x-1.5 transition-transform duration-300 flex-shrink-0" />
             </Link>
 
             <Link
               to="/Careers/customer-care?tab=apply"
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-200/90 hover:border-amber-400 transition-all shadow-xs hover:shadow-md flex items-center justify-between group hover:scale-[1.01]"
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-white hover:to-amber-50 border-2 border-amber-200/90 hover:border-amber-400 transition-all duration-300 ease-out shadow-xs hover:shadow-lg hover:shadow-amber-900/10 flex items-center justify-between group hover:-translate-y-1 hover:scale-[1.015] will-change-transform"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] text-[#10243a] flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] text-[#10243a] flex items-center justify-center font-bold shadow-xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                   <Headphones className="w-5 h-5 text-amber-950" />
                 </div>
                 <div>
@@ -442,12 +442,12 @@ export const CareersHubPage: React.FC = () => {
                     </span>
                     <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider">Customer Care</span>
                   </div>
-                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 mt-0.5">
+                  <div className="text-xs sm:text-sm font-black text-[#10243a] group-hover:text-amber-800 transition-colors mt-0.5">
                     Apply as Customer Care (নারী কর্মী)
                   </div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-amber-900 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ArrowRight className="w-4 h-4 text-amber-900 group-hover:translate-x-1.5 transition-transform duration-300 flex-shrink-0" />
             </Link>
           </div>
         </div>
@@ -458,12 +458,12 @@ export const CareersHubPage: React.FC = () => {
         }`}>
           {/* Card 1: Accountant */}
           {(selectedRoleTab === 'both' || selectedRoleTab === 'accountant') && (
-            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#167d83] transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#167d83] transition-all duration-300 ease-out shadow-md hover:shadow-[0_24px_48px_-12px_rgba(22,125,131,0.22)] hover:-translate-y-1.5 hover:scale-[1.01] will-change-transform flex flex-col justify-between overflow-hidden group">
               <div>
                 {/* Header Section with Deep Navy-Teal Gradient & Gold Trim */}
                 <div className="bg-gradient-to-br from-[#091b2c] via-[#102d45] to-[#167d83] p-6 sm:p-7 text-white border-b-4 border-[#c7a76b] relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-44 h-44 bg-teal-400/15 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
-                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-amber-400/10 rounded-full blur-xl pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-44 h-44 bg-teal-400/15 group-hover:bg-teal-300/25 group-hover:scale-125 transition-all duration-500 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-amber-400/10 group-hover:bg-amber-300/20 group-hover:scale-110 transition-all duration-500 rounded-full blur-xl pointer-events-none"></div>
                   
                   {/* Top Badges Row */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
@@ -480,7 +480,7 @@ export const CareersHubPage: React.FC = () => {
                   {/* Job Title & Nature */}
                   <div className="space-y-1.5 relative z-10">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight group-hover:text-teal-100 transition-colors">
                         Accountant
                       </h3>
                       <span className="text-xs sm:text-sm font-bold text-[#ddc38f] bg-black/30 border border-[#c7a76b]/40 px-3 py-1 rounded-lg backdrop-blur-xs">
@@ -495,7 +495,7 @@ export const CareersHubPage: React.FC = () => {
 
                 {/* 4-Tile Quick Specs Matrix */}
                 <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <GraduationCap className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Education</span>
@@ -506,7 +506,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Accounting or Finance Major</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <Users className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Experience</span>
@@ -517,7 +517,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Internship / trainee exp. valued</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <DollarSign className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Remuneration</span>
@@ -528,7 +528,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">+ 2 Festival Bonuses &amp; Medical</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-teal-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Workplace</span>
@@ -679,14 +679,14 @@ export const CareersHubPage: React.FC = () => {
 
           {/* Card 2: Customer Care Executive */}
           {(selectedRoleTab === 'both' || selectedRoleTab === 'customercare') && (
-            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#c7a76b] transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#c7a76b] transition-all duration-300 ease-out shadow-md hover:shadow-[0_24px_48px_-12px_rgba(199,167,107,0.28)] hover:-translate-y-1.5 hover:scale-[1.01] will-change-transform flex flex-col justify-between overflow-hidden group">
               <div>
                 {/* Header Section with Deep Navy-Amber Gradient & Gold Trim */}
                 <div className="bg-gradient-to-br from-[#122438] via-[#1a3854] to-[#1a6670] p-6 sm:p-7 text-white border-b-4 border-amber-400 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-36 h-36 bg-amber-400/15 rounded-full blur-2xl pointer-events-none -mr-10 -mt-10"></div>
+                  <div className="absolute top-0 right-0 w-36 h-36 bg-amber-400/15 group-hover:bg-amber-300/25 group-hover:scale-125 transition-all duration-500 rounded-full blur-2xl pointer-events-none -mr-10 -mt-10"></div>
                   
                   {/* Top Badges Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-amber-300 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/15">
                       <Headphones className="w-3.5 h-3.5 text-amber-300" />
                       Customer Care / Call Center Desk
@@ -698,8 +698,8 @@ export const CareersHubPage: React.FC = () => {
                   </div>
 
                   {/* Job Title & Nature */}
-                  <div className="space-y-1">
-                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-between">
+                  <div className="space-y-1 relative z-10">
+                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-between group-hover:text-amber-100 transition-colors">
                       <span>Customer Care Executive</span>
                       <span className="text-xs sm:text-sm font-semibold text-amber-300 bg-black/20 px-2.5 py-1 rounded-lg">
                         Female
@@ -738,7 +738,7 @@ export const CareersHubPage: React.FC = () => {
 
                 {/* 4-Tile Quick Specs Matrix */}
                 <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50 border-b border-slate-200">
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <GraduationCap className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Education</span>
@@ -749,7 +749,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Any academic discipline</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <Users className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Experience</span>
@@ -760,7 +760,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Call center exp. preferred</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <DollarSign className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Remuneration</span>
@@ -771,7 +771,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">+ 2 Festival Bonuses</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Workplace</span>
@@ -853,12 +853,12 @@ export const CareersHubPage: React.FC = () => {
 
           {/* Card 3: Management Trainee Officer (MTO) */}
           {(selectedRoleTab === 'both' || selectedRoleTab === 'mto') && (
-            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-amber-400 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-amber-400 transition-all duration-300 ease-out shadow-md hover:shadow-[0_24px_48px_-12px_rgba(245,158,11,0.24)] hover:-translate-y-1.5 hover:scale-[1.01] will-change-transform flex flex-col justify-between overflow-hidden group">
               <div>
                 {/* Header Section with Deep Navy-Gold Gradient & Gold Trim */}
                 <div className="bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#1c3c5d] p-6 sm:p-7 text-white border-b-4 border-amber-400 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-44 h-44 bg-amber-400/15 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
-                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-teal-400/10 rounded-full blur-xl pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-44 h-44 bg-amber-400/15 group-hover:bg-amber-300/25 group-hover:scale-125 transition-all duration-500 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-teal-400/10 group-hover:bg-teal-300/20 group-hover:scale-110 transition-all duration-500 rounded-full blur-xl pointer-events-none"></div>
 
                   {/* Top Badges Row */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
@@ -875,7 +875,7 @@ export const CareersHubPage: React.FC = () => {
                   {/* Job Title & Nature */}
                   <div className="space-y-1.5 relative z-10">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight group-hover:text-amber-200 transition-colors">
                         Management Trainee (MTO)
                       </h3>
                       <span className="text-xs sm:text-sm font-bold text-[#ddc38f] bg-black/30 border border-[#c7a76b]/40 px-3 py-1 rounded-lg backdrop-blur-xs">
@@ -890,7 +890,7 @@ export const CareersHubPage: React.FC = () => {
 
                 {/* 4-Tile Quick Specs Matrix */}
                 <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <GraduationCap className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Education</span>
@@ -901,7 +901,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Finance, Law or Management</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <Users className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Experience</span>
@@ -912,7 +912,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Entry-Level Trainee Program</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <DollarSign className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Remuneration</span>
@@ -923,7 +923,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">+ 2 Festival Bonuses &amp; Review</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Workplace</span>
@@ -1047,12 +1047,12 @@ export const CareersHubPage: React.FC = () => {
 
           {/* Card 4: Sales & Marketing Executive */}
           {(selectedRoleTab === 'both' || selectedRoleTab === 'sales') && (
-            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between overflow-hidden group">
+            <div className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 ease-out shadow-md hover:shadow-[0_24px_48px_-12px_rgba(16,185,129,0.22)] hover:-translate-y-1.5 hover:scale-[1.01] will-change-transform flex flex-col justify-between overflow-hidden group">
               <div>
                 {/* Header Section with Deep Emerald Gradient & Gold Trim */}
                 <div className="bg-gradient-to-br from-[#0a231c] via-[#0f3d32] to-[#106b53] p-6 sm:p-7 text-white border-b-4 border-amber-400 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-44 h-44 bg-emerald-400/15 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
-                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-amber-400/10 rounded-full blur-xl pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-44 h-44 bg-emerald-400/15 group-hover:bg-emerald-300/25 group-hover:scale-125 transition-all duration-500 rounded-full blur-2xl pointer-events-none -mr-12 -mt-12"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-amber-400/10 group-hover:bg-amber-300/20 group-hover:scale-110 transition-all duration-500 rounded-full blur-xl pointer-events-none"></div>
 
                   {/* Top Badges Row */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
@@ -1069,7 +1069,7 @@ export const CareersHubPage: React.FC = () => {
                   {/* Job Title & Nature */}
                   <div className="space-y-1.5 relative z-10">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight group-hover:text-emerald-100 transition-colors">
                         Sales &amp; Marketing Executive
                       </h3>
                       <span className="text-xs sm:text-sm font-bold text-amber-300 bg-black/30 border border-amber-400/40 px-3 py-1 rounded-lg backdrop-blur-xs">
@@ -1084,7 +1084,7 @@ export const CareersHubPage: React.FC = () => {
 
                 {/* 4-Tile Quick Specs Matrix */}
                 <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <GraduationCap className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Education</span>
@@ -1095,7 +1095,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Management or any discipline</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <Users className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Experience</span>
@@ -1106,7 +1106,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Prior sales/telemarketing valued</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Remuneration</span>
@@ -1117,7 +1117,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">+ Sales Commission &amp; Bonuses</div>
                   </div>
 
-                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-colors">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <MapPin className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Workplace</span>

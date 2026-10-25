@@ -590,6 +590,32 @@ export function Contact() {
 
   useEffect(() => {
     setActiveTab(getRequestedTab(location.search, location.hash));
+    const params = new URLSearchParams(location.search);
+    const paramService = params.get('service');
+    const paramLead = params.get('lead');
+    if (paramService && SERVICES.includes(paramService)) {
+      setInquiryState((prev) => ({
+        ...prev,
+        currentStep: 1,
+        data: {
+          ...prev.data,
+          service: paramService,
+          message:
+            paramLead && !prev.data.message.trim()
+              ? `Attention: ${paramLead} Desk — We would like to discuss `
+              : prev.data.message,
+        },
+        stepValidationMessage: null,
+      }));
+    }
+    if (location.hash === '#contact-form-section' || paramLead) {
+      window.setTimeout(() => {
+        document.getElementById('contact-form-section')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
   }, [location.search, location.hash]);
 
   const errors = useMemo(() => validateForm(form), [form]);

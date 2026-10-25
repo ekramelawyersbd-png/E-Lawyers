@@ -10,9 +10,13 @@ export function Layout() {
   const { isFocusMode, readerTheme } = useFocusMode();
   const location = useLocation();
   const isArticleView = location.pathname.startsWith('/article/');
-  const hideNavs = isFocusMode && isArticleView;
+  const isLmsPortalView =
+    location.pathname === '/student' ||
+    location.pathname.startsWith('/student/') ||
+    location.pathname === '/lms';
+  const hideNavs = (isFocusMode && isArticleView) || isLmsPortalView;
 
-  const bgThemeClass = !hideNavs
+  const bgThemeClass = !hideNavs || isLmsPortalView
     ? 'bg-slate-50'
     : readerTheme === 'sepia'
     ? 'bg-[#fbf7ee] text-[#3c2f1f]'
@@ -23,7 +27,15 @@ export function Layout() {
   return (
     <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`}>
       {!hideNavs && <Navbar />}
-      <main className={`flex-1 w-full max-w-full ${hideNavs ? 'pb-8 pt-0' : 'pb-16 lg:pb-0'}`}>
+      <main
+        className={`flex-1 w-full max-w-full ${
+          isLmsPortalView
+            ? 'p-0'
+            : hideNavs
+            ? 'pb-8 pt-0'
+            : 'pb-16 lg:pb-0'
+        }`}
+      >
         <Outlet />
       </main>
       {!hideNavs && <Footer />}

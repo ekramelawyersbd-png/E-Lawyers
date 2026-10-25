@@ -168,7 +168,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
 
                       <div className="flex items-center justify-between mt-2.5">
                         <div className="flex items-center gap-1.5 font-black text-xs text-slate-900">
-                          <span>BDT {(item.product.price * item.quantity).toLocaleString('en-IN')}</span>
+                          <span>BDT {(item.product.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           {item.product.originalPrice > item.product.price && (
                             <span className="text-[10px] line-through text-slate-400 font-normal">
                               BDT {(item.product.originalPrice * item.quantity).toLocaleString('en-IN')}
@@ -271,18 +271,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span className="font-bold text-slate-900">BDT {subtotal.toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-slate-900">BDT {subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-emerald-700 font-bold">
                     <span>Discount Savings:</span>
-                    <span>-BDT {discount.toLocaleString('en-IN')}</span>
+                    <span>-BDT {discount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
                   <span>Total Amount:</span>
                   <span className="text-base text-emerald-700 font-black">
-                    BDT {total.toLocaleString('en-IN')}
+                    BDT {total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>

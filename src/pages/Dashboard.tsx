@@ -66,6 +66,7 @@ import { mockArticles } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { usePurchases } from '../contexts/PurchaseContext';
+import { useLms } from '../contexts/LmsContext';
 
 type SortOption = 'recent' | 'title' | 'readTime';
 
@@ -74,6 +75,11 @@ export function Dashboard() {
   const tabParam = searchParams.get('tab');
   const sectionParam = searchParams.get('section');
   const { user, signInWithGoogle, logout } = useAuth();
+  const { getFirstUncompletedLesson } = useLms();
+  const continueLearningTarget = useMemo(
+    () => getFirstUncompletedLesson(),
+    [getFirstUncompletedLesson]
+  );
   const { 
     savedItems, 
     removeBookmark, 
@@ -494,6 +500,21 @@ export function Dashboard() {
               </div>
               <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                 LMS
+              </span>
+            </Link>
+
+            <Link
+              id="dashboard-continue-learning-btn"
+              to={continueLearningTarget.routeUrl}
+              title={`Resume at ${continueLearningTarget.className} in ${continueLearningTarget.courseTitle}`}
+              className="w-full flex items-center justify-between text-left px-3.5 py-2.5 transition-colors rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer"
+            >
+              <div className="flex items-center justify-start gap-2.5 text-left min-w-0">
+                <ArrowRight className="w-4 h-4 text-emerald-100 shrink-0" />
+                <span className="text-left leading-snug truncate">Continue Learning</span>
+              </div>
+              <span className="text-[10px] font-mono bg-emerald-800/80 text-emerald-100 font-bold px-2 py-0.5 rounded-full shrink-0">
+                {continueLearningTarget.className}
               </span>
             </Link>
 

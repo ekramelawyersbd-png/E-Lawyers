@@ -92,6 +92,47 @@ export function Home() {
     { title: 'Legal Checklist for Entrepreneurs', path: '/article/startup-legal-checklist', category: 'Business & Startup', readTime: '5 min read' }
   ];
 
+  const practiceDesks = [
+    {
+      desk: 'Corporate Structuring & Tax Strategy',
+      lead: 'Ekramul Islam Khandaker',
+      role: 'Founding Member',
+      service: 'Integrated Joint Ecosystem Consultation',
+      focus: 'Entity formation, strategic tax planning, and multi-regulatory governance',
+      imgSrc: 'https://i.ibb.co/tTskLmG0/17-removebg-preview.png',
+    },
+    {
+      desk: 'Commercial Law & Litigation',
+      lead: 'Advocate Anamul Haque',
+      role: 'Founding Member',
+      service: 'Corporate Law & RJSC Compliance',
+      focus: 'Contract vetting, RJSC compliance, commercial disputes, and regulatory vetting',
+      imgSrc: 'https://i.ibb.co/GQvnZKpX/13.png',
+    },
+    {
+      desk: 'Audit, IFRS & ACCA Advisory',
+      lead: 'Muhammad Abdul Kader ACCA',
+      role: 'Senior Consultant',
+      service: 'Fractional CFO & Financial Modeling',
+      focus: 'Financial reporting, statutory audit readiness, and internal control systems',
+      imgSrc: 'https://i.ibb.co/2YPhyMYW/19.png',
+    },
+    {
+      desk: 'NBR Income Tax & VAT Compliance',
+      lead: 'Zohir Uddin',
+      role: 'Partner',
+      service: 'Corporate Tax, VAT & Statutory Audit',
+      focus: 'Corporate & individual tax returns, Mushak compliance, and tribunal defense',
+      imgSrc: 'https://i.ibb.co/FLDh8Wcx/3.png',
+    },
+  ];
+
+  const routeToSpecialistDesk = (service: string, leadName: string) => {
+    navigate(
+      `/contact?tab=inquiry&service=${encodeURIComponent(service)}&lead=${encodeURIComponent(leadName)}#contact-form-section`
+    );
+  };
+
 
 
   return (
@@ -531,6 +572,62 @@ export function Home() {
         </div>
       </section>
 
+      {/* 3. Specialist Practice Desks Routing Strip */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <div>
+              <p className="text-xs font-semibold text-emerald-800">Practice Leadership Routing</p>
+              <h2 className="mt-1 text-xl sm:text-2xl font-bold text-slate-950">
+                Route your inquiry directly to a specialist partner desk
+              </h2>
+            </div>
+            <Link
+              to="/team"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950"
+            >
+              <span>Meet all 21 team members</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {practiceDesks.map((item) => (
+              <article
+                key={item.lead}
+                className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 hover:bg-white hover:border-emerald-300 hover:shadow-xs transition"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={item.imgSrc}
+                      alt={item.lead}
+                      loading="lazy"
+                      className="h-12 w-12 rounded-full object-cover object-top border border-slate-200 bg-white shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{item.lead}</h3>
+                      <p className="text-xs font-medium text-emerald-700">{item.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{item.desk}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-4">{item.focus}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => routeToSpecialistDesk(item.service, item.lead)}
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-emerald-700 text-emerald-800 hover:text-white border border-slate-200 hover:border-emerald-700 text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Route Brief to Desk</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 4. Featured Guides & 5. Latest Legal Updates */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -751,10 +848,10 @@ export function Home() {
                     )
                 )
                   .slice(0, 3)
-                  .map((question) => {
+                  .map((question, idx) => {
                     const topAnswer = question.answers?.[0];
                     return (
-                      <div key={question.id} className="py-5 first:pt-4 last:pb-2">
+                      <div key={question.id} className={`py-5 first:pt-4 last:pb-2 ${idx === 1 || idx === 2 ? 'hidden' : ''}`}>
                         {/* Unboxed Metadata Row */}
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 mb-1.5">
                           <span className="font-bold text-emerald-700">{question.category}</span>

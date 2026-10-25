@@ -538,13 +538,21 @@ function loadServerProducts(): ShopProduct[] {
       modified = true;
     } else {
       const found = existingMap.get(sp.id) || existingMap.get(sp.slug);
-      if (found && sp.brochureUrl && !found.brochureUrl) {
-        found.brochureUrl = sp.brochureUrl;
-        found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
-        modified = true;
+      if (found) {
+        if (sp.brochureUrl && !found.brochureUrl) {
+          found.brochureUrl = sp.brochureUrl;
+          found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
+          modified = true;
+        }
+        if (found.price !== 0) {
+          found.price = 0;
+          modified = true;
+        }
       }
     }
   });
+
+  products = products.map(p => ({ ...p, price: 0 }));
 
   if (modified) {
     saveServerProducts(products);

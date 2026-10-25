@@ -64,12 +64,12 @@ export const CheckoutPage: React.FC = () => {
   }, [productSlug, products]);
 
   const checkoutItems = singleProduct 
-    ? [{ product: singleProduct, quantity: singleQty }] 
-    : items;
+    ? [{ product: { ...singleProduct, price: 0 }, quantity: singleQty }] 
+    : items.map(item => ({ ...item, product: { ...item.product, price: 0 } }));
 
-  const orderSubtotal = singleProduct ? singleProduct.price * singleQty : subtotal;
-  const orderDiscount = singleProduct ? 0 : discount;
-  const orderTotal = singleProduct ? singleProduct.price * singleQty : total;
+  const orderSubtotal = 0;
+  const orderDiscount = 0;
+  const orderTotal = 0;
 
   const isFree = orderTotal === 0;
 
@@ -334,7 +334,7 @@ export const CheckoutPage: React.FC = () => {
       setOrderEmailResult(res);
       setTestEmailFeedback({
         type: 'success',
-        text: `Confirmation email dispatched to ${targetEmail} (${itemsList.length} item(s) • BDT ${orderTotal.toLocaleString('en-IN')}).`,
+        text: `Confirmation email dispatched to ${targetEmail} (${itemsList.length} item(s) • BDT ${orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).`,
         previewUrl: res.previewUrl
       });
     } catch (err: any) {
@@ -680,7 +680,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     <div className="text-xs font-extrabold text-slate-900 flex items-center gap-2">
                       <span>Automated Order Confirmation</span>
                       <span className="text-[11px] font-semibold text-emerald-700">
-                        · {completedOrderSnapshot?.items.length || purchasedProducts.length} Item(s) · BDT {(completedOrderSnapshot?.total ?? orderTotal).toLocaleString('en-IN')}
+                        · {completedOrderSnapshot?.items.length || purchasedProducts.length} Item(s) · BDT {(completedOrderSnapshot?.total ?? orderTotal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-600 mt-0.5">
@@ -877,7 +877,15 @@ Contact & Advisory: https://blog.accounticca.com/contact
           </div>
         ) : (
           /* Form Screen */
-          <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <form
+            onSubmit={handleSubmitOrder}
+            className="grid grid-cols-1 md:grid-cols-12 gap-8"
+            style={{
+              lineHeight: '11px',
+              height: '846.312px',
+              width: '958px',
+            }}
+          >
             
             {/* Left Column: Contact & Payment (7 cols) */}
             <div className="md:col-span-7 space-y-6">
@@ -1111,7 +1119,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   </div>
 
                   {/* Instant Order Confirmation Email Delivery Bar */}
-                  <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/90 space-y-2.5">
+                  <div className="hidden p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/90 space-y-2.5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div className="flex items-start gap-2.5 min-w-0">
                         <div className="p-2 rounded-xl bg-emerald-600 text-white shrink-0 mt-0.5">
@@ -1126,7 +1134,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                           </div>
                           <p className="text-[11px] text-emerald-800 mt-0.5 truncate">
                             {isEmailValid
-                              ? `Receipt for ${checkoutItems.length} item(s) (BDT ${orderTotal.toLocaleString('en-IN')}) will be sent to ${email.trim().toLowerCase()}`
+                              ? `Receipt for ${checkoutItems.length} item(s) (BDT ${orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) will be sent to ${email.trim().toLowerCase()}`
                               : 'Enter your email address above to receive your itemized order confirmation & download links.'}
                           </p>
                         </div>
@@ -1282,9 +1290,9 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex items-start gap-3.5">
                     <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-extrabold text-base text-emerald-900">Total Due: BDT 0 (Free Access)</h4>
+                      <h4 className="font-extrabold text-base text-emerald-900">Total Due: BDT 0.00 (Free Access)</h4>
                       <p className="text-emerald-800 mt-1 leading-relaxed">
-                        Payment method is hidden because the total due amount equals <strong>BDT 0</strong>. No bKash payment or transaction ID is needed. Enter your email details above and confirm your order below to unlock instant downloads.
+                        Payment method is hidden because the total due amount equals <strong>BDT 0.00</strong>. No bKash payment or transaction ID is needed. Enter your email details above and confirm your order below to unlock instant downloads.
                       </p>
                     </div>
                   </div>
@@ -1314,7 +1322,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         <div className="text-[10px] text-slate-500">Format: {item.product.format} • Qty: {item.quantity}</div>
                       </div>
                       <div className="font-black text-slate-900 shrink-0 text-sm">
-                        BDT {(item.product.price * item.quantity).toLocaleString('en-IN')}
+                        BDT {(item.product.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
                   ))}
@@ -1324,12 +1332,12 @@ Contact & Advisory: https://blog.accounticca.com/contact
                 <div className="pt-4 border-t border-slate-200 space-y-2 text-xs text-slate-600">
                   <div className="flex justify-between">
                     <span>Subtotal Amount:</span>
-                    <span className="font-bold text-slate-900">BDT {orderSubtotal.toLocaleString('en-IN')}</span>
+                    <span className="font-bold text-slate-900">BDT {orderSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   {orderDiscount > 0 && (
                     <div className="flex justify-between text-emerald-700 font-bold">
                       <span>Discount Savings:</span>
-                      <span>-BDT {orderDiscount.toLocaleString('en-IN')}</span>
+                      <span>-BDT {orderDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   <div className="flex justify-between items-center pt-1">
@@ -1347,7 +1355,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                   <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-200">
                     <span>Total Due:</span>
                     <span className="text-lg text-emerald-700 font-black">
-                      BDT {orderTotal.toLocaleString('en-IN')}
+                      BDT {orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -1378,8 +1386,8 @@ Contact & Advisory: https://blog.accounticca.com/contact
                         <Lock className="w-4 h-4" />
                         <span>
                           {isFree 
-                            ? 'Confirm Order • Free (BDT 0)' 
-                            : `Confirm Order • BDT ${orderTotal.toLocaleString('en-IN')}`}
+                            ? 'Confirm Order • Free (BDT 0.00)' 
+                            : `Confirm Order • BDT ${orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </span>
                       </>
                     )}
@@ -1389,7 +1397,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
               </div>
 
               {/* Order Confirmation Template Inspector & Live Preview */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-4">
+              <div className="hidden bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
@@ -1401,7 +1409,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
                       </h3>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
                         Triggers automatically on submission to confirm your {checkoutItems.length} item(s) and{' '}
-                        <strong className="text-slate-800">BDT {orderTotal.toLocaleString('en-IN')}</strong> total cost.
+                        <strong className="text-slate-800">BDT {orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> total cost.
                       </p>
                     </div>
                   </div>

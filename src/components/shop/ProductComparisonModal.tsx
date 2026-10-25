@@ -169,7 +169,7 @@ export const ProductComparisonModal: React.FC<ProductComparisonModalProps> = ({
                             <div className="mt-3 pt-2.5 border-t border-slate-200/80 flex items-baseline justify-between">
                               <div>
                                 <span className="text-base font-black text-slate-950">
-                                  BDT {product.price.toLocaleString('en-IN')}
+                                  BDT {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                                 {product.originalPrice > product.price && (
                                   <span className="block text-[11px] line-through text-slate-400">

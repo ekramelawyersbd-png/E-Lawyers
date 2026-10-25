@@ -1,10 +1,12 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { safeSetDoc } from '../contexts/LmsContext';
+import { mockArticles } from '../data/mockData';
 
 export type LmsContentTabType = 'live' | 'recorded' | 'note' | 'ppt' | 'mcq';
 
 export interface LmsClassContentLinks {
+  hasLiveClass?: boolean;
   live: string;
   recorded: string;
   note: string;
@@ -14,10 +16,75 @@ export interface LmsClassContentLinks {
 
 export type LmsPortalDataMap = Record<string, LmsClassContentLinks>;
 
+export interface AcademyPortalCourseOption {
+  id: string;
+  title: string;
+  categoryLabel: string;
+}
+
+const TRAINING_ARTICLE_IDS = ['400', '401', '402', '403', '404', '405', '406'];
+
+/**
+ * Builds the complete list of Academy courses from the /training page
+ */
+export function getAcademyPortalCourses(): AcademyPortalCourseOption[] {
+  const fromTrainingArticles: AcademyPortalCourseOption[] = TRAINING_ARTICLE_IDS.map((id) => {
+    const found = mockArticles.find((a) => a.id === id);
+    return {
+      id: `academy-course-${id}`,
+      title: found ? found.title : `Academy Course #${id}`,
+      categoryLabel: found?.category || 'Academy Program'
+    };
+  });
+
+  const additionalAcademyPrograms: AcademyPortalCourseOption[] = [
+    {
+      id: 'interactive-lms-masterclass',
+      title: 'Interactive LMS Portal: Tax & RJSC Masterclasses',
+      categoryLabel: 'Online LMS Track'
+    },
+    {
+      id: 'personal-income-tax',
+      title: 'Personal Income Tax & Online e-Return Filing Masterclass (AY 2026–27)',
+      categoryLabel: 'Live Masterclass'
+    },
+    {
+      id: 'rjsc-corporate-compliance',
+      title: 'Corporate Law, RJSC Company Registration & Annual Compliance Program',
+      categoryLabel: 'Corporate Compliance'
+    }
+  ];
+
+  // Deduplicate by title while keeping all /training Academy courses first
+  const seenTitles = new Set<string>();
+  const combined: AcademyPortalCourseOption[] = [];
+
+  for (const item of [...fromTrainingArticles, ...additionalAcademyPrograms]) {
+    const key = item.title.trim().toLowerCase();
+    if (!seenTitles.has(key)) {
+      seenTitles.add(key);
+      combined.push(item);
+    }
+  }
+
+  return combined;
+}
+
 export const LMS_PORTAL_STORAGE_KEY = 'lmsData';
+
+function getCourseStorageKey(courseId?: string): string {
+  if (!courseId) return LMS_PORTAL_STORAGE_KEY;
+  return `${LMS_PORTAL_STORAGE_KEY}_${courseId}`;
+}
+
+function getCourseFirestoreDocId(courseId?: string): string {
+  if (!courseId) return 'default';
+  return courseId.replace(/[^a-zA-Z0-9_-]/g, '_');
+}
 
 export const DEFAULT_LMS_PORTAL_DATA: LmsPortalDataMap = {
   'Class 01': {
+    hasLiveClass: true,
     live: 'https://meet.google.com/',
     recorded: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     note: 'https://docs.google.com/document/d/e/2PACX-1vT.../pub?embedded=true',
@@ -25,6 +92,7 @@ export const DEFAULT_LMS_PORTAL_DATA: LmsPortalDataMap = {
     mcq: 'https://docs.google.com/forms/d/e/1FAIpQLSf.../viewform?embedded=true'
   },
   'Class 02': {
+    hasLiveClass: true,
     live: 'https://zoom.us/j/123456789',
     recorded: '',
     note: '',
@@ -32,6 +100,7 @@ export const DEFAULT_LMS_PORTAL_DATA: LmsPortalDataMap = {
     mcq: ''
   },
   'Class 03': {
+    hasLiveClass: false,
     live: '',
     recorded: '',
     note: '',
@@ -44,13 +113,31 @@ export function cloneDefaultLmsData(): LmsPortalDataMap {
   return JSON.parse(JSON.stringify(DEFAULT_LMS_PORTAL_DATA));
 }
 
-export function loadLmsPortalData(): LmsPortalDataMap {
+export function loadLmsPortalData(courseId?: string): LmsPortalDataMap {
+  const storageKey = getCourseStorageKey(courseId);
   try {
-    const raw = localStorage.getItem(LMS_PORTAL_STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
         return parsed as LmsPortalDataMap;
+      }
+    }
+    // Fallback to legacy default key if loading primary tax course
+    if (
+      courseId === 'academy-course-401' ||
+      courseId === 'personal-income-tax'
+    ) {
+      const legacyRaw = localStorage.getItem(LMS_PORTAL_STORAGE_KEY);
+      if (legacyRaw) {
+        const legacyParsed = JSON.parse(legacyRaw);
+        if (
+          legacyParsed &&
+          typeof legacyParsed === 'object' &&
+          Object.keys(legacyParsed).length > 0
+        ) {
+          return legacyParsed as LmsPortalDataMap;
+        }
       }
     }
   } catch {
@@ -58,43 +145,55 @@ export function loadLmsPortalData(): LmsPortalDataMap {
   }
   const initial = cloneDefaultLmsData();
   try {
-    localStorage.setItem(LMS_PORTAL_STORAGE_KEY, JSON.stringify(initial));
+    localStorage.setItem(storageKey, JSON.stringify(initial));
   } catch {
     // Ignore storage error
   }
   return initial;
 }
 
-export async function saveLmsPortalData(data: LmsPortalDataMap): Promise<void> {
+export async function saveLmsPortalData(
+  data: LmsPortalDataMap,
+  courseId?: string
+): Promise<void> {
+  const storageKey = getCourseStorageKey(courseId);
   try {
+    localStorage.setItem(storageKey, JSON.stringify(data));
     localStorage.setItem(LMS_PORTAL_STORAGE_KEY, JSON.stringify(data));
-    window.dispatchEvent(new CustomEvent('lmsDataUpdated', { detail: data }));
+    window.dispatchEvent(
+      new CustomEvent('lmsDataUpdated', { detail: { courseId, data } })
+    );
   } catch {
     // Ignore storage error
   }
 
   try {
-    await safeSetDoc(
-      doc(db, 'lms_portal_config', 'default'),
-      {
-        classes: data,
-        updatedAt: new Date().toISOString()
-      },
-      { merge: true }
-    );
+    const docId = getCourseFirestoreDocId(courseId);
+    await safeSetDoc(doc(db, 'lms_portal_config', docId), {
+      courseId: courseId || 'default',
+      classes: data,
+      updatedAt: new Date().toISOString()
+    });
   } catch {
     // Offline fallback is already handled by localStorage
   }
 }
 
-export async function syncLmsPortalDataFromFirestore(): Promise<LmsPortalDataMap | null> {
+export async function syncLmsPortalDataFromFirestore(
+  courseId?: string
+): Promise<LmsPortalDataMap | null> {
   try {
-    const snap = await getDoc(doc(db, 'lms_portal_config', 'default'));
+    const docId = getCourseFirestoreDocId(courseId);
+    const snap = await getDoc(doc(db, 'lms_portal_config', docId));
     if (snap.exists()) {
       const docData = snap.data();
-      if (docData?.classes && typeof docData.classes === 'object' && Object.keys(docData.classes).length > 0) {
+      if (
+        docData?.classes &&
+        typeof docData.classes === 'object' &&
+        Object.keys(docData.classes).length > 0
+      ) {
         const remote = docData.classes as LmsPortalDataMap;
-        localStorage.setItem(LMS_PORTAL_STORAGE_KEY, JSON.stringify(remote));
+        localStorage.setItem(getCourseStorageKey(courseId), JSON.stringify(remote));
         return remote;
       }
     }

@@ -159,7 +159,7 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                     </div>
                     <div className="flex items-baseline gap-2 mt-0.5">
                       <span className="text-2xl font-black text-slate-900">
-                        BDT {product.price.toLocaleString('en-IN')}
+                        BDT {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       {product.originalPrice > product.price && (
                         <span className="text-sm line-through text-slate-400 font-semibold">
@@ -240,7 +240,7 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                     ) : (
                       <>
                         <ShoppingBag className="w-4 h-4 text-emerald-400" />
-                        <span>Add to Cart (BDT {(product.price * quantity).toLocaleString('en-IN')})</span>
+                        <span>Add to Cart (BDT {(product.price * quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
                       </>
                     )}
                   </button>

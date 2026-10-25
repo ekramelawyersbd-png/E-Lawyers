@@ -48,10 +48,16 @@ export function getLocalProducts(): ShopProduct[] {
         modified = true;
       } else {
         const found = existingMap.get(sp.id) || existingMap.get(sp.slug);
-        if (found && sp.brochureUrl && !found.brochureUrl) {
-          found.brochureUrl = sp.brochureUrl;
-          found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
-          modified = true;
+        if (found) {
+          if (sp.brochureUrl && !found.brochureUrl) {
+            found.brochureUrl = sp.brochureUrl;
+            found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
+            modified = true;
+          }
+          if (found.price !== 0) {
+            found.price = 0;
+            modified = true;
+          }
         }
       }
     });
@@ -59,6 +65,7 @@ export function getLocalProducts(): ShopProduct[] {
     if (parsed.length > 0) {
       const normalized = parsed.map((p: any) => ({
         ...p,
+        price: 0,
         productType: p.productType || inferProductType(p)
       }));
       if (modified) {
@@ -103,6 +110,7 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
       if (Array.isArray(data.products) && data.products.length > 0) {
         const normalized = data.products.map((p: any) => ({
           ...p,
+          price: 0,
           productType: p.productType || inferProductType(p)
         }));
         setLocalProducts(normalized);
@@ -130,7 +138,7 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
             category: data.category,
             format: data.format
           }),
-          price: Number(data.price) || 0,
+          price: 0,
           originalPrice: Number(data.originalPrice) || Number(data.price) || 0,
           rating: Number(data.rating) || 4.9,
           reviewsCount: Number(data.reviewsCount) || 10,

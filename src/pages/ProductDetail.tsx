@@ -717,7 +717,7 @@ export function ProductDetail() {
                     </div>
                     <div className="flex items-baseline gap-3 mt-2">
                       <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">
-                        BDT {product.price.toLocaleString('en-IN')}
+                        BDT {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       {product.originalPrice > product.price && (
                         <span className="text-base line-through text-slate-400 font-medium">
@@ -1076,7 +1076,7 @@ export function ProductDetail() {
 
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                       <span className="font-bold text-base text-slate-900 font-mono">
-                        BDT {rel.price.toLocaleString('en-IN')}
+                        BDT {rel.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       <Link
                         to={`/shop/${rel.slug}`}
