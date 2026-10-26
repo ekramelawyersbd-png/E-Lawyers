@@ -1151,11 +1151,11 @@ export function Shop() {
                         <div className="text-[10px] text-slate-400 uppercase font-semibold">Statutory Toolkit</div>
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-lg font-black text-slate-950">
-                            BDT 0.00
+                            BDT {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                           {product.originalPrice > product.price && (
                             <span className="text-xs line-through text-slate-400 font-medium">
-                              BDT {product.originalPrice.toLocaleString('en-IN')}
+                              BDT {product.originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
                           )}
                         </div>

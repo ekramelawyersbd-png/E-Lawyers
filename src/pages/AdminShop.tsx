@@ -121,7 +121,7 @@ const RECENT_TRANSACTIONS = [
 
 export function AdminShop() {
   const navigate = useNavigate();
-  const { products, addOrUpdateProduct, removeProduct, resetDefaults, loading, togglePublishStatus } = useProducts();
+  const { products, addOrUpdateProduct, updatePrice, removeProduct, resetDefaults, loading, togglePublishStatus } = useProducts();
   const { adminUser, logout } = useShopAuth();
   const { transactions, processRefund } = usePurchases();
 
@@ -145,6 +145,12 @@ export function AdminShop() {
   const [selectedFilterType, setSelectedFilterType] = useState<string>('All');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Inline Price Editing State
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [inlinePriceInput, setInlinePriceInput] = useState<number | string>('');
+  const [inlineOrigPriceInput, setInlineOrigPriceInput] = useState<number | string>('');
+  const [savingPriceId, setSavingPriceId] = useState<string | null>(null);
 
   // Form mode: false = collapsed, 'create' = new product, 'edit' = editing product
   const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
@@ -297,6 +303,47 @@ export function AdminShop() {
       });
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const handleStartEditPrice = (prod: ShopProduct) => {
+    setEditingPriceId(prod.id);
+    setInlinePriceInput(prod.price);
+    setInlineOrigPriceInput(prod.originalPrice > prod.price ? prod.originalPrice : prod.price);
+  };
+
+  const handleCancelEditPrice = () => {
+    setEditingPriceId(null);
+    setInlinePriceInput('');
+    setInlineOrigPriceInput('');
+  };
+
+  const handleSaveInlinePrice = async (prod: ShopProduct) => {
+    const parsedPrice = Number(inlinePriceInput);
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+      setStatusMessage({ type: 'error', text: 'Please enter a valid non-negative price amount.' });
+      return;
+    }
+
+    const parsedOrig = Number(inlineOrigPriceInput);
+    const validOrig = !isNaN(parsedOrig) && parsedOrig >= parsedPrice ? parsedOrig : parsedPrice;
+
+    setSavingPriceId(prod.id);
+    try {
+      await updatePrice(prod.id, parsedPrice, validOrig);
+      setStatusMessage({
+        type: 'success',
+        text: `Price for "${prod.title}" updated to BDT ${parsedPrice.toLocaleString('en-IN')}. The Shop page and catalog now reflect this updated price automatically!`
+      });
+      setTimeout(() => setStatusMessage(null), 4000);
+      setEditingPriceId(null);
+    } catch (err: any) {
+      setStatusMessage({
+        type: 'error',
+        text: err?.message || 'Failed to update product price.'
+      });
+    } finally {
+      setSavingPriceId(null);
     }
   };
 
@@ -1506,7 +1553,14 @@ export function AdminShop() {
                   <th className="py-3 px-4">Item</th>
                   <th className="py-3 px-4">Type & Category</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Price</th>
+                  <th className="py-3 px-4 bg-emerald-50/80 text-emerald-950 font-black border-x border-emerald-200/70">
+                    <div className="flex items-center gap-1.5">
+                      <span>Price</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-600 text-white uppercase tracking-wider shadow-2xs">
+                        Editable
+                      </span>
+                    </div>
+                  </th>
                   <th className="py-3 px-4">Direct Page URL</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
@@ -1575,14 +1629,92 @@ export function AdminShop() {
                         )}
                       </td>
 
-                      {/* Price */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <div className="font-black text-slate-900">
-                          BDT {prod.price.toLocaleString('en-IN')}
-                        </div>
-                        {prod.originalPrice > prod.price && (
-                          <div className="text-[10px] line-through text-slate-400">
-                            BDT {prod.originalPrice.toLocaleString('en-IN')}
+                      {/* Price (Interactive & Editable) */}
+                      <td className="py-3.5 px-4 whitespace-nowrap bg-emerald-50/20 border-x border-emerald-100/40">
+                        {editingPriceId === prod.id ? (
+                          <div className="p-2.5 bg-white rounded-xl border-2 border-emerald-500 shadow-md space-y-2 min-w-[210px]">
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-extrabold text-slate-800 uppercase tracking-wider">
+                                  Current Price (BDT) *
+                                </label>
+                                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
+                                  Live on Shop
+                                </span>
+                              </div>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={inlinePriceInput}
+                                onChange={(e) => setInlinePriceInput(e.target.value)}
+                                className="w-full px-2.5 py-1.5 text-xs font-mono font-bold bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                placeholder="e.g. 1500"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">
+                                Strikethrough Original (BDT)
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={inlineOrigPriceInput}
+                                onChange={(e) => setInlineOrigPriceInput(e.target.value)}
+                                className="w-full px-2 py-1 text-[11px] font-mono bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-emerald-500"
+                                placeholder="Optional (e.g. 2500)"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1.5 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleSaveInlinePrice(prod)}
+                                disabled={savingPriceId === prod.id}
+                                className="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-[11px] font-black rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs"
+                                title="Save updated price and instantly show on Shop page"
+                              >
+                                <Check className="w-3.5 h-3.5 text-white" />
+                                <span>{savingPriceId === prod.id ? 'Saving...' : 'Save & Push to Shop'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEditPrice}
+                                disabled={savingPriceId === prod.id}
+                                className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors cursor-pointer"
+                                title="Cancel editing"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between gap-3 group/price">
+                            <div>
+                              <div className="font-black text-slate-900 flex items-center gap-1.5">
+                                <span>BDT {prod.price.toLocaleString('en-IN')}</span>
+                                {prod.price === 0 && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-extrabold uppercase">
+                                    Free
+                                  </span>
+                                )}
+                              </div>
+                              {prod.originalPrice > prod.price && (
+                                <div className="text-[10px] line-through text-slate-400 font-medium">
+                                  BDT {prod.originalPrice.toLocaleString('en-IN')}
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditPrice(prod)}
+                              className="px-2 py-1 text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all cursor-pointer text-[10px] font-extrabold flex items-center gap-1 shadow-2xs"
+                              title="Click to update price for this product and show on Shop page"
+                            >
+                              <Edit3 className="w-3 h-3 text-emerald-600" />
+                              <span>Update Price</span>
+                            </button>
                           </div>
                         )}
                       </td>

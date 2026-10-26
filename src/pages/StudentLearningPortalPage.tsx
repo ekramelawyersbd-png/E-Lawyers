@@ -1216,9 +1216,9 @@ export const StudentLearningPortalPage: React.FC<{
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col bg-white overflow-hidden">
-              {/* Top Horizontal Tabs */}
-              <div className="flex items-center justify-between bg-[#1e4e75] px-2 sm:px-6 pt-2 border-b border-[#153a58] overflow-x-auto shrink-0 gap-1">
-                <div className="flex items-center gap-1 overflow-x-auto">
+              {/* Top Horizontal Tabs (Mobile-Enhanced Grid + Desktop Tab Strip) */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-[#1e4e75] p-2.5 sm:px-6 sm:pt-2 sm:pb-0 border-b border-[#153a58] shrink-0 gap-2 sm:gap-1">
+                <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-1 w-full sm:w-auto sm:overflow-x-auto">
                   {visibleTabsForCurrentClass.map((tab) => {
                     const isActive = tab.id === effectiveTab;
                     const TabIcon = tab.icon;
@@ -1230,21 +1230,23 @@ export const StudentLearningPortalPage: React.FC<{
                         type="button"
                         data-type={tab.id}
                         onClick={() => setCurrentTab(tab.id)}
-                        className={`group relative px-4 sm:px-5 py-3.5 rounded-t-lg whitespace-nowrap transition-all text-xs sm:text-[0.925rem] border-b-[3px] cursor-pointer select-none inline-flex items-center gap-2 ${
+                        className={`group relative min-h-[42px] sm:min-h-0 px-3 sm:px-5 py-2 sm:py-3.5 rounded-lg sm:rounded-b-none sm:rounded-t-lg whitespace-nowrap transition-all text-xs sm:text-[0.925rem] border sm:border-0 sm:border-b-[3px] cursor-pointer select-none inline-flex items-center justify-between sm:justify-start gap-2 ${
                           isActive
-                            ? 'text-white bg-[#2a6b9e] border-b-sky-300 font-bold shadow-[0_-2px_10px_rgba(0,0,0,0.12)]'
-                            : 'text-white/80 border-b-transparent hover:text-white hover:bg-white/10 font-medium'
+                            ? 'text-white bg-[#2a6b9e] border-sky-300/70 sm:border-b-sky-300 font-bold shadow-xs sm:shadow-[0_-2px_10px_rgba(0,0,0,0.12)]'
+                            : 'text-white/85 bg-white/5 sm:bg-transparent border-white/10 sm:border-b-transparent hover:text-white hover:bg-white/10 font-medium'
                         }`}
                       >
-                        <TabIcon
-                          className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
-                            isActive ? 'text-sky-200' : 'text-white/70 group-hover:text-white'
-                          }`}
-                        />
-                        <span>{tab.label}</span>
+                        <span className="inline-flex items-center gap-1.5 sm:gap-2 min-w-0 truncate">
+                          <TabIcon
+                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform group-hover:scale-105 ${
+                              isActive ? 'text-sky-200' : 'text-white/70 group-hover:text-white'
+                            }`}
+                          />
+                          <span className="truncate">{tab.label}</span>
+                        </span>
                         {hasContent && (
                           <span
-                            className={`text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                            className={`text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
                               isActive
                                 ? 'bg-white/20 text-white'
                                 : 'bg-white/10 text-sky-200/90'
@@ -1258,29 +1260,36 @@ export const StudentLearningPortalPage: React.FC<{
                   })}
                 </div>
 
-                {/* Quick Class Stepper inside Tab Bar on larger screens */}
-                <div className="hidden lg:flex items-center gap-1.5 pb-1.5 pl-4 shrink-0">
-                  <button
-                    type="button"
-                    disabled={!prevClassKey}
-                    onClick={() => prevClassKey && setCurrentClass(prevClassKey)}
-                    title={prevClassKey ? `Previous: ${prevClassKey}` : 'First Class'}
-                    className="p-1.5 rounded-md text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-xs font-mono tabular-nums text-sky-100 px-1.5">
-                    {currentClassIndex + 1} / {classKeys.length}
+                {/* Quick Class Stepper (Visible on Mobile & Desktop inside Tab Bar) */}
+                <div className="flex items-center justify-between sm:justify-end gap-2 pt-1.5 sm:pt-0 sm:pb-1.5 sm:pl-4 border-t border-white/10 sm:border-t-0 shrink-0">
+                  <span className="text-[11px] font-medium text-sky-200/90 sm:hidden truncate">
+                    Module: <strong className="text-white">{currentClass}</strong>
                   </span>
-                  <button
-                    type="button"
-                    disabled={!nextClassKey}
-                    onClick={() => nextClassKey && setCurrentClass(nextClassKey)}
-                    title={nextClassKey ? `Next: ${nextClassKey}` : 'Last Class'}
-                    className="p-1.5 rounded-md text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+                    <button
+                      type="button"
+                      disabled={!prevClassKey}
+                      onClick={() => prevClassKey && setCurrentClass(prevClassKey)}
+                      title={prevClassKey ? `Previous: ${prevClassKey}` : 'First Class'}
+                      className="px-2 py-1 sm:p-1.5 rounded-md bg-white/10 sm:bg-transparent text-white/90 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-colors inline-flex items-center gap-1 text-xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="sm:hidden font-semibold">Prev</span>
+                    </button>
+                    <span className="text-xs font-mono tabular-nums text-sky-100 px-1.5">
+                      {currentClassIndex + 1} / {classKeys.length}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={!nextClassKey}
+                      onClick={() => nextClassKey && setCurrentClass(nextClassKey)}
+                      title={nextClassKey ? `Next: ${nextClassKey}` : 'Last Class'}
+                      className="px-2 py-1 sm:p-1.5 rounded-md bg-white/10 sm:bg-transparent text-white/90 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-colors inline-flex items-center gap-1 text-xs"
+                    >
+                      <span className="sm:hidden font-semibold">Next</span>
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
 

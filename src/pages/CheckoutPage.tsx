@@ -64,12 +64,15 @@ export const CheckoutPage: React.FC = () => {
   }, [productSlug, products]);
 
   const checkoutItems = singleProduct 
-    ? [{ product: { ...singleProduct, price: 0 }, quantity: singleQty }] 
-    : items.map(item => ({ ...item, product: { ...item.product, price: 0 } }));
+    ? [{ product: { ...singleProduct, price: singleProduct.price || 10 }, quantity: singleQty }] 
+    : items.length > 0
+      ? items.map(item => ({ ...item, product: { ...item.product, price: item.product.price || 10 } }))
+      : [];
 
-  const orderSubtotal = 0;
+  const rawSubtotal = checkoutItems.reduce((acc, curr) => acc + (curr.product?.price || 10) * curr.quantity, 0);
+  const orderSubtotal = rawSubtotal > 0 ? rawSubtotal : 10;
   const orderDiscount = 0;
-  const orderTotal = 0;
+  const orderTotal = Math.max(0, orderSubtotal - orderDiscount);
 
   const isFree = orderTotal === 0;
 
@@ -1332,7 +1335,12 @@ Contact & Advisory: https://blog.accounticca.com/contact
                 <div className="pt-4 border-t border-slate-200 space-y-2 text-xs text-slate-600">
                   <div className="flex justify-between">
                     <span>Subtotal Amount:</span>
-                    <span className="font-bold text-slate-900">BDT {orderSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span 
+                      className="font-bold text-slate-900 text-[10px]"
+                      style={{ fontSize: '10px' }}
+                    >
+                      BDT {orderSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
                   </div>
                   {orderDiscount > 0 && (
                     <div className="flex justify-between text-emerald-700 font-bold">

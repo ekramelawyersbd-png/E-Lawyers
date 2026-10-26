@@ -6,6 +6,7 @@ import {
   saveProduct as apiSaveProduct, 
   deleteProduct as apiDeleteProduct, 
   resetProductsToDefault as apiResetDefault,
+  updateProductPrice as apiUpdatePrice,
   PRODUCTS_UPDATE_EVENT 
 } from '../services/productService';
 
@@ -61,6 +62,17 @@ export function useProducts() {
     }
   }, []);
 
+  const updatePrice = useCallback(async (id: string, price: number, originalPrice?: number) => {
+    try {
+      const saved = await apiUpdatePrice(id, price, originalPrice);
+      setProducts(getLocalProducts());
+      return saved;
+    } catch (err: any) {
+      setError(err?.message || 'Failed to update price');
+      throw err;
+    }
+  }, []);
+
   const removeProduct = useCallback(async (id: string) => {
     try {
       await apiDeleteProduct(id);
@@ -99,6 +111,7 @@ export function useProducts() {
     loading,
     error,
     addOrUpdateProduct,
+    updatePrice,
     removeProduct,
     resetDefaults,
     getProductBySlug,

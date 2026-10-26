@@ -5,6 +5,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { MobileInstallPrompt } from '../pwa/MobileInstallPrompt';
 import { CartDrawer } from '../shop/CartDrawer';
 import { useFocusMode } from '../../contexts/FocusModeContext';
+import { AiAssistantWidget } from '../AiAssistantWidget';
 
 export function Layout() {
   const { isFocusMode, readerTheme } = useFocusMode();
@@ -25,7 +26,7 @@ export function Layout() {
     : 'bg-white text-slate-900';
 
   return (
-    <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`}>
+    <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`} style={{ width: '100%', maxWidth: '100%' }}>
       {!hideNavs && <Navbar />}
       <main
         className={`flex-1 w-full max-w-full ${

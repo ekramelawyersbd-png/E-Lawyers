@@ -8,11 +8,15 @@ import {
   ArrowLeft, 
   ShieldCheck, 
   UserCheck, 
-  BookOpen 
+  BookOpen,
+  CreditCard,
+  Zap,
+  Lock
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
+import { initiateUddoktaPayCheckout } from '../services/uddoktapayService';
 
 export const EnrollmentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +27,7 @@ export const EnrollmentPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isPayingOnline, setIsPayingOnline] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,13 +188,64 @@ export const EnrollmentPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2">
+              {/* Payment & Reservation Buttons */}
+              <div className="pt-2 space-y-3">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    if (!name.trim() || !email.trim() || !phone.trim()) {
+                      alert('Please provide your name, email, and phone number first.');
+                      return;
+                    }
+                    setIsPayingOnline(true);
+                    try {
+                      const numericAmount = parseInt(coursePrice.replace(/[^0-9]/g, ''), 10) || 12500;
+                      const res = await initiateUddoktaPayCheckout({
+                        fullName: name,
+                        email: email,
+                        amount: numericAmount,
+                        metadata: {
+                          courseTitle,
+                          phone,
+                          type: 'Course Enrollment',
+                          enrollment_id: `ENR-${Date.now()}`
+                        }
+                      });
+                      if (res.status && res.payment_url) {
+                        window.location.href = res.payment_url;
+                      } else {
+                        alert(res.message || 'Could not initiate UddoktaPay checkout.');
+                      }
+                    } catch (err: any) {
+                      alert(err.message || 'Payment initiation error');
+                    } finally {
+                      setIsPayingOnline(false);
+                    }
+                  }}
+                  disabled={isPayingOnline}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 hover:from-pink-700 hover:to-rose-700 text-white rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Zap className="w-4 h-4 text-amber-300" />
+                  <span>
+                    {isPayingOnline 
+                      ? 'Redirecting to UddoktaPay...' 
+                      : `Pay Online with UddoktaPay (bKash · Nagad · Cards)`}
+                  </span>
+                </button>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-slate-200"></div>
+                  <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">or pay offline</span>
+                  <div className="flex-grow border-t border-slate-200"></div>
+                </div>
+
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <UserCheck className="w-4 h-4" />
-                  <span>Confirm Course Seat Reservation</span>
+                  <span>Reserve Seat &amp; Pay at Campus / Bank</span>
                 </button>
               </div>
             </form>

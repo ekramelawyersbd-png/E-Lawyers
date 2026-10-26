@@ -54,10 +54,6 @@ export function getLocalProducts(): ShopProduct[] {
             found.requiresPurchaseToAccess = sp.requiresPurchaseToAccess;
             modified = true;
           }
-          if (found.price !== 0) {
-            found.price = 0;
-            modified = true;
-          }
         }
       }
     });
@@ -65,7 +61,8 @@ export function getLocalProducts(): ShopProduct[] {
     if (parsed.length > 0) {
       const normalized = parsed.map((p: any) => ({
         ...p,
-        price: 0,
+        price: typeof p.price === 'number' && !isNaN(p.price) ? p.price : 0,
+        originalPrice: typeof p.originalPrice === 'number' && !isNaN(p.originalPrice) ? p.originalPrice : (p.price || 0),
         productType: p.productType || inferProductType(p)
       }));
       if (modified) {
@@ -110,7 +107,8 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
       if (Array.isArray(data.products) && data.products.length > 0) {
         const normalized = data.products.map((p: any) => ({
           ...p,
-          price: 0,
+          price: typeof p.price === 'number' && !isNaN(p.price) ? p.price : (Number(p.price) || 0),
+          originalPrice: typeof p.originalPrice === 'number' && !isNaN(p.originalPrice) ? p.originalPrice : (p.price || 0),
           productType: p.productType || inferProductType(p)
         }));
         setLocalProducts(normalized);
@@ -128,6 +126,9 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
       const firestoreProducts: ShopProduct[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
+        const resolvedPrice = typeof data.price === 'number' && !isNaN(data.price) 
+          ? data.price 
+          : (Number(data.price) || 0);
         firestoreProducts.push({
           id: docSnap.id,
           title: data.title || '',
@@ -138,8 +139,8 @@ export async function fetchProducts(): Promise<ShopProduct[]> {
             category: data.category,
             format: data.format
           }),
-          price: 0,
-          originalPrice: Number(data.originalPrice) || Number(data.price) || 0,
+          price: resolvedPrice,
+          originalPrice: Number(data.originalPrice) || resolvedPrice,
           rating: Number(data.rating) || 4.9,
           reviewsCount: Number(data.reviewsCount) || 10,
           format: data.format || 'Digital DOCX / PDF',
@@ -283,6 +284,66 @@ export async function toggleProductPublishStatus(productId: string): Promise<Sho
   }
 
   // Auto-append updated status to connected Workspace Shop Google Sheet (non-blocking)
+  appendShopProductToSheet(updated).catch(() => {});
+
+  return updated;
+}
+
+/**
+ * Updates a product's price, immediately updating localStorage, dispatching
+ * PRODUCTS_UPDATE_EVENT for real-time Shop page updates, and syncing to backend & Firestore.
+ */
+export async function updateProductPrice(
+  productId: string,
+  newPrice: number,
+  newOriginalPrice?: number
+): Promise<ShopProduct | null> {
+  const current = getLocalProducts();
+  const prod = current.find(p => p.id === productId || p.slug === productId);
+  if (!prod) return null;
+
+  const validPrice = Math.max(0, Number(newPrice) || 0);
+  const validOrigPrice = newOriginalPrice !== undefined ? Math.max(0, Number(newOriginalPrice) || 0) : prod.originalPrice;
+
+  const updated: ShopProduct = {
+    ...prod,
+    price: validPrice,
+    originalPrice: validOrigPrice
+  };
+
+  // 1. Instant local update & window event dispatch (Shop page updates immediately!)
+  const updatedList = current.map(p => (p.id === prod.id || p.slug === prod.slug ? updated : p));
+  setLocalProducts(updatedList);
+
+  // 2. Sync to Backend Server API
+  const token = getStoredAdminToken();
+  if (token) {
+    try {
+      await fetch(`/api/shop/products/${encodeURIComponent(prod.id)}/price`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ price: validPrice, originalPrice: validOrigPrice })
+      });
+    } catch (serverErr) {
+      console.warn('[ProductService] Backend price update warning:', serverErr);
+    }
+  }
+
+  // 3. Sync to Firestore
+  try {
+    const docRef = doc(db, 'products', prod.id);
+    await setDoc(docRef, {
+      ...updated,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (err) {
+    console.warn('Could not sync price update to Firestore:', err);
+  }
+
+  // 4. Auto-append updated price to connected Workspace Shop Google Sheet (non-blocking)
   appendShopProductToSheet(updated).catch(() => {});
 
   return updated;

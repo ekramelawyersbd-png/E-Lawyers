@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { calculateReadingTime } from '../utils/readingTime';
-import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check, ThumbsUp, MessageCircle, HelpCircle, Star, CheckCircle2, MapPin } from 'lucide-react';
+import { ArrowRight, Clock, Minus, Plus, Type, Contrast, BookOpen, Calculator, FileText, Landmark, LineChart, MessageSquare, Search, Scale, Briefcase, FileSignature, Users, BookMarked, Calendar as CalendarIcon, ArrowUpRight, ExternalLink, ShieldCheck, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Wrench, GraduationCap, Award, UserCheck, CheckSquare, Building2, ScrollText, Gavel, Facebook, Linkedin, Share2, Copy, Check, ThumbsUp, MessageCircle, HelpCircle, Star, CheckCircle2, MapPin, ShoppingBag, FileCheck } from 'lucide-react';
 import { mockArticles, categories } from '../data/mockData';
 import { INITIAL_EXPERTS, INITIAL_QUESTIONS } from '../data/communityData';
 import { format } from 'date-fns';
@@ -12,6 +12,7 @@ import { ShareSectionButton } from '../components/ShareSectionButton';
 import { SectionNote } from '../components/SectionNote';
 import { NewsletterSignup } from '../components/NewsletterSignup';
 import { Testimonials } from '../components/Testimonials';
+import { QuickContactSection } from '../components/QuickContactSection';
 import { SEO } from '../components/SEO';
 
 export function Home() {
@@ -628,6 +629,457 @@ export function Home() {
         </div>
       </section>
 
+      {/* 4. Academy Highlight Section — Accounticca Academy */}
+      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-[#061e24] via-[#092d35] to-[#0c3c46]">
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                {/* LEFT: Copy + CTA */}
+                <div className="lg:w-[52%]">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Live Cohorts Enrolling · CPD &amp; Professional Syllabus</span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                    Accelerate Skills at{' '}
+                    <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
+                      Accounticca Academy
+                    </span>
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                    Practical practitioner-led training in Bangladesh Income Tax, VAT &amp; SD Act 2012, RJSC corporate governance, and hands-on e-Return filing.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    <Link 
+                      to="/training"
+                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    >
+                      <span>Explore All Courses</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white/10 hover:bg-white/20 border border-emerald-400/30 hover:border-emerald-400/60 text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <MessageSquare className="w-4 h-4 text-emerald-300" />
+                      <span>Send an inquiry</span>
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 hover:border-emerald-300 text-emerald-200 hover:text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <CalendarIcon className="w-4 h-4 text-emerald-300" />
+                      <span>Book appointment</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* RIGHT: 4 Course Mini-Cards */}
+                <div className="lg:w-[48%]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Course 1: Personal Income Tax */}
+                    <Link 
+                      to="/training"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Calculator className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Personal Income Tax</div>
+                        <div className="text-[11px] text-emerald-300 font-semibold truncate">Live Cohort · e-Return Filing</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-emerald-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Course 2: VAT & SD Act */}
+                    <Link 
+                      to="/training"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 to-cyan-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <FileCheck className="w-5 h-5 text-cyan-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">VAT &amp; SD Masterclass</div>
+                        <div className="text-[11px] text-cyan-300 font-semibold truncate">Mushak 6.3 &amp; Withholding</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Course 3: RJSC & Company Law */}
+                    <Link 
+                      to="/training"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-yellow-800 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Building2 className="w-5 h-5 text-amber-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">RJSC &amp; Secretarial</div>
+                        <div className="text-[11px] text-amber-300 font-semibold truncate">Incorporation &amp; Compliance</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Course 4: Practical Accounting */}
+                    <Link 
+                      to="/training"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-700 to-emerald-950 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Award className="w-5 h-5 text-teal-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Practical Accounting</div>
+                        <div className="text-[11px] text-teal-300 font-semibold truncate">IFRS, Excel &amp; Tax Audit</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-teal-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Strip */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  Interactive Live Cohorts · Case Studies · Course Completion Certificates
+                </span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link 
+                    to="/contact?tab=inquiry#inquiry"
+                    className="text-emerald-300 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Send an inquiry</span>
+                  </Link>
+                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <Link 
+                    to="/contact?tab=inquiry#inquiry"
+                    className="text-teal-300 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    <span>Book appointment</span>
+                  </Link>
+                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <Link 
+                    to="/verify-certificate"
+                    className="text-slate-300 font-bold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    Verify Student Certificate
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Shop Highlight Section — Compliance Shop */}
+      <section className="py-10 sm:py-14 px-4 bg-[#eaeff5] border-y border-slate-200/80">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-400/40 bg-gradient-to-br from-[#0c0e23] via-[#141838] to-[#1a214d]">
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-400/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                {/* LEFT: Copy + CTA */}
+                <div className="lg:w-[52%]">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/15 border border-indigo-400/40 text-indigo-300 text-[11px] font-bold uppercase tracking-wider mb-4">
+                    <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                    <span>Instant Digital Downloads · Supreme Court &amp; CA Vetted</span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                    Legal &amp; Tax Toolkits at{' '}
+                    <span className="bg-gradient-to-r from-amber-300 via-amber-200 to-yellow-300 bg-clip-text text-transparent">
+                      Compliance Shop
+                    </span>
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                    Skip weeks of drafting. Download ready-to-use MOA &amp; AOA templates, Board resolutions, automated income tax calculators, and statutory registers.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    <Link 
+                      to="/shop"
+                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c7a76b] via-[#ddc38f] to-[#c7a76b] hover:from-[#ddc38f] hover:to-[#c7a76b] text-[#10243a] font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    >
+                      <span>Explore All Toolkits</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white/10 hover:bg-white/20 border border-amber-400/30 hover:border-amber-400/60 text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <MessageSquare className="w-4 h-4 text-amber-300" />
+                      <span>Send an inquiry</span>
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 hover:border-amber-300 text-amber-200 hover:text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <CalendarIcon className="w-4 h-4 text-amber-300" />
+                      <span>Book appointment</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* RIGHT: 4 Product Mini-Cards */}
+                <div className="lg:w-[48%]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Product 1: RJSC Incorporation Kit */}
+                    <Link 
+                      to="/shop?category=corporate"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-700 to-amber-950 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Building2 className="w-5 h-5 text-amber-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">RJSC Incorporation Kit</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">MOA, AOA &amp; Resolutions</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Product 2: Income Tax Return Suite */}
+                    <Link 
+                      to="/shop?category=tax"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <FileText className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Income Tax Return Suite</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Excel Computations 2026-27</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Product 3: Commercial Contracts */}
+                    <Link 
+                      to="/shop?category=legal"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-700 to-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Scale className="w-5 h-5 text-indigo-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Commercial Agreements</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Vendor, Employment &amp; Lease</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Product 4: VAT Mushak Toolkit */}
+                    <Link 
+                      to="/shop?category=vat"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-700 to-cyan-950 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Briefcase className="w-5 h-5 text-teal-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">VAT Mushak Toolkit</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">6.1, 6.2, 6.3 &amp; Challans</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Strip */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  100% Bangladesh Statutory Compliant · Instant File Delivery
+                </span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link 
+                    to="/contact?tab=inquiry#inquiry"
+                    className="text-amber-300 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Send an inquiry</span>
+                  </Link>
+                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <Link 
+                    to="/contact?tab=inquiry#inquiry"
+                    className="text-amber-200 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    <span>Book appointment</span>
+                  </Link>
+                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <Link 
+                    to="/shop"
+                    className="text-[#ddc38f] font-bold hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    Browse All 40+ Toolkits
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Careers Highlight Section — E-Lawyers */}
+      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
+        <div className="max-w-6xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#c7a76b]/50 bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#16445a]">
+            {/* Ambient glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-[#c7a76b]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                {/* LEFT: Copy + CTA */}
+                <div className="lg:w-[52%]">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>We're Hiring · 4 Career Tracks Open</span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                    Build Your Career at{' '}
+                    <span className="bg-gradient-to-r from-[#ddc38f] via-[#c7a76b] to-[#ddc38f] bg-clip-text text-transparent">
+                      E-Lawyers
+                    </span>
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                    Join a premier corporate legal &amp; business consultancy in Dhaka. 4 career
+                    tracks now open for fresh graduates &amp; experienced professionals.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    <Link 
+                      to="/Careers"
+                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c7a76b] via-[#d5b67b] to-[#c7a76b] hover:from-[#d5b67b] hover:to-[#c7a76b] text-[#10243a] font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    >
+                      <span>Explore All Careers</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white/10 hover:bg-white/20 border border-[#c7a76b]/30 hover:border-[#c7a76b]/60 text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <MessageSquare className="w-4 h-4 text-[#ddc38f]" />
+                      <span>Send an inquiry</span>
+                    </Link>
+                    <Link 
+                      to="/contact?tab=inquiry#inquiry"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-[#c7a76b]/50 hover:border-amber-300 text-amber-200 hover:text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                    >
+                      <CalendarIcon className="w-4 h-4 text-[#ddc38f]" />
+                      <span>Book appointment</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* RIGHT: 4 Role Mini-Cards */}
+                <div className="lg:w-[48%]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Role 1: MTO */}
+                    <Link 
+                      to="/Careers/mto"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Award className="w-5 h-5 text-amber-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">MTO Trainee</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 2: Sales & Marketing */}
+                    <Link 
+                      to="/Careers/sales-marketing"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <LineChart className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Sales &amp; Marketing</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 3: Accountant */}
+                    <Link 
+                      to="/Careers/accountant"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Calculator className="w-5 h-5 text-emerald-300" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Accountant</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Accounts Division)</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+
+                    {/* Role 4: Customer Care */}
+                    <Link 
+                      to="/Careers/customer-care"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c7a76b] backdrop-blur-sm transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Users className="w-5 h-5 text-[#10243a]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-white truncate">Customer Care</div>
+                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Female Only)</div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Strip */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-[#c7a76b]" />
+                  Panthapath, Dhaka · Full-Time In-Person Positions
+                </span>
+                <Link 
+                  to="/Careers#check-status"
+                  className="text-[#ddc38f] font-bold hover:text-white flex items-center gap-1 transition-colors"
+                >
+                  Already applied? Check Status
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 4. Featured Guides & 5. Latest Legal Updates */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -1052,127 +1504,8 @@ export function Home() {
         </div>
       </section>
 
-      {/* Careers Highlight Section — E-Lawyers */}
-      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
-        <div className="max-w-6xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#c7a76b]/50 bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#16445a]">
-
-            {/* Ambient glows */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-[#c7a76b]/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
-
-                {/* LEFT: Copy + CTA */}
-                <div className="lg:w-[52%]">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>We're Hiring · 4 Career Tracks Open</span>
-                  </div>
-
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
-                    Build Your Career at{' '}
-                    <span className="bg-gradient-to-r from-[#ddc38f] via-[#c7a76b] to-[#ddc38f] bg-clip-text text-transparent">
-                      E-Lawyers
-                    </span>
-                  </h2>
-
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
-                    Join a premier corporate legal &amp; business consultancy in Dhaka. 4 career
-                    tracks now open for fresh graduates &amp; experienced professionals.
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Link to="/Careers"
-                       className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c7a76b] via-[#d5b67b] to-[#c7a76b] hover:from-[#d5b67b] hover:to-[#c7a76b] text-[#10243a] font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all">
-                      <span>Explore All Careers</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      Deadline: Oct 31, 2026
-                    </span>
-                  </div>
-                </div>
-
-                {/* RIGHT: 4 Role Mini-Cards */}
-                <div className="lg:w-[48%]">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-
-                    {/* Role 1: MTO */}
-                    <Link to="/Careers/mto"
-                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Award className="w-5 h-5 text-amber-300" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">MTO Trainee</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                    </Link>
-
-                    {/* Role 2: Sales & Marketing */}
-                    <Link to="/Careers/sales-marketing"
-                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <LineChart className="w-5 h-5 text-emerald-300" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Sales &amp; Marketing</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                    </Link>
-
-                    {/* Role 3: Accountant */}
-                    <Link to="/Careers/accountant"
-                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Calculator className="w-5 h-5 text-emerald-300" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Accountant</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Accounts Division)</div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                    </Link>
-
-                    {/* Role 4: Customer Care */}
-                    <Link to="/Careers/customer-care"
-                       className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c7a76b] backdrop-blur-sm transition-all">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Users className="w-5 h-5 text-[#10243a]" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Customer Care</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Female Only)</div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                    </Link>
-
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Strip */}
-              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-[#c7a76b]" />
-                  Panthapath, Dhaka · Full-Time In-Person Positions
-                </span>
-                <Link to="/Careers#check-status"
-                   className="text-[#ddc38f] font-bold hover:text-white flex items-center gap-1 transition-colors">
-                  Already applied? Check Status
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Shorter Consultation & Intake Desk Section (Inquiry & Appointment) */}
+      <QuickContactSection />
 
       {/* Customer Testimonial Carousel */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">

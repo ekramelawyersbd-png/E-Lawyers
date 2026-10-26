@@ -41,7 +41,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return Array.isArray(parsed)
         ? parsed.map((item) => ({
             ...item,
-            product: { ...item.product, price: 0 }
+            product: { 
+              ...item.product, 
+              price: typeof item.product?.price === 'number' && !isNaN(item.product.price) 
+                ? item.product.price 
+                : 0 
+            }
           }))
         : [];
     } catch {
@@ -80,7 +85,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [promoCode]);
 
   const addToCart = useCallback((product: ShopProduct, quantity = 1) => {
-    const normalizedProduct: ShopProduct = { ...product, price: 0 };
+    const normalizedProduct: ShopProduct = { 
+      ...product, 
+      price: typeof product.price === 'number' && !isNaN(product.price) ? product.price : 0 
+    };
     setItems((prev) => {
       const existing = prev.find((item) => item.product.id === normalizedProduct.id);
       if (existing) {

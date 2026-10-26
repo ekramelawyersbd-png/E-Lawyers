@@ -1692,7 +1692,7 @@ export function Contact() {
         id="contact-form-section"
         className="mx-auto max-w-7xl scroll-mt-6 px-4 py-10 sm:px-6 lg:px-8"
       >
-        <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+        <div className="grid gap-8 lg:gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
           <div className="lg:sticky lg:top-8">
             <p className="text-xs font-semibold text-emerald-800">Consultation &amp; Intake Desk</p>
             <h2 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-4xl">

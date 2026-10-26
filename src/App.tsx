@@ -54,6 +54,8 @@ import { Shop } from './pages/Shop';
 import { ProductDetail } from './pages/ProductDetail';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { EnrollmentPage } from './pages/EnrollmentPage';
+import { PaymentVerifyPage } from './pages/PaymentVerifyPage';
+import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { AdminShop } from './pages/AdminShop';
 import { ShopAdminLogin } from './pages/ShopAdminLogin';
 import { ShopAdminRouteGuard } from './components/auth/ShopAdminRouteGuard';
@@ -217,6 +219,14 @@ export default function App() {
                     <Route path="shop/product/:slug" element={<ProductDetail />} />
                     <Route path="checkout" element={<CheckoutPage />} />
                     <Route path="enrollment" element={<EnrollmentPage />} />
+                    
+                    {/* UddoktaPay Hosted Payment Gateway Callbacks & Verification */}
+                    <Route path="payment/verify" element={<PaymentVerifyPage />} />
+                    <Route path="payment/cancel" element={<PaymentCancelPage />} />
+                    <Route path="gateway/payment/success" element={<PaymentVerifyPage />} />
+                    <Route path="gateway/payment/cancel" element={<PaymentCancelPage />} />
+                    <Route path="gateway/uddoktapay/success" element={<PaymentVerifyPage />} />
+                    <Route path="gateway/uddoktapay/cancel" element={<PaymentCancelPage />} />
                     
                     {/* Admin Shop Catalog Desk (Protected by Authorized Credentials: hmekram@gmail.com) */}
                     <Route path="admin/shop" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />

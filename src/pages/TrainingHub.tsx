@@ -162,7 +162,114 @@ export function TrainingHub() {
         </div>
       </div>
 
+      <div className="p-2.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-lg flex flex-col items-center max-w-fit mx-auto overflow-hidden">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Felawyerssbd%2Fvideos%2F1271548471021064%2F&show_text=false&width=560&t=0"
+          width="560"
+          height="314"
+          className="border-0 overflow-hidden rounded-2xl bg-black max-w-full"
+          scrolling="no"
+          frameBorder="0"
+          allowFullScreen={true}
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          title="E-Lawyers & Accounticca Academy Featured Training Video"
+        />
+      </div>
 
+      {/* Featured Academy Video Reels & Live Class Spotlight */}
+      <section
+        id="live-classes-section"
+        className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 lg:p-10 shadow-2xs"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left: Context & Live Cohort Details */}
+          <div className="lg:col-span-6 space-y-5">
+            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+              <Video className="w-4 h-4 text-emerald-600" />
+              <span>Featured Academy Reels</span>
+              <span aria-hidden="true">·</span>
+              <span>Practical Tax, VAT &amp; Legal Training</span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Watch Inside Our Practical Training &amp; Live Sessions
+            </h2>
+
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+              Experience how our instructors break down real-world Income Tax Act 2023 calculations, online e-Return filing, VAT compliance, and RJSC corporate procedures for practitioners and learners across Bangladesh.
+            </p>
+
+            {liveClassPrograms.map((program) => (
+              <div
+                key={program.id}
+                className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-5 space-y-3"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <span className="font-bold text-emerald-700">{program.bengaliTag}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{program.scheduleLabel}</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="font-mono tabular-nums font-semibold text-slate-800">
+                    {program.price}
+                  </span>
+                </div>
+
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  {program.title}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {program.excerpt}
+                </p>
+
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <Link
+                    to={program.detailPath}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+                  >
+                    <span>View Course Syllabus</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCourse({
+                        id: program.id,
+                        title: program.title,
+                        description: program.excerpt,
+                        price: program.price
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    <span>Enroll in Live Cohort</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/*Right: Embedded Facebook Videos (2 Reels 269x476 + 1 Landscape 560x314) */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <div className="p-2.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-lg flex flex-col items-center">
+                <iframe
+                  src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1289755342457988%2F&show_text=false&width=269&t=0"
+                  width="269"
+                  height="476"
+                  className="border-0 overflow-hidden rounded-2xl bg-black"
+                  scrolling="no"
+                  frameBorder="0"
+                  allowFullScreen={true}
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  title="E-Lawyers & Accounticca Academy Featured Training Reel 1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Training Programs Grid (Balanced Cards with Uniform Action Footers) */}
       <section className="space-y-6">

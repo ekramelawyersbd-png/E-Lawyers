@@ -140,7 +140,9 @@ export const signInWithWorkspaceGoogle = async (emailHint: string = DEFAULT_WORK
 
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
-    console.error('Workspace Google sign-in failed:', error);
+    if (error?.code !== 'auth/popup-closed-by-user' && error?.code !== 'auth/cancelled-popup-request') {
+      console.error('Workspace Google sign-in failed:', error);
+    }
     throw error;
   } finally {
     isSigningIn = false;

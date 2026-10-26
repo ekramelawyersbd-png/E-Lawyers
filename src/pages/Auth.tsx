@@ -183,7 +183,9 @@ export function Auth() {
         navigate(from === '/auth' ? '/dashboard' : from, { replace: true });
       }
     } catch (err: any) {
-      console.error('Google Sign-In error:', err);
+      if (err?.code !== 'auth/popup-closed-by-user' && err?.code !== 'auth/cancelled-popup-request') {
+        console.error('Google Sign-In error:', err);
+      }
       setError(formatAuthError(err));
     } finally {
       setIsGoogleLoading(false);

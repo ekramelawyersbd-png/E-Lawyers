@@ -1,0 +1,40 @@
+{
+  "name": "UddoktaPay Hosted",
+  "author": "UddoktaPay",
+  "version": "1.0.0",
+  "description": "Accept automated payments in Paymenter via UddoktaPay (bKash, Nagad, Rocket, Cards)",
+  "apiKey": "",
+  "secretKey": "",
+  "hostedUrl": "https://pay.uddoktapay.com",
+  "isSandbox": false,
+  "enabled": true,
+  "supportedMethods": [
+    { "name": "bKash", "type": "MFS", "color": "#e2136e" },
+    { "name": "Nagad", "type": "MFS", "color": "#f7941d" },
+    { "name": "Rocket", "type": "MFS", "color": "#8c3494" },
+    { "name": "Upay", "type": "MFS", "color": "#005baa" },
+    { "name": "Visa / Mastercard / Amex", "type": "Cards", "color": "#1a1f71" },
+    { "name": "Internet Banking", "type": "Bank", "color": "#00875a" }
+  ],
+  "fields": [
+    {
+      "name": "api_key",
+      "label": "API Key",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "secret_key",
+      "label": "API Secret",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "hosted_url",
+      "label": "Hosted Checkout URL",
+      "type": "text",
+      "required": true,
+      "default": "https://pay.uddoktapay.com"
+    }
+  ]
+}
