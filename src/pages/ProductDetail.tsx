@@ -30,6 +30,7 @@ import { usePurchases } from '../contexts/PurchaseContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { ShopProduct, inferProductType } from '../data/shopProducts';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -236,24 +237,22 @@ export function ProductDetail() {
         ]}
       />
 
-      {/* Top Clean Breadcrumbs & Navigation Bar */}
+      {/* Sync product hierarchy with Layout's global Breadcrumb bar beneath header */}
+      <Breadcrumbs
+        items={[
+          { label: 'Digital Shop', path: '/shop' },
+          { label: product.category, path: `/shop?category=${encodeURIComponent(product.category)}` },
+          { label: product.title }
+        ]}
+      />
+
+      {/* Top Product Action Bar */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-          
-          <nav className="flex items-center gap-2 text-slate-500 font-medium overflow-x-auto">
-            <Link to="/" className="hover:text-slate-900 transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <Link to="/shop" className="hover:text-slate-900 transition-colors">Digital Shop</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <Link 
-              to={`/shop?category=${encodeURIComponent(product.category)}`}
-              className="hover:text-emerald-700 transition-colors"
-            >
-              {product.category}
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="text-slate-900 font-semibold truncate max-w-xs">{product.title}</span>
-          </nav>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-slate-600 font-medium">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Verified Digital Resource · {product.category}</span>
+          </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
             {/* Show admin desk button strictly for authenticated users */}

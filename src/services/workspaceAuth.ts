@@ -1,13 +1,10 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
 import { 
-  getAuth, 
   signInWithPopup, 
   GoogleAuthProvider, 
-  onAuthStateChanged, 
   User, 
   signOut 
 } from 'firebase/auth';
-import { app } from '../lib/firebase';
+import { auth, fallbackAuth, getActivePopupAuth } from '../lib/firebase';
 
 export const WORKSPACE_SCOPES = [
   // Drive & Files
@@ -116,11 +113,11 @@ export const setAccessToken = (token: string | null, email: string = DEFAULT_WOR
 };
 
 export const signInWithWorkspaceGoogle = async (emailHint: string = DEFAULT_WORKSPACE_EMAIL): Promise<{ user: User; accessToken: string }> => {
-  const auth = getAuth(app);
+  const activeAuth = getActivePopupAuth();
   try {
     isSigningIn = true;
     const provider = createWorkspaceGoogleProvider(emailHint);
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(activeAuth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     
     if (!credential?.accessToken) {
@@ -150,9 +147,8 @@ export const signInWithWorkspaceGoogle = async (emailHint: string = DEFAULT_WORK
 };
 
 export const logoutWorkspace = async () => {
-  const auth = getAuth(app);
   try {
-    await signOut(auth);
+    await Promise.allSettled([signOut(auth), signOut(fallbackAuth)]);
   } catch (e) {
     // ignore
   }
@@ -164,3 +160,4 @@ export const logoutWorkspace = async () => {
     // ignore
   }
 };
+

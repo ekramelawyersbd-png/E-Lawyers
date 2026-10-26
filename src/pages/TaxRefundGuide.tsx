@@ -426,8 +426,8 @@ export function TaxRefundGuide() {
           </div>
 
           {/* 12. Sidebar Content (Desktop) */}
-          <div className="lg:col-span-4 relative">
-            <div className="sticky top-24 max-h-[calc(100vh-6.5rem)] overflow-y-auto space-y-8 pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
+          <div className="lg:col-span-4 relative w-full self-start">
+            <div className="sticky top-24 space-y-8 w-full">
               
               {/* Search Box */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">

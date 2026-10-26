@@ -130,19 +130,6 @@ export function ResourceLibraryPage() {
         </div>
       )}
 
-      {/* Breadcrumb Header */}
-      <div className="border-b border-slate-200/80 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-            <Link to="/" className="hover:text-emerald-700 transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <Link to="/tools" className="hover:text-emerald-700 transition-colors">Resources</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-900 font-bold">Resource Library (PDFs)</span>
-          </div>
-        </div>
-      </div>
-
       {/* Hero Header */}
       <div className="bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-12 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>

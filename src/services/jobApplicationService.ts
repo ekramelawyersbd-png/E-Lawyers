@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   orderBy
 } from 'firebase/firestore';
-import { db, auth } from '../lib/firebase';
+import { db, auth, fallbackAuth } from '../lib/firebase';
 import { handleFirestoreError, OperationType } from '../lib/firestoreErrors';
 
 export type ApplicationStatus = 
@@ -120,9 +120,15 @@ export async function fetchUserApplications(userId: string, userEmail?: string):
     console.warn('Error reading applications from localStorage:', e);
   }
 
+  const firestoreUser = fallbackAuth.currentUser;
+  if (!firestoreUser) {
+    return localApps;
+  }
+
+  const effectiveUid = firestoreUser.uid || userId;
   try {
     const appsRef = collection(db, COLLECTION_NAME);
-    const q = query(appsRef, where('userId', '==', userId));
+    const q = query(appsRef, where('userId', '==', effectiveUid));
     const snapshot = await getDocs(q);
 
     const cloudApps: JobApplication[] = [];
@@ -144,7 +150,11 @@ export async function fetchUserApplications(userId: string, userEmail?: string):
     }
   } catch (error) {
     console.warn('Firestore fetchUserApplications error, falling back to local cache:', error);
-    handleFirestoreError(error, OperationType.LIST, COLLECTION_NAME);
+    try {
+      handleFirestoreError(error, OperationType.LIST, COLLECTION_NAME);
+    } catch {
+      // Non-blocking fallback
+    }
   }
 
   // Return local storage items if cloud was empty or offline
@@ -169,8 +179,12 @@ export async function saveJobApplication(
   const refId = appData.referenceId || `EL-2026-${randomSuffix}`;
   const initialStatus: ApplicationStatus = appData.status || 'Under Review';
 
+  const firestoreUser = fallbackAuth.currentUser;
+  const effectiveUid = firestoreUser?.uid || appData.userId;
+
   const fullApplication: JobApplication = {
     ...appData,
+    userId: effectiveUid,
     id: docId,
     referenceId: refId,
     status: initialStatus,
@@ -183,7 +197,7 @@ export async function saveJobApplication(
   };
 
   // 1. Cache to local storage immediately
-  const localKey = getLocalStorageKey(fullApplication.userId);
+  const localKey = getLocalStorageKey(appData.userId);
   try {
     const raw = localStorage.getItem(localKey);
     const existing: JobApplication[] = raw ? JSON.parse(raw) : [];
@@ -194,16 +208,22 @@ export async function saveJobApplication(
     console.warn('LocalStorage save error:', storageErr);
   }
 
-  // 2. Persist to Firestore
-  try {
-    const docRef = doc(db, COLLECTION_NAME, docId);
-    await setDoc(docRef, {
-      ...fullApplication,
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-  } catch (error) {
-    console.warn('Firestore saveJobApplication error (saved locally):', error);
-    handleFirestoreError(error, OperationType.WRITE, `${COLLECTION_NAME}/${docId}`);
+  // 2. Persist to Firestore only if authenticated on Firestore project
+  if (firestoreUser) {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, docId);
+      await setDoc(docRef, {
+        ...fullApplication,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.warn('Firestore saveJobApplication error (saved locally):', error);
+      try {
+        handleFirestoreError(error, OperationType.WRITE, `${COLLECTION_NAME}/${docId}`);
+      } catch {
+        // Non-blocking fallback
+      }
+    }
   }
 
   return fullApplication;
@@ -244,17 +264,24 @@ export async function updateJobApplication(
     console.warn('LocalStorage update error:', e);
   }
 
-  // Update Firestore
-  try {
-    const docRef = doc(db, COLLECTION_NAME, id);
-    await updateDoc(docRef, {
-      ...updates,
-      lastUpdatedDate: formattedDate,
-      updatedAt: serverTimestamp()
-    });
-  } catch (error) {
-    console.warn('Firestore updateJobApplication error:', error);
-    handleFirestoreError(error, OperationType.UPDATE, `${COLLECTION_NAME}/${id}`);
+  // Update Firestore only if authenticated on Firestore project
+  const firestoreUser = fallbackAuth.currentUser;
+  if (firestoreUser) {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      await updateDoc(docRef, {
+        ...updates,
+        lastUpdatedDate: formattedDate,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn('Firestore updateJobApplication error:', error);
+      try {
+        handleFirestoreError(error, OperationType.UPDATE, `${COLLECTION_NAME}/${id}`);
+      } catch {
+        // Non-blocking fallback
+      }
+    }
   }
 }
 

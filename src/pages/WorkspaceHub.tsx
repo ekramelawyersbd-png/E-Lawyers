@@ -905,8 +905,8 @@ export const WorkspaceHub: React.FC = () => {
         )}
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-2 shadow-xs overflow-x-auto">
-          <div className="flex gap-1.5 min-w-max">
+        <div className="bg-white rounded-2xl border border-slate-200 p-2.5 shadow-xs w-full">
+          <div className="flex flex-wrap gap-1.5 w-full">
             {tabs.map((t) => {
               const Icon = t.icon;
               const isActive = activeTab === t.id;

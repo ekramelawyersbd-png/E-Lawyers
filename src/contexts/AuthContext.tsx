@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 import { auth, fallbackAuth, db } from '../lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { authService, ERPAuthUser } from '../services/authService';
@@ -27,10 +27,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleAuthState = async (currentUser: User | null) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const currentEmail = (currentUser.email || currentUser.providerData?.[0]?.email || '').trim().toLowerCase();
+    let isBridging = false;
+
+    const handleAuthState = async (incomingUser: User | null) => {
+      // If customDomainAuth is signed in, but fallbackAuth (Firestore project) is not yet bridged,
+      // try to bridge using cached Google OAuth access_token
+      if (auth.currentUser && !fallbackAuth.currentUser && !isBridging) {
+        const cachedOAuthToken = localStorage.getItem('erp_google_oauth_access_token');
+        if (cachedOAuthToken) {
+          isBridging = true;
+          try {
+            const bridgeCred = GoogleAuthProvider.credential(null, cachedOAuthToken);
+            await signInWithCredential(fallbackAuth, bridgeCred);
+          } catch {
+            localStorage.removeItem('erp_google_oauth_access_token');
+          } finally {
+            isBridging = false;
+          }
+        }
+      }
+
+      const activeUser = fallbackAuth.currentUser || auth.currentUser || incomingUser;
+
+      if (activeUser) {
+        setUser(activeUser);
+        const currentEmail = (activeUser.email || activeUser.providerData?.[0]?.email || '').trim().toLowerCase();
         const isAdmin = [
           "admin@erpforu.com",
           "superadmin@erpforu.com",
@@ -44,20 +65,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const role: 'admin' | 'client' = isAdmin ? 'admin' : 'client';
         const roleId: 'role-admin' | 'role-client' = isAdmin ? 'role-admin' : 'role-client';
-        const displayName = currentUser.displayName || (currentEmail ? currentEmail.split('@')[0] : 'User');
+        const displayName = activeUser.displayName || (currentEmail ? currentEmail.split('@')[0] : 'User');
 
         try {
-          const token = await currentUser.getIdToken();
-          const rawProviderId = currentUser.providerData?.[0]?.providerId || '';
+          const token = await activeUser.getIdToken();
+          const rawProviderId = activeUser.providerData?.[0]?.providerId || '';
           const provider: 'google' | 'facebook' | 'email' = 
             rawProviderId === 'facebook.com' ? 'facebook' :
             rawProviderId === 'google.com' ? 'google' : 'email';
 
           const sessionUser: ERPAuthUser = {
-            uid: currentUser.uid,
+            uid: activeUser.uid,
             email: currentEmail,
             displayName,
-            photoURL: currentUser.photoURL || null,
+            photoURL: activeUser.photoURL || null,
             role,
             roleId,
             provider,
@@ -68,10 +89,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } catch {
           // Fallback session user if token refresh fails while offline
           const fallbackSession: ERPAuthUser = {
-            uid: currentUser.uid,
+            uid: activeUser.uid,
             email: currentEmail,
             displayName,
-            photoURL: currentUser.photoURL || null,
+            photoURL: activeUser.photoURL || null,
             role,
             roleId,
             provider: 'google',
@@ -81,20 +102,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           localStorage.setItem('erp_auth_user', JSON.stringify(fallbackSession));
         }
 
-        try {
-          const userRef = doc(db, 'users', currentUser.uid);
-          await setDoc(
-            userRef,
-            {
-              email: currentEmail,
-              displayName: currentUser.displayName || displayName,
-              updatedAt: serverTimestamp(),
-              role
-            },
-            { merge: true }
-          );
-        } catch {
-          // Client may be operating in offline mode; local cache will sync when online
+        // Only write to Firestore users collection when fallbackAuth.currentUser (the Firestore project's Auth) is authenticated
+        const firestoreUser = fallbackAuth.currentUser;
+        if (firestoreUser) {
+          try {
+            const userRef = doc(db, 'users', firestoreUser.uid);
+            await setDoc(
+              userRef,
+              {
+                email: currentEmail,
+                displayName: activeUser.displayName || displayName,
+                updatedAt: serverTimestamp(),
+                role
+              },
+              { merge: true }
+            );
+          } catch {
+            // Client may be operating in offline mode; local cache will sync when online
+          }
         }
       } else {
         if (!auth.currentUser && !fallbackAuth.currentUser) {

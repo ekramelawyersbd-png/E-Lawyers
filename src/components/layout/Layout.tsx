@@ -5,11 +5,12 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { MobileInstallPrompt } from '../pwa/MobileInstallPrompt';
 import { CartDrawer } from '../shop/CartDrawer';
 import { useFocusMode } from '../../contexts/FocusModeContext';
-import { AiAssistantWidget } from '../AiAssistantWidget';
+import { BreadcrumbProvider, Breadcrumb } from '../Breadcrumb';
 
 export function Layout() {
   const { isFocusMode, readerTheme } = useFocusMode();
   const location = useLocation();
+  const isHomePage = location.pathname === '/';
   const isArticleView = location.pathname.startsWith('/article/');
   const isLmsPortalView =
     location.pathname === '/student' ||
@@ -26,23 +27,26 @@ export function Layout() {
     : 'bg-white text-slate-900';
 
   return (
-    <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`} style={{ width: '100%', maxWidth: '100%' }}>
-      {!hideNavs && <Navbar />}
-      <main
-        className={`flex-1 w-full max-w-full ${
-          isLmsPortalView
-            ? 'p-0'
-            : hideNavs
-            ? 'pb-8 pt-0'
-            : 'pb-16 lg:pb-0'
-        }`}
-      >
-        <Outlet />
-      </main>
-      {!hideNavs && <Footer />}
-      {!hideNavs && <MobileBottomNav />}
-      {!hideNavs && <MobileInstallPrompt />}
-      <CartDrawer />
-    </div>
+    <BreadcrumbProvider hasGlobalBar={!hideNavs && !isHomePage}>
+      <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`} style={{ width: '100%', maxWidth: '100%' }}>
+        {!hideNavs && <Navbar />}
+        {!hideNavs && !isHomePage && <Breadcrumb />}
+        <main
+          className={`flex-1 w-full max-w-full ${
+            isLmsPortalView
+              ? 'p-0'
+              : hideNavs
+              ? 'pb-8 pt-0'
+              : 'pb-16 lg:pb-0'
+          }`}
+        >
+          <Outlet />
+        </main>
+        {!hideNavs && <Footer />}
+        {!hideNavs && <MobileBottomNav />}
+        {!hideNavs && <MobileInstallPrompt />}
+        <CartDrawer />
+      </div>
+    </BreadcrumbProvider>
   );
 }

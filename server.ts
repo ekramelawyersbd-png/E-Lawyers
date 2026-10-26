@@ -3045,8 +3045,22 @@ Each object must follow this exact JSON schema:
     }
   });
 
-  // Firebase Authentication Custom Domain Reverse Proxy
-  // Allows https://blog.accounticca.com/__/auth/* to seamlessly serve Firebase OAuth handlers
+  // Firebase Authentication Custom Domain Reverse Proxy & Init Config
+  // Allows custom domains (e.g. blog.accounticca.com) to seamlessly serve Firebase OAuth handlers
+  app.get("/__/firebase/init.json", (_req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.json({
+      apiKey: "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg",
+      appId: "1:425825496026:web:f1564f14d5ae5ba920eee3",
+      authDomain: "gen-lang-client-0396222608.firebaseapp.com",
+      databaseURL: "",
+      measurementId: "G-P4WQ33CP7G",
+      messagingSenderId: "425825496026",
+      projectId: "gen-lang-client-0396222608",
+      storageBucket: "gen-lang-client-0396222608.firebasestorage.app"
+    });
+  });
+
   app.all("/__/auth/*", async (req, res) => {
     try {
       const targetUrl = `https://gen-lang-client-0396222608.firebaseapp.com${req.originalUrl}`;

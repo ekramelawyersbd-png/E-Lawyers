@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import {
+  doc,
+  getDocFromServer,
   getFirestore,
   initializeFirestore,
   persistentLocalCache,
@@ -17,12 +19,10 @@ try {
   // Ignore if setLogLevel is unavailable
 }
 
-// Firebase configuration
-// Custom authDomain: 'accounticca.com' ensures Google Sign-In displays:
-// "Choose an account to continue to accounticca.com"
+// Primary Firebase configuration for Firestore & backend project (gen-lang-client-0396222608)
 const firebaseConfig = {
   apiKey: "AIzaSyD0HcNrqIDq_tNPhPX4zO73aYrE8e1z-gg",
-  authDomain: "accounticca.com",
+  authDomain: "gen-lang-client-0396222608.firebaseapp.com",
   projectId: "gen-lang-client-0396222608",
   storageBucket: "gen-lang-client-0396222608.firebasestorage.app",
   messagingSenderId: "425825496026",
@@ -30,15 +30,23 @@ const firebaseConfig = {
   measurementId: "G-P4WQ33CP7G"
 };
 
-// Fallback configuration for project domain
-const fallbackFirebaseConfig = {
-  ...firebaseConfig,
-  authDomain: "gen-lang-client-0396222608.firebaseapp.com"
+// Custom Domain Auth configuration for https://accounticca.com/__/auth/handler
+// Uses the Firebase project that owns the accounticca.com Firebase Hosting domain
+// to prevent auth/invalid-continue-uri while displaying "continue to accounticca.com"
+const customDomainFirebaseConfig = {
+  apiKey: "AIzaSyBC1NdgFVxE5YULuYJV_zSX9-W-P4wP-iE",
+  authDomain: "accounticca.com",
+  projectId: "elawyersnew",
+  storageBucket: "elawyersnew.firebasestorage.app",
+  messagingSenderId: "56739184994",
+  appId: "1:56739184994:web:43721b822379a65ed22c3b",
+  measurementId: "G-5L7XVT8MDQ"
 };
 
-// Initialize Firebase
+// Initialize Firebase Apps
 export const app = initializeApp(firebaseConfig);
-export const fallbackApp = initializeApp(fallbackFirebaseConfig, 'fallbackApp');
+export const customDomainApp = initializeApp(customDomainFirebaseConfig, 'accounticcaAuthApp');
+export const fallbackApp = app;
 
 const FIRESTORE_DB_ID = "ai-studio-accounticcainsig-89414606-29ba-4643-944b-e0ac41725d03";
 
@@ -61,13 +69,39 @@ try {
 
 export const db = firestoreDb;
 
+// Validate connection to Firestore on boot
+async function testConnection() {
+  try {
+    await getDocFromServer(doc(db, 'test', 'connection'));
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.error("Please check your Firebase configuration.");
+    }
+  }
+}
+if (typeof window !== 'undefined') {
+  testConnection();
+}
+
 // Initialize Auth & Cloud Functions
-export const auth = getAuth(app);
-export const fallbackAuth = getAuth(fallbackApp);
+// customDomainAuth serves https://accounticca.com/__/auth/handler
+// fallbackAuth serves gen-lang-client-0396222608.firebaseapp.com and syncs Firestore auth state
+export const customDomainAuth = getAuth(customDomainApp);
+export const fallbackAuth = getAuth(app);
+export const auth = customDomainAuth;
 export const functions = getFunctions(app);
+
+/**
+ * Returns the custom domain Auth instance (`https://accounticca.com/__/auth/handler`).
+ */
+export function getActivePopupAuth() {
+  return customDomainAuth;
+}
 
 // Authentication Providers
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const facebookProvider = new FacebookAuthProvider();
@@ -88,5 +122,6 @@ if (typeof window !== 'undefined') {
     // Ignore analytics init failure in non-supported environments
   });
 }
+
 
 

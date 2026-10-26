@@ -882,12 +882,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
           /* Form Screen */
           <form
             onSubmit={handleSubmitOrder}
-            className="grid grid-cols-1 md:grid-cols-12 gap-8"
-            style={{
-              lineHeight: '11px',
-              height: '846.312px',
-              width: '958px',
-            }}
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 w-full items-start"
           >
             
             {/* Left Column: Contact & Payment (7 cols) */}

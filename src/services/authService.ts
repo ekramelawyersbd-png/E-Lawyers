@@ -1,5 +1,5 @@
-import { signInWithPopup, signOut, User } from 'firebase/auth';
-import { auth, fallbackAuth, googleProvider, facebookProvider } from '../lib/firebase';
+import { signInWithPopup, signInWithCredential, GoogleAuthProvider, signOut, User } from 'firebase/auth';
+import { auth, fallbackAuth, getActivePopupAuth, googleProvider, facebookProvider } from '../lib/firebase';
 
 export interface ERPAuthUser {
   uid: string;
@@ -14,21 +14,40 @@ export interface ERPAuthUser {
 
 export const authService = {
   // ──────────────────────────────────────────
-  // 🌐 Google Sign-In
+  // 🌐 Google Sign-In (via https://accounticca.com/__/auth/handler)
   // ──────────────────────────────────────────
   loginWithGoogle: async (): Promise<ERPAuthUser> => {
-    // 1. Trigger Firebase Google Popup with fallback resilience
+    // 1. Trigger Firebase Google Popup via https://accounticca.com/__/auth/handler
+    const activeAuth = getActivePopupAuth();
     let userCred;
     try {
-      userCred = await signInWithPopup(auth, googleProvider);
+      userCred = await signInWithPopup(activeAuth, googleProvider);
+      // Silently bridge the Google OAuth access_token to the Firestore project Auth instance
+      // so Firestore security rules have an active authenticated session
+      try {
+        const oauthCred = GoogleAuthProvider.credentialFromResult(userCred);
+        if (oauthCred?.accessToken) {
+          localStorage.setItem('erp_google_oauth_access_token', oauthCred.accessToken);
+          if (fallbackAuth && activeAuth !== fallbackAuth) {
+            const bridgeCred = GoogleAuthProvider.credential(null, oauthCred.accessToken);
+            const bridgedUserCred = await signInWithCredential(fallbackAuth, bridgeCred);
+            if (bridgedUserCred?.user) {
+              userCred = bridgedUserCred;
+            }
+          }
+        }
+      } catch {
+        // Proceed with primary userCred if bridge is skipped
+      }
     } catch (popupErr: any) {
+      const secondaryAuth = activeAuth === auth ? fallbackAuth : auth;
       if (
-        fallbackAuth && 
+        secondaryAuth && 
         popupErr?.code !== 'auth/popup-closed-by-user' && 
         popupErr?.code !== 'auth/cancelled-popup-request'
       ) {
         try {
-          userCred = await signInWithPopup(fallbackAuth, googleProvider);
+          userCred = await signInWithPopup(secondaryAuth, googleProvider);
         } catch {
           throw popupErr;
         }
@@ -96,8 +115,9 @@ export const authService = {
   // 📘 Facebook Sign-In
   // ──────────────────────────────────────────
   loginWithFacebook: async (): Promise<ERPAuthUser> => {
-    // 1. Trigger Firebase Facebook Popup
-    const userCred = await signInWithPopup(auth, facebookProvider);
+    // 1. Trigger Firebase Facebook Popup using pre-verified active popup Auth instance
+    const activeAuth = getActivePopupAuth();
+    const userCred = await signInWithPopup(activeAuth, facebookProvider);
     const user: User = userCred.user;
     const userEmail = (user.email || user.providerData?.[0]?.email || '').trim().toLowerCase();
 
@@ -133,7 +153,8 @@ export const authService = {
   // ──────────────────────────────────────────
   logout: async (): Promise<void> => {
     localStorage.removeItem('erp_auth_user');
-    await signOut(auth);
+    localStorage.removeItem('erp_google_oauth_access_token');
+    await Promise.allSettled([signOut(auth), signOut(fallbackAuth)]);
   },
 
   // ──────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { auth } from './firebase';
+import { auth, fallbackAuth } from './firebase';
 
 export enum OperationType {
   CREATE = 'create',
@@ -34,15 +34,17 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     errMessage.toLowerCase().includes('offline') ||
     errMessage.toLowerCase().includes('could not reach cloud firestore backend');
 
+  const activeUser = fallbackAuth.currentUser || auth.currentUser;
+
   const errInfo: FirestoreErrorInfo = {
     error: errMessage,
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+      userId: activeUser?.uid,
+      email: activeUser?.email,
+      emailVerified: activeUser?.emailVerified,
+      isAnonymous: activeUser?.isAnonymous,
+      tenantId: activeUser?.tenantId,
+      providerInfo: activeUser?.providerData?.map(provider => ({
         providerId: provider.providerId,
         email: provider.email,
       })) || []
