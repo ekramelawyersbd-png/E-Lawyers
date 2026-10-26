@@ -339,18 +339,7 @@ export function ProductDetail() {
       )}
 
       {/* Main Content Container: 1200-1280px Max Width with Balanced 2-Column Grid */}
-      <main
-        className="max-w-[1280px] px-4 sm:px-6 lg:px-8"
-        style={{
-          height: '2267.5px',
-          width: '1050px',
-          marginTop: '0px',
-          marginLeft: '173.5px',
-          marginRight: '184.5px',
-          paddingTop: '0px',
-          paddingBottom: '0px',
-        }}
-      >
+      <main className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full">
 
           {/* LEFT COLUMN: Visual Media (40% width on Desktop = 5 cols), Specs, Excerpt, Guarantee */}

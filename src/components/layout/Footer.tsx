@@ -13,25 +13,25 @@ import { buildAppointmentUrl } from '../../utils/appointmentRedirect';
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden" style={{ width: '1271.33px', height: '576.208px', marginTop: '48px', maxWidth: '100%' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="w-full bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10" style={{ textAlign: 'center' }}>
-          <div className="col-span-1 md:col-span-1 text-justify">
-            <Link to="/" className="flex items-center gap-3 mb-6 group">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 items-start text-left">
+          <div className="col-span-1">
+            <Link to="/" className="flex items-center gap-3 mb-5 group">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white/10 p-1 group-hover:scale-105 transition-transform">
                 <img src="/footer-logo.png" alt="Compliance Hub Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-xl text-white">Compliance <span className="text-emerald-500">Hub</span></span>
             </Link>
-            <p className="text-sm font-medium text-slate-500 leading-relaxed">
-              Your Trusted Platform for Corporate Law, Tax, VAT & Business Compliance Updates in Bangladesh.
+            <p className="text-sm font-medium text-slate-400 leading-relaxed">
+              Your Trusted Platform for Corporate Law, Tax, VAT &amp; Business Compliance Updates in Bangladesh.
             </p>
           </div>
           
-          <div style={{ textAlign: 'left', fontSize: '12px' }}>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Quick Links</h3>
-            <ul className="space-y-4 text-sm font-medium">
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-5">Quick Links</h3>
+            <ul className="space-y-3.5 text-sm font-medium">
               <li><Link to="/team" className="hover:text-emerald-400 transition-colors">Our Professional Team</Link></li>
               <li>
                 <a 
@@ -67,41 +67,30 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <Link to="/Careers" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  Careers · Job Openings
+                <Link to="/Careers" className="hover:text-emerald-300 transition-colors text-emerald-400 font-bold inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                  <span>Careers · Job Openings</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div style={{ textAlign: 'left', lineHeight: '33px', fontSize: '14px', fontStyle: 'normal', fontWeight: 'normal' }}>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Resources</h3>
-            <ul 
-              className="space-y-4 text-sm font-medium"
-              style={{
-                marginLeft: '0px',
-                marginRight: '0px',
-                paddingLeft: '0px',
-                paddingTop: '0px',
-                paddingBottom: '0px',
-                borderRadius: '0px',
-                borderWidth: '0px'
-              }}
-            >
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-5">Resources</h3>
+            <ul className="space-y-3.5 text-sm font-medium">
               <li><Link to="/" className="hover:text-emerald-400 transition-colors">Blog Categories</Link></li>
-              <li><Link to="/resource-library" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Resource Library (PDFs)</Link></li>
-              <li><Link to="/shop" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">Legal & Tax Shop (Digital)</Link></li>
-              <li className="hidden"><Link to="/admin/shop" className="hidden">Catalog Admin & Add Products</Link></li>
-              <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal & Tax Tools</Link></li>
+              <li><Link to="/resource-library" className="hover:text-emerald-300 transition-colors text-emerald-400 font-bold">Resource Library (PDFs)</Link></li>
+              <li><Link to="/shop" className="hover:text-emerald-300 transition-colors text-emerald-400 font-bold">Legal &amp; Tax Shop (Digital)</Link></li>
+              <li className="hidden"><Link to="/admin/shop" className="hidden">Catalog Admin &amp; Add Products</Link></li>
+              <li><Link to="/tools" className="hover:text-emerald-400 transition-colors">Legal &amp; Tax Tools</Link></li>
             </ul>
           </div>
 
-          <div style={{ textAlign: 'left', fontSize: '12px' }}>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Community</h3>
-            <ul className="space-y-4 text-sm font-medium">
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-5">Community</h3>
+            <ul className="space-y-3.5 text-sm font-medium">
               <li>
-                <Link to="/community" className="hover:text-emerald-400 transition-colors text-emerald-400 font-bold">
+                <Link to="/community" className="hover:text-emerald-300 transition-colors text-emerald-400 font-bold">
                   Community Hub &amp; Rankings
                 </Link>
               </li>
@@ -123,37 +112,24 @@ export function Footer() {
             </ul>
           </div>
 
-          <div style={{ textAlign: 'justify' }}>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6">Get in Touch</h3>
-            <p className="text-sm text-slate-500 font-medium mb-4">
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-5">Get in Touch</h3>
+            <p className="text-sm text-slate-400 font-medium mb-5 leading-relaxed">
               Need immediate legal or tax assistance? Connect directly with our experts through our contact desk.
             </p>
             <Link 
               to="/contact" 
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"
-              style={{
-                paddingTop: '12px',
-                paddingBottom: '12px',
-                paddingLeft: '12px',
-                paddingRight: '12px'
-              }}
+              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:shadow-emerald-900/40 transition-all duration-200 shadow-lg group"
             >
-              <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+              <Calendar className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform shrink-0" />
               <span>Contact Our Advisors</span>
-              <ArrowRight className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </Link>
           </div>
         </div>
 
         {/* Verified Ecosystem Media & Social Hubs (ACCOUNTICCA × E-LAWYERS) */}
-        <div 
-          className="border-t border-slate-800/80 mt-12 pt-8 pb-2"
-          style={{
-            marginTop: '120px',
-            paddingTop: '6px',
-            paddingLeft: '0px'
-          }}
-        >
+        <div className="border-t border-slate-800/80 mt-12 pt-8 pb-2">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5 text-center md:text-left">
               <span className="text-xs font-bold text-white tracking-wide">
@@ -273,10 +249,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div 
-          className="border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6"
-          style={{ paddingTop: '30px', marginTop: '0px' }}
-        >
+        <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2.5">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Language:</span>
@@ -286,7 +259,7 @@ export function Footer() {
           <div className="flex flex-wrap justify-center gap-6">
             <span className="text-[11px] uppercase font-bold tracking-widest text-slate-500">© {new Date().getFullYear()} Compliance Hub</span>
             <Link to="/privacy" className="text-[11px] uppercase font-bold tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="text-[11px] uppercase font-bold tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
+            <Link to="/terms" className="text-[11px] uppercase font-bold tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">Terms &amp; Conditions</Link>
           </div>
         </div>
       </div>

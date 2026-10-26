@@ -1,20 +1,24 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) {
-  margin-right: auto;
-  margin-left: auto;
-  max-width: 1200px;
+div#root:nth-of-type(1) > div:nth-of-type(1) {
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) {
-  margin-right: auto;
   margin-left: auto;
-  max-width: 1000px;
+  margin-right: auto;
   width: 100%;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 14px;
 }
+
 

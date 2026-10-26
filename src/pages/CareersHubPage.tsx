@@ -279,21 +279,7 @@ export const CareersHubPage: React.FC = () => {
       </section>
 
       {/* Main Content Body */}
-      <main 
-        className="max-w-6xl mx-auto px-4 -mt-8 sm:-mt-10 space-y-12 relative z-20"
-        style={{
-          height: '2277.5px',
-          marginLeft: '50px',
-          marginRight: '0px',
-          paddingLeft: '10px',
-          paddingRight: '10px',
-          marginTop: '10px',
-          marginBottom: '10px',
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          width: '10612px'
-        }}
-      >
+      <main className="w-full max-w-6xl mx-auto px-4 -mt-8 sm:-mt-10 space-y-12 relative z-20">
 
         {/* Unified Application Navigator Banner - Moved Forward with Elevated Depth */}
         <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-slate-200/90 p-5 md:p-7 relative z-30 transition-all duration-300">
