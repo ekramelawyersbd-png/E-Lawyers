@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockArticles, categories } from '../data/mockData';
 import { format } from 'date-fns';
 import { calculateReadingTime } from '../utils/readingTime';
-import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck, Maximize2, Minimize2 } from 'lucide-react';
+import { Bookmark, Clock, MessageCircle, Share2, ThumbsUp, Printer, Award, Facebook, Twitter, Linkedin, Link as LinkIcon, Search, ChevronRight, User, Calendar, Briefcase, FileText, ExternalLink, Loader2, ImageOff, Check, ShieldCheck, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +19,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { useFocusMode } from '../contexts/FocusModeContext';
 import { FocusModeReaderBar } from '../components/article/FocusModeReaderBar';
+import { QuoteCardGeneratorModal } from '../components/article/QuoteCardGeneratorModal';
 
 import { ComplianceChecklist } from '../components/ComplianceChecklist';
 import { ImageCarousel } from '../components/ImageCarousel';
@@ -102,6 +103,39 @@ export function Article() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [glossaryHighlightsEnabled, setGlossaryHighlightsEnabled] = useState(true);
   const [activeGlossaryModalTerm, setActiveGlossaryModalTerm] = useState<GlossaryTerm | null>(null);
+  const [selectedQuoteText, setSelectedQuoteText] = useState<string | null>(null);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [floatingToolbarPos, setFloatingToolbarPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) {
+        setFloatingToolbarPos(null);
+        return;
+      }
+      const text = selection.toString().trim();
+      if (text.length >= 10 && text.length <= 600) {
+        const range = selection.getRangeAt(0);
+        const contentBody = document.getElementById('article-content-body');
+        if (contentBody && contentBody.contains(range.commonAncestorContainer)) {
+          setSelectedQuoteText(text);
+          const rect = range.getBoundingClientRect();
+          setFloatingToolbarPos({
+            x: Math.max(20, Math.min(window.innerWidth - 220, rect.left + rect.width / 2 - 90)),
+            y: rect.top - 55 + window.scrollY
+          });
+          return;
+        }
+      }
+      setFloatingToolbarPos(null);
+    };
+
+    document.addEventListener('mouseup', handleSelectionChange);
+    return () => {
+      document.removeEventListener('mouseup', handleSelectionChange);
+    };
+  }, []);
   const [bookmarkedGlossaryIds, setBookmarkedGlossaryIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('compliance_hub_glossary_bookmarks');
@@ -1274,6 +1308,38 @@ export function Article() {
           if (found) setActiveGlossaryModalTerm(found);
         }}
       />
+
+      {/* Quote Card Generator Modal */}
+      {isQuoteModalOpen && selectedQuoteText && (
+        <QuoteCardGeneratorModal
+          isOpen={isQuoteModalOpen}
+          onClose={() => setIsQuoteModalOpen(false)}
+          initialQuote={selectedQuoteText}
+          articleTitle={article.title}
+          articleAuthor={article.author.name}
+          articleUrl={window.location.href}
+        />
+      )}
+
+      {/* Floating Selection Toolbar Button */}
+      {floatingToolbarPos && !isQuoteModalOpen && (
+        <div
+          style={{ top: `${floatingToolbarPos.y}px`, left: `${floatingToolbarPos.x}px` }}
+          className="absolute z-40 animate-in fade-in zoom-in-95 duration-150"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setIsQuoteModalOpen(true);
+              setFloatingToolbarPos(null);
+            }}
+            className="flex items-center gap-2 bg-slate-900 dark:bg-emerald-600 text-white px-3.5 py-2 rounded-xl shadow-xl hover:bg-slate-800 dark:hover:bg-emerald-500 font-bold text-xs cursor-pointer border border-white/20 transition-transform hover:scale-105"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400 dark:text-white" />
+            <span>Create Share Quote</span>
+          </button>
+        </div>
+      )}
     </>
   );
 }
