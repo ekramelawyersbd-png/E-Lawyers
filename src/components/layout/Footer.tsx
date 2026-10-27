@@ -10,12 +10,16 @@ import {
 } from 'lucide-react';
 import { LanguageToggle } from '../LanguageToggle';
 import { buildAppointmentUrl } from '../../utils/appointmentRedirect';
+import { FooterNewsletter } from './FooterNewsletter';
 
 export function Footer() {
   return (
     <footer className="w-full bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Business Compliance Newsletter Subscription Form */}
+        <FooterNewsletter />
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 items-start text-left">
           <div className="col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-5 group">

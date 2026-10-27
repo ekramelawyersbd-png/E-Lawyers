@@ -14,6 +14,7 @@ import {
   generateAppointmentReminderEmailHtml, 
   AppointmentEmailPayload 
 } from './emailTemplates';
+import { google } from 'googleapis';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -51,6 +52,214 @@ function getEmailTransporter() {
     }
   });
 }
+
+/**
+ * Cloud Function: onNewAppointmentBookingCreated
+ * Listens for new appointment bookings in Firestore 'appointments' collection.
+ * 1. Uses Google Calendar API to automatically create a calendar event.
+ * 2. Sends confirmation emails to BOTH client and centralized firm desk at ekram@elawyersbd.com.
+ * 3. Updates the Firestore document with event references and delivery confirmation.
+ */
+export const onNewAppointmentBookingCreated = functions.firestore
+  .document('appointments/{appointmentId}')
+  .onCreate(async (snap, context) => {
+    const appointmentId = context.params.appointmentId;
+    const data = snap.data();
+
+    if (!data) {
+      console.log(`[onNewAppointmentBookingCreated] No data found for appointment ${appointmentId}`);
+      return null;
+    }
+
+    const recipientEmail = (data.email || data.userEmail || data.clientEmail || '').trim();
+    if (!recipientEmail || !recipientEmail.includes('@')) {
+      console.warn(`[onNewAppointmentBookingCreated] No valid client email for appointment ${appointmentId}`);
+      return null;
+    }
+
+    const CENTRAL_FIRM_DESK = 'ekram@elawyersbd.com';
+    const partnerEmail = (data.assignedPartner?.email || data.leadPartnerEmail || '').trim();
+    const providerCopies = Array.from(new Set([CENTRAL_FIRM_DESK, partnerEmail].filter(e => Boolean(e) && e.includes('@'))));
+
+    console.log(`[onNewAppointmentBookingCreated] Processing new appointment ${appointmentId} (${data.referenceId}) for ${recipientEmail}`);
+
+    // --- 1. Create Google Calendar Event via Google Calendar API ---
+    let calendarEventId: string | undefined = undefined;
+    let calendarEventLink: string | undefined = undefined;
+
+    // Parse appointment time in BST (UTC+6)
+    const dateStr = data.date || new Date().toISOString().split('T')[0];
+    const timeSlotStr = data.timeSlot || '10:00 AM - 10:45 AM BST';
+    const parts = dateStr.split('-').map(Number);
+    const [year, month, day] = parts.length >= 3 ? parts : [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()];
+
+    let startHour = 10;
+    let startMin = 0;
+    const match = (timeSlotStr || '').match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (match) {
+      startHour = parseInt(match[1], 10);
+      startMin = parseInt(match[2], 10);
+      const meridian = match[3] ? match[3].toUpperCase() : '';
+      if (meridian === 'PM' && startHour < 12) startHour += 12;
+      if (meridian === 'AM' && startHour === 12) startHour = 0;
+    }
+
+    // Bangladesh Standard Time is UTC+6
+    const startDateTime = new Date(Date.UTC(year, month - 1, day, startHour - 6, startMin));
+    const endDateTime = new Date(startDateTime.getTime() + 45 * 60 * 1000);
+
+    const isVirtual = (data.mode || '').toLowerCase().includes('virtual');
+    const location = isVirtual
+      ? 'Virtual Consultation (Google Workspace Scheduled)'
+      : 'Suite G-5, BTI Centara Grand, 144 Green Road, Panthapath, Dhaka-1205';
+
+    const eventSummary = `[Legal Consultation] ${data.practiceArea || 'Legal & Tax Consultation'} - ${data.clientName || 'Valued Client'}`;
+    const eventDescription = [
+      `Docket Reference: ${data.referenceId || appointmentId}`,
+      `Client: ${data.clientName || 'Valued Client'} (${data.companyName || 'Direct Individual Client'})`,
+      `Client Contact: ${recipientEmail} | ${data.phone || 'N/A'}`,
+      `Practice Area: ${data.practiceArea || 'Statutory Corporate & Legal Advisory'}`,
+      `Specialized Focus: ${data.expertiseArea || 'Advisory Consultation'}`,
+      `Assigned Counsel: ${data.assignedPartner?.name || 'Chamber Lead'} (${data.assignedPartner?.chamber || 'ELA Chambers'})`,
+      `Consultation Mode: ${isVirtual ? 'Virtual Consultation (Workspace Scheduled)' : 'In-Person Chamber Suite'}`,
+      `Matter Notes: ${data.notes || 'General Advisory Consultation'}`,
+      `\nService Provider Contacts:`,
+      `Central Firm Desk: ${CENTRAL_FIRM_DESK}`,
+      `Lead Partner Desk: ${data.assignedPartner?.desk || 'Advisory Lead'}`
+    ].join('\n');
+
+    try {
+      let authClient: any;
+      if (data.workspaceAccessToken) {
+        const oauth2 = new google.auth.OAuth2();
+        oauth2.setCredentials({ access_token: data.workspaceAccessToken });
+        authClient = oauth2;
+      } else {
+        const auth = new google.auth.GoogleAuth({
+          scopes: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
+        });
+        authClient = auth;
+      }
+
+      const calendar = google.calendar({ version: 'v3', auth: authClient });
+      const eventResponse = await calendar.events.insert({
+        calendarId: 'primary',
+        requestBody: {
+          summary: eventSummary,
+          description: eventDescription,
+          location,
+          start: {
+            dateTime: startDateTime.toISOString(),
+            timeZone: 'Asia/Dhaka'
+          },
+          end: {
+            dateTime: endDateTime.toISOString(),
+            timeZone: 'Asia/Dhaka'
+          },
+          attendees: [
+            { email: recipientEmail, displayName: data.clientName || 'Client' },
+            { email: CENTRAL_FIRM_DESK, displayName: 'ELA Central Firm Desk' }
+          ]
+        }
+      });
+
+      if (eventResponse.data) {
+        calendarEventId = eventResponse.data.id || undefined;
+        calendarEventLink = eventResponse.data.htmlLink || undefined;
+        console.log(`[onNewAppointmentBookingCreated] Google Calendar event created: ${calendarEventId}`);
+      }
+    } catch (calErr: any) {
+      console.warn(`[onNewAppointmentBookingCreated] Calendar sync notice for ${appointmentId}:`, calErr?.message || calErr);
+    }
+
+    // --- 2. Send Confirmation Emails to Client and Centralized Firm Desk (ekram@elawyersbd.com) ---
+    const payload: AppointmentEmailPayload = {
+      referenceId: data.referenceId || `APT-${appointmentId.substring(0, 8).toUpperCase()}`,
+      clientName: data.clientName || 'Valued Client',
+      email: recipientEmail,
+      phone: data.phone,
+      companyName: data.companyName,
+      practiceArea: data.practiceArea || 'Statutory Corporate & Legal Advisory',
+      mode: data.mode || 'virtual',
+      date: dateStr,
+      timeSlot: timeSlotStr,
+      status: 'Confirmed',
+      meetingLink: data.meetingLink || calendarEventLink,
+      assignedLead: data.assignedPartner?.name || 'Adv. Ekram Hossain'
+    };
+
+    const { subject, html, text } = generateAppointmentEmailHtml(payload);
+    const transporter = getEmailTransporter();
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL || '"ELA & Associates Legal Chambers" <appointments@accounticca.com>',
+      to: recipientEmail,
+      cc: providerCopies,
+      replyTo: CENTRAL_FIRM_DESK,
+      subject,
+      html,
+      text
+    };
+
+    let messageId = `cf-notif-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      messageId = info.messageId || messageId;
+      console.log(`[onNewAppointmentBookingCreated] Confirmation email dispatched: ${messageId} to ${recipientEmail} & CC ${providerCopies.join(', ')}`);
+    } catch (mailErr) {
+      console.warn(`[onNewAppointmentBookingCreated] Mailer dispatch warning for ${appointmentId}:`, mailErr);
+    }
+
+    // --- 3. Log Notification Event and Update Firestore Appointment ---
+    try {
+      await db.collection('emailNotifications').add({
+        appointmentId,
+        referenceId: payload.referenceId,
+        recipientEmail,
+        ccEmails: providerCopies,
+        clientName: payload.clientName,
+        status: 'Confirmed',
+        subject,
+        messageId,
+        calendarEventId: calendarEventId || null,
+        calendarEventLink: calendarEventLink || null,
+        triggeredBy: 'onNewAppointmentBookingCreated',
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        delivered: true
+      });
+
+      const updates: Record<string, any> = {
+        confirmationEmailSent: true,
+        confirmationEmailSentAt: admin.firestore.FieldValue.serverTimestamp(),
+        confirmationRecipients: [recipientEmail, ...providerRecipients],
+        confirmationMessageId: messageId,
+        calendarSynced: Boolean(calendarEventId || data.calendarSynced),
+        calendarSyncedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (calendarEventId && !data.calendarEventId) {
+        updates.calendarEventId = calendarEventId;
+      }
+      if (calendarEventLink && !data.calendarEventLink) {
+        updates.calendarEventLink = calendarEventLink;
+      }
+
+      await snap.ref.update(updates);
+      console.log(`[onNewAppointmentBookingCreated] Firestore appointment ${appointmentId} updated successfully.`);
+    } catch (updateErr) {
+      console.warn(`[onNewAppointmentBookingCreated] Firestore update notice:`, updateErr);
+    }
+
+    return {
+      success: true,
+      appointmentId,
+      referenceId: payload.referenceId,
+      calendarEventId,
+      messageId,
+      clientEmail: recipientEmail,
+      firmDeskEmail: CENTRAL_FIRM_DESK
+    };
+  });
 
 /**
  * Cloud Function: Triggered whenever an appointment document is updated in Firestore

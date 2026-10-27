@@ -140,6 +140,12 @@
         "status": "string",
         "userId": "string",
         "userEmail": "string",
+        "calendarEventId": "string",
+        "calendarSynced": "boolean",
+        "reminder3hSent": "boolean",
+        "reminder3hSentAt": "string",
+        "cancellationReason": "string",
+        "cancelledAt": "string",
         "createdAt": "timestamp",
         "updatedAt": "timestamp",
         "rating": "map"

@@ -14,6 +14,9 @@ export interface AppointmentEmailPayload {
   updatedAt?: string;
   meetingLink?: string;
   assignedLead?: string;
+  leadPartnerEmail?: string;
+  assignedPartnerEmail?: string;
+  hoursRemaining?: number;
 }
 
 export function generateAppointmentEmailHtml(data: AppointmentEmailPayload): { subject: string; html: string; text: string } {
@@ -214,36 +217,50 @@ Chamber Address: Suite 704, Concord Tower, 113 Kazi Nazrul Islam Avenue, Dhaka-1
 }
 
 /**
- * Generate 24-hour reminder email for upcoming consultations
+ * Generate 3-hour or 24-hour reminder email for upcoming consultations
  */
-export function generateAppointmentReminderEmailHtml(data: AppointmentEmailPayload): { subject: string; html: string; text: string } {
-  const isVirtual = data.mode.toLowerCase().includes('virtual');
+export function generateAppointmentReminderEmailHtml(data: AppointmentEmailPayload, hoursAhead: number = 3): { subject: string; html: string; text: string } {
+  const isVirtual = (data.mode || '').toLowerCase().includes('virtual');
+  const hours = data.hoursRemaining || hoursAhead || 3;
+  const isThreeHours = hours <= 3;
+
   const meetingUrl = data.meetingLink || (isVirtual 
     ? `https://meet.google.com/ela-${data.referenceId.toLowerCase().replace(/[^a-z0-9]/g, '')}` 
     : '');
 
-  const subject = `[REMINDER] Upcoming Consultation Within 24 Hours #${data.referenceId} - ELA & Associates Legal Chambers`;
+  const subject = isThreeHours
+    ? `[3-HOUR REMINDER] Upcoming Legal Consultation Docket #${data.referenceId} - ELA & Associates Legal Chambers`
+    : `[REMINDER] Upcoming Consultation Within 24 Hours #${data.referenceId} - ELA & Associates Legal Chambers`;
 
   const text = `
 ELA & ASSOCIATES | ADVOCATES & TAX CONSULTANTS
-AUTOMATED 24-HOUR CONSULTATION REMINDER
+AUTOMATED ${isThreeHours ? '3-HOUR' : '24-HOUR'} CONSULTATION REMINDER
 
 Reference Docket: ${data.referenceId}
 Client Name: ${data.clientName}
 Practice Area: ${data.practiceArea}
 Date: ${data.date}
 Time Slot: ${data.timeSlot}
-Mode: ${isVirtual ? 'Virtual (Google Meet)' : 'In-Person Chamber Consultation'}
+Mode: ${isVirtual ? 'Virtual Consultation (Google Workspace Scheduled)' : 'In-Person Chamber Consultation'}
 ${data.companyName ? `Company: ${data.companyName}\n` : ''}
 ${isVirtual && meetingUrl ? `Meeting Room Link: ${meetingUrl}\n` : ''}
 
 Pre-Session Guidance:
-- Virtual: Please join 5 minutes prior to the session with a stable internet connection.
+- Notification: Both client and assigned legal counsel (lead partner & ekram@elawyersbd.com) have received this 3-hour advance reminder.
 - In-Person: Arrive at Suite G-5, BTI Centara Grand, 144 Green Road, Panthapath, Dhaka-1205.
+- Virtual: Ensure documents, statutory files, and query notes are accessible.
 
 Direct Hotline: +880 1335-230170 | +880 1712-345678
-Official Support: appointments@accounticca.com
+Official Support: ekram@elawyersbd.com | appointments@accounticca.com
   `.trim();
+
+  const badgeText = isThreeHours ? '⏰ UPCOMING IN 3 HOURS' : '⏰ UPCOMING IN 24 HOURS';
+  const headline = isThreeHours 
+    ? 'Consultation Reminder: Scheduled in 3 Hours' 
+    : 'Consultation Reminder: Scheduled for Tomorrow';
+  const subtext = isThreeHours
+    ? `Dear ${escapeHtml(data.clientName)}, this is an automated reminder that your scheduled advisory consultation for <strong>${escapeHtml(data.practiceArea)}</strong> will commence in approximately 3 hours (${escapeHtml(data.timeSlot)}). Both you and your assigned legal counsel have been alerted in advance.`
+    : `Dear ${escapeHtml(data.clientName)}, this is an automated courtesy reminder that your advisory consultation for <strong>${escapeHtml(data.practiceArea)}</strong> is scheduled to commence within the next 24 hours.`;
 
   const html = `
 <!DOCTYPE html>
@@ -260,15 +277,15 @@ Official Support: appointments@accounticca.com
     .brand-title { font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.01em; }
     .brand-subtitle { font-size: 12px; color: #94a3b8; margin: 4px 0 0 0; }
     .content { padding: 36px; }
-    .reminder-badge { display: inline-block; padding: 8px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; margin-bottom: 20px; }
+    .reminder-badge { display: inline-block; padding: 8px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background-color: ${isThreeHours ? '#fff7ed' : '#eff6ff'}; color: ${isThreeHours ? '#c2410c' : '#1d4ed8'}; border: 1px solid ${isThreeHours ? '#fed7aa' : '#bfdbfe'}; margin-bottom: 20px; }
     .headline { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; line-height: 1.3; }
     .subtext { font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 28px 0; }
     .docket-card { background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 28px; }
     .docket-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 16px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; }
-    .action-box { background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin-bottom: 28px; }
-    .action-title { font-size: 14px; font-weight: 700; color: #1e40af; margin: 0 0 8px 0; }
-    .action-desc { font-size: 13px; color: #1d4ed8; line-height: 1.5; margin: 0; }
-    .btn { display: inline-block; background-color: #1d4ed8; color: #ffffff !important; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 14px; text-align: center; }
+    .action-box { background-color: ${isThreeHours ? '#fff7ed' : '#eff6ff'}; border: 1px solid ${isThreeHours ? '#fed7aa' : '#bfdbfe'}; border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+    .action-title { font-size: 14px; font-weight: 700; color: ${isThreeHours ? '#9a3412' : '#1e40af'}; margin: 0 0 8px 0; }
+    .action-desc { font-size: 13px; color: ${isThreeHours ? '#c2410c' : '#1d4ed8'}; line-height: 1.5; margin: 0; }
+    .btn { display: inline-block; background-color: ${isThreeHours ? '#c2410c' : '#1d4ed8'}; color: #ffffff !important; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 14px; text-align: center; }
     .checklist { background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 20px; margin-bottom: 28px; }
     .footer { background-color: #f8fafc; padding: 24px 36px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; line-height: 1.6; text-align: center; }
     .footer-divider { margin: 16px 0; border: 0; border-top: 1px solid #e2e8f0; }
@@ -286,14 +303,14 @@ Official Support: appointments@accounticca.com
 
     <!-- Content -->
     <div class="content">
-      <div class="reminder-badge">⏰ UPCOMING IN 24 HOURS</div>
+      <div class="reminder-badge">${badgeText}</div>
 
       <h1 class="headline">
-        Consultation Reminder: Scheduled for Tomorrow
+        ${headline}
       </h1>
 
       <p class="subtext">
-        Dear ${escapeHtml(data.clientName)}, this is an automated courtesy reminder that your advisory consultation for <strong>${escapeHtml(data.practiceArea)}</strong> is scheduled to commence within the next 24 hours.
+        ${subtext}
       </p>
 
       <!-- Docket Card -->
@@ -314,11 +331,11 @@ Official Support: appointments@accounticca.com
           </tr>
           <tr>
             <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Time Slot (BST):</td>
-            <td style="padding: 6px 0; font-weight: 700; color: #1d4ed8; text-align: right;">${escapeHtml(data.timeSlot)}</td>
+            <td style="padding: 6px 0; font-weight: 700; color: ${isThreeHours ? '#c2410c' : '#1d4ed8'}; text-align: right;">${escapeHtml(data.timeSlot)}</td>
           </tr>
           <tr>
             <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Format / Mode:</td>
-            <td style="padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;">${isVirtual ? 'Virtual (Google Meet)' : 'In-Person Chamber Suite'}</td>
+            <td style="padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;">${isVirtual ? 'Virtual Consultation (Google Workspace)' : 'In-Person Chamber Suite'}</td>
           </tr>
         </table>
       </div>
@@ -326,13 +343,15 @@ Official Support: appointments@accounticca.com
       <!-- Action Box -->
       ${isVirtual ? `
       <div class="action-box">
-        <h3 class="action-title">🎥 Video Conference Preparation</h3>
+        <h3 class="action-title">📱 Virtual Session Details</h3>
         <p class="action-desc">
-          Your secure video session room is prepared. Please enter the room 5 minutes prior to the start time with your documents and questions ready.
+          Your appointment has been synchronized with the Google Workspace calendar. Please ensure your device is charged and ready 5 minutes prior to the start time.
         </p>
+        ${meetingUrl ? `
         <div style="margin-top: 14px;">
-          <a href="${meetingUrl}" target="_blank" class="btn">Access Google Meet Room</a>
+          <a href="${meetingUrl}" target="_blank" class="btn">Access Meeting Space</a>
         </div>
+        ` : ''}
       </div>
       ` : `
       <div class="action-box">
@@ -347,16 +366,21 @@ Official Support: appointments@accounticca.com
       <div class="checklist">
         <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px;">Pre-Consultation Checklist:</div>
         <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #78350f; line-height: 1.6;">
-          <li>Prepare relevant corporate or tax notices, assessments, or contracts.</li>
-          <li>Have your list of statutory questions or litigation objectives ready.</li>
-          <li>For rescheduling inquiries, notify the chamber at least 4 hours in advance.</li>
+          <li>Keep relevant tax returns, audit letters, corporate contracts, or litigation files at hand.</li>
+          <li>Prepare specific statutory questions or desired legal outcome scoping.</li>
+          <li>Urgent inquiries or schedule adjustments: Contact centralized desk at <strong>ekram@elawyersbd.com</strong>.</li>
         </ul>
+      </div>
+
+      <!-- Notification distribution note -->
+      <div style="font-size: 12px; color: #64748b; line-height: 1.5; border-left: 3px solid #cbd5e1; padding-left: 14px; margin-bottom: 20px;">
+        <strong>Notice Distribution:</strong> Transmitted simultaneously to the client and legal service providers (Assigned Lead Partner &amp; Central Firm Desk: ekram@elawyersbd.com).
       </div>
 
       <!-- Help info -->
       <div style="font-size: 13px; color: #64748b; line-height: 1.5; border-left: 3px solid #cbd5e1; padding-left: 14px;">
         <strong>Chamber Helpline:</strong> +880 1335-230170 | +880 1712-345678<br>
-        <strong>Email:</strong> appointments@accounticca.com
+        <strong>Email:</strong> ekram@elawyersbd.com | appointments@accounticca.com
       </div>
     </div>
 
@@ -366,7 +390,7 @@ Official Support: appointments@accounticca.com
       <div style="margin-top: 4px;">Suite G-5, BTI Centara Grand, 144 Green Road, Panthapath, Dhaka-1205</div>
       <div class="footer-divider"></div>
       <div class="footer-legal">
-        This automated 24-hour appointment reminder was generated by the Accounticca Scheduled Firebase Cloud Functions Suite.
+        This automated ${isThreeHours ? '3-hour' : '24-hour'} appointment reminder was generated by the ELA &amp; Associates Chamber Automation Suite (Central Desk: ekram@elawyersbd.com).
       </div>
     </div>
   </div>

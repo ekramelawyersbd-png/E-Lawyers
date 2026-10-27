@@ -33,6 +33,7 @@ import { db } from '../lib/firebase';
 import { getAccessToken } from '../services/workspaceAuth';
 import { getStoredContactSheetId } from '../services/contactSheetsSync';
 import { AppointmentBookingForm } from '../components/AppointmentBookingForm';
+import { ClientBookingDashboard } from '../components/ClientBookingDashboard';
 import { FloatingLiveChat } from '../components/FloatingLiveChat';
 import { OfficeLocationMap } from '../components/OfficeLocationMap';
 import { FormSuccessAnimation } from '../components/FormSuccessAnimation';
@@ -1935,7 +1936,15 @@ export function Contact() {
         </div>
       </section>
 
-      {/* 5. Pre-Consultation FAQ Section */}
+      {/* 5. Client Booking Dashboard Section */}
+      <section
+        id="client-booking-dashboard-section"
+        className="mx-auto max-w-7xl scroll-mt-6 px-4 py-6 sm:px-6 lg:px-8"
+      >
+        <ClientBookingDashboard onScheduleNew={() => scrollToForm('appointment')} />
+      </section>
+
+      {/* 6. Pre-Consultation FAQ Section */}
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-9 shadow-xs">
           <div className="max-w-2xl mb-6">

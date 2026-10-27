@@ -404,6 +404,9 @@ export function NewsletterSignup({
                 autoComplete="email"
                 type="email"
                 required
+                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+                title="Please enter a valid email address (e.g. advocate@firm.com)"
+                maxLength={150}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="advocate@firm.com"

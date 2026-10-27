@@ -54,6 +54,7 @@ import { DocumentViewerModal } from './DocumentViewerModal';
 import { UploadDocumentModal } from './UploadDocumentModal';
 import { PaymentHistory } from './PaymentHistory';
 import { SharedClientCalendar } from './SharedClientCalendar';
+import { ClientBookingDashboard } from '../ClientBookingDashboard';
 
 export const ClientPortal: React.FC = () => {
   const { user, authUser, signInWithGoogle, logout } = useAuth();
@@ -814,14 +815,20 @@ export const ClientPortal: React.FC = () => {
 
       {/* TAB 2: ONGOING CONSULTATIONS */}
       {activePortalTab === 'consultations' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="space-y-6 animate-in fade-in duration-150">
+          <ClientBookingDashboard
+            title="Scheduled Consultations & Booking Manager"
+            subtitle="View upcoming appointments, track real-time /workspace calendar sync and 3-hour advance reminders, or cancel bookings if necessary."
+          />
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                Ongoing &amp; Scheduled Consultations
+                Consultation Case Files &amp; Deliverables
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Track chamber partner assignments, live video links, and case milestones
+                Track chamber partner assignments, live video links, and associated document deliverables
               </p>
             </div>
 
@@ -1060,6 +1067,7 @@ export const ClientPortal: React.FC = () => {
               <p>No consultations matching your current filter.</p>
             </div>
           )}
+          </div>
         </div>
       )}
 

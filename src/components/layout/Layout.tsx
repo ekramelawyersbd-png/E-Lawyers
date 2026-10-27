@@ -7,8 +7,12 @@ import { CartDrawer } from '../shop/CartDrawer';
 import { GlobalSearchOverlay } from '../search/GlobalSearchOverlay';
 import { useFocusMode } from '../../contexts/FocusModeContext';
 import { BreadcrumbProvider, Breadcrumb } from '../Breadcrumb';
+import { useAppointmentReminderScanner } from '../../hooks/useAppointmentReminderScanner';
 
 export function Layout() {
+  // Dual-engine client scanner: runs in the background of active sessions to dispatch pending 3h reminders
+  useAppointmentReminderScanner();
+
   const { isFocusMode, readerTheme } = useFocusMode();
   const location = useLocation();
   const isHomePage = location.pathname === '/';

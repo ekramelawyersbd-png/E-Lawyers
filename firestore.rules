@@ -95,8 +95,13 @@ service cloud.firestore {
                     && request.resource.data.email is string
                     && request.resource.data.practiceArea is string
                     && request.resource.data.date is string;
-      // Allow read and manage if authenticated client/staff or matches email
-      allow read, update, delete: if isAuthenticated();
+      // Allow reading by reference ID / email lookup or authenticated client
+      allow read: if true;
+      // Allow updating status, calendar sync, reminder flag, or cancellation reason
+      allow update: if isAuthenticated()
+                    || (request.resource.data.email == resource.data.email
+                        && request.resource.data.referenceId == resource.data.referenceId);
+      allow delete: if isAuthenticated();
     }
 
     // Automated Email Notifications Collection

@@ -35,6 +35,7 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
+import { GoogleApiActivationNotice } from '../components/workspace/GoogleApiActivationNotice';
 import { 
   getStoredRecruitmentSheetId,
   setStoredRecruitmentSheetId,
@@ -886,8 +887,16 @@ export const WorkspaceHub: React.FC = () => {
           </div>
         </div>
 
-        {/* Feedback alert */}
-        {feedback && (
+        {/* Feedback alert & API Activation Guidance */}
+        {feedback && feedback.type === 'error' && (feedback.message.includes('has not been used in project') || feedback.message.includes('is disabled') || feedback.message.includes('Enable it by visiting') || feedback.message.includes('drive.googleapis.com')) ? (
+          <GoogleApiActivationNotice
+            apiName={activeTab === 'drive' ? 'Google Drive API' : activeTab === 'sheets' ? 'Google Sheets API' : `${activeTab.toUpperCase()} API`}
+            projectId="56739184994"
+            errorMessage={feedback.message}
+            onRetry={() => loadTabData(activeTab)}
+            isLoading={loading}
+          />
+        ) : feedback && (
           <div className={`p-4 rounded-2xl border text-sm flex items-center justify-between ${
             feedback.type === 'success' 
               ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
@@ -1020,7 +1029,17 @@ export const WorkspaceHub: React.FC = () => {
                 <div className="space-y-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Your Drive Files</h4>
                   {driveFiles.length === 0 ? (
-                    <p className="text-xs text-slate-500 py-6 text-center">No files found or loading...</p>
+                    feedback && feedback.type === 'error' && (feedback.message.includes('has not been used in project') || feedback.message.includes('is disabled') || feedback.message.includes('drive.googleapis.com')) ? (
+                      <GoogleApiActivationNotice
+                        apiName="Google Drive API"
+                        projectId="56739184994"
+                        errorMessage={feedback.message}
+                        onRetry={() => loadTabData('drive')}
+                        isLoading={loading}
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-500 py-6 text-center">No files found or loading...</p>
+                    )
                   ) : (
                     <div className="divide-y divide-slate-100 border border-slate-100 rounded-2xl overflow-hidden">
                       {driveFiles.map((f) => (

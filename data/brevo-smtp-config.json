@@ -1,0 +1,9 @@
+{
+  "host": "smtp-relay.brevo.com",
+  "port": 587,
+  "user": "9dabe5001@smtp-brevo.com",
+  "key": "",
+  "senderName": "ACCOUNTICCA x E-Lawyers",
+  "senderEmail": "ekram@elawyersbd.com",
+  "updatedAt": "2026-10-27T21:44:00.000Z"
+}

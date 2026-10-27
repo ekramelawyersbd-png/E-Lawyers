@@ -1,5 +1,89 @@
 [
   {
+    "id": "notif-test-1793139106408-b16313",
+    "messageId": "<b7297352-e85d-97df-0ab4-8245eb43c2ee@elawyersbd.com>",
+    "referenceId": "BREVO-TEST-MVR8Q4OE",
+    "clientName": "Brevo Relay Diagnostic",
+    "recipientEmail": "ekram@elawyersbd.com",
+    "ccEmails": [
+      "ekram@elawyersbd.com"
+    ],
+    "practiceArea": "Brevo SMTP Relay Verification",
+    "mode": "virtual",
+    "date": "2026-10-27",
+    "timeSlot": "10:11 PM",
+    "status": "Confirmed",
+    "subject": "[BREVO-TEST-MVR8Q4OE] Brevo SMTP Relay Verification — ACCOUNTICCA x E-Lawyers",
+    "html": "\n        <div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;\">\n          <div style=\"background: #0f172a; color: #ffffff; padding: 24px 28px;\">\n            <div style=\"font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #34d399; font-weight: 700;\">Brevo SMTP Relay Verification</div>\n            <h2 style=\"margin: 6px 0 0; font-size: 20px;\">Outbound Mail Relay Active</h2>\n          </div>\n          <div style=\"padding: 24px 28px; color: #1e293b; font-size: 14px; line-height: 1.6;\">\n            <p>This is an automated diagnostic dispatch from <strong>ACCOUNTICCA x E-Lawyers</strong> verifying transactional email routing through <strong>Brevo SMTP Relay</strong>.</p>\n            <div style=\"background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin: 16px 0; font-family: monospace; font-size: 12px;\">\n              <div><strong>Relay Host:</strong> smtp-relay.brevo.com:587 (STARTTLS)</div>\n              <div><strong>SMTP Login:</strong> 9dabe5001@smtp-brevo.com</div>\n              <div><strong>Verified From:</strong> \"ACCOUNTICCA x E-Lawyers\" &lt;ekram@elawyersbd.com&gt;</div>\n              <div><strong>Recipient:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Central Firm Copy:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Reference ID:</strong> BREVO-TEST-MVR8Q4OE</div>\n            </div>\n          </div>\n        </div>\n      ",
+    "text": "Brevo SMTP Relay Verification (BREVO-TEST-MVR8Q4OE) from \"ACCOUNTICCA x E-Lawyers\" <ekram@elawyersbd.com> (Login: 9dabe5001@smtp-brevo.com) via smtp-relay.brevo.com:587 to ekram@elawyersbd.com.",
+    "sentAt": "2026-10-27T22:11:46.429Z",
+    "delivered": true,
+    "transport": "Brevo SMTP Relay (smtp-relay.brevo.com:587)"
+  },
+  {
+    "id": "notif-test-1793138761278-5e2e6d",
+    "messageId": "<3a9ef4f3-43fa-be85-f9f1-8cfa5c6c7e03@elawyersbd.com>",
+    "referenceId": "BREVO-TEST-MVR8IM2B",
+    "clientName": "Brevo Relay Diagnostic",
+    "recipientEmail": "ekram@elawyersbd.com",
+    "ccEmails": [
+      "ekram@elawyersbd.com"
+    ],
+    "practiceArea": "Brevo SMTP Relay Verification",
+    "mode": "virtual",
+    "date": "2026-10-27",
+    "timeSlot": "10:06 PM",
+    "status": "Confirmed",
+    "subject": "[BREVO-TEST-MVR8IM2B] Brevo SMTP Relay Verification — ACCOUNTICCA x E-Lawyers",
+    "html": "\n        <div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;\">\n          <div style=\"background: #0f172a; color: #ffffff; padding: 24px 28px;\">\n            <div style=\"font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #34d399; font-weight: 700;\">Brevo SMTP Relay Verification</div>\n            <h2 style=\"margin: 6px 0 0; font-size: 20px;\">Outbound Mail Relay Active</h2>\n          </div>\n          <div style=\"padding: 24px 28px; color: #1e293b; font-size: 14px; line-height: 1.6;\">\n            <p>This is an automated diagnostic dispatch from <strong>ACCOUNTICCA x E-Lawyers</strong> verifying transactional email routing through <strong>Brevo SMTP Relay</strong>.</p>\n            <div style=\"background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin: 16px 0; font-family: monospace; font-size: 12px;\">\n              <div><strong>Relay Host:</strong> smtp-relay.brevo.com:587 (STARTTLS)</div>\n              <div><strong>SMTP Login:</strong> 9dabe5001@smtp-brevo.com</div>\n              <div><strong>Verified From:</strong> \"ACCOUNTICCA x E-Lawyers\" &lt;ekram@elawyersbd.com&gt;</div>\n              <div><strong>Recipient:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Central Firm Copy:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Reference ID:</strong> BREVO-TEST-MVR8IM2B</div>\n            </div>\n          </div>\n        </div>\n      ",
+    "text": "Brevo SMTP Relay Verification (BREVO-TEST-MVR8IM2B) from \"ACCOUNTICCA x E-Lawyers\" <ekram@elawyersbd.com> (Login: 9dabe5001@smtp-brevo.com) via smtp-relay.brevo.com:587 to ekram@elawyersbd.com.",
+    "sentAt": "2026-10-27T22:06:01.297Z",
+    "delivered": true,
+    "transport": "Brevo SMTP Relay Ready (smtp-relay.brevo.com:587 • Preview Relay Active)"
+  },
+  {
+    "id": "notif-test-1793138565059-eda484",
+    "messageId": "<7338deb4-b96e-358a-d599-2a7230079919@accounticca.com>",
+    "referenceId": "BREVO-TEST-MVR8EEZ0",
+    "clientName": "Brevo Relay Diagnostic",
+    "recipientEmail": "ekram@elawyersbd.com",
+    "ccEmails": [
+      "ekram@elawyersbd.com"
+    ],
+    "practiceArea": "Brevo SMTP Relay Verification",
+    "mode": "virtual",
+    "date": "2026-10-27",
+    "timeSlot": "10:02 PM",
+    "status": "Confirmed",
+    "subject": "[BREVO-TEST-MVR8EEZ0] Brevo SMTP Relay Verification — ACCOUNTICCA x E-Lawyers",
+    "html": "\n        <div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;\">\n          <div style=\"background: #0f172a; color: #ffffff; padding: 24px 28px;\">\n            <div style=\"font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #34d399; font-weight: 700;\">Brevo SMTP Relay Verification</div>\n            <h2 style=\"margin: 6px 0 0; font-size: 20px;\">Outbound Mail Relay Active</h2>\n          </div>\n          <div style=\"padding: 24px 28px; color: #1e293b; font-size: 14px; line-height: 1.6;\">\n            <p>This is an automated diagnostic dispatch from <strong>ACCOUNTICCA x E-Lawyers</strong> verifying transactional email routing through <strong>Brevo SMTP Relay</strong>.</p>\n            <div style=\"background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin: 16px 0; font-family: monospace; font-size: 12px;\">\n              <div><strong>Relay Host:</strong> smtp-relay.brevo.com:587 (STARTTLS)</div>\n              <div><strong>SMTP Login:</strong> 9dabe5001@smtp-brevo.com</div>\n              <div><strong>Verified From:</strong> \"Accounticca Advisory Limited\" &lt;info@accounticca.com&gt;</div>\n              <div><strong>Recipient:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Central Firm Copy:</strong> ekram@elawyersbd.com</div>\n              <div><strong>Reference ID:</strong> BREVO-TEST-MVR8EEZ0</div>\n            </div>\n          </div>\n        </div>\n      ",
+    "text": "Brevo SMTP Relay Verification (BREVO-TEST-MVR8EEZ0) from \"Accounticca Advisory Limited\" <info@accounticca.com> (Login: 9dabe5001@smtp-brevo.com) via smtp-relay.brevo.com:587 to ekram@elawyersbd.com.",
+    "sentAt": "2026-10-27T22:02:45.080Z",
+    "delivered": true,
+    "transport": "Brevo SMTP Relay Ready (smtp-relay.brevo.com:587 • Preview Relay Active)"
+  },
+  {
+    "id": "notif-1793129976128-2f7fa8",
+    "messageId": "msg-1793129975513-d3358ca8",
+    "referenceId": "APT-NOTIF-TEST",
+    "clientName": "Advocate Test",
+    "recipientEmail": "client@test.com",
+    "ccEmails": [
+      "ekram@elawyersbd.com"
+    ],
+    "practiceArea": "Income Tax Assessment",
+    "mode": "virtual",
+    "date": "2026-10-27",
+    "timeSlot": "11:00 AM - 11:45 AM BST",
+    "status": "Confirmed",
+    "subject": "[CONFIRMED] Consultation Docket #APT-NOTIF-TEST - ELA & Associates Legal Chambers",
+    "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>[CONFIRMED] Consultation Docket #APT-NOTIF-TEST - ELA & Associates Legal Chambers</title>\n  <style>\n    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased; }\n    .wrapper { width: 100%; max-width: 640px; margin: 30px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; }\n    .header { background: linear-gradient(135deg, #091e3a 0%, #102a4c 100%); padding: 32px 36px; text-align: left; border-bottom: 3px solid #d4af37; }\n    .brand-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #d4af37; margin: 0 0 6px 0; }\n    .brand-title { font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.01em; }\n    .brand-subtitle { font-size: 12px; color: #94a3b8; margin: 4px 0 0 0; }\n    .content { padding: 36px; }\n    .status-badge { display: inline-block; padding: 8px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background-color: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; margin-bottom: 20px; }\n    .headline { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; line-height: 1.3; }\n    .subtext { font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 28px 0; }\n    .docket-card { background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 28px; }\n    .docket-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 16px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; }\n    .docket-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }\n    .docket-label { color: #64748b; font-weight: 500; }\n    .docket-val { color: #0f172a; font-weight: 700; text-align: right; }\n    .action-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 28px; }\n    .action-title { font-size: 14px; font-weight: 700; color: #166534; margin: 0 0 8px 0; }\n    .action-desc { font-size: 13px; color: #15803d; line-height: 1.5; margin: 0; }\n    .btn { display: inline-block; background-color: #059669; color: #ffffff !important; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 14px; text-align: center; }\n    .footer { background-color: #f8fafc; padding: 24px 36px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; line-height: 1.6; text-align: center; }\n    .footer-divider { margin: 16px 0; border: 0; border-top: 1px solid #e2e8f0; }\n    .footer-legal { font-size: 11px; color: #94a3b8; }\n  </style>\n</head>\n<body>\n  <div class=\"wrapper\">\n    <!-- Header -->\n    <div class=\"header\">\n      <div class=\"brand-eyebrow\">Supreme Court & Corporate Tax Practice</div>\n      <div class=\"brand-title\">ELA &amp; ASSOCIATES</div>\n      <div class=\"brand-subtitle\">Advocates, Corporate Law Consultants &amp; NBR Tax Advisors</div>\n    </div>\n\n    <!-- Content -->\n    <div class=\"content\">\n      <div class=\"status-badge\">CONSULTATION CONFIRMED</div>\n\n      <h1 class=\"headline\">\n        Consultation Confirmed for Advocate Test\n      </h1>\n\n      <p class=\"subtext\">\n        Dear Advocate Test, your consultation docket has been formally approved and assigned to our practice lead. Please review your session coordinates below.\n      </p>\n\n      <!-- Docket Card -->\n      <div class=\"docket-card\">\n        <div class=\"docket-header\">Official Consultation Docket Specifications</div>\n        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse: collapse;\">\n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Docket ID:</td>\n            <td style=\"padding: 6px 0; font-weight: 800; font-family: monospace; font-size: 15px; color: #091e3a; text-align: right;\">APT-NOTIF-TEST</td>\n          </tr>\n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Practice Area:</td>\n            <td style=\"padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;\">Income Tax Assessment</td>\n          </tr>\n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Consultation Mode:</td>\n            <td style=\"padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;\">Virtual (Google Meet)</td>\n          </tr>\n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Scheduled Date:</td>\n            <td style=\"padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;\">2026-10-27</td>\n          </tr>\n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Time Window:</td>\n            <td style=\"padding: 6px 0; font-weight: 700; color: #059669; text-align: right;\">11:00 AM - 11:45 AM BST</td>\n          </tr>\n          \n          <tr>\n            <td style=\"padding: 6px 0; color: #64748b; font-size: 14px;\">Assigned Partner:</td>\n            <td style=\"padding: 6px 0; font-weight: 600; color: #334155; text-align: right;\">Adv. Ekram Hossain</td>\n          </tr>\n        </table>\n      </div>\n\n      <!-- Action Box -->\n      \n      <div class=\"action-box\">\n        <h3 class=\"action-title\">🎥 Google Meet Room Coordinates</h3>\n        <p class=\"action-desc\">\n          Your encrypted virtual consultation room is provisioned. Please enter the room 5 minutes prior to your allocated time slot with your microphone and documentation prepared.\n        </p>\n        \n        <div style=\"margin-top: 14px;\">\n          <a href=\"https://meet.google.com/ela-aptnotiftest\" target=\"_blank\" class=\"btn\" style=\"background-color: #059669;\">Join Google Meet Consultation</a>\n        </div>\n        \n      </div>\n      \n\n      \n\n      <!-- Help info -->\n      <div style=\"font-size: 13px; color: #64748b; line-height: 1.5; border-left: 3px solid #cbd5e1; padding-left: 14px;\">\n        <strong>Need Assistance or Rescheduling?</strong><br>\n        Direct Desk: <strong>+880 1712-345678</strong> | Official Inquiries: <strong>appointments@accounticca.com</strong><br>\n        Office Hours: Saturday to Thursday, 9:30 AM – 7:30 PM BST.\n      </div>\n    </div>\n\n    <!-- Footer -->\n    <div class=\"footer\">\n      <div><strong>ELA &amp; ASSOCIATES ADVOCATES &amp; LEGAL CONSULTANTS</strong></div>\n      <div style=\"margin-top: 4px;\">Suite 704, Concord Tower, 113 Kazi Nazrul Islam Avenue, Dhaka-1000, Bangladesh</div>\n      <div class=\"footer-divider\"></div>\n      <div class=\"footer-legal\">\n        This automated notification is issued pursuant to statutory chamber booking records on Accounticca Compliance Hub. \n        All consultation docket discussions are subject to legal professional privilege and advocate-client confidentiality under the Bangladesh Legal Practitioners and Bar Council Order.\n      </div>\n    </div>\n  </div>\n</body>\n</html>",
+    "text": "ELA & ASSOCIATES | ADVOCATES & TAX CONSULTANTS\nOfficial Appointment Status Notice\n\nReference Docket: APT-NOTIF-TEST\nStatus: CONFIRMED\nClient Name: Advocate Test\nPractice Area: Income Tax Assessment\nMode: Virtual (Google Meet)\nDate & Time: 2026-10-27 at 11:00 AM - 11:45 AM BST\n\n\nGoogle Meet Link: https://meet.google.com/ela-aptnotiftest\n\n\nHotline: +880 1712-345678 | Email: chamber@accounticca.com\nChamber Address: Suite 704, Concord Tower, 113 Kazi Nazrul Islam Avenue, Dhaka-1000",
+    "sentAt": "2026-10-27T19:39:36.128Z",
+    "delivered": true,
+    "transport": "Firebase Cloud Functions & ELA Mailer Gateway"
+  },
+  {
     "id": "notif-1791893771486-3a19e1",
     "messageId": "remind-1791893771486-3f9661",
     "referenceId": "APT-2026-92841",
