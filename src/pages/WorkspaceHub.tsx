@@ -923,7 +923,9 @@ export const WorkspaceHub: React.FC = () => {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id as ActiveTab)}
-                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition ${
+                  className={`${
+                    t.id === 'classroom' ? 'hidden' : 'flex'
+                  } items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition ${
                     isActive 
                       ? 'bg-emerald-700 text-white shadow-xs' 
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'

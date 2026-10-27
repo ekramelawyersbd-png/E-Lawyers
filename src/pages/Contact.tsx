@@ -1342,7 +1342,7 @@ export function Contact() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f7f4] pb-16 text-slate-900">
+    <main className="min-h-screen border-white bg-[#f5f7f4] pb-16 text-slate-900">
       <ServiceSEO
         title={
           activeTab === 'appointment'
