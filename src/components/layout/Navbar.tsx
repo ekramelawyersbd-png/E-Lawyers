@@ -671,27 +671,21 @@ export function Navbar() {
                 )}
               </button>
             </div>
-            {/* Search Icon / Expandable Search with Autocomplete - hidden on mobile view only, moved to three dot */}
+            {/* Search Icon / Global Search Trigger (Cmd+K) */}
             <div className="relative hidden sm:flex items-center">
-              {searchOpen ? (
-                <GlobalSearchAutocomplete
-                  isOpen={searchOpen}
-                  onClose={() => setSearchOpen(false)}
-                  variant="navbar-desktop"
-                  placeholder="Search articles, tax tools, SROs..."
-                  autoFocus={true}
-                />
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(true)}
-                  className="h-9 w-9 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-600 hover:text-emerald-800 transition-all flex items-center justify-center group cursor-pointer shadow-2xs"
-                  aria-label="Search articles and tax tools"
-                  title="Search articles & tax tools (Press ⌘K)"
-                >
-                  <Search className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
+                className="h-9 px-3 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-600 hover:text-emerald-800 transition-all flex items-center gap-2 group cursor-pointer shadow-2xs"
+                aria-label="Search articles, tools, and courses (Cmd+K)"
+                title="Search articles, tools & courses (Press ⌘K)"
+              >
+                <Search className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
+                <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-800 hidden md:inline">Search...</span>
+                <kbd className="hidden lg:inline-block text-[10px] font-bold text-slate-400 bg-slate-200/80 px-1.5 py-0.5 rounded border border-slate-300">
+                  ⌘K
+                </kbd>
+              </button>
             </div>
 
             {user ? (
@@ -861,15 +855,22 @@ export function Navbar() {
               <LanguageToggle />
             </div>
             <div>
-              <GlobalSearchAutocomplete
-                isOpen={true}
-                onClose={() => {
-                  // Keep drawer open when search input loses focus
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  window.dispatchEvent(new CustomEvent('open-global-search'));
                 }}
-                variant="navbar-mobile"
-                placeholder="Search articles & tax tools..."
-                autoFocus={false}
-              />
+                className="w-full flex items-center justify-between px-3.5 py-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-500 font-semibold shadow-2xs hover:border-emerald-500 transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-emerald-600" />
+                  <span>Search articles, tools &amp; courses...</span>
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                  ⌘K
+                </span>
+              </button>
             </div>
           </div>
 

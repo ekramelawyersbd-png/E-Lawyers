@@ -4,6 +4,7 @@ import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileInstallPrompt } from '../pwa/MobileInstallPrompt';
 import { CartDrawer } from '../shop/CartDrawer';
+import { GlobalSearchOverlay } from '../search/GlobalSearchOverlay';
 import { useFocusMode } from '../../contexts/FocusModeContext';
 import { BreadcrumbProvider, Breadcrumb } from '../Breadcrumb';
 
@@ -46,6 +47,7 @@ export function Layout() {
         {!hideNavs && <MobileBottomNav />}
         {!hideNavs && <MobileInstallPrompt />}
         <CartDrawer />
+        <GlobalSearchOverlay />
       </div>
     </BreadcrumbProvider>
   );
