@@ -33,7 +33,8 @@ import {
   TrendingUp,
   ArrowDown,
   ArrowUp,
-  Heart
+  Heart,
+  GraduationCap
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
 import { 
@@ -50,6 +51,7 @@ import { useShopAuth } from '../contexts/ShopAuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { ProductComparisonModal } from '../components/shop/ProductComparisonModal';
 import { ProductComparisonDock } from '../components/shop/ProductComparisonDock';
+import { AcademyCoursesShopBox } from '../components/shop/AcademyCoursesShopBox';
 
 export type ShopSortOption = 'bestselling' | 'price_low' | 'price_high' | 'rating';
 
@@ -222,6 +224,7 @@ export function Shop() {
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = {
       'All Types': publishedProducts.length,
+      'Academy Courses': 0,
       'Templates': 0,
       'Consultation': 0,
       'Legal Kits': 0,
@@ -234,6 +237,16 @@ export function Shop() {
       }
     });
     return counts;
+  }, [publishedProducts]);
+
+  // All Academy courses derived from live products
+  const academyCourses = useMemo(() => {
+    return publishedProducts.filter(
+      (p) =>
+        p.category === 'Academy Courses' ||
+        (p.productType || inferProductType(p)) === 'Academy Courses' ||
+        p.id.startsWith('academy-')
+    );
   }, [publishedProducts]);
 
   const categoryCounts = useMemo(() => {
@@ -555,7 +568,7 @@ export function Shop() {
             </div>
 
             {/* Segmented Switcher Row */}
-            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 rounded-2xl bg-slate-100 p-1.5" role="tablist" aria-label="Product types">
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 rounded-2xl bg-slate-100 p-1.5" role="tablist" aria-label="Product types">
               {[
                 {
                   id: 'All Types' as const,
@@ -563,6 +576,13 @@ export function Shop() {
                   subtitle: 'Complete Catalog',
                   icon: Layers,
                   count: typeCounts['All Types'],
+                },
+                {
+                  id: 'Academy Courses' as const,
+                  label: 'Academy Courses',
+                  subtitle: 'Live & LMS Cohorts',
+                  icon: GraduationCap,
+                  count: typeCounts['Academy Courses'] || academyCourses.length,
                 },
                 {
                   id: 'Templates' as const,
@@ -872,6 +892,24 @@ export function Shop() {
 
         </div>
 
+        {/* Dedicated Academy Courses Shop Box (All Training Programs from /training) */}
+        {academyCourses.length > 0 &&
+          (selectedType === 'All Types' ||
+            selectedType === 'Academy Courses' ||
+            selectedCategory === 'Academy Courses' ||
+            selectedCategory === 'All Products') &&
+          !searchQuery.trim() &&
+          !showOnlyBookmarked && (
+            <AcademyCoursesShopBox
+              courses={academyCourses}
+              onAddToCart={(course) => handleAddToCart({ stopPropagation: () => {} } as any, course)}
+              onInstantBuy={(course) => handleInstantBuy({ stopPropagation: () => {} } as any, course)}
+              isBookmarked={isBookmarked}
+              onToggleBookmark={handleToggleFavorite}
+              addedIds={addedIds}
+            />
+          )}
+
         {/* Results Counter Summary & Active Sort Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 font-medium mb-6 pb-2 border-b border-slate-200/60">
           <div className="flex flex-wrap items-center gap-2">
@@ -1067,6 +1105,7 @@ export function Shop() {
                         {pType === 'Legal Kits' && <Package className="w-3 h-3 text-amber-400" />}
                         {pType === 'Consultation' && <Video className="w-3 h-3 text-purple-400" />}
                         {pType === 'Books & Manuals' && <BookOpen className="w-3 h-3 text-amber-400" />}
+                        {pType === 'Academy Courses' && <GraduationCap className="w-3 h-3 text-emerald-400" />}
                         <span>{pType}</span>
                       </button>
                     </div>
@@ -1199,9 +1238,13 @@ export function Shop() {
                     <button
                       type="button"
                       onClick={(e) => handleInstantBuy(e, product)}
-                      className="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer hover:shadow-md"
+                      className={`w-full py-2.5 px-3 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer hover:shadow-md ${
+                        pType === 'Academy Courses'
+                          ? 'bg-emerald-600 hover:bg-emerald-700'
+                          : 'bg-slate-900 hover:bg-slate-800'
+                      }`}
                     >
-                      <span>Buy Now</span>
+                      <span>{pType === 'Academy Courses' ? 'Enroll Now' : 'Buy Now'}</span>
                       <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
                     </button>
                   </div>
@@ -1307,7 +1350,7 @@ export function Shop() {
 
       {/* Floating Cart Trigger Button */}
       {totalItemsCount > 0 && (
-        <div className={`fixed right-6 z-40 transition-all duration-300 animate-in fade-in ${
+        <div className={`fixed left-6 z-40 transition-all duration-300 animate-in fade-in ${
           selectedCompareProducts.length > 0 ? 'bottom-24 sm:bottom-6' : 'bottom-6'
         }`}>
           <button

@@ -118,6 +118,30 @@ export default function App() {
                       }
                     />
                     <Route
+                      path="student/dashboard/:courseId"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/dashboard/:courseId/exam"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage autoOpenExam />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
+                      path="student/dashboard/:courseId/lesson/:lessonId"
+                      element={
+                        <LmsRouteGuard>
+                          <StudentLearningPortalPage />
+                        </LmsRouteGuard>
+                      }
+                    />
+                    <Route
                       path="student/course/:courseId"
                       element={
                         <LmsRouteGuard>

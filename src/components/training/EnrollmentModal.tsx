@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { X, CheckCircle2, ExternalLink, Calendar } from 'lucide-react';
 import { redirectToAppointment, buildAppointmentUrl, APPOINTMENT_BASE_URL } from '../../utils/appointmentRedirect';
+import { getAcademyCourseDashboardPath } from '../../utils/lmsPortalStore';
 
 interface EnrollmentModalProps {
   isOpen: boolean;
@@ -108,6 +109,13 @@ export function EnrollmentModal({ isOpen, onClose, title, description, price }: 
                   <span>Open Appointment Portal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
+                <Link
+                  to={getAcademyCourseDashboardPath(title)}
+                  onClick={onClose}
+                  className="w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors text-sm flex items-center justify-center gap-2"
+                >
+                  <span>Open Student Dashboard</span>
+                </Link>
                 <button
                   onClick={onClose}
                   className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors text-sm"

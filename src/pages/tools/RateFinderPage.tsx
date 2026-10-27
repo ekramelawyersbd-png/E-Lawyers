@@ -264,7 +264,7 @@ Effective Total Tax Incidence (TTI): ${dutyBreakdown.effectiveTotalTaxIncidenceP
       <ToolSEO
         title={
           selectedItem
-            ? `${selectedItem.title} (${selectedItem.codeOrSection}) – National Rate Finder | Accounticca`
+            ? `${selectedItem.title} (${selectedItem.code}) – National Rate Finder | Accounticca`
             : 'Bangladesh National Tax, VAT, TDS, VDS & Customs Duty Rate Finder | Accounticca'
         }
         description="Search statutory VAT schedules, TDS/VDS withholding sections, and HS Code customs import duty rates under Bangladesh Finance Act 2026."

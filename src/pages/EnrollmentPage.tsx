@@ -17,6 +17,7 @@ import { SEO } from '../components/SEO';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { buildAppointmentUrl } from '../utils/appointmentRedirect';
 import { initiateUddoktaPayCheckout } from '../services/uddoktapayService';
+import { getAcademyCourseDashboardPath } from '../utils/lmsPortalStore';
 
 export const EnrollmentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -125,6 +126,12 @@ export const EnrollmentPage: React.FC = () => {
                   <span>Open Appointment Portal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
+                <Link
+                  to={getAcademyCourseDashboardPath(courseTitle)}
+                  className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors text-xs"
+                >
+                  Open Course Dashboard
+                </Link>
                 <Link
                   to="/training"
                   className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition-colors text-xs"

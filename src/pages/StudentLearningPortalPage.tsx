@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   Plus,
   Trash2,
@@ -34,6 +34,8 @@ import {
   LmsPortalDataMap,
   AcademyPortalCourseOption,
   getAcademyPortalCourses,
+  slugifyAcademyCourseName,
+  resolveAcademyCourseOption,
   loadLmsPortalData,
   saveLmsPortalData,
   cloneDefaultLmsData,
@@ -96,8 +98,13 @@ const CONTENT_TABS: {
 export const StudentLearningPortalPage: React.FC<{
   autoOpenExam?: boolean;
 }> = ({ autoOpenExam = false }) => {
-  const { courseId: paramCourseId, certificateId: paramCertificateId } = useParams<{
+  const {
+    courseId: paramCourseId,
+    lessonId: paramLessonId,
+    certificateId: paramCertificateId
+  } = useParams<{
     courseId?: string;
+    lessonId?: string;
     certificateId?: string;
   }>();
   const navigate = useNavigate();
@@ -125,9 +132,12 @@ export const StudentLearningPortalPage: React.FC<{
       const key = c.title.trim().toLowerCase();
       if (!seenTitles.has(key)) {
         seenTitles.add(key);
+        const slug = slugifyAcademyCourseName(c.title);
         extraFromContext.push({
           id: c.courseId,
           title: c.title,
+          slug,
+          dashboardPath: `/student/dashboard/${slug}`,
           categoryLabel: c.programTag || 'LMS Program'
         });
       }
@@ -139,10 +149,10 @@ export const StudentLearningPortalPage: React.FC<{
   const [selectedPortalCourseId, setSelectedPortalCourseId] = useState<string>(() => {
     const opts = getAcademyPortalCourses();
 
-    // 1. Check route parameter (:courseId)
+    // 1. Check route parameter (:courseId — supports slug, title, or ID)
     if (paramCourseId) {
-      const byId = opts.find((o) => o.id === paramCourseId);
-      if (byId) return byId.id;
+      const resolvedFromParam = resolveAcademyCourseOption(paramCourseId);
+      if (resolvedFromParam) return resolvedFromParam.id;
     }
 
     // 2. Check URL query string (?course=...) or saved active portal course or student enrollment
@@ -150,18 +160,15 @@ export const StudentLearningPortalPage: React.FC<{
       const params = new URLSearchParams(window.location.search);
       const queryCourse = params.get('course') || params.get('courseId');
       if (queryCourse) {
-        const matched = opts.find(
-          (o) =>
-            o.id === queryCourse ||
-            o.title.trim().toLowerCase() === queryCourse.trim().toLowerCase()
-        );
-        if (matched) return matched.id;
+        const resolvedFromQuery = resolveAcademyCourseOption(queryCourse);
+        if (resolvedFromQuery) return resolvedFromQuery.id;
       }
 
       try {
         const savedPortalCourse = window.localStorage.getItem('lms_active_portal_course_id');
-        if (savedPortalCourse && opts.some((o) => o.id === savedPortalCourse)) {
-          return savedPortalCourse;
+        if (savedPortalCourse) {
+          const resolvedSaved = resolveAcademyCourseOption(savedPortalCourse);
+          if (resolvedSaved) return resolvedSaved.id;
         }
 
         const rawEnrollments = window.localStorage.getItem('training_enrollments');
@@ -169,14 +176,9 @@ export const StudentLearningPortalPage: React.FC<{
           const parsed = JSON.parse(rawEnrollments);
           if (Array.isArray(parsed) && parsed.length > 0) {
             const latestEnrollment = parsed[parsed.length - 1];
-            const enrolledTitle = String(latestEnrollment?.title || '').trim().toLowerCase();
+            const enrolledTitle = String(latestEnrollment?.title || '').trim();
             if (enrolledTitle) {
-              const matchedByEnrollment = opts.find(
-                (o) =>
-                  o.title.trim().toLowerCase() === enrolledTitle ||
-                  enrolledTitle.includes(o.title.trim().toLowerCase()) ||
-                  o.title.trim().toLowerCase().includes(enrolledTitle)
-              );
+              const matchedByEnrollment = resolveAcademyCourseOption(enrolledTitle);
               if (matchedByEnrollment) return matchedByEnrollment.id;
             }
           }
@@ -193,7 +195,7 @@ export const StudentLearningPortalPage: React.FC<{
         const rjscOpt = opts.find((o) => o.id === 'academy-course-402' || o.id === 'rjsc-corporate-compliance');
         if (rjscOpt) return rjscOpt.id;
       }
-      const matchedProfileOpt = opts.find((o) => o.id === firstEnrolledId);
+      const matchedProfileOpt = resolveAcademyCourseOption(firstEnrolledId);
       if (matchedProfileOpt) return matchedProfileOpt.id;
     }
 
@@ -203,12 +205,15 @@ export const StudentLearningPortalPage: React.FC<{
     return defaultOpt ? defaultOpt.id : 'academy-course-401';
   });
 
-  const selectedCourseOption = useMemo(
+  const selectedCourseOption = useMemo<AcademyPortalCourseOption>(
     () =>
       academyCourseOptions.find((o) => o.id === selectedPortalCourseId) ||
+      resolveAcademyCourseOption(selectedPortalCourseId) ||
       academyCourseOptions[0] || {
         id: 'academy-course-401',
         title: activeCourse.title,
+        slug: slugifyAcademyCourseName(activeCourse.title),
+        dashboardPath: `/student/dashboard/${slugifyAcademyCourseName(activeCourse.title)}`,
         categoryLabel: 'Academy Program'
       },
     [academyCourseOptions, selectedPortalCourseId, activeCourse.title]
@@ -259,25 +264,43 @@ export const StudentLearningPortalPage: React.FC<{
     }
   }, [selectedPortalCourseId, recordCourseAccess]);
 
-  // Sync course and lesson when URL query parameters (?course=..., ?lesson=..., ?class=...) change
+  // Sync course and lesson when route param (:courseId, :lessonId) or URL query parameters (?course=..., ?lesson=..., ?class=..., ?tab=...) change
   useEffect(() => {
-    const queryCourse = searchParams.get('course') || searchParams.get('courseId') || paramCourseId;
+    const queryCourse =
+      paramCourseId || searchParams.get('course') || searchParams.get('courseId');
     const queryClass = searchParams.get('class');
-    const queryLesson = searchParams.get('lesson');
+    const queryLesson = paramLessonId || searchParams.get('lesson');
+    const queryTab = searchParams.get('tab') as LmsContentTabType | null;
+
+    if (queryTab && ['live', 'recorded', 'note', 'ppt', 'mcq'].includes(queryTab)) {
+      setCurrentTab(queryTab);
+    }
 
     let targetCourseId = selectedPortalCourseId;
     if (queryCourse) {
-      const matchedOpt = academyCourseOptions.find(
-        (o) =>
-          o.id === queryCourse ||
-          o.title.trim().toLowerCase() === queryCourse.trim().toLowerCase()
-      );
+      const matchedOpt =
+        resolveAcademyCourseOption(queryCourse) ||
+        academyCourseOptions.find(
+          (o) =>
+            o.id === queryCourse ||
+            o.slug === queryCourse ||
+            o.title.trim().toLowerCase() === queryCourse.trim().toLowerCase()
+        );
       if (matchedOpt && matchedOpt.id !== selectedPortalCourseId) {
         targetCourseId = matchedOpt.id;
         setSelectedPortalCourseId(matchedOpt.id);
+        try {
+          window.localStorage.setItem('lms_active_portal_course_id', matchedOpt.id);
+        } catch {
+          // Ignore storage error
+        }
         const nextCourseData = loadLmsPortalData(matchedOpt.id);
         setLmsData(nextCourseData);
         setAdminDraftRows(createDraftRowsFromMap(nextCourseData));
+        const nextKeys = Object.keys(nextCourseData);
+        if (nextKeys[0] && !queryClass && !queryLesson) {
+          setCurrentClass(nextKeys[0]);
+        }
       }
     }
 
@@ -296,7 +319,7 @@ export const StudentLearningPortalPage: React.FC<{
         }
       }
     }
-  }, [searchParams, paramCourseId]);
+  }, [searchParams, paramCourseId, paramLessonId, academyCourseOptions]);
 
   // In-UI notification & reset confirmation states (replacing window.alert / window.confirm)
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
@@ -332,13 +355,15 @@ export const StudentLearningPortalPage: React.FC<{
         LmsPortalDataMap | { courseId?: string; data: LmsPortalDataMap }
       >;
       if (!customEvent.detail) return;
-      if ('data' in customEvent.detail && customEvent.detail.data) {
+      const detailObj = customEvent.detail as any;
+      if (detailObj && typeof detailObj === 'object' && 'data' in detailObj && detailObj.data) {
+        const payloadData = detailObj.data as LmsPortalDataMap;
         if (
-          !customEvent.detail.courseId ||
-          customEvent.detail.courseId === selectedPortalCourseId
+          !detailObj.courseId ||
+          detailObj.courseId === selectedPortalCourseId
         ) {
-          setLmsData(customEvent.detail.data);
-          setAdminDraftRows(createDraftRowsFromMap(customEvent.detail.data));
+          setLmsData(payloadData);
+          setAdminDraftRows(createDraftRowsFromMap(payloadData));
         }
       } else {
         const directMap = customEvent.detail as LmsPortalDataMap;
@@ -416,26 +441,31 @@ export const StudentLearningPortalPage: React.FC<{
     }, 3500);
   };
 
-  // Handle selecting an Academy course from the header dropdown menu:
-  // Loads that course's curriculum and automatically opens the Admin Page below for that course.
+  // Handle selecting an Academy course from the header dropdown menu or course directory:
+  // Navigates to /student/dashboard/<course-slug> and loads that course's curriculum.
   const handleCourseDropdownChange = (newCourseId: string) => {
-    setSelectedPortalCourseId(newCourseId);
+    const chosen =
+      academyCourseOptions.find((o) => o.id === newCourseId) ||
+      resolveAcademyCourseOption(newCourseId);
+    const resolvedId = chosen ? chosen.id : newCourseId;
+
+    setSelectedPortalCourseId(resolvedId);
     try {
-      window.localStorage.setItem('lms_active_portal_course_id', newCourseId);
+      window.localStorage.setItem('lms_active_portal_course_id', resolvedId);
     } catch {
       // Ignore storage errors
     }
 
     // Sync LmsContext activeCourseId if matching
-    if (newCourseId === 'academy-course-402' || newCourseId === 'rjsc-corporate-compliance') {
+    if (resolvedId === 'academy-course-402' || resolvedId === 'rjsc-corporate-compliance') {
       setActiveCourseId('rjsc-corporate-compliance');
-    } else if (courses.some((c) => c.courseId === newCourseId)) {
-      setActiveCourseId(newCourseId);
+    } else if (courses.some((c) => c.courseId === resolvedId)) {
+      setActiveCourseId(resolvedId);
     } else {
       setActiveCourseId('personal-income-tax');
     }
 
-    const courseData = loadLmsPortalData(newCourseId);
+    const courseData = loadLmsPortalData(resolvedId);
     setLmsData(courseData);
     setAdminDraftRows(createDraftRowsFromMap(courseData));
     const firstKey = Object.keys(courseData)[0] || 'Class 01';
@@ -443,12 +473,13 @@ export const StudentLearningPortalPage: React.FC<{
     setCurrentTab('live');
     setConfirmResetOpen(false);
 
-    // Automatically open the Admin Page below for the selected course
-    setIsAdminView(true);
-
-    const chosen = academyCourseOptions.find((o) => o.id === newCourseId);
     if (chosen) {
-      showToast(`Opened Admin Page for "${chosen.title}"`);
+      navigate(chosen.dashboardPath);
+      showToast(
+        isAdminView
+          ? `Opened Admin Page for "${chosen.title}"`
+          : `Switched to "${chosen.title}"`
+      );
     }
   };
 
@@ -712,6 +743,7 @@ export const StudentLearningPortalPage: React.FC<{
       const clsName = targetKeys[idx];
       const lessonId = getLessonIdForClass(clsName, idx);
       if (!isLessonCompleted(targetCourseId, lessonId)) {
+        const courseOpt = resolveAcademyCourseOption(targetCourseId) || selectedCourseOption;
         return {
           ...contextTarget,
           portalCourseId: targetCourseId,
@@ -719,14 +751,15 @@ export const StudentLearningPortalPage: React.FC<{
           className: clsName,
           lessonIndex: idx,
           allCompleted: false,
-          routeUrl: `/student/dashboard?course=${encodeURIComponent(
-            targetCourseId
-          )}&lesson=${encodeURIComponent(lessonId)}&class=${encodeURIComponent(clsName)}`
+          routeUrl: `${courseOpt.dashboardPath}?lesson=${encodeURIComponent(
+            lessonId
+          )}&class=${encodeURIComponent(clsName)}`
         };
       }
     }
 
     const fallbackCls = targetKeys[0] || 'Class 01';
+    const fallbackOpt = resolveAcademyCourseOption(targetCourseId) || selectedCourseOption;
     return {
       ...contextTarget,
       portalCourseId: targetCourseId,
@@ -734,11 +767,11 @@ export const StudentLearningPortalPage: React.FC<{
       className: fallbackCls,
       lessonIndex: 0,
       allCompleted: true,
-      routeUrl: `/student/dashboard?course=${encodeURIComponent(
-        targetCourseId
-      )}&lesson=cls_01&class=${encodeURIComponent(fallbackCls)}`
+      routeUrl: `${fallbackOpt.dashboardPath}?lesson=cls_01&class=${encodeURIComponent(
+        fallbackCls
+      )}`
     };
-  }, [getFirstUncompletedLesson, isLessonCompleted, lmsData, selectedPortalCourseId]);
+  }, [getFirstUncompletedLesson, isLessonCompleted, lmsData, selectedPortalCourseId, selectedCourseOption]);
 
   const handleContinueLearning = () => {
     const target = nextUncompletedTarget;
@@ -892,7 +925,7 @@ export const StudentLearningPortalPage: React.FC<{
         title={dynamicTitle}
         description={dynamicDescription}
         serviceType="Student Learning Management System"
-        canonicalUrl="/student/dashboard"
+        canonicalUrl={selectedCourseOption.dashboardPath}
       />
 
       {/* LMS Portal Header */}
@@ -902,7 +935,7 @@ export const StudentLearningPortalPage: React.FC<{
             <GraduationCap className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[#1e4e75]">
                 LMS Portal
               </h1>
@@ -914,42 +947,29 @@ export const StudentLearningPortalPage: React.FC<{
                   ? `${currentClass} of ${classKeys.length} · ${currentTabLabel}`
                   : `${adminDraftRows.length} Modules Configured`}
               </span>
+              <span className="hidden lg:inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-600">
+                {selectedCourseOption.dashboardPath}
+              </span>
             </div>
-            <p className="mt-1 flex items-center gap-2 max-w-full sm:max-w-md md:max-w-xl">
+            <div className="mt-1 flex items-center gap-2 max-w-full sm:max-w-md md:max-w-xl">
               <select
                 value={selectedPortalCourseId}
-                disabled={!isAdminView}
-                onChange={(e) => {
-                  if (isAdminView) {
-                    handleCourseDropdownChange(e.target.value);
-                  }
-                }}
+                onChange={(e) => handleCourseDropdownChange(e.target.value)}
                 aria-label="Select Academy Course from /training"
                 title={
                   isAdminView
                     ? 'Select an Academy course to open its Admin Content Management panel'
-                    : selectedCourseOption.title
+                    : `Active Academy Course: ${selectedCourseOption.title} (${selectedCourseOption.dashboardPath})`
                 }
-                className={
-                  isAdminView
-                    ? 'w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50/90 hover:bg-white hover:border-[#1e4e75] text-xs sm:text-sm font-semibold text-[#1e4e75] shadow-2xs transition-all cursor-pointer focus:outline-none focus:border-[#1e4e75] focus:ring-2 focus:ring-[#1e4e75]/25 truncate'
-                    : 'hidden'
-                }
+                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50/90 hover:bg-white hover:border-[#1e4e75] text-xs sm:text-sm font-semibold text-[#1e4e75] shadow-2xs transition-all cursor-pointer focus:outline-none focus:border-[#1e4e75] focus:ring-2 focus:ring-[#1e4e75]/25 truncate"
               >
-                {(isAdminView ? academyCourseOptions : [selectedCourseOption]).map(
-                  (courseOpt) => (
-                    <option key={courseOpt.id} value={courseOpt.id}>
-                      {courseOpt.title}
-                    </option>
-                  )
-                )}
+                {academyCourseOptions.map((courseOpt) => (
+                  <option key={courseOpt.id} value={courseOpt.id}>
+                    {courseOpt.title}
+                  </option>
+                ))}
               </select>
-              {!isAdminView && (
-                <span className="text-xs sm:text-sm font-semibold text-slate-600 truncate select-none">
-                  {selectedCourseOption.title}
-                </span>
-              )}
-            </p>
+            </div>
           </div>
         </div>
 
@@ -1003,6 +1023,43 @@ export const StudentLearningPortalPage: React.FC<{
           </button>
         </div>
       </header>
+
+      {/* Academy Courses Directory Bar (/student/dashboard/:courseSlug pages from /training) */}
+      <nav
+        aria-label="Academy Courses Pages"
+        className="bg-slate-900 text-white px-4 sm:px-8 py-2.5 border-b border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar"
+      >
+        <Link
+          to="/training"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold border border-slate-700 shrink-0 transition-colors"
+          title="Back to /training Academy Hub"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>/training Courses:</span>
+        </Link>
+
+        {academyCourseOptions.map((courseOpt) => {
+          const isCurrentCourse = courseOpt.id === selectedPortalCourseId;
+          return (
+            <Link
+              key={courseOpt.id}
+              to={courseOpt.dashboardPath}
+              onClick={(e) => {
+                e.preventDefault();
+                handleCourseDropdownChange(courseOpt.id);
+              }}
+              title={`${courseOpt.title} (${courseOpt.dashboardPath})`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold whitespace-nowrap shrink-0 transition-all border ${
+                isCurrentCourse
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-2xs'
+                  : 'bg-slate-800/70 text-slate-300 border-slate-700/80 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <span>{courseOpt.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
       {/* Views Container */}
       <div id="app-container" className="flex-1 flex flex-col overflow-hidden relative">

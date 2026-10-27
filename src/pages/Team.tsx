@@ -134,7 +134,7 @@ export function Team() {
         }
         description={
           selectedMember
-            ? selectedMember.shortBio
+            ? selectedMember.bio
             : 'Meet our multidisciplinary team of Supreme Court Advocates, ACCA Chartered Certified Accountants, Income Tax Practitioners, and RJSC Corporate Advisors.'
         }
         canonicalUrl="/team"

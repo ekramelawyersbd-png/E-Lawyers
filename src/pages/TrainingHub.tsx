@@ -22,6 +22,7 @@ import { CertificateModal } from '../components/training/CertificateModal';
 import { TrainingFAQ } from '../components/training/TrainingFAQ';
 import { CareerPathways } from '../components/training/CareerPathways';
 import { SEO } from '../components/SEO';
+import { getAcademyCourseDashboardPath } from '../utils/lmsPortalStore';
 
 interface LiveClassProgram {
   id: string;
@@ -230,6 +231,13 @@ export function TrainingHub() {
                     <span>View Course Syllabus</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
+                  <Link
+                    to={getAcademyCourseDashboardPath(program.title)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+                  >
+                    <MonitorPlay className="w-4 h-4 text-emerald-600" />
+                    <span>Student Dashboard</span>
+                  </Link>
                   <button
                     type="button"
                     onClick={() => {
@@ -298,6 +306,7 @@ export function TrainingHub() {
               article.id === '401'
                 ? '/course/personal-income-tax'
                 : `/article/${article.id}`;
+            const courseDashboardPath = getAcademyCourseDashboardPath(article.title);
 
             return (
               <div
@@ -318,7 +327,7 @@ export function TrainingHub() {
                   </div>
 
                   <div>
-                    <Link to={detailPath} className="block">
+                    <Link to={courseDashboardPath} className="block">
                       <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                         {article.title}
                       </h3>
@@ -329,7 +338,7 @@ export function TrainingHub() {
                   </div>
                 </div>
 
-                <div className="pt-5 mt-5 border-t border-slate-100 space-y-3">
+                <div className="pt-5 mt-5 border-t border-slate-100 space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500">Program Fee</span>
                     <span className="font-mono tabular-nums font-bold text-slate-900">
@@ -361,6 +370,15 @@ export function TrainingHub() {
                       Enroll Now
                     </button>
                   </div>
+
+                  <Link
+                    to={courseDashboardPath}
+                    className="w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    title={`Open Student Dashboard for ${article.title} (${courseDashboardPath})`}
+                  >
+                    <MonitorPlay className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="truncate">Student Portal</span>
+                  </Link>
                 </div>
               </div>
             );
@@ -379,9 +397,14 @@ export function TrainingHub() {
               </div>
 
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
-                  Interactive LMS Portal: Tax &amp; RJSC Masterclasses
-                </h3>
+                <Link
+                  to={getAcademyCourseDashboardPath('Interactive LMS Portal: Tax & RJSC Masterclasses')}
+                  className="block"
+                >
+                  <h3 className="text-base sm:text-lg font-bold text-white hover:text-emerald-300 transition-colors leading-snug">
+                    Interactive LMS Portal: Tax &amp; RJSC Masterclasses
+                  </h3>
+                </Link>
                 <p className="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
                   Access sequential video lectures, protected statutory study notes, module quizzes, final examination, and instant PDF certification.
                 </p>
@@ -404,7 +427,7 @@ export function TrainingHub() {
                   <span>Syllabus</span>
                 </Link>
                 <Link
-                  to="/student/dashboard"
+                  to={getAcademyCourseDashboardPath('Interactive LMS Portal: Tax & RJSC Masterclasses')}
                   className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
                 >
                   <span>Open LMS</span>

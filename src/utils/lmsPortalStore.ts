@@ -19,10 +19,26 @@ export type LmsPortalDataMap = Record<string, LmsClassContentLinks>;
 export interface AcademyPortalCourseOption {
   id: string;
   title: string;
+  slug: string;
+  dashboardPath: string;
   categoryLabel: string;
+  articleId?: string;
 }
 
 const TRAINING_ARTICLE_IDS = ['400', '401', '402', '403', '404', '405', '406'];
+
+/**
+ * Converts an Academy Course title into a clean URL-safe slug for /student/dashboard/:courseSlug
+ */
+export function slugifyAcademyCourseName(title: string): string {
+  return (title || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[–—]/g, '-')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 /**
  * Builds the complete list of Academy courses from the /training page
@@ -30,18 +46,33 @@ const TRAINING_ARTICLE_IDS = ['400', '401', '402', '403', '404', '405', '406'];
 export function getAcademyPortalCourses(): AcademyPortalCourseOption[] {
   const fromTrainingArticles: AcademyPortalCourseOption[] = TRAINING_ARTICLE_IDS.map((id) => {
     const found = mockArticles.find((a) => a.id === id);
+    const title = found ? found.title : `Academy Course #${id}`;
+    const slug = slugifyAcademyCourseName(title);
     return {
       id: `academy-course-${id}`,
-      title: found ? found.title : `Academy Course #${id}`,
+      articleId: id,
+      title,
+      slug,
+      dashboardPath: `/student/dashboard/${slug}`,
       categoryLabel: found?.category || 'Academy Program'
     };
   });
 
-  const additionalAcademyPrograms: AcademyPortalCourseOption[] = [
+  const additionalRawPrograms: Array<{
+    id: string;
+    title: string;
+    categoryLabel: string;
+    customSlug?: string;
+  }> = [
     {
       id: 'interactive-lms-masterclass',
       title: 'Interactive LMS Portal: Tax & RJSC Masterclasses',
       categoryLabel: 'Online LMS Track'
+    },
+    {
+      id: 'live-income-tax-2026',
+      title: 'Live Class: Personal Income Tax & Online e-Return Filing Masterclass',
+      categoryLabel: 'Live Cohort 01'
     },
     {
       id: 'personal-income-tax',
@@ -54,6 +85,19 @@ export function getAcademyPortalCourses(): AcademyPortalCourseOption[] {
       categoryLabel: 'Corporate Compliance'
     }
   ];
+
+  const additionalAcademyPrograms: AcademyPortalCourseOption[] = additionalRawPrograms.map(
+    (item) => {
+      const slug = item.customSlug || slugifyAcademyCourseName(item.title);
+      return {
+        id: item.id,
+        title: item.title,
+        slug,
+        dashboardPath: `/student/dashboard/${slug}`,
+        categoryLabel: item.categoryLabel
+      };
+    }
+  );
 
   // Deduplicate by title while keeping all /training Academy courses first
   const seenTitles = new Set<string>();
@@ -68,6 +112,95 @@ export function getAcademyPortalCourses(): AcademyPortalCourseOption[] {
   }
 
   return combined;
+}
+
+/**
+ * Resolves any route parameter or query parameter (course slug, exact title, article ID, or course ID)
+ * to its matching AcademyPortalCourseOption from /training.
+ */
+export function resolveAcademyCourseOption(
+  paramOrQuery?: string | null
+): AcademyPortalCourseOption | undefined {
+  if (!paramOrQuery) return undefined;
+  let decoded = paramOrQuery;
+  try {
+    decoded = decodeURIComponent(paramOrQuery);
+  } catch {
+    decoded = paramOrQuery;
+  }
+  const cleaned = decoded.trim().replace(/^\/+|\/+$/g, '').replace(/=$/, '').trim();
+  if (!cleaned) return undefined;
+
+  const lower = cleaned.toLowerCase();
+  const slugifiedInput = slugifyAcademyCourseName(cleaned);
+  const options = getAcademyPortalCourses();
+
+  // 1. Direct match by id, articleId, slug, or case-insensitive title
+  const exactMatch = options.find(
+    (opt) =>
+      opt.id.toLowerCase() === lower ||
+      (opt.articleId && opt.articleId.toLowerCase() === lower) ||
+      `academy-course-${lower}` === opt.id.toLowerCase() ||
+      opt.slug === lower ||
+      opt.slug === slugifiedInput ||
+      opt.title.trim().toLowerCase() === lower ||
+      slugifyAcademyCourseName(opt.title) === slugifiedInput
+  );
+  if (exactMatch) return exactMatch;
+
+  // 2. Alias / partial slug matching for common short names
+  if (slugifiedInput === 'vat' || slugifiedInput.includes('vat-training')) {
+    return options.find((o) => o.id === 'academy-course-400');
+  }
+  if (
+    slugifiedInput === 'personal-income-tax-return-filing' ||
+    slugifiedInput === 'income-tax-training'
+  ) {
+    return options.find((o) => o.id === 'academy-course-401');
+  }
+  if (
+    slugifiedInput === 'rjsc-training' ||
+    slugifiedInput === 'company-registration-training' ||
+    slugifiedInput.includes('rjsc-company-registration')
+  ) {
+    return options.find((o) => o.id === 'academy-course-402');
+  }
+  if (slugifiedInput.includes('bar-council')) {
+    return options.find((o) => o.id === 'academy-course-403');
+  }
+  if (slugifiedInput.includes('high-court')) {
+    return options.find((o) => o.id === 'academy-course-404');
+  }
+  if (slugifiedInput.includes('practical-accounting') || slugifiedInput === 'accounting-training') {
+    return options.find((o) => o.id === 'academy-course-405');
+  }
+  if (slugifiedInput.includes('ms-office') || slugifiedInput.includes('microsoft-office')) {
+    return options.find((o) => o.id === 'academy-course-406');
+  }
+
+  return options.find(
+    (opt) =>
+      opt.slug.includes(slugifiedInput) || slugifiedInput.includes(opt.slug)
+  );
+}
+
+/**
+ * Returns the canonical /student/dashboard/:courseSlug URL for any course ID, slug, or title.
+ */
+export function getAcademyCourseDashboardPath(
+  courseIdOrSlugOrTitle?: string | null
+): string {
+  const matched = resolveAcademyCourseOption(courseIdOrSlugOrTitle);
+  if (matched) {
+    return matched.dashboardPath;
+  }
+  if (courseIdOrSlugOrTitle && courseIdOrSlugOrTitle.trim()) {
+    const fallbackSlug = slugifyAcademyCourseName(courseIdOrSlugOrTitle);
+    if (fallbackSlug) {
+      return `/student/dashboard/${fallbackSlug}`;
+    }
+  }
+  return '/student/dashboard';
 }
 
 export const LMS_PORTAL_STORAGE_KEY = 'lmsData';

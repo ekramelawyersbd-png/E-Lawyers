@@ -5,6 +5,7 @@ import { mockArticles, categories } from '../data/mockData';
 import { SHOP_PRODUCTS } from '../data/shopProducts';
 import { searchableTaxTools } from '../data/searchableTools';
 import { INITIAL_LMS_COURSES } from '../data/lmsCoursesData';
+import { resolveAcademyCourseOption } from '../utils/lmsPortalStore';
 
 export interface BreadcrumbItem {
   label: string;
@@ -273,7 +274,7 @@ export function resolveDynamicBreadcrumbs(
         if (matchedTool) {
           return [
             { label: 'Tools & Calculators', path: '/tools' },
-            { label: matchedTool.title },
+            { label: matchedTool.name },
           ];
         }
       }
@@ -295,7 +296,7 @@ export function resolveDynamicBreadcrumbs(
     if (matchedFromSearchable) {
       return [
         { label: 'Tools & Calculators', path: '/tools' },
-        { label: matchedFromSearchable.title },
+        { label: matchedFromSearchable.name },
       ];
     }
 
@@ -368,7 +369,45 @@ export function resolveDynamicBreadcrumbs(
 
   // 7. Student LMS Portal
   if (first === 'student') {
-    if (!second || second === 'dashboard') {
+    if (!second) {
+      return [
+        { label: 'Training Academy', path: '/training' },
+        { label: 'Student Learning Portal' },
+      ];
+    }
+    if (second === 'dashboard') {
+      if (segments[2]) {
+        const rawCourseParam = segments[2];
+        const resolvedAcademyCourse = resolveAcademyCourseOption(rawCourseParam);
+        const courseTitle = resolvedAcademyCourse
+          ? resolvedAcademyCourse.title
+          : formatSegmentLabel(rawCourseParam);
+        const coursePath = resolvedAcademyCourse
+          ? resolvedAcademyCourse.dashboardPath
+          : `/student/dashboard/${rawCourseParam}`;
+
+        if (segments[3] === 'exam') {
+          return [
+            { label: 'Training Academy', path: '/training' },
+            { label: 'Student Dashboard', path: '/student/dashboard' },
+            { label: courseTitle, path: coursePath },
+            { label: 'Final Certification Assessment' },
+          ];
+        }
+        if (segments[3] === 'lesson' && segments[4]) {
+          return [
+            { label: 'Training Academy', path: '/training' },
+            { label: 'Student Dashboard', path: '/student/dashboard' },
+            { label: courseTitle, path: coursePath },
+            { label: formatSegmentLabel(segments[4]) },
+          ];
+        }
+        return [
+          { label: 'Training Academy', path: '/training' },
+          { label: 'Student Dashboard', path: '/student/dashboard' },
+          { label: courseTitle },
+        ];
+      }
       return [
         { label: 'Training Academy', path: '/training' },
         { label: 'Student Learning Portal' },
@@ -376,15 +415,20 @@ export function resolveDynamicBreadcrumbs(
     }
     if (second === 'course' && segments[2]) {
       const courseId = segments[2];
-      const course = INITIAL_LMS_COURSES.find((c) => c.id === courseId);
-      const courseTitle = course ? course.title : formatSegmentLabel(courseId);
+      const course = INITIAL_LMS_COURSES.find((c) => c.courseId === courseId);
+      const academyCourse = resolveAcademyCourseOption(courseId);
+      const courseTitle = course
+        ? course.title
+        : academyCourse
+        ? academyCourse.title
+        : formatSegmentLabel(courseId);
       if (segments[3] === 'lesson' && segments[4]) {
         const lessonId = segments[4];
-        const lesson = course?.lessons.find((l) => l.id === lessonId);
+        const lesson = course?.lessons.find((l) => l.lessonId === lessonId);
         return [
           { label: 'Student Portal', path: '/student/dashboard' },
           { label: courseTitle, path: `/student/course/${courseId}` },
-          { label: lesson ? lesson.title : formatSegmentLabel(lessonId) },
+          { label: lesson ? lesson.heading : formatSegmentLabel(lessonId) },
         ];
       }
       if (segments[3] === 'exam') {

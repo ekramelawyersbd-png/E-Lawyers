@@ -43,7 +43,7 @@ export function Category() {
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row-reverse justify-between items-start sm:items-center gap-4 mb-8">
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input 

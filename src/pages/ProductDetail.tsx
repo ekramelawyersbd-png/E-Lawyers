@@ -21,7 +21,9 @@ import {
   Lock,
   FileDown,
   ExternalLink,
-  Heart
+  Heart,
+  GraduationCap,
+  MonitorPlay
 } from 'lucide-react';
 import { ServiceSEO } from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
@@ -809,6 +811,49 @@ export function ProductDetail() {
                 </div>
               </div>
 
+              {/* Academy Course Hub & Syllabus Navigation Card */}
+              {(product.category === 'Academy Courses' || product.coursePath) && (
+                <div className="rounded-2xl border border-emerald-300/80 bg-gradient-to-r from-emerald-50 via-teal-50 to-white p-4 sm:p-5 shadow-sm space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <GraduationCap className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                          <span>Academy Certified Program Track</span>
+                          <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900 border border-emerald-300">
+                            Verified Certification
+                          </span>
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-0.5">
+                          {product.cohortSchedule || 'Sequential video lectures, statutory notes, module quizzes, and LMS examination.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {product.coursePath && (
+                        <Link
+                          to={product.coursePath}
+                          className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors inline-flex items-center gap-1.5"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>View Full Syllabus</span>
+                        </Link>
+                      )}
+                      <Link
+                        to="/student/dashboard"
+                        className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors inline-flex items-center gap-1.5"
+                      >
+                        <MonitorPlay className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Student Portal</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
 
 
@@ -1085,7 +1130,7 @@ export function ProductDetail() {
 
       {/* Floating Cart Trigger Button (When Cart Has Items) */}
       {totalItemsCount > 0 && (
-        <div className="fixed bottom-6 right-6 z-40 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-6 left-6 z-40 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}

@@ -137,7 +137,7 @@ export function Glossary() {
         }
         description={
           selectedTermForModal
-            ? selectedTermForModal.definition
+            ? selectedTermForModal.summary
             : 'Comprehensive statutory dictionary of Bangladesh Income Tax Act 2023, VAT & SD Act 2012, RJSC Companies Act 1994, and IFRS accounting terminology.'
         }
         canonicalUrl="/glossary"
