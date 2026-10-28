@@ -6530,7 +6530,7 @@ ${JSON.stringify({ "@context": "https://schema.org", "@graph": schemaGraph }, nu
         categories: categories,
         tools: searchableTaxTools,
         products: products,
-        courses: INITIAL_LMS_COURSES
+        courses: INITIAL_LMS_COURSES.map(c => ({ ...c, id: c.courseId }))
       });
       res.setHeader("Content-Type", "application/xml; charset=utf-8");
       res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=86400");

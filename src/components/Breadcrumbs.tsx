@@ -692,6 +692,33 @@ function BreadcrumbTrail({
   showBackButton?: boolean;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const breadcrumbJsonLd = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://accounticca.com';
+    const itemListElement = [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `${origin}/`,
+      },
+      ...items.map((item, index) => {
+        const itemUrl = item.path ? (item.path.startsWith('http') ? item.path : `${origin}${item.path}`) : `${origin}${location.pathname}`;
+        return {
+          '@type': 'ListItem',
+          position: index + 2,
+          name: item.label,
+          item: itemUrl,
+        };
+      }),
+    ];
+    return JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement,
+    });
+  }, [items, location.pathname]);
 
   if (items.length === 0) {
     return null;
@@ -714,6 +741,10 @@ function BreadcrumbTrail({
       aria-label="Breadcrumb"
       className={`flex items-center justify-between gap-3 text-xs sm:text-sm font-medium text-slate-600 print:hidden ${className}`}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+      />
       <div className="flex items-center min-w-0 overflow-x-auto no-scrollbar py-0.5">
         {showBackButton && (
           <button

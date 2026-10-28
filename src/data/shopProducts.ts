@@ -74,6 +74,36 @@ export type ShopCategory = typeof SHOP_CATEGORIES[number];
 
 export const SHOP_PRODUCTS: ShopProduct[] = [
   {
+    id: 'personal-income-tax-2025-recorded',
+    title: 'Personal Income Tax Masterclass 2025 (Recorded Session & Complete Filing Kit)',
+    slug: 'personal-income-tax-2025-recorded',
+    category: 'Academy Courses',
+    productType: 'Academy Courses',
+    price: 1500,
+    originalPrice: 2500,
+    rating: 4.96,
+    reviewsCount: 89,
+    format: 'Full HD Video Workshop (3.5 Hours) + Excel Return Kit & PDF Guide',
+    badge: 'Popular',
+    shortDescription: 'Comprehensive recorded masterclass covering Bangladesh personal income tax computation, salary perquisites, Section 78 investment rebate, and NBR e-Return portal step-by-step.',
+    fullDescription: 'An intensive recorded masterclass conducted by Supreme Court Advocates and Chartered Accountants. This masterclass walks through every aspect of individual tax return filing under the Income Tax Act 2023. Includes complete video recordings of all sessions, step-by-step e-Return portal screen recordings, downloadable excel worksheets, IT-10B net wealth reconciliation guides, and sample calculation templates.',
+    governingLaw: 'Income Tax Act, 2023 & Finance Act (Bangladesh)',
+    pagesOrFiles: '3.5 Hours HD Video • Excel Templates (.xlsx) • PDF Guides',
+    features: [
+      '3.5 Hours Full HD video recordings with timestamp chapters',
+      'Step-by-step NBR Online e-Return portal filing walkthrough',
+      'Detailed calculation of salary, house property, and investment rebates',
+      'IT-10B net wealth statement reconciliation masterclass',
+      'Downloadable excel calculators and editable PDF forms',
+      'Certificate of completion upon passing the final quiz'
+    ],
+    samplePreviewSnippet: 'Welcome to the Personal Income Tax Masterclass 2025 Recorded Session. In this comprehensive module, we examine gross taxable income calculation, allowable exemptions under Sixth Schedule, and electronic return submission...',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800',
+    authorOrVettedBy: 'Adv. Ekram Hossain, Advocate, Supreme Court of Bangladesh & Lead Tax Counsel',
+    trainingCourseId: 'personal-income-tax',
+    coursePath: '/course/personal-income-tax'
+  },
+  {
     id: 'mutual-nda-pro-kit',
     title: 'Mutual Non-Disclosure Agreement (NDA) Pro Kit',
     slug: 'mutual-nda-pro-kit',

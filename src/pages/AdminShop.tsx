@@ -50,6 +50,7 @@ import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget
 import { TransactionalEmailTemplateManager } from '../components/admin/TransactionalEmailTemplateManager';
 import { TransactionalEmailHistoryTab } from '../components/admin/TransactionalEmailHistoryTab';
 import { AdminSeoManager } from '../components/admin/AdminSeoManager';
+import { AdminSearchAnalyticsTab } from '../components/admin/AdminSearchAnalyticsTab';
 import { 
   ShopProduct, 
   SHOP_CATEGORIES, 
@@ -128,7 +129,7 @@ const RECENT_TRANSACTIONS = [
 export function AdminShop({
   initialTab = 'catalog'
 }: {
-  initialTab?: 'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo';
+  initialTab?: 'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo' | 'search-analytics';
 } = {}) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -148,9 +149,12 @@ export function AdminShop({
     }
   };
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo'>(() => {
+  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo' | 'search-analytics'>(() => {
     if (location.pathname.includes('/seo') || location.search.includes('tab=seo')) {
       return 'seo';
+    }
+    if (location.pathname.includes('/search') || location.search.includes('tab=search-analytics')) {
+      return 'search-analytics';
     }
     if (location.pathname.includes('/email-history') || location.search.includes('tab=email-history')) {
       return 'email-history';
@@ -164,6 +168,8 @@ export function AdminShop({
   useEffect(() => {
     if (location.pathname.includes('/seo') || location.search.includes('tab=seo')) {
       setActiveAdminTab('seo');
+    } else if (location.pathname.includes('/search') || location.search.includes('tab=search-analytics')) {
+      setActiveAdminTab('search-analytics');
     } else if (location.pathname.includes('/email-history') || location.search.includes('tab=email-history')) {
       setActiveAdminTab('email-history');
     } else if (location.pathname.includes('/email-templates') || location.search.includes('tab=email-templates')) {
@@ -608,6 +614,18 @@ export function AdminShop({
               <Globe className="w-4 h-4 text-emerald-400" />
               <span>SEO & Indexing</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('search-analytics')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'search-analytics'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <Search className="w-4 h-4 text-emerald-400" />
+              <span>Search & Gaps</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
@@ -647,7 +665,11 @@ export function AdminShop({
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {activeAdminTab === 'seo' ? (
+        {activeAdminTab === 'search-analytics' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <AdminSearchAnalyticsTab />
+          </div>
+        ) : activeAdminTab === 'seo' ? (
           <div className="space-y-8 animate-in fade-in duration-300">
             <AdminSeoManager />
           </div>
