@@ -162,6 +162,19 @@ export function Auth() {
           console.warn('User profile doc creation warning:', dbErr);
         }
 
+        // Dispatch Brevo registration welcome email using the Admin Transactional Email Template Manager
+        fetch('/api/email/send-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'welcome',
+            name: fullName.trim() || newUser.displayName || 'Member',
+            email: newUser.email || email.trim(),
+            accountRole: 'Verified Client Member',
+            portalUrl: `${window.location.origin}/client-portal`
+          })
+        }).catch(() => {});
+
         navigate(from, { replace: true });
       }
     } catch (err: any) {

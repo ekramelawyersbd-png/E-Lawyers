@@ -16,15 +16,17 @@ import {
   ArrowLeft,
   ExternalLink,
   HardDrive,
-  RefreshCw
+  RefreshCw,
+  Mail
 } from 'lucide-react';
 import { useLms, CertificateStatus } from '../contexts/LmsContext';
 import { LmsR2AssetMetadata } from '../data/lmsCoursesData';
 import { R2MaterialUploadCard } from '../components/lms/R2MaterialUploadCard';
 import { fetchR2StorageStatus, R2StorageStatus } from '../utils/r2StorageClient';
 import { ServiceSEO } from '../components/SEO';
+import { TransactionalEmailTemplateManager } from '../components/admin/TransactionalEmailTemplateManager';
 
-type AdminLmsTab = 'editor' | 'assessments' | 'students' | 'certificates' | 'audit';
+type AdminLmsTab = 'editor' | 'assessments' | 'students' | 'certificates' | 'audit' | 'email-templates';
 
 export const AdminLmsDashboardPage: React.FC<{
   initialTab?: AdminLmsTab;
@@ -422,7 +424,8 @@ export const AdminLmsDashboardPage: React.FC<{
             { id: 'assessments' as const, label: '2. Quiz & Final Exam Manager', icon: SlidersHorizontal },
             { id: 'students' as const, label: '3. Student Enrollment & Progress', icon: Users },
             { id: 'certificates' as const, label: '4. Certificate Manager', icon: Award },
-            { id: 'audit' as const, label: '5. Admin Action Logs', icon: History }
+            { id: 'audit' as const, label: '5. Admin Action Logs', icon: History },
+            { id: 'email-templates' as const, label: '6. Email Templates (Brevo)', icon: Mail }
           ].map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
@@ -1195,6 +1198,11 @@ export const AdminLmsDashboardPage: React.FC<{
               ))}
             </div>
           </div>
+        )}
+
+        {/* TAB 6: TRANSACTIONAL EMAIL TEMPLATE MANAGER (BREVO) */}
+        {activeTab === 'email-templates' && (
+          <TransactionalEmailTemplateManager />
         )}
       </div>
     </div>

@@ -47,6 +47,22 @@ export const EnrollmentPage: React.FC = () => {
       enrollments.push(enrollment);
       localStorage.setItem('training_enrollments', JSON.stringify(enrollments));
       setIsSubmitted(true);
+
+      // Dispatch Brevo course enrollment email using the Admin Transactional Email Template Manager
+      fetch('/api/email/send-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'enrollment',
+          enrollmentId: `ENR-${enrollment.id.slice(-6)}`,
+          name,
+          email,
+          phone,
+          courseTitle,
+          tuitionFee: coursePrice,
+          dashboardUrl: `${window.location.origin}${getAcademyCourseDashboardPath(courseTitle)}`
+        })
+      }).catch(() => {});
     } catch (err) {
       console.error('Failed to save enrollment', err);
     }

@@ -34,6 +34,27 @@ import {
   generateShopOrderEmailHtml,
   type ShopOrderEmailData
 } from "./src/utils/shopOrderEmailTemplate";
+import {
+  DEFAULT_TRANSACTIONAL_EMAIL_TEMPLATES,
+  renderTransactionalTemplate,
+  extractTemplatePlaceholderKeys,
+  type TransactionalEmailTemplate,
+  type EmailPlaceholderDefinition
+} from "./src/utils/transactionalEmailTemplates";
+import {
+  DEFAULT_SEO_CONFIG,
+  DEFAULT_INDEXNOW_KEY,
+  generateXmlSitemap,
+  generateRobotsTxt,
+  generateLlmsTxt,
+  type SeoConfig,
+  type RouteSeoEntry,
+  type IndexNowLogEntry,
+  type DynamicSitemapContent
+} from "./src/utils/seoConfig";
+import { mockArticles, categories } from "./src/data/mockData";
+import { searchableTaxTools } from "./src/data/searchableTools";
+import { INITIAL_LMS_COURSES } from "./src/data/lmsCoursesData";
 
 process.on("uncaughtException", (err) => {
   console.error("[Server Uncaught Exception — Recovered]:", err);
@@ -71,6 +92,8 @@ const CONTACT_REQUESTS_STORAGE_FILE = path.join(process.cwd(), "data", "contact-
 const CONTACT_SHEET_CONFIG_FILE = path.join(process.cwd(), "data", "contact-sheet-config.json");
 const SHOP_ORDERS_STORAGE_FILE = path.join(process.cwd(), "data", "shop-orders-server.json");
 const SHOP_SHEET_CONFIG_FILE = path.join(process.cwd(), "data", "shop-sheet-config.json");
+const SEO_CONFIG_FILE = path.join(process.cwd(), "data", "seo-config.json");
+const SEO_INDEXNOW_LOGS_FILE = path.join(process.cwd(), "data", "seo-indexnow-logs.json");
 
 export interface RecruitmentSheetConfig {
   spreadsheetId: string;
@@ -471,6 +494,11 @@ export interface EmailNotificationRecord {
   text: string;
   sentAt: string;
   delivered: boolean;
+  deliveryStatus?: 'delivered' | 'failed' | 'pending';
+  category?: 'registration' | 'booking' | 'payment' | 'system';
+  smtpNotice?: string | null;
+  fromHeader?: string;
+  retriedAt?: string;
   transport: string;
   cancellationReason?: string;
 }
@@ -849,6 +877,76 @@ async function startServer() {
     };
   }
 
+  // --- Transactional Email Template Manager Storage & Helpers ---
+  const EMAIL_TEMPLATES_FILE = path.join(process.cwd(), "data", "email-templates-server.json");
+
+  function loadEmailTemplates(): TransactionalEmailTemplate[] {
+    let savedList: TransactionalEmailTemplate[] = [];
+    try {
+      if (fs.existsSync(EMAIL_TEMPLATES_FILE)) {
+        const parsed = JSON.parse(fs.readFileSync(EMAIL_TEMPLATES_FILE, "utf-8"));
+        if (Array.isArray(parsed)) {
+          savedList = parsed;
+        }
+      }
+    } catch (err) {
+      console.warn("[Email Templates] Failed to read email-templates-server.json:", err);
+    }
+
+    const savedMap = new Map<string, TransactionalEmailTemplate>();
+    for (const item of savedList) {
+      if (item && typeof item.id === "string") {
+        savedMap.set(item.id, item);
+      }
+    }
+
+    const merged: TransactionalEmailTemplate[] = DEFAULT_TRANSACTIONAL_EMAIL_TEMPLATES.map((def) => {
+      const custom = savedMap.get(def.id);
+      if (!custom) return { ...def };
+      // Merge placeholders so default placeholders are preserved alongside any custom ones
+      const customPlaceholders = Array.isArray(custom.placeholders) ? custom.placeholders : def.placeholders;
+      const phMap = new Map<string, EmailPlaceholderDefinition>();
+      for (const p of def.placeholders) {
+        phMap.set(p.key, { ...p });
+      }
+      for (const p of customPlaceholders) {
+        if (p && p.key) {
+          phMap.set(p.key, {
+            key: p.key,
+            token: p.token || `{{${p.key}}}`,
+            label: p.label || p.key,
+            description: p.description || "Custom placeholder variable",
+            sampleValue: p.sampleValue ?? "",
+            isCustom: p.isCustom ?? !def.placeholders.some((dp) => dp.key === p.key)
+          });
+        }
+      }
+      return {
+        ...def,
+        ...custom,
+        id: def.id,
+        category: def.category,
+        placeholders: Array.from(phMap.values())
+      };
+    });
+
+    return merged;
+  }
+
+  function saveEmailTemplates(templates: TransactionalEmailTemplate[]): void {
+    try {
+      const dir = path.dirname(EMAIL_TEMPLATES_FILE);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(EMAIL_TEMPLATES_FILE, JSON.stringify(templates, null, 2), "utf-8");
+    } catch (err) {
+      console.error("[Email Templates] Failed to write email-templates-server.json:", err);
+    }
+  }
+
+  function getEmailTemplateById(id: string): TransactionalEmailTemplate | undefined {
+    return loadEmailTemplates().find((t) => t.id === id);
+  }
+
   // Helper middleware to strictly enforce admin authentication on server-side
   const requireAdminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -1126,16 +1224,60 @@ async function startServer() {
         leadPartnerEmail: leadPartnerEmail || assignedPartnerEmail
       };
 
-      const { subject, html, text } = generateAppointmentEmailHtml(payload);
+      const fallbackGenerated = generateAppointmentEmailHtml(payload);
+      let subject = fallbackGenerated.subject;
+      let html = fallbackGenerated.html;
+      let text = fallbackGenerated.text;
+
+      // Check Admin Transactional Email Template Manager for customized Booking templates
+      const targetTemplateId = normalizedStatus === 'Cancelled' ? 'booking_cancellation' : 'booking_confirmation';
+      const managedBookingTpl = getEmailTemplateById(targetTemplateId);
+      if (managedBookingTpl && managedBookingTpl.enabled) {
+        const renderedManaged = renderTransactionalTemplate(
+          managedBookingTpl,
+          {
+            clientName: payload.clientName,
+            clientEmail: payload.email,
+            clientPhone: payload.phone || 'Not provided',
+            referenceId: payload.referenceId,
+            practiceArea: payload.practiceArea,
+            consultationMode: payload.mode === 'in-person' ? 'In-Chambers Consultation (Panthapath, Dhaka)' : 'Virtual Video Consultation (Google Meet)',
+            date: payload.date,
+            timeSlot: payload.timeSlot,
+            status: normalizedStatus,
+            notes: req.body?.notes || cancellationReason || 'Scheduled via Chambers Appointment Desk',
+            calendarSyncInfo: 'An automated 3-hour prior reminder and Google Calendar invitation are active for this slot.',
+            portalUrl: 'https://blog.accounticca.com/contact?tab=appointment',
+            rebookUrl: 'https://blog.accounticca.com/contact?tab=appointment',
+            firmName: 'ACCOUNTICCA x E-Lawyers',
+            firmDeskEmail: CENTRAL_FIRM_DESK_EMAIL,
+            officeAddress: 'Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205'
+          },
+          false
+        );
+        if (renderedManaged.subject && renderedManaged.html) {
+          subject = renderedManaged.subject;
+          html = renderedManaged.html;
+          text = renderedManaged.text || fallbackGenerated.text;
+        }
+      }
+
       let messageId = `msg-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
       // Assemble provider recipients: Lead partner and centralized firm desk (ekram@elawyersbd.com)
       const partnerEmail = (leadPartnerEmail || assignedPartnerEmail || "").trim();
-      const providerCopies = Array.from(new Set([CENTRAL_FIRM_DESK_EMAIL, partnerEmail].filter(e => Boolean(e) && e.includes("@"))));
+      const includeAdminCc = managedBookingTpl ? managedBookingTpl.ccAdmin : true;
+      const providerCopies = Array.from(
+        new Set(
+          [includeAdminCc ? CENTRAL_FIRM_DESK_EMAIL : "", partnerEmail].filter(
+            (e) => Boolean(e) && e.includes("@")
+          )
+        )
+      );
 
       const dispatchResult = await dispatchBrevoSmtpEmail({
         to: email,
-        cc: providerCopies,
+        cc: providerCopies.length > 0 ? providerCopies : undefined,
         subject,
         html,
         text,
@@ -1305,7 +1447,42 @@ async function startServer() {
       hoursRemaining: 3
     };
 
-    const { subject, html, text } = generateAppointmentReminderEmailHtml(payload, 3);
+    const fallbackReminder = generateAppointmentReminderEmailHtml(payload, 3);
+    let subject = fallbackReminder.subject;
+    let html = fallbackReminder.html;
+    let text = fallbackReminder.text;
+
+    const managedReminderTpl = getEmailTemplateById("booking_reminder_3h");
+    if (managedReminderTpl && managedReminderTpl.enabled) {
+      const renderedReminder = renderTransactionalTemplate(
+        managedReminderTpl,
+        {
+          clientName: payload.clientName,
+          clientEmail: payload.email,
+          referenceId: payload.referenceId,
+          practiceArea: payload.practiceArea,
+          consultationMode:
+            payload.mode === "in-person"
+              ? "In-Chambers Consultation (Panthapath, Dhaka)"
+              : "Virtual Video Consultation (Google Meet)",
+          date: payload.date,
+          timeSlot: payload.timeSlot,
+          hoursRemaining: "3",
+          portalUrl: "https://blog.accounticca.com/contact?tab=appointment",
+          firmName: "ACCOUNTICCA x E-Lawyers",
+          firmDeskEmail: CENTRAL_FIRM_DESK_EMAIL,
+          officeAddress:
+            "Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205",
+        },
+        false
+      );
+      if (renderedReminder.subject && renderedReminder.html) {
+        subject = renderedReminder.subject;
+        html = renderedReminder.html;
+        text = renderedReminder.text || fallbackReminder.text;
+      }
+    }
+
     const dispatchResult = await dispatchBrevoSmtpEmail({
       to: recipientEmail,
       cc: providerCopies,
@@ -2738,13 +2915,67 @@ async function startServer() {
       };
 
       const generated = generateShopOrderEmailHtml(emailPayload);
-      const subject = String(body.subject || generated.subject);
-      const html = String(body.html || generated.html);
-      const text = String(body.text || generated.text);
+      let subject = String(body.subject || generated.subject);
+      let html = String(body.html || generated.html);
+      let text = String(body.text || generated.text);
+
+      // Check Admin Transactional Email Template Manager for customized Payment Receipt template
+      const managedPaymentTpl = getEmailTemplateById("payment_receipt");
+      if (!body.html && managedPaymentTpl && managedPaymentTpl.enabled) {
+        const itemsHtml =
+          emailPayload.items.length > 0
+            ? emailPayload.items
+                .map(
+                  (item, idx) =>
+                    `<div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; background: #ffffff; font-size: 13px; display: flex; justify-content: space-between;">
+                      <div><strong>${idx + 1}. ${item.title}</strong> <span style="color:#64748b;font-size:12px;">(${item.format || item.category || "Digital Resource"} × ${item.quantity || 1})</span></div>
+                      <div style="color:#059669;font-weight:700;">BDT ${Number(item.lineTotal ?? Number(item.unitPrice || 0) * Number(item.quantity || 1)).toLocaleString("en-IN")}</div>
+                    </div>`
+                )
+                .join("")
+            : `<div style="padding: 12px 16px; background: #ffffff; font-size: 13px;">Digital Order Settlement (#${orderId}) — <strong style="color:#059669;">BDT ${emailPayload.totalCost.toLocaleString("en-IN")}</strong></div>`;
+
+        const itemsText =
+          emailPayload.items.length > 0
+            ? emailPayload.items
+                .map(
+                  (item, idx) =>
+                    `${idx + 1}. ${item.title} (${item.quantity || 1}x) - BDT ${Number(item.lineTotal ?? Number(item.unitPrice || 0) * Number(item.quantity || 1)).toLocaleString("en-IN")}`
+                )
+                .join("\n")
+            : `Order #${orderId} - BDT ${emailPayload.totalCost.toLocaleString("en-IN")}`;
+
+        const renderedPayment = renderTransactionalTemplate(
+          managedPaymentTpl,
+          {
+            customerName,
+            customerEmail,
+            customerPhone: customerPhone || "Not provided",
+            orderId,
+            trxId: emailPayload.trxId,
+            paymentMethod: emailPayload.paymentMethod,
+            totalAmount: emailPayload.totalCost.toLocaleString("en-IN"),
+            paymentDate: emailPayload.orderDate || new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+            itemsSummaryHtml: itemsHtml,
+            itemsSummaryText: itemsText,
+            downloadPortalUrl: "https://blog.accounticca.com/client-portal?tab=purchases",
+            firmName: "ACCOUNTICCA x E-Lawyers",
+            firmDeskEmail: CENTRAL_FIRM_DESK_EMAIL,
+            officeAddress: "Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205"
+          },
+          false
+        );
+
+        if (renderedPayment.subject && renderedPayment.html) {
+          subject = renderedPayment.subject;
+          html = renderedPayment.html;
+          text = renderedPayment.text || generated.text;
+        }
+      }
 
       const shopDispatch = await dispatchBrevoSmtpEmail({
         to: customerEmail,
-        cc: CENTRAL_FIRM_DESK_EMAIL,
+        cc: managedPaymentTpl && !managedPaymentTpl.ccAdmin ? undefined : CENTRAL_FIRM_DESK_EMAIL,
         subject,
         html,
         text,
@@ -3636,6 +3867,620 @@ Each object must follow this exact JSON schema:
       });
     } catch (err: any) {
       return res.status(500).json({ error: "Failed to dispatch Brevo test email", details: err?.message });
+    }
+  });
+
+  // ============================================================================
+  // TRANSACTIONAL EMAIL TEMPLATE MANAGER API (BREVO SMTP RELAY)
+  // ============================================================================
+  app.get("/api/email/templates", (_req, res) => {
+    try {
+      const templates = loadEmailTemplates();
+      const cfg = getBrevoSmtpConfig();
+      res.json({
+        success: true,
+        templates,
+        brevoRelay: {
+          host: cfg.host,
+          port: cfg.port,
+          login: cfg.user,
+          senderName: cfg.senderName,
+          senderEmail: cfg.senderEmail,
+          formattedFrom: getFormattedBrevoFromHeader(),
+          liveRelayActive: canUseProductionSmtp() && !productionSmtpAuthFailed,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to load transactional email templates", details: err?.message });
+    }
+  });
+
+  app.put("/api/email/templates/:id", (req, res) => {
+    try {
+      const templateId = String(req.params.id || "").trim();
+      const templates = loadEmailTemplates();
+      const idx = templates.findIndex((t) => t.id === templateId);
+      if (idx === -1) {
+        return res.status(404).json({ error: `Email template '${templateId}' not found.` });
+      }
+
+      const body = req.body || {};
+      const current = templates[idx];
+
+      const nextSubject = typeof body.subjectTemplate === "string" ? body.subjectTemplate : current.subjectTemplate;
+      const nextHtml = typeof body.htmlTemplate === "string" ? body.htmlTemplate : current.htmlTemplate;
+      const nextText = typeof body.textTemplate === "string" ? body.textTemplate : current.textTemplate;
+
+      // Auto-discover any new {{placeholder}} tokens in subject/html/text and ensure they exist in placeholders list
+      const existingPlaceholders: EmailPlaceholderDefinition[] = Array.isArray(body.placeholders)
+        ? body.placeholders
+        : current.placeholders;
+      const phMap = new Map<string, EmailPlaceholderDefinition>();
+      for (const p of existingPlaceholders) {
+        if (p && p.key) {
+          phMap.set(p.key, {
+            key: p.key,
+            token: `{{${p.key}}}`,
+            label: p.label || p.key,
+            description: p.description || "Template placeholder variable",
+            sampleValue: p.sampleValue ?? "",
+            isCustom: p.isCustom
+          });
+        }
+      }
+
+      const detectedKeys = extractTemplatePlaceholderKeys(nextSubject, nextHtml, nextText);
+      for (const key of detectedKeys) {
+        if (!phMap.has(key)) {
+          phMap.set(key, {
+            key,
+            token: `{{${key}}}`,
+            label: key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
+            description: `Custom placeholder {{${key}}}`,
+            sampleValue: `[Sample ${key}]`,
+            isCustom: true
+          });
+        }
+      }
+
+      const updatedTemplate: TransactionalEmailTemplate = {
+        ...current,
+        name: typeof body.name === "string" && body.name.trim() ? body.name.trim() : current.name,
+        description: typeof body.description === "string" ? body.description : current.description,
+        enabled: typeof body.enabled === "boolean" ? body.enabled : current.enabled,
+        ccAdmin: typeof body.ccAdmin === "boolean" ? body.ccAdmin : current.ccAdmin,
+        subjectTemplate: nextSubject,
+        htmlTemplate: nextHtml,
+        textTemplate: nextText,
+        placeholders: Array.from(phMap.values()),
+        updatedAt: new Date().toISOString(),
+        updatedBy: typeof body.updatedBy === "string" ? body.updatedBy : "Admin"
+      };
+
+      templates[idx] = updatedTemplate;
+      saveEmailTemplates(templates);
+
+      return res.json({
+        success: true,
+        template: updatedTemplate,
+        message: `Template "${updatedTemplate.name}" saved and active for Brevo SMTP dispatches.`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to update email template", details: err?.message });
+    }
+  });
+
+  app.post("/api/email/templates/:id/reset", (req, res) => {
+    try {
+      const templateId = String(req.params.id || "").trim();
+      if (templateId === "all") {
+        const freshDefaults = DEFAULT_TRANSACTIONAL_EMAIL_TEMPLATES.map((t) => ({
+          ...t,
+          updatedAt: new Date().toISOString()
+        }));
+        saveEmailTemplates(freshDefaults);
+        return res.json({
+          success: true,
+          templates: freshDefaults,
+          message: "All transactional email templates have been reset to factory defaults."
+        });
+      }
+
+      const defaultTpl = DEFAULT_TRANSACTIONAL_EMAIL_TEMPLATES.find((t) => t.id === templateId);
+      if (!defaultTpl) {
+        return res.status(404).json({ error: `Default template '${templateId}' not found.` });
+      }
+
+      const templates = loadEmailTemplates();
+      const idx = templates.findIndex((t) => t.id === templateId);
+      const resetItem: TransactionalEmailTemplate = {
+        ...defaultTpl,
+        updatedAt: new Date().toISOString()
+      };
+      if (idx >= 0) {
+        templates[idx] = resetItem;
+      } else {
+        templates.push(resetItem);
+      }
+      saveEmailTemplates(templates);
+
+      return res.json({
+        success: true,
+        template: resetItem,
+        message: `Template "${resetItem.name}" reset to factory default HTML and placeholders.`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to reset email template", details: err?.message });
+    }
+  });
+
+  app.post("/api/email/templates/:id/preview", (req, res) => {
+    try {
+      const templateId = String(req.params.id || "").trim();
+      const stored = getEmailTemplateById(templateId);
+      const body = req.body || {};
+
+      const templateToRender = {
+        subjectTemplate: typeof body.subjectTemplate === "string" ? body.subjectTemplate : stored?.subjectTemplate || "",
+        htmlTemplate: typeof body.htmlTemplate === "string" ? body.htmlTemplate : stored?.htmlTemplate || "",
+        textTemplate: typeof body.textTemplate === "string" ? body.textTemplate : stored?.textTemplate || "",
+        placeholders: Array.isArray(body.placeholders) ? body.placeholders : stored?.placeholders || []
+      };
+
+      const rendered = renderTransactionalTemplate(templateToRender, body.variables || {}, true);
+      return res.json({
+        success: true,
+        ...rendered,
+        fromHeader: getFormattedBrevoFromHeader()
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to render template preview", details: err?.message });
+    }
+  });
+
+  app.post("/api/email/templates/:id/test", async (req, res) => {
+    try {
+      const templateId = String(req.params.id || "").trim();
+      const stored = getEmailTemplateById(templateId);
+      if (!stored && !req.body?.htmlTemplate) {
+        return res.status(404).json({ error: `Template '${templateId}' not found.` });
+      }
+
+      const body = req.body || {};
+      const recipientEmail = String(body.recipientEmail || body.email || CENTRAL_FIRM_DESK_EMAIL)
+        .trim()
+        .toLowerCase();
+      if (!recipientEmail || !recipientEmail.includes("@")) {
+        return res.status(400).json({ error: "A valid recipient email address is required for test dispatch." });
+      }
+
+      const templateToRender = {
+        subjectTemplate: typeof body.subjectTemplate === "string" ? body.subjectTemplate : stored!.subjectTemplate,
+        htmlTemplate: typeof body.htmlTemplate === "string" ? body.htmlTemplate : stored!.htmlTemplate,
+        textTemplate: typeof body.textTemplate === "string" ? body.textTemplate : stored!.textTemplate,
+        placeholders: Array.isArray(body.placeholders) ? body.placeholders : stored!.placeholders
+      };
+
+      const rendered = renderTransactionalTemplate(templateToRender, body.variables || {}, true);
+      const dispatchRes = await dispatchBrevoSmtpEmail({
+        to: recipientEmail,
+        cc: recipientEmail !== CENTRAL_FIRM_DESK_EMAIL ? CENTRAL_FIRM_DESK_EMAIL : undefined,
+        subject: `[TEST] ${rendered.subject}`,
+        html: rendered.html,
+        text: rendered.text
+      });
+
+      const record: EmailNotificationRecord = {
+        id: `notif-tpl-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        messageId: dispatchRes.messageId,
+        referenceId: `TPL-TEST-${templateId.toUpperCase()}`,
+        clientName: rendered.resolvedVariables.clientName || rendered.resolvedVariables.customerName || "Template Test Recipient",
+        recipientEmail,
+        ccEmails: [CENTRAL_FIRM_DESK_EMAIL],
+        practiceArea: `Template Test: ${stored?.name || templateId}`,
+        mode: "virtual",
+        date: new Date().toISOString().split("T")[0],
+        timeSlot: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+        status: "Confirmed",
+        subject: `[TEST] ${rendered.subject}`,
+        html: rendered.html,
+        text: rendered.text,
+        sentAt: new Date().toISOString(),
+        delivered: dispatchRes.delivered,
+        transport: dispatchRes.transport
+      };
+      const all = loadNotifications();
+      all.unshift(record);
+      saveNotifications(all.slice(0, 100));
+
+      return res.json({
+        success: true,
+        templateId,
+        recipientEmail,
+        subject: `[TEST] ${rendered.subject}`,
+        messageId: dispatchRes.messageId,
+        transport: dispatchRes.transport,
+        fromHeader: dispatchRes.fromHeader,
+        previewUrl: dispatchRes.previewUrl,
+        message: `Live test email for "${stored?.name || templateId}" dispatched to ${recipientEmail} via ${dispatchRes.transport}.`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to dispatch template test email", details: err?.message });
+    }
+  });
+
+  // Live Transactional Endpoint for Registration & Course Enrollment Emails
+  app.post("/api/email/send-registration", async (req, res) => {
+    try {
+      const body = req.body || {};
+      const type = body.type === "enrollment" ? "registration_enrollment" : "registration_welcome";
+      const clientEmail = String(body.email || body.clientEmail || "").trim().toLowerCase();
+      const clientName = String(body.name || body.clientName || clientEmail.split("@")[0] || "Valued Member").trim();
+
+      if (!clientEmail || !clientEmail.includes("@")) {
+        return res.status(400).json({ error: "A valid email address is required." });
+      }
+
+      const tpl = getEmailTemplateById(type) || DEFAULT_TRANSACTIONAL_EMAIL_TEMPLATES.find((t) => t.id === type)!;
+      if (!tpl.enabled) {
+        return res.json({
+          success: true,
+          skipped: true,
+          message: `Template '${tpl.name}' is currently disabled by admin.`
+        });
+      }
+
+      const refId = String(
+        body.referenceId ||
+          body.enrollmentId ||
+          (type === "registration_enrollment"
+            ? `ENR-${Date.now().toString(36).toUpperCase()}`
+            : `REG-${Date.now().toString(36).toUpperCase()}`)
+      );
+
+      const rendered = renderTransactionalTemplate(
+        tpl,
+        {
+          clientName,
+          clientEmail,
+          clientPhone: body.phone || body.clientPhone || "Not provided",
+          accountRole: body.accountRole || "Verified Client Member",
+          registrationDate: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+          referenceId: refId,
+          enrollmentId: refId,
+          courseTitle: body.courseTitle || "Personal & Corporate Income Tax Masterclass 2026-27",
+          tuitionFee: body.tuitionFee || body.coursePrice || "BDT 12,500",
+          portalUrl: body.portalUrl || "https://blog.accounticca.com/client-portal",
+          dashboardUrl: body.dashboardUrl || "https://blog.accounticca.com/student/dashboard",
+          firmName: "ACCOUNTICCA x E-Lawyers",
+          firmDeskEmail: CENTRAL_FIRM_DESK_EMAIL,
+          firmPhone: "+880 1613-242524",
+          officeAddress: "Suite G-5, BTI Centara Grand, 144–144/1 Green Road, Panthapath, Dhaka–1205"
+        },
+        true
+      );
+
+      const dispatchRes = await dispatchBrevoSmtpEmail({
+        to: clientEmail,
+        cc: tpl.ccAdmin && clientEmail !== CENTRAL_FIRM_DESK_EMAIL ? CENTRAL_FIRM_DESK_EMAIL : undefined,
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text
+      });
+
+      const record: EmailNotificationRecord = {
+        id: `notif-reg-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        messageId: dispatchRes.messageId,
+        referenceId: refId,
+        clientName,
+        recipientEmail: clientEmail,
+        ccEmails: tpl.ccAdmin ? [CENTRAL_FIRM_DESK_EMAIL] : [],
+        practiceArea: type === "registration_enrollment" ? `Course Enrollment (${body.courseTitle || "Academy"})` : "Account Registration",
+        mode: "virtual",
+        date: new Date().toISOString().split("T")[0],
+        timeSlot: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+        status: "Confirmed",
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
+        sentAt: new Date().toISOString(),
+        delivered: dispatchRes.delivered,
+        transport: dispatchRes.transport
+      };
+      const all = loadNotifications();
+      all.unshift(record);
+      saveNotifications(all.slice(0, 100));
+
+      return res.json({
+        success: true,
+        referenceId: refId,
+        recipientEmail: clientEmail,
+        messageId: dispatchRes.messageId,
+        transport: dispatchRes.transport,
+        message: `Registration email dispatched to ${clientEmail} via ${dispatchRes.transport}.`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to dispatch registration email", details: err?.message });
+    }
+  });
+
+  // ============================================================================
+  // BREVO TRANSACTIONAL EMAIL HISTORY & DELIVERY LOGS API
+  // ============================================================================
+  function inferEmailRecordCategory(rec: EmailNotificationRecord): "registration" | "booking" | "payment" | "system" {
+    if (rec.category) return rec.category;
+    const ref = (rec.referenceId || "").toUpperCase();
+    const area = (rec.practiceArea || "").toLowerCase();
+    const id = (rec.id || "").toLowerCase();
+    const subj = (rec.subject || "").toLowerCase();
+
+    if (
+      ref.startsWith("ORD-") ||
+      ref.startsWith("ACC-") ||
+      ref.startsWith("INV-") ||
+      ref.startsWith("PAY-") ||
+      id.includes("notif-ord-") ||
+      area.includes("shop order") ||
+      area.includes("payment") ||
+      subj.includes("payment receipt") ||
+      subj.includes("order confirmation")
+    ) {
+      return "payment";
+    }
+
+    if (
+      ref.startsWith("REG-") ||
+      ref.startsWith("ENR-") ||
+      ref.startsWith("SUB-") ||
+      id.includes("notif-reg-") ||
+      id.includes("notif-sub-") ||
+      area.includes("registration") ||
+      area.includes("enrollment") ||
+      area.includes("newsletter") ||
+      subj.includes("welcome to") ||
+      subj.includes("enrollment")
+    ) {
+      return "registration";
+    }
+
+    if (
+      ref.startsWith("BREVO-TEST") ||
+      ref.startsWith("TPL-TEST") ||
+      id.includes("notif-test-") ||
+      id.includes("notif-tpl-") ||
+      area.includes("verification") ||
+      area.includes("template test")
+    ) {
+      return "system";
+    }
+
+    return "booking";
+  }
+
+  function inferEmailDeliveryStatus(rec: EmailNotificationRecord): "delivered" | "failed" | "pending" {
+    if (rec.deliveryStatus === "delivered" || rec.deliveryStatus === "failed" || rec.deliveryStatus === "pending") {
+      return rec.deliveryStatus;
+    }
+    const transportLower = (rec.transport || "").toLowerCase();
+    const statusLower = (rec.status || "").toLowerCase();
+
+    if (
+      rec.delivered === false ||
+      statusLower === "failed" ||
+      transportLower.includes("failed") ||
+      transportLower.includes("error") ||
+      transportLower.includes("bounced")
+    ) {
+      return "failed";
+    }
+
+    if (
+      statusLower === "pending" ||
+      transportLower.includes("queued") ||
+      transportLower.includes("preview relay")
+    ) {
+      return "pending";
+    }
+
+    return "delivered";
+  }
+
+  app.get("/api/email/history", (req, res) => {
+    try {
+      const { status, category, search, limit: limitParam } = req.query;
+      const rawList = loadNotifications();
+      const cfg = getBrevoSmtpConfig();
+
+      const enriched = rawList.map((item) => ({
+        ...item,
+        deliveryStatus: inferEmailDeliveryStatus(item),
+        category: inferEmailRecordCategory(item),
+        fromHeader: item.fromHeader || getFormattedBrevoFromHeader(),
+      }));
+
+      const total = enriched.length;
+      const deliveredCount = enriched.filter((e) => e.deliveryStatus === "delivered").length;
+      const pendingCount = enriched.filter((e) => e.deliveryStatus === "pending").length;
+      const failedCount = enriched.filter((e) => e.deliveryStatus === "failed").length;
+      const deliveryRate = total > 0 ? Math.round((deliveredCount / total) * 100) : 100;
+
+      let filtered = enriched;
+
+      if (status && typeof status === "string" && status !== "all") {
+        const targetStatus = status.trim().toLowerCase();
+        filtered = filtered.filter((e) => e.deliveryStatus === targetStatus);
+      }
+
+      if (category && typeof category === "string" && category !== "all") {
+        const targetCat = category.trim().toLowerCase();
+        filtered = filtered.filter((e) => e.category === targetCat);
+      }
+
+      if (search && typeof search === "string" && search.trim()) {
+        const q = search.trim().toLowerCase();
+        filtered = filtered.filter(
+          (e) =>
+            (e.recipientEmail || "").toLowerCase().includes(q) ||
+            (e.clientName || "").toLowerCase().includes(q) ||
+            (e.referenceId || "").toLowerCase().includes(q) ||
+            (e.subject || "").toLowerCase().includes(q) ||
+            (e.messageId || "").toLowerCase().includes(q) ||
+            (e.practiceArea || "").toLowerCase().includes(q)
+        );
+      }
+
+      const maxItems = limitParam ? Math.min(250, Math.max(1, parseInt(String(limitParam), 10) || 100)) : 100;
+
+      return res.json({
+        success: true,
+        stats: {
+          total,
+          deliveredCount,
+          pendingCount,
+          failedCount,
+          deliveryRate,
+        },
+        brevoRelay: {
+          host: cfg.host,
+          port: cfg.port,
+          login: cfg.user,
+          senderName: cfg.senderName,
+          senderEmail: cfg.senderEmail,
+          formattedFrom: getFormattedBrevoFromHeader(),
+          liveRelayActive: canUseProductionSmtp() && !productionSmtpAuthFailed,
+        },
+        logs: filtered.slice(0, maxItems),
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to load Brevo email history logs", details: err?.message });
+    }
+  });
+
+  app.post("/api/email/history/:id/resend", async (req, res) => {
+    try {
+      const logId = String(req.params.id || "").trim();
+      const all = loadNotifications();
+      const idx = all.findIndex((item) => item.id === logId);
+      if (idx === -1) {
+        return res.status(404).json({ error: `Email log record '${logId}' not found.` });
+      }
+
+      const target = all[idx];
+      const overrideRecipient =
+        typeof req.body?.recipientEmail === "string" && req.body.recipientEmail.includes("@")
+          ? req.body.recipientEmail.trim().toLowerCase()
+          : target.recipientEmail;
+
+      const dispatchRes = await dispatchBrevoSmtpEmail({
+        to: overrideRecipient,
+        cc: target.ccEmails && target.ccEmails.length > 0 ? target.ccEmails : undefined,
+        subject: target.subject,
+        html: target.html,
+        text: target.text,
+      });
+
+      const isLiveRelay = dispatchRes.transport.includes("Brevo SMTP Relay (");
+      const nextStatus: "delivered" | "failed" | "pending" = !dispatchRes.delivered
+        ? "failed"
+        : isLiveRelay
+        ? "delivered"
+        : "pending";
+
+      const updatedRecord: EmailNotificationRecord = {
+        ...target,
+        recipientEmail: overrideRecipient,
+        messageId: dispatchRes.messageId,
+        transport: dispatchRes.transport,
+        delivered: dispatchRes.delivered,
+        deliveryStatus: nextStatus,
+        smtpNotice: dispatchRes.smtpNotice || null,
+        fromHeader: dispatchRes.fromHeader,
+        retriedAt: new Date().toISOString(),
+        sentAt: new Date().toISOString(),
+      };
+
+      all[idx] = updatedRecord;
+      saveNotifications(all);
+
+      return res.json({
+        success: true,
+        log: {
+          ...updatedRecord,
+          category: inferEmailRecordCategory(updatedRecord),
+          deliveryStatus: inferEmailDeliveryStatus(updatedRecord),
+        },
+        message: `Resent "${updatedRecord.subject}" to ${overrideRecipient} via ${dispatchRes.transport}.`,
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to resend email via Brevo SMTP", details: err?.message });
+    }
+  });
+
+  app.patch("/api/email/history/:id/status", (req, res) => {
+    try {
+      const logId = String(req.params.id || "").trim();
+      const { deliveryStatus } = req.body || {};
+      if (!["delivered", "failed", "pending"].includes(deliveryStatus)) {
+        return res.status(400).json({ error: "deliveryStatus must be 'delivered', 'failed', or 'pending'." });
+      }
+
+      const all = loadNotifications();
+      const idx = all.findIndex((item) => item.id === logId);
+      if (idx === -1) {
+        return res.status(404).json({ error: `Email log record '${logId}' not found.` });
+      }
+
+      all[idx].deliveryStatus = deliveryStatus;
+      all[idx].delivered = deliveryStatus === "delivered";
+      saveNotifications(all);
+
+      return res.json({
+        success: true,
+        log: {
+          ...all[idx],
+          category: inferEmailRecordCategory(all[idx]),
+          deliveryStatus: inferEmailDeliveryStatus(all[idx]),
+        },
+        message: `Email log status updated to ${deliveryStatus.toUpperCase()}.`,
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to update email log status", details: err?.message });
+    }
+  });
+
+  app.post("/api/email/history/webhook", (req, res) => {
+    try {
+      const payload = req.body || {};
+      const eventType = String(payload.event || "").toLowerCase();
+      const msgId = String(payload["message-id"] || payload.messageId || "").trim();
+
+      if (msgId) {
+        const all = loadNotifications();
+        const idx = all.findIndex((n) => n.messageId === msgId || n.messageId.includes(msgId));
+        if (idx >= 0) {
+          if (eventType === "delivered" || eventType === "opened" || eventType === "click") {
+            all[idx].deliveryStatus = "delivered";
+            all[idx].delivered = true;
+          } else if (
+            eventType.includes("bounce") ||
+            eventType === "blocked" ||
+            eventType === "error" ||
+            eventType === "invalid_email" ||
+            eventType === "spam"
+          ) {
+            all[idx].deliveryStatus = "failed";
+            all[idx].delivered = false;
+            all[idx].smtpNotice = payload.reason || `Brevo webhook event: ${eventType}`;
+          } else if (eventType === "request" || eventType === "deferred") {
+            all[idx].deliveryStatus = "pending";
+          }
+          saveNotifications(all);
+        }
+      }
+
+      return res.json({ success: true, received: true });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Webhook processing error", details: err?.message });
     }
   });
 
@@ -5444,16 +6289,494 @@ Each object must follow this exact JSON schema:
     }
   });
 
+  // ==========================================
+  // SEO, SEARCH VISIBILITY & DISCOVERY SERVICES
+  // ==========================================
+
+  function loadSeoConfig(): SeoConfig {
+    try {
+      if (fs.existsSync(SEO_CONFIG_FILE)) {
+        const raw = fs.readFileSync(SEO_CONFIG_FILE, "utf-8");
+        const parsed = JSON.parse(raw);
+        return {
+          ...DEFAULT_SEO_CONFIG,
+          ...parsed,
+          routes: {
+            ...DEFAULT_SEO_CONFIG.routes,
+            ...(parsed.routes || {})
+          }
+        };
+      }
+    } catch (e) {
+      console.warn("[SEO Config Load Error — using defaults]:", e);
+    }
+    return DEFAULT_SEO_CONFIG;
+  }
+
+  function saveSeoConfig(config: SeoConfig): void {
+    try {
+      const dataDir = path.dirname(SEO_CONFIG_FILE);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(SEO_CONFIG_FILE, JSON.stringify(config, null, 2), "utf-8");
+    } catch (e) {
+      console.error("[SEO Config Save Error]:", e);
+    }
+  }
+
+  function loadIndexNowLogs(): IndexNowLogEntry[] {
+    try {
+      if (fs.existsSync(SEO_INDEXNOW_LOGS_FILE)) {
+        const raw = fs.readFileSync(SEO_INDEXNOW_LOGS_FILE, "utf-8");
+        return JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn("[IndexNow Logs Load Error]:", e);
+    }
+    return [];
+  }
+
+  function saveIndexNowLogs(logs: IndexNowLogEntry[]): void {
+    try {
+      const dataDir = path.dirname(SEO_INDEXNOW_LOGS_FILE);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(SEO_INDEXNOW_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), "utf-8");
+    } catch (e) {
+      console.error("[IndexNow Logs Save Error]:", e);
+    }
+  }
+
+  function resolveServerRequestOrigin(req: express.Request): string {
+    const forwardedProto = req.headers["x-forwarded-proto"];
+    const proto = typeof forwardedProto === "string" ? forwardedProto.split(",")[0].trim() : req.protocol || "http";
+    const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost:3000";
+    return `${proto}://${host}`;
+  }
+
+  function escapeHtmlChars(str: string): string {
+    return String(str || "")
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function injectSeoIntoHtml(html: string, req: express.Request, seoConfig: SeoConfig): string {
+    const origin = resolveServerRequestOrigin(req);
+    const pathname = req.path;
+
+    // Check if private/admin/auth route -> enforce noindex
+    const isPrivate = pathname.startsWith('/admin') || 
+      pathname.startsWith('/student/dashboard') || 
+      pathname.startsWith('/checkout') || 
+      pathname.startsWith('/cart') || 
+      pathname.startsWith('/payment');
+
+    // Find route config or fallback
+    let routeEntry = seoConfig.routes[pathname] || seoConfig.routes[pathname.replace(/\/$/, '')];
+    
+    // Check dynamic routes (e.g. /shop/:slug)
+    if (!routeEntry && pathname.startsWith('/shop/')) {
+      const slug = pathname.replace('/shop/', '').replace(/\/$/, '');
+      const products = loadServerProducts();
+      const matched = products.find((p: any) => p.slug === slug || p.id === slug);
+      if (matched) {
+        routeEntry = {
+          path: pathname,
+          title: `${matched.title}`,
+          description: matched.shortDescription || matched.fullDescription?.slice(0, 150) || seoConfig.defaultDescription,
+          keywords: [matched.category, matched.title, 'Bangladesh Legal Template', 'Accounticca Shop'],
+          ogImage: matched.imageUrl || seoConfig.defaultOgImage,
+          schemaType: 'Product',
+          priority: 0.8,
+          changefreq: 'daily'
+        };
+      }
+    }
+
+    if (!routeEntry) {
+      routeEntry = seoConfig.routes['/'] || {
+        path: '/',
+        title: seoConfig.siteName,
+        description: seoConfig.defaultDescription,
+        keywords: seoConfig.defaultKeywords,
+        ogImage: seoConfig.defaultOgImage,
+        schemaType: 'LegalService',
+        priority: 1.0,
+        changefreq: 'daily'
+      };
+    }
+
+    const title = routeEntry.title.includes('ACCOUNTICCA') || routeEntry.title.includes('E-Lawyers')
+      ? routeEntry.title
+      : `${routeEntry.title}${seoConfig.titleSuffix}`;
+    const description = routeEntry.description || seoConfig.defaultDescription;
+    const keywords = (routeEntry.keywords?.length ? routeEntry.keywords : seoConfig.defaultKeywords).join(', ');
+    const canonicalUrl = `${origin}${pathname === '/' ? '' : pathname}`;
+    const ogImageUrl = routeEntry.ogImage?.startsWith('http') 
+      ? routeEntry.ogImage 
+      : `${origin}${routeEntry.ogImage?.startsWith('/') ? routeEntry.ogImage : `/${routeEntry.ogImage || 'logo.png'}`}`;
+
+    const robotsDirective = isPrivate || routeEntry.noindex
+      ? 'noindex, nofollow'
+      : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+    let verificationMeta = '';
+    if (seoConfig.googleSiteVerification) {
+      verificationMeta += `\n    <meta name="google-site-verification" content="${escapeHtmlChars(seoConfig.googleSiteVerification)}" />`;
+    }
+    if (seoConfig.bingSiteVerification) {
+      verificationMeta += `\n    <meta name="msvalidate.01" content="${escapeHtmlChars(seoConfig.bingSiteVerification)}" />`;
+    }
+    if (seoConfig.facebookDomainVerification) {
+      verificationMeta += `\n    <meta name="facebook-domain-verification" content="${escapeHtmlChars(seoConfig.facebookDomainVerification)}" />`;
+    }
+
+    const schemaGraph: any[] = [
+      {
+        "@type": "LegalService",
+        "@id": `${origin}/#organization`,
+        "name": "E-Lawyers & Accounticca",
+        "alternateName": seoConfig.siteName,
+        "url": origin,
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${origin}/logo.png`,
+          "width": "1024",
+          "height": "1024"
+        },
+        "image": ogImageUrl,
+        "description": description,
+        "telephone": seoConfig.telephone,
+        "email": seoConfig.email,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": seoConfig.streetAddress,
+          "addressLocality": seoConfig.addressLocality,
+          "postalCode": seoConfig.postalCode,
+          "addressCountry": seoConfig.addressCountry
+        },
+        "sameAs": seoConfig.sameAs
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${origin}/#website`,
+        "url": origin,
+        "name": seoConfig.siteName,
+        "publisher": {
+          "@id": `${origin}/#organization`
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": `${origin}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ];
+
+    if (routeEntry.schemaType && routeEntry.schemaType !== 'LegalService' && routeEntry.schemaType !== 'WebSite') {
+      schemaGraph.push({
+        "@type": routeEntry.schemaType,
+        "@id": `${canonicalUrl}#${routeEntry.schemaType.toLowerCase()}`,
+        "name": routeEntry.title,
+        "url": canonicalUrl,
+        "description": description,
+        "publisher": {
+          "@id": `${origin}/#organization`
+        }
+      });
+    }
+
+    const ldJsonScript = `<script type="application/ld+json">
+${JSON.stringify({ "@context": "https://schema.org", "@graph": schemaGraph }, null, 2)}
+    </script>`;
+
+    let modified = html;
+    modified = modified.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtmlChars(title)}</title>`);
+    modified = modified.replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="description" content="${escapeHtmlChars(description)}" />`);
+    modified = modified.replace(/<meta\s+name="keywords"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="keywords" content="${escapeHtmlChars(keywords)}" />`);
+    modified = modified.replace(/<meta\s+name="robots"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="robots" content="${robotsDirective}" />`);
+    modified = modified.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i, `<link rel="canonical" href="${canonicalUrl}" />`);
+    modified = modified.replace(/<meta\s+property="og:url"\s+content="[\s\S]*?"\s*\/?>/i, `<meta property="og:url" content="${canonicalUrl}" />`);
+    modified = modified.replace(/<meta\s+property="og:title"\s+content="[\s\S]*?"\s*\/?>/i, `<meta property="og:title" content="${escapeHtmlChars(title)}" />`);
+    modified = modified.replace(/<meta\s+property="og:description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta property="og:description" content="${escapeHtmlChars(description)}" />`);
+    modified = modified.replace(/<meta\s+property="og:image"\s+content="[\s\S]*?"\s*\/?>/i, `<meta property="og:image" content="${ogImageUrl}" />`);
+    modified = modified.replace(/<meta\s+property="og:image:secure_url"\s+content="[\s\S]*?"\s*\/?>/i, `<meta property="og:image:secure_url" content="${ogImageUrl}" />`);
+    modified = modified.replace(/<meta\s+name="twitter:url"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="twitter:url" content="${canonicalUrl}" />`);
+    modified = modified.replace(/<meta\s+name="twitter:title"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtmlChars(title)}" />`);
+    modified = modified.replace(/<meta\s+name="twitter:description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtmlChars(description)}" />`);
+    modified = modified.replace(/<meta\s+name="twitter:image"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="twitter:image" content="${ogImageUrl}" />`);
+    modified = modified.replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/i, ldJsonScript);
+
+    if (verificationMeta) {
+      modified = modified.replace('</head>', `${verificationMeta}\n  </head>`);
+    }
+
+    return modified;
+  }
+
+  // 1. Dynamic XML Sitemap (GET /sitemap.xml)
+  app.get("/sitemap.xml", (req, res) => {
+    try {
+      const origin = resolveServerRequestOrigin(req);
+      const seoConfig = loadSeoConfig();
+      const products = loadServerProducts().filter((p: any) => p.status === 'published');
+      const xml = generateXmlSitemap(origin, seoConfig, {
+        articles: mockArticles,
+        categories: categories,
+        tools: searchableTaxTools,
+        products: products,
+        courses: INITIAL_LMS_COURSES
+      });
+      res.setHeader("Content-Type", "application/xml; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=86400");
+      res.setHeader("X-Robots-Tag", "noindex"); // Standard header for sitemap itself
+      return res.status(200).send(xml);
+    } catch (err: any) {
+      console.error("[Sitemap Generation Error]:", err);
+      return res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  // 2. Dynamic robots.txt (GET /robots.txt)
+  app.get("/robots.txt", (req, res) => {
+    try {
+      const origin = resolveServerRequestOrigin(req);
+      const seoConfig = loadSeoConfig();
+      const txt = generateRobotsTxt(origin, seoConfig);
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=3600");
+      return res.status(200).send(txt);
+    } catch (err: any) {
+      console.error("[Robots.txt Error]:", err);
+      return res.status(500).send("User-agent: *\nAllow: /");
+    }
+  });
+
+  // 3. Dynamic llms.txt & llms-full.txt for AI Search Engines (ChatGPT, Perplexity, Claude, Google AI)
+  app.get(["/llms.txt", "/llms-full.txt"], (req, res) => {
+    try {
+      const origin = resolveServerRequestOrigin(req);
+      const seoConfig = loadSeoConfig();
+      const products = loadServerProducts().filter((p: any) => p.status === 'published');
+      const markdown = generateLlmsTxt(origin, seoConfig, { products });
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=7200");
+      return res.status(200).send(markdown);
+    } catch (err: any) {
+      console.error("[llms.txt Generation Error]:", err);
+      return res.status(500).send("Error generating llms.txt");
+    }
+  });
+
+  // 4. IndexNow Dynamic Verification Key Endpoint (GET /:key.txt)
+  app.get("/:key.txt", (req, res, next) => {
+    const key = req.params.key;
+    const seoConfig = loadSeoConfig();
+    if (key && (key === seoConfig.indexNowApiKey || key === DEFAULT_INDEXNOW_KEY)) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      return res.status(200).send(key);
+    }
+    next();
+  });
+
+  // 5. GET /api/seo/config
+  app.get("/api/seo/config", (req, res) => {
+    try {
+      const config = loadSeoConfig();
+      return res.status(200).json(config);
+    } catch (err: any) {
+      console.error("[Get SEO Config Error]:", err);
+      return res.status(500).json({ error: "Failed to read SEO configuration." });
+    }
+  });
+
+  // 6. PUT /api/seo/config
+  app.put("/api/seo/config", (req, res) => {
+    try {
+      const updates = req.body || {};
+      const current = loadSeoConfig();
+      const updatedConfig: SeoConfig = {
+        ...current,
+        ...updates,
+        routes: {
+          ...current.routes,
+          ...(updates.routes || {})
+        },
+        updatedAt: new Date().toISOString()
+      };
+      saveSeoConfig(updatedConfig);
+      return res.status(200).json({ success: true, config: updatedConfig });
+    } catch (err: any) {
+      console.error("[Update SEO Config Error]:", err);
+      return res.status(500).json({ error: "Failed to save SEO configuration." });
+    }
+  });
+
+  // 7. PUT /api/seo/routes — Update or add specific route metadata
+  app.put("/api/seo/routes", (req, res) => {
+    try {
+      const routePayload: RouteSeoEntry = req.body;
+      if (!routePayload || !routePayload.path) {
+        return res.status(400).json({ error: "Route path is required." });
+      }
+      const current = loadSeoConfig();
+      current.routes[routePayload.path] = {
+        ...routePayload,
+        lastmod: new Date().toISOString().split("T")[0]
+      };
+      current.updatedAt = new Date().toISOString();
+      saveSeoConfig(current);
+      return res.status(200).json({ success: true, route: current.routes[routePayload.path] });
+    } catch (err: any) {
+      console.error("[Update Route SEO Error]:", err);
+      return res.status(500).json({ error: "Failed to update route SEO." });
+    }
+  });
+
+  // 8. POST /api/seo/reset — Reset SEO config to defaults
+  app.post("/api/seo/reset", (req, res) => {
+    try {
+      saveSeoConfig(DEFAULT_SEO_CONFIG);
+      return res.status(200).json({ success: true, config: DEFAULT_SEO_CONFIG });
+    } catch (err: any) {
+      console.error("[Reset SEO Config Error]:", err);
+      return res.status(500).json({ error: "Failed to reset SEO configuration." });
+    }
+  });
+
+  // 9. POST /api/seo/indexnow — Submit URLs to IndexNow API (Bing, Yandex, Seznam, Naver)
+  app.post("/api/seo/indexnow", async (req, res) => {
+    try {
+      const { urlList } = req.body || {};
+      const origin = resolveServerRequestOrigin(req);
+      const urlObj = new URL(origin);
+      const host = urlObj.host;
+      const seoConfig = loadSeoConfig();
+      const apiKey = seoConfig.indexNowApiKey || DEFAULT_INDEXNOW_KEY;
+
+      let urlsToSubmit: string[] = [];
+      if (Array.isArray(urlList) && urlList.length > 0) {
+        urlsToSubmit = urlList.map((u: string) => (u.startsWith("http") ? u : `${origin}${u.startsWith("/") ? u : `/${u}`}`));
+      } else {
+        // Default to all public routes
+        urlsToSubmit = Object.keys(seoConfig.routes)
+          .filter((p) => !seoConfig.routes[p].noindex)
+          .map((p) => `${origin}${p === "/" ? "" : p}`);
+      }
+
+      const indexNowPayload = {
+        host: host,
+        key: apiKey,
+        keyLocation: `${origin}/${apiKey}.txt`,
+        urlList: urlsToSubmit
+      };
+
+      console.log(`[IndexNow Submission] Submitting ${urlsToSubmit.length} URLs for host: ${host}`);
+
+      let statusCode = 200;
+      let statusText = "OK";
+      try {
+        const engineResponse = await fetch("https://api.indexnow.org/indexnow", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8"
+          },
+          body: JSON.stringify(indexNowPayload)
+        });
+        statusCode = engineResponse.status;
+        statusText = engineResponse.statusText;
+      } catch (remoteErr: any) {
+        console.warn("[IndexNow Remote Ping Notice — recorded locally]:", remoteErr?.message);
+        statusCode = 202;
+        statusText = "Queued (Network Timeout / Local Simulation)";
+      }
+
+      const logEntry: IndexNowLogEntry = {
+        id: `INX-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        timestamp: new Date().toISOString(),
+        host: host,
+        key: apiKey,
+        urlList: urlsToSubmit,
+        statusCode: statusCode,
+        statusText: statusText,
+        engine: "api.indexnow.org (Bing, Yandex & Partners)"
+      };
+
+      const existingLogs = loadIndexNowLogs();
+      existingLogs.unshift(logEntry);
+      saveIndexNowLogs(existingLogs);
+
+      return res.status(200).json({
+        success: true,
+        submittedCount: urlsToSubmit.length,
+        log: logEntry
+      });
+    } catch (err: any) {
+      console.error("[IndexNow Submission Error]:", err);
+      return res.status(500).json({ error: err?.message || "Failed to submit URLs to IndexNow." });
+    }
+  });
+
+  // 10. GET /api/seo/indexnow/logs — View IndexNow submission history
+  app.get("/api/seo/indexnow/logs", (req, res) => {
+    try {
+      const logs = loadIndexNowLogs();
+      return res.status(200).json({ logs });
+    } catch (err: any) {
+      console.error("[Get IndexNow Logs Error]:", err);
+      return res.status(500).json({ error: "Failed to retrieve IndexNow logs." });
+    }
+  });
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
+
+    // Intercept HTML navigation requests before Vite serves standard index.html to inject server-side SEO meta
+    app.use(async (req, res, next) => {
+      const isHtmlNav = (req.method === 'GET' || req.method === 'HEAD') &&
+        req.accepts('text/html') &&
+        !req.path.startsWith('/api') &&
+        !req.path.startsWith('/@') &&
+        !req.path.includes('.') &&
+        !req.path.startsWith('/node_modules');
+
+      if (isHtmlNav) {
+        try {
+          const indexRaw = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8');
+          const seoInjected = injectSeoIntoHtml(indexRaw, req, loadSeoConfig());
+          const htmlTransformed = await vite.transformIndexHtml(req.originalUrl, seoInjected);
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(htmlTransformed);
+        } catch (e) {
+          next(e);
+        }
+      } else {
+        next();
+      }
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { index: false }));
     app.get('*', (req, res) => {
+      const isHtmlNav = req.accepts('text/html') && !req.path.startsWith('/api');
+      if (isHtmlNav) {
+        try {
+          const indexRaw = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+          const seoInjected = injectSeoIntoHtml(indexRaw, req, loadSeoConfig());
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(seoInjected);
+        } catch {
+          return res.sendFile(path.join(distPath, 'index.html'));
+        }
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

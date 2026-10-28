@@ -252,8 +252,11 @@ export default function App() {
                     <Route path="gateway/uddoktapay/success" element={<PaymentVerifyPage />} />
                     <Route path="gateway/uddoktapay/cancel" element={<PaymentCancelPage />} />
                     
-                    {/* Admin Shop Catalog Desk (Protected by Authorized Credentials: hmekram@gmail.com) */}
+                    {/* Admin Shop Catalog Desk, Transactional Emails & SEO Manager (Protected by Authorized Credentials: hmekram@gmail.com) */}
                     <Route path="admin/shop" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />
+                    <Route path="admin/email-templates" element={<ShopAdminRouteGuard><AdminShop initialTab="email-templates" /></ShopAdminRouteGuard>} />
+                    <Route path="admin/email-history" element={<ShopAdminRouteGuard><AdminShop initialTab="email-history" /></ShopAdminRouteGuard>} />
+                    <Route path="admin/seo" element={<ShopAdminRouteGuard><AdminShop initialTab="seo" /></ShopAdminRouteGuard>} />
                     <Route path="admin/products" element={<Navigate to="/admin/shop" replace />} />
                     <Route path="admin" element={<ShopAdminRouteGuard><AdminShop /></ShopAdminRouteGuard>} />
                     

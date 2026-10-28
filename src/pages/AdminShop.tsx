@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Trash2, 
@@ -33,7 +33,10 @@ import {
   BarChart3,
   CreditCard,
   FileSpreadsheet,
-  RefreshCw
+  RefreshCw,
+  Mail,
+  History,
+  Globe
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
@@ -44,6 +47,9 @@ import { useProducts } from '../hooks/useProducts';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { usePurchases } from '../contexts/PurchaseContext';
 import { PaymentStatusWidget } from '../components/dashboard/PaymentStatusWidget';
+import { TransactionalEmailTemplateManager } from '../components/admin/TransactionalEmailTemplateManager';
+import { TransactionalEmailHistoryTab } from '../components/admin/TransactionalEmailHistoryTab';
+import { AdminSeoManager } from '../components/admin/AdminSeoManager';
 import { 
   ShopProduct, 
   SHOP_CATEGORIES, 
@@ -119,8 +125,13 @@ const RECENT_TRANSACTIONS = [
   { id: 'PAY-TXN-9988772', customer: 'Mahbub Alam', email: 'mahbub@example.com', product: 'Company Incorporation Kit', amount: '3000.00', status: 'PENDING', date: '2026-10-15T18:10:22Z' }
 ];
 
-export function AdminShop() {
+export function AdminShop({
+  initialTab = 'catalog'
+}: {
+  initialTab?: 'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo';
+} = {}) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { products, addOrUpdateProduct, updatePrice, removeProduct, resetDefaults, loading, togglePublishStatus } = useProducts();
   const { adminUser, logout } = useShopAuth();
   const { transactions, processRefund } = usePurchases();
@@ -137,7 +148,28 @@ export function AdminShop() {
     }
   };
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'payments'>('catalog');
+  const [activeAdminTab, setActiveAdminTab] = useState<'catalog' | 'analytics' | 'payments' | 'email-templates' | 'email-history' | 'seo'>(() => {
+    if (location.pathname.includes('/seo') || location.search.includes('tab=seo')) {
+      return 'seo';
+    }
+    if (location.pathname.includes('/email-history') || location.search.includes('tab=email-history')) {
+      return 'email-history';
+    }
+    if (location.pathname.includes('/email-templates') || location.search.includes('tab=email-templates')) {
+      return 'email-templates';
+    }
+    return initialTab;
+  });
+
+  useEffect(() => {
+    if (location.pathname.includes('/seo') || location.search.includes('tab=seo')) {
+      setActiveAdminTab('seo');
+    } else if (location.pathname.includes('/email-history') || location.search.includes('tab=email-history')) {
+      setActiveAdminTab('email-history');
+    } else if (location.pathname.includes('/email-templates') || location.search.includes('tab=email-templates')) {
+      setActiveAdminTab('email-templates');
+    }
+  }, [location.pathname, location.search]);
 
   // Filter & Search in Admin list
   const [searchTerm, setSearchTerm] = useState('');
@@ -537,8 +569,44 @@ export function AdminShop() {
                   : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              <CreditCard className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <CreditCard className="w-4 h-4 text-emerald-400" />
               <span>Payment Status & Link Tracker</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('email-templates')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'email-templates'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <Mail className="w-4 h-4 text-emerald-400" />
+              <span>Email Templates (Brevo)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('email-history')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'email-history'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <History className="w-4 h-4 text-emerald-400" />
+              <span>Email History</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveAdminTab('seo')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all inline-flex items-center gap-2 cursor-pointer ${
+                activeAdminTab === 'seo'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>SEO & Indexing</span>
             </button>
           </div>
 
@@ -579,7 +647,19 @@ export function AdminShop() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {activeAdminTab === 'payments' ? (
+        {activeAdminTab === 'seo' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <AdminSeoManager />
+          </div>
+        ) : activeAdminTab === 'email-history' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <TransactionalEmailHistoryTab />
+          </div>
+        ) : activeAdminTab === 'email-templates' ? (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <TransactionalEmailTemplateManager />
+          </div>
+        ) : activeAdminTab === 'payments' ? (
           <div className="space-y-8 animate-in fade-in duration-300">
             <PaymentStatusWidget />
           </div>

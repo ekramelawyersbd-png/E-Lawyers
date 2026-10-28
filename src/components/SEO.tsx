@@ -75,13 +75,12 @@ export interface SEOProps {
   children?: React.ReactNode;
 }
 
-const DEFAULT_SITE_NAME = 'Accounticca & E-Lawyers Compliance Hub';
-const DEFAULT_SHORT_BRAND = 'Accounticca & E-Lawyers';
+const DEFAULT_SITE_NAME = 'Compliance Hub — ACCOUNTICCA x E-Lawyers';
+const DEFAULT_SHORT_BRAND = 'ACCOUNTICCA x E-Lawyers';
 const DEFAULT_DESCRIPTION =
   'Legal, Tax, VAT, Accounting & Business Technology Knowledge Platform for Bangladesh by Accounticca & E-Lawyers.';
-const DEFAULT_FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&q=80&w=1200';
-const DEFAULT_FALLBACK_BASE_URL = 'https://accounticca.com';
+const DEFAULT_FALLBACK_IMAGE = '/logo.png';
+const DEFAULT_FALLBACK_BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://blog.accounticca.com';
 
 /**
  * Safely reads current router pathname when rendered inside a Router context
@@ -330,7 +329,29 @@ export function SEO({
         provider: {
           '@type': 'Organization',
           name: 'E-Lawyers Academy & Accounticca',
-          sameAs: DEFAULT_FALLBACK_BASE_URL
+          sameAs: fullCanonicalUrl
+        }
+      });
+    }
+
+    // 4b. Product Schema (for Digital Shop & Packages)
+    if (type === 'product') {
+      list.push({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: title,
+        image: fullImageUrl,
+        description,
+        brand: {
+          '@type': 'Brand',
+          name: siteName
+        },
+        offers: {
+          '@type': 'Offer',
+          url: fullCanonicalUrl,
+          priceCurrency: 'BDT',
+          price: '0',
+          availability: 'https://schema.org/InStock'
         }
       });
     }
@@ -387,6 +408,16 @@ export function SEO({
       ? 'profile'
       : 'website';
 
+  const isPrivatePath = Boolean(
+    currentPathname.startsWith('/admin') ||
+    currentPathname.startsWith('/student/dashboard') ||
+    currentPathname.startsWith('/checkout') ||
+    currentPathname.startsWith('/cart') ||
+    currentPathname.startsWith('/payment')
+  );
+
+  const shouldNoIndex = noindex || isPrivatePath;
+
   return (
     <Helmet prioritizeSeoTags>
       {/* Primary Document Title & Meta Tags */}
@@ -398,7 +429,7 @@ export function SEO({
       <meta
         name="robots"
         content={
-          noindex
+          shouldNoIndex
             ? 'noindex, nofollow'
             : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'
         }

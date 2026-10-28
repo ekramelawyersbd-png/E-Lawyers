@@ -1,0 +1,30 @@
+[
+  {
+    "id": "INX-1793146697833-ks88",
+    "timestamp": "2026-10-28T00:18:17.833Z",
+    "host": "localhost:3000",
+    "key": "accounticca_seo_indexnow_2026",
+    "urlList": [
+      "http://localhost:3000",
+      "http://localhost:3000/calculators",
+      "http://localhost:3000/services",
+      "http://localhost:3000/insights",
+      "http://localhost:3000/shop",
+      "http://localhost:3000/courses",
+      "http://localhost:3000/booking",
+      "http://localhost:3000/tools/rjsc-fee-calculator",
+      "http://localhost:3000/tools/tax-slabs-explorer",
+      "http://localhost:3000/tools/wealth-surcharge",
+      "http://localhost:3000/tools/investment-rebate",
+      "http://localhost:3000/training",
+      "http://localhost:3000/about",
+      "http://localhost:3000/contact",
+      "http://localhost:3000/faq",
+      "http://localhost:3000/privacy",
+      "http://localhost:3000/terms"
+    ],
+    "statusCode": 422,
+    "statusText": "Unprocessable Entity",
+    "engine": "api.indexnow.org (Bing, Yandex & Partners)"
+  }
+]
