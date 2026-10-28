@@ -284,7 +284,7 @@ export const StudentLearningPortalPage: React.FC<{
           (o) =>
             o.id === queryCourse ||
             o.slug === queryCourse ||
-            o.title.trim().toLowerCase() === queryCourse.trim().toLowerCase()
+            (o.title && queryCourse && typeof o.title === 'string' && typeof queryCourse === 'string' && o.title.trim().toLowerCase() === queryCourse.trim().toLowerCase())
         );
       if (matchedOpt && matchedOpt.id !== selectedPortalCourseId) {
         targetCourseId = matchedOpt.id;
@@ -501,8 +501,8 @@ export const StudentLearningPortalPage: React.FC<{
 
   const handleAdminAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailClean = adminEmailInput.trim().toLowerCase();
-    const passClean = adminPasswordInput.trim();
+    const emailClean = (adminEmailInput || '').trim().toLowerCase();
+    const passClean = (adminPasswordInput || '').trim();
 
     if (emailClean === 'hmekram@gmail.com' && passClean === '123ekraM.com') {
       setIsAdminAuthenticated(true);
