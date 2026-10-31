@@ -226,11 +226,11 @@ export function SocialShareButtons({
         id="floating-article-share-rail"
         aria-label="Floating social sharing rail"
         className={cn(
-          "fixed left-4 2xl:left-8 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-center gap-2 p-2 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl ring-1 ring-slate-900/5 animate-in fade-in duration-500",
+          "fixed left-3 2xl:left-5 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-center gap-2 p-2 w-auto max-w-fit bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-lg ring-1 ring-slate-900/5 animate-in fade-in duration-500",
           className
         )}
       >
-        <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 pt-1 pb-0.5 select-none">
+        <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 pt-0.5 pb-0.5 select-none">
           Share
         </span>
 

@@ -663,7 +663,7 @@ export function Article() {
         />
       )}
 
-      <div className={isFocusMode ? "max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12 transition-all duration-300" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12"}>
+      <div className={isFocusMode ? "max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12 transition-all duration-300" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:pl-20 xl:pr-10 2xl:pl-24 2xl:pr-12 py-8 md:py-12"}>
         {!isFocusMode && (
           <Breadcrumbs 
             items={[

@@ -487,7 +487,7 @@ export function PersonalIncomeTaxCourse() {
       {/* 3. WHY LEARN PERSONAL INCOME TAX? */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center px-[10px] pt-0">
             <div className="lg:col-span-6 space-y-6">
               <span className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
                 Core Competency
@@ -527,7 +527,7 @@ export function PersonalIncomeTaxCourse() {
 
       {/* 4. COURSE CURRICULUM (10 CLASSES) */}
       <section id="curriculum" className="py-20 bg-slate-900 text-white scroll-mt-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-[100px]">
           <div className="text-center space-y-4 mb-16">
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
               10 Comprehensive Classes
@@ -675,7 +675,7 @@ export function PersonalIncomeTaxCourse() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-[100px]">
             {whatIsIncluded.map((item, idx) => (
               <div key={idx} className="p-6 bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 flex items-center justify-center">
@@ -704,7 +704,7 @@ export function PersonalIncomeTaxCourse() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-[100px]">
             {outcomes.map((outcome, idx) => (
               <div key={idx} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3.5">
                 <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 font-black text-xs">
@@ -732,7 +732,7 @@ export function PersonalIncomeTaxCourse() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-[100px]">
             {targetAudience.map((item, idx) => (
               <div key={idx} className="p-6 bg-slate-50 rounded-2xl border border-slate-200 hover:border-slate-300 transition-all space-y-2">
                 <div className="flex items-center gap-2">
@@ -761,7 +761,7 @@ export function PersonalIncomeTaxCourse() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-[100px]">
             {opportunities.map((opp, idx) => (
               <div key={idx} className="p-6 bg-slate-800/80 rounded-3xl border border-slate-700/80 space-y-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold">
@@ -790,7 +790,7 @@ export function PersonalIncomeTaxCourse() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-[100px]">
             {mentors.map((mentor, idx) => (
               <div key={idx} className="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group">
                 <div className="space-y-4">
@@ -834,7 +834,7 @@ export function PersonalIncomeTaxCourse() {
       {/* 9. CERTIFICATE SECTION */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center px-[100px]">
             <div className="lg:col-span-6 space-y-6">
               <span className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
                 Official Credential
