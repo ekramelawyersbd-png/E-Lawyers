@@ -17,14 +17,18 @@ import {
 } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { verifyUddoktaPayPayment, VerifyPaymentResponse } from '../services/uddoktapayService';
+import { usePurchases } from '../contexts/PurchaseContext';
 
 export const PaymentVerifyPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { purchaseProduct } = usePurchases();
   const invoiceId = searchParams.get('session_id') || searchParams.get('invoice_id') || searchParams.get('invoiceId') || searchParams.get('sess') || '';
   const sessionId = searchParams.get('session_id') || '';
   const simulated = searchParams.get('simulated') === 'true';
   const paramAmount = searchParams.get('amount') || '';
+  const paramProductId = searchParams.get('product_id') || searchParams.get('productId') || '';
+  const paramProductTitle = searchParams.get('product_title') || searchParams.get('title') || '';
 
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<VerifyPaymentResponse | null>(null);
@@ -43,6 +47,22 @@ export const PaymentVerifyPage: React.FC = () => {
         if (isMounted) {
           setResult(res);
           setLoading(false);
+          const verified = res?.verified || res?.status_code === 'COMPLETED' || res?.status === true;
+          const resolvedProductId = paramProductId || (res as any)?.metadata?.product_id;
+          const resolvedTitle = paramProductTitle || (res as any)?.metadata?.product_title || 'Verified Digital Product';
+          if (verified && resolvedProductId) {
+            purchaseProduct(
+              String(resolvedProductId),
+              String(resolvedTitle),
+              Number(res?.amount || paramAmount || 1500),
+              res?.payment_method || 'UddoktaPay Gateway',
+              'completed',
+              {
+                orderId: sessionId || invoiceId,
+                transactionId: res?.transaction_id || `TRX-${invoiceId}`
+              }
+            );
+          }
         }
       } catch (err) {
         console.error('Verification error:', err);
@@ -57,7 +77,7 @@ export const PaymentVerifyPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [invoiceId]);
+  }, [invoiceId, paramAmount, paramProductId, paramProductTitle, purchaseProduct, sessionId]);
 
   const handleCopy = (text?: string) => {
     if (!text) return;
@@ -116,10 +136,10 @@ export const PaymentVerifyPage: React.FC = () => {
                     Return to Shop
                   </Link>
                   <Link
-                    to="/"
+                    to="/client-portal"
                     className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all"
                   >
-                    Go Home
+                    Go to Dashboard
                   </Link>
                 </div>
               </div>
@@ -183,11 +203,11 @@ export const PaymentVerifyPage: React.FC = () => {
                 {/* Action Links */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   <Link
-                    to="/student/dashboard"
+                    to="/client-portal"
                     className="flex items-center justify-center gap-2 py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-all cursor-pointer"
                   >
                     <GraduationCap className="w-4 h-4" />
-                    <span>Go to Student LMS Portal</span>
+                    <span>Go to Dashboard</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
 
@@ -196,7 +216,7 @@ export const PaymentVerifyPage: React.FC = () => {
                     className="flex items-center justify-center gap-2 py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-all cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    <span>Return to Shop & Downloads</span>
+                    <span>View Products &amp; Downloads</span>
                   </Link>
                 </div>
 

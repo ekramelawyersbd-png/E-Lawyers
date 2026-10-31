@@ -868,7 +868,7 @@ export function DynamicBreadcrumbBar() {
 
   return (
     <div className="w-full bg-white/95 backdrop-blur-xs border-b border-slate-200/80 print:hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+      <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-2.5">
         <BreadcrumbTrail items={resolvedItems} showBackButton />
       </div>
     </div>

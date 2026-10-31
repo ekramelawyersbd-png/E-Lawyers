@@ -34,8 +34,7 @@ export function Layout() {
   return (
     <BreadcrumbProvider hasGlobalBar={!hideNavs && !isHomePage}>
       <div
-        className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`}
-        style={{ width: '100%', maxWidth: '100%' }}
+        className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip selection:bg-emerald-100 selection:text-emerald-900 antialiased transition-colors duration-300`}
       >
         {!hideNavs && <Navbar />}
         {!hideNavs && !isHomePage && <Breadcrumb />}

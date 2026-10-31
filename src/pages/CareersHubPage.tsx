@@ -146,26 +146,26 @@ export const CareersHubPage: React.FC = () => {
         serviceType="Job Recruitment & Career Opportunities"
       />
 
-      {/* Hero Header - Official E-Lawyers WE'RE HIRING Master Banner Theme */}
-      <section className="bg-gradient-to-b from-[#091b2f] via-[#0d2238] to-[#071422] text-white pt-8 sm:pt-10 pb-24 sm:pb-28 px-4 border-b border-[#167d83]/40 relative z-10 overflow-hidden">
-        {/* Ambient background glows matching banner color palette */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none -mr-28 -mt-28"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-400/15 rounded-full blur-3xl pointer-events-none -ml-28 -mb-28"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(#167d83_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none"></div>
+      {/* Hero Header - Enhanced Light Official E-Lawyers WE'RE HIRING Master Banner Theme */}
+      <section className="bg-gradient-to-br from-white via-[#fdfaf3] to-emerald-50/50 text-slate-900 pt-8 sm:pt-12 pb-24 sm:pb-28 px-4 border-b border-slate-200/90 relative z-10 overflow-hidden">
+        {/* Ambient light background glows matching banner color palette */}
+        <div className="absolute top-0 right-0 w-[520px] h-[520px] bg-amber-300/20 rounded-full blur-3xl pointer-events-none -mr-28 -mt-28"></div>
+        <div className="absolute bottom-0 left-0 w-[520px] h-[520px] bg-emerald-300/20 rounded-full blur-3xl pointer-events-none -ml-28 -mb-28"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
 
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Top Brand & WhatsApp Hotline Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#0d2642] border-2 border-emerald-400/50 flex items-center justify-center font-black text-amber-300 text-lg shadow-md ring-2 ring-emerald-500/20">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-5 border-b border-slate-200/90">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#c7a76b]/60 flex items-center justify-center font-black text-[#10243a] text-lg shadow-sm ring-4 ring-amber-500/10">
                 ELA
               </div>
               <div>
-                <span className="text-xs font-black tracking-widest text-white uppercase block">
+                <span className="text-xs font-black tracking-widest text-[#10243a] uppercase block">
                   E-Lawyers Legal &amp; Business Consultancy Firm
                 </span>
-                <p className="text-xs text-slate-300 flex items-center gap-1.5 mt-0.5 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <p className="text-xs text-slate-600 flex items-center gap-1.5 mt-0.5 font-semibold">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                   BTI Centara Grand, Panthapath, Dhaka · Central Recruitment Portal
                 </p>
               </div>
@@ -177,65 +177,65 @@ export const CareersHubPage: React.FC = () => {
                 href="https://wa.me/8801335230170?text=Hello%20E-Lawyers%2C%20I%20am%20inquiring%20about%20the%202026%20recruitment%20drive."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/50 text-emerald-300 hover:text-white text-xs font-bold transition-all shadow-xs group"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-900 text-xs font-bold transition-all shadow-2xs group"
                 title="Direct WhatsApp Helpline: +88 01335230170-81"
               >
-                <div className="w-4 h-4 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                <div className="w-4 h-4 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-2xs">
                   <Phone className="w-2.5 h-2.5 fill-current" />
                 </div>
                 <span className="tracking-wide font-mono font-bold">+88 01335230170-81</span>
               </a>
 
-              <span className="inline-flex items-center gap-2 text-xs text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-3.5 py-1.5 rounded-full font-bold shadow-2xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="inline-flex items-center gap-2 text-xs text-emerald-900 bg-white border border-emerald-300 px-3.5 py-1.5 rounded-full font-bold shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Active Recruitment · 4 Career Tracks</span>
               </span>
             </div>
           </div>
 
           {/* Hero Headline & Recruitment Overview */}
-          <div className="mb-8 text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-400/40 text-xs font-bold text-amber-300 shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <div className="mb-9 text-center max-w-3xl mx-auto space-y-3.5">
+            <div className="inline-flex items-center gap-2 bg-amber-50/90 px-4 py-1.5 rounded-full border border-amber-300/80 text-xs font-extrabold text-amber-900 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Official 2026 Recruitment Circular · Deadline: 31 October 2026</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#10243a] leading-tight">
               Build Your Career with{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-teal-200">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9e7a33] via-emerald-700 to-[#167d83]">
                 E-Lawyers
               </span>
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
               Join our Accounts, Taxation, Corporate Legal &amp; Client Services divisions at BTI Centara Grand, Panthapath, Dhaka. Select your track below to view requirements or apply online.
             </p>
           </div>
 
           {/* Interactive Role Action Grid - Direct 1-Click Pathways to Official Forms */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: MTO */}
             <Link
               to="/Careers/mto?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-b from-[#10243a] to-[#0c1c2e] border-2 border-blue-500/40 hover:border-amber-400 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-white hover:bg-amber-50/40 border-2 border-slate-200/90 hover:border-amber-400 text-slate-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-blue-900/60 border border-blue-400/30 text-amber-300 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shadow-2xs">
                     <GraduationCap className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-200 border border-blue-700/50">
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
                     Multiple Vacancies
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-white group-hover:text-amber-300 transition-colors leading-snug">
+                  <h3 className="font-black text-sm text-[#10243a] group-hover:text-amber-800 transition-colors leading-snug">
                     MANAGEMENT TRAINEE OFFICER (MTO)
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     Bachelor&apos;s in Accounting, Finance, BBA, Management or Law.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
+              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-amber-800 group-hover:text-amber-900">
                 <span>Apply Online</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -244,27 +244,27 @@ export const CareersHubPage: React.FC = () => {
             {/* Card 2: Sales & Marketing */}
             <Link
               to="/Careers/sales-marketing?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-b from-[#0a3028] to-[#06201b] border-2 border-emerald-500/40 hover:border-emerald-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-white hover:bg-emerald-50/40 border-2 border-slate-200/90 hover:border-emerald-500 text-slate-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-400/30 text-emerald-300 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shadow-2xs">
                     <TrendingUp className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-200 border border-emerald-700/50">
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200">
                     Multiple Vacancies
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                  <h3 className="font-black text-sm text-[#10243a] group-hover:text-emerald-800 transition-colors leading-snug">
                     SALES &amp; MARKETING EXECUTIVE
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     Bachelor&apos;s Degree · Attractive Salary + Performance Incentives.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-emerald-300 group-hover:text-emerald-200">
+              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-emerald-700 group-hover:text-emerald-900">
                 <span>Apply Online</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -273,27 +273,27 @@ export const CareersHubPage: React.FC = () => {
             {/* Card 3: Accountant */}
             <Link
               to="/Careers/accountant?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-b from-[#31230e] to-[#211709] border-2 border-amber-500/40 hover:border-amber-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-white hover:bg-teal-50/40 border-2 border-slate-200/90 hover:border-[#167d83] text-slate-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-amber-900/60 border border-amber-400/30 text-amber-300 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#167d83] flex items-center justify-center shadow-2xs">
                     <Briefcase className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-200 border border-amber-700/50">
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-900 border border-teal-200">
                     2 Vacancies
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-white group-hover:text-amber-300 transition-colors leading-snug">
+                  <h3 className="font-black text-sm text-[#10243a] group-hover:text-[#167d83] transition-colors leading-snug">
                     ACCOUNTANT
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     Accounting, Finance or Related Degree · Corporate Accounts.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-amber-300 group-hover:text-amber-200">
+              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-[#167d83] group-hover:text-teal-900">
                 <span>Apply Online</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -302,27 +302,27 @@ export const CareersHubPage: React.FC = () => {
             {/* Card 4: Customer Care */}
             <Link
               to="/Careers/customer-care?tab=apply"
-              className="p-4 rounded-2xl bg-gradient-to-b from-[#112a3d] to-[#0a1b28] border-2 border-teal-500/40 hover:border-teal-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-white hover:bg-amber-50/40 border-2 border-slate-200/90 hover:border-[#c7a76b] text-slate-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col justify-between"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-teal-900/60 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center shadow-2xs">
                     <Headphones className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-teal-950/80 text-teal-200 border border-teal-700/50">
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
                     2 Vacancies · Female
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-white group-hover:text-teal-300 transition-colors leading-snug">
+                  <h3 className="font-black text-sm text-[#10243a] group-hover:text-amber-800 transition-colors leading-snug">
                     CUSTOMER CARE EXECUTIVE
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     HSC or Above · Freshers Welcome · Excellent Communication.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-teal-300 group-hover:text-teal-200">
+              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-amber-800 group-hover:text-amber-950">
                 <span>Apply Online</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -330,25 +330,25 @@ export const CareersHubPage: React.FC = () => {
           </div>
 
           {/* Banner Verification & Contact Information Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/10">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Application Deadline</span>
-              <span className="text-xs sm:text-sm font-black text-amber-400 mt-0.5 block">31 October 2026</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-7 pt-5 border-t border-slate-200/90">
+            <div className="bg-white/90 border border-slate-200/90 rounded-xl p-3 text-center shadow-2xs">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Application Deadline</span>
+              <span className="text-xs sm:text-sm font-black text-amber-700 mt-0.5 block">31 October 2026</span>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Official Portal</span>
-              <span className="text-xs sm:text-sm font-black text-emerald-400 mt-0.5 block">blog.accounticca.com/Careers</span>
+            <div className="bg-white/90 border border-slate-200/90 rounded-xl p-3 text-center shadow-2xs">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Official Portal</span>
+              <span className="text-xs sm:text-sm font-black text-emerald-700 mt-0.5 block">blog.accounticca.com/Careers</span>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Direct WhatsApp Helpline</span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-white mt-0.5 block">+88 01335230170-81</span>
+            <div className="bg-white/90 border border-slate-200/90 rounded-xl p-3 text-center shadow-2xs">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Direct WhatsApp Helpline</span>
+              <span className="text-xs sm:text-sm font-mono font-bold text-[#10243a] mt-0.5 block">+88 01335230170-81</span>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Social Network</span>
-              <span className="text-xs sm:text-sm font-bold text-teal-300 mt-0.5 block">/eLawyerssBD</span>
+            <div className="bg-white/90 border border-slate-200/90 rounded-xl p-3 text-center shadow-2xs">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Social Network</span>
+              <span className="text-xs sm:text-sm font-bold text-[#167d83] mt-0.5 block">/eLawyerssBD</span>
             </div>
           </div>
         </div>

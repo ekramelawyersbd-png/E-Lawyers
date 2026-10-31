@@ -14,6 +14,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
+import { usePurchases } from '../../contexts/PurchaseContext';
 
 interface CartDrawerProps {
   onCheckout?: () => void;
@@ -36,6 +37,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
     isCartOpen, 
     setIsCartOpen 
   } = useCart();
+  const { isPurchased, isPendingPurchase } = usePurchases();
 
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -126,82 +128,131 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
               </div>
             ) : (
               <div className="space-y-3.5">
-                {items.map((item) => (
-                  <div
-                    key={item.product.id}
-                    className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-emerald-200 transition-all flex gap-3.5"
-                  >
-                    <Link
-                      to={`/shop/${item.product.slug}`}
-                      onClick={() => setIsCartOpen(false)}
-                      className="shrink-0 block"
+                {items.map((item) => {
+                  const alreadyOwned = isPurchased(item.product.id) || isPurchased(item.product.slug);
+                  const pendingOrder = isPendingPurchase(item.product.id) || isPendingPurchase(item.product.slug);
+
+                  return (
+                    <div
+                      key={item.product.id}
+                      className={`p-3.5 rounded-2xl border transition-all flex gap-3.5 ${
+                        alreadyOwned
+                          ? 'bg-emerald-50/70 border-emerald-200'
+                          : pendingOrder
+                          ? 'bg-amber-50/70 border-amber-200'
+                          : 'bg-slate-50 border-slate-200/80 hover:border-emerald-200'
+                      }`}
                     >
-                      <img
-                        src={item.product.imageUrl}
-                        alt={item.product.title}
-                        className="w-16 h-16 rounded-xl object-cover border border-slate-200 hover:opacity-90 transition-opacity"
-                      />
-                    </Link>
+                      <Link
+                        to={`/shop/${item.product.slug}`}
+                        onClick={() => setIsCartOpen(false)}
+                        className="shrink-0 block"
+                      >
+                        <img
+                          src={item.product.imageUrl}
+                          alt={item.product.title}
+                          className="w-16 h-16 rounded-xl object-cover border border-slate-200 hover:opacity-90 transition-opacity"
+                        />
+                      </Link>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-1">
-                        <Link
-                          to={`/shop/${item.product.slug}`}
-                          onClick={() => setIsCartOpen(false)}
-                          className="font-bold text-xs text-slate-900 leading-snug line-clamp-2 hover:text-emerald-700 transition-colors"
-                        >
-                          {item.product.title}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.product.id)}
-                          className="text-slate-400 hover:text-rose-500 p-1 transition-colors"
-                          title="Remove item"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1">
+                          <Link
+                            to={`/shop/${item.product.slug}`}
+                            onClick={() => setIsCartOpen(false)}
+                            className="font-bold text-xs text-slate-900 leading-snug line-clamp-2 hover:text-emerald-700 transition-colors"
+                          >
+                            {item.product.title}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.product.id)}
+                            className="text-slate-400 hover:text-rose-500 p-1 transition-colors"
+                            title="Remove item"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
 
-                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">
-                        {item.product.format}
-                      </div>
+                        <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+                          {item.product.format}
+                        </div>
 
-                      <div className="flex items-center justify-between mt-2.5">
-                        <div className="flex items-center gap-1.5 font-black text-xs text-slate-900">
-                          <span>BDT {(item.product.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                          {item.product.originalPrice > item.product.price && (
-                            <span className="text-[10px] line-through text-slate-400 font-normal">
-                              BDT {(item.product.originalPrice * item.quantity).toLocaleString('en-IN')}
+                        {alreadyOwned ? (
+                          <div className="mt-2 space-y-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                              <Check className="w-3 h-3" />
+                              Already Purchased — Duplicate Blocked
                             </span>
-                          )}
-                        </div>
+                            <div className="grid grid-cols-2 gap-1.5">
+                              <Link
+                                to={`/shop/${item.product.slug}`}
+                                onClick={() => setIsCartOpen(false)}
+                                className="py-1.5 px-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold text-center transition-colors"
+                              >
+                                View Product
+                              </Link>
+                              <Link
+                                to="/client-portal"
+                                onClick={() => setIsCartOpen(false)}
+                                className="py-1.5 px-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold text-center transition-colors"
+                              >
+                                Go to Dashboard
+                              </Link>
+                            </div>
+                          </div>
+                        ) : pendingOrder ? (
+                          <div className="mt-2 space-y-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold">
+                              Pending Verification
+                            </span>
+                            <Link
+                              to="/client-portal"
+                              onClick={() => setIsCartOpen(false)}
+                              className="block py-1.5 px-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[10px] font-bold text-center transition-colors"
+                            >
+                              Go to Dashboard
+                            </Link>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between mt-2.5">
+                            <div className="flex items-center gap-1.5 font-black text-xs text-slate-900">
+                              <span>BDT {(item.product.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              {item.product.originalPrice > item.product.price && (
+                                <span className="text-[10px] line-through text-slate-400 font-normal">
+                                  BDT {(item.product.originalPrice * item.quantity).toLocaleString('en-IN')}
+                                </span>
+                              )}
+                            </div>
 
-                        {/* Quantity Controls */}
-                        <div className="flex items-center border border-slate-200 bg-white rounded-lg">
-                          <button
-                            type="button"
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                            className="p-1 hover:bg-slate-100 text-slate-600 rounded-l-lg transition-colors"
-                            title="Decrease quantity"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="px-2 text-xs font-bold text-slate-800">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                            className="p-1 hover:bg-slate-100 text-slate-600 rounded-r-lg transition-colors"
-                            title="Increase quantity"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
+                            {/* Quantity Controls */}
+                            <div className="flex items-center border border-slate-200 bg-white rounded-lg">
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                className="p-1 hover:bg-slate-100 text-slate-600 rounded-l-lg transition-colors"
+                                title="Decrease quantity"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="px-2 text-xs font-bold text-slate-800">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                className="p-1 hover:bg-slate-100 text-slate-600 rounded-r-lg transition-colors"
+                                title="Increase quantity"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 

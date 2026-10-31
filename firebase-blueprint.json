@@ -165,6 +165,28 @@
         "sentAt": "timestamp",
         "delivered": "boolean"
       }
+    },
+    {
+      "name": "user_purchases",
+      "description": "Verified product, course, and toolkit purchase records permanently bound to unique user IDs",
+      "fields": {
+        "purchaseId": "string",
+        "userId": "string",
+        "userEmail": "string",
+        "productId": "string",
+        "productSlug": "string",
+        "productName": "string",
+        "orderId": "string",
+        "transactionId": "string",
+        "amount": "number",
+        "paymentMethod": "string",
+        "paymentStatus": "string",
+        "accessStatus": "string",
+        "purchaseDate": "string",
+        "accessExpiryDate": "string",
+        "createdAt": "timestamp",
+        "updatedAt": "timestamp"
+      }
     }
   ],
   "relationships": [
@@ -181,6 +203,11 @@
     {
       "parent": "users",
       "child": "comments",
+      "type": "one-to-many"
+    },
+    {
+      "parent": "users",
+      "child": "user_purchases",
       "type": "one-to-many"
     },
     {

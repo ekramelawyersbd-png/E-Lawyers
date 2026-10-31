@@ -154,6 +154,7 @@ export const authService = {
   logout: async (): Promise<void> => {
     localStorage.removeItem('erp_auth_user');
     localStorage.removeItem('erp_google_oauth_access_token');
+    localStorage.removeItem('accounticca_checkout_client_identity');
     await Promise.allSettled([signOut(auth), signOut(fallbackAuth)]);
   },
 

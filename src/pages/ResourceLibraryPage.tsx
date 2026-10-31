@@ -131,20 +131,20 @@ export function ResourceLibraryPage() {
       )}
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-12 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      <div className="bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 text-slate-900 pt-12 pb-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-slate-800">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-slate-200/80">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider mb-4">
-                <FolderDown className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-bold uppercase tracking-wider mb-4">
+                <FolderDown className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Statutory Legal & Tax Documentation Vault</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                Resource Library <span className="text-emerald-400 font-black">(PDFs)</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+                Resource Library <span className="text-emerald-600 font-black">(PDFs)</span>
               </h1>
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
                 Download verified, practitioner-grade legal draft templates, corporate resolutions, employment contracts, and statutory tax checklists customized for Bangladesh law (Contract Act 1872, Income Tax Act 2023, Companies Act 1994, and Labour Act 2006).
               </p>
             </div>
@@ -152,7 +152,7 @@ export function ResourceLibraryPage() {
             <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Link
                 to="/tools"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-white text-xs font-bold border border-slate-700 transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-all shadow-xs"
               >
                 <span>Interactive Calculators</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -169,21 +169,21 @@ export function ResourceLibraryPage() {
 
           {/* Quick Stats Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-2">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
-              <div className="text-2xl font-black text-emerald-400">{RESOURCE_TEMPLATES.length}+</div>
-              <div className="text-xs text-slate-300 font-medium mt-0.5">Compliant Drafts</div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+              <div className="text-2xl font-black text-emerald-600">{RESOURCE_TEMPLATES.length}+</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">Compliant Drafts</div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
-              <div className="text-2xl font-black text-white">100% Free</div>
-              <div className="text-xs text-slate-300 font-medium mt-0.5">One-Click PDF Export</div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+              <div className="text-2xl font-black text-slate-900">100% Free</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">One-Click PDF Export</div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
-              <div className="text-2xl font-black text-emerald-400">AY 2026-27</div>
-              <div className="text-xs text-slate-300 font-medium mt-0.5">Updated Tax SROs</div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+              <div className="text-2xl font-black text-emerald-600">AY 2026-27</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">Updated Tax SROs</div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
-              <div className="text-2xl font-black text-white">Full Text</div>
-              <div className="text-xs text-slate-300 font-medium mt-0.5">Editable & Copyable</div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+              <div className="text-2xl font-black text-slate-900">Full Text</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">Editable & Copyable</div>
             </div>
           </div>
         </div>

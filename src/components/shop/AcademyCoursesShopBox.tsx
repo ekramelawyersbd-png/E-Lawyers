@@ -20,6 +20,7 @@ import {
   FileCheck
 } from 'lucide-react';
 import { ShopProduct } from '../../data/shopProducts';
+import { ProductPurchaseActions } from './ProductPurchaseActions';
 
 interface AcademyCoursesShopBoxProps {
   courses: ShopProduct[];
@@ -383,40 +384,16 @@ export function AcademyCoursesShopBox({
                 </div>
               </div>
 
-              {/* Card Action Buttons (Dual CTA: Add to Cart + Instant Buy / Enroll) */}
+              {/* Card Action Buttons (Dynamic Purchase Verification CTA) */}
               <div className="px-5 pb-5 pt-0 space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onAddToCart(course)}
-                    className={`w-full py-2.5 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
-                      isAdded
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 shadow-2xs hover:border-slate-300'
-                    }`}
-                  >
-                    {isAdded ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-white" />
-                        <span>Added!</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Add to Cart</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onInstantBuy(course)}
-                    className="w-full py-2.5 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer hover:shadow-md"
-                  >
-                    <span>Enroll Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-white" />
-                  </button>
-                </div>
+                <ProductPurchaseActions
+                  product={course}
+                  isAdded={isAdded}
+                  onAddToCart={(_, prod) => onAddToCart(prod)}
+                  onBuyNow={(_, prod) => onInstantBuy(prod)}
+                  variant="course"
+                  viewProductHref={detailHref}
+                />
 
                 {/* Direct Link to Student LMS Portal */}
                 <Link

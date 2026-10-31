@@ -205,19 +205,19 @@ export function VatApportionmentCalculatorPage() {
         {/* Main Calculator Card */}
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
           {/* Header */}
-          <div className="bg-slate-900 text-white p-6 md:p-8 border-b border-slate-800">
+          <div className="bg-gradient-to-r from-emerald-50/80 via-white to-slate-50 text-slate-900 p-6 md:p-8 border-b border-slate-200">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium mb-2">
+                <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold mb-2">
                   <span>Section 47 · VAT & SD Act, 2012</span>
                   <span aria-hidden="true">·</span>
                   <span>Rule 28 · Mushak 9.1 Part-4 & Part-5</span>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2.5">
-                  <Calculator className="w-6 h-6 text-emerald-400 shrink-0" />
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+                  <Calculator className="w-6 h-6 text-emerald-600 shrink-0" />
                   <span>Section 47 VAT Apportionment Calculator (উপকরণ করের আংশিক রেয়াত)</span>
                 </h2>
-                <p className="text-sm text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
+                <p className="text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed">
                   Enter your <strong>Total Input Tax (I)</strong>, <strong>Standard/Zero-Rated Supply Value (T)</strong>, and <strong>Total Supplies (T_total)</strong> to calculate your monthly Eligible Partial Rebate and Part-5 Increasing Adjustment.
                 </p>
               </div>
@@ -226,12 +226,12 @@ export function VatApportionmentCalculatorPage() {
                 <button
                   type="button"
                   onClick={handleCopySummary}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs text-xs font-semibold transition-colors cursor-pointer"
                 >
                   {copiedSummary ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-300">Copied</span>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">Copied</span>
                     </>
                   ) : (
                     <>
@@ -243,7 +243,7 @@ export function VatApportionmentCalculatorPage() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs text-xs font-semibold transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Reset</span>
@@ -252,11 +252,11 @@ export function VatApportionmentCalculatorPage() {
             </div>
 
             {/* Formula Display */}
-            <div className="mt-6 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="text-xs text-slate-300">
-                <span className="font-semibold text-white">Section 47 Statutory Apportionment Formula:</span>
+            <div className="mt-6 p-4 rounded-xl bg-white border border-emerald-200/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="text-xs text-slate-600">
+                <span className="font-semibold text-slate-900">Section 47 Statutory Apportionment Formula:</span>
               </div>
-              <div className="font-mono text-xs md:text-sm text-emerald-300 font-semibold">
+              <div className="font-mono text-xs md:text-sm text-emerald-700 font-semibold">
                 Eligible Partial Rebate = I × (T ÷ T_total)
               </div>
             </div>

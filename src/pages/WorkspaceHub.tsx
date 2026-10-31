@@ -817,46 +817,46 @@ export const WorkspaceHub: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="bg-gradient-to-r from-white via-emerald-50/60 to-teal-50/50 rounded-3xl p-8 sm:p-10 text-slate-900 border border-slate-200/90 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                   Enterprise Workspace Integration
                 </div>
                 {adminUser && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-200 text-xs font-medium">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200/80 text-cyan-800 text-xs font-medium">
+                    <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
                     <span>Admin: {adminUser.email}</span>
                   </div>
                 )}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
                 Google Workspace Hub
               </h1>
-              <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+              <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed">
                 Connect your Google Workspace suite to streamline tax returns, sync client schedules, generate legal documents, and collaborate in real-time.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3">
               {token ? (
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 shadow-md">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                       <span>Permanently Connected</span>
                     </span>
-                    <span className="text-[11px] text-emerald-200 truncate max-w-[210px] font-medium">
+                    <span className="text-[11px] text-emerald-700 truncate max-w-[210px] font-medium">
                       {getConnectedWorkspaceEmail()}
                     </span>
                   </div>
                   <button
                     onClick={handleSignOut}
-                    className="ml-2 text-xs text-rose-300 hover:text-white underline font-semibold transition cursor-pointer"
+                    className="ml-2 text-xs text-rose-600 hover:text-rose-700 underline font-semibold transition cursor-pointer"
                   >
                     Disconnect
                   </button>
@@ -865,7 +865,7 @@ export const WorkspaceHub: React.FC = () => {
                 <button
                   onClick={handleSignIn}
                   disabled={isAuthenticating}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-bold px-6 py-3 rounded-2xl shadow-xl transition active:scale-95 disabled:opacity-50 cursor-pointer border border-white/40"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-bold px-6 py-3 rounded-2xl shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer border border-slate-200"
                 >
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>

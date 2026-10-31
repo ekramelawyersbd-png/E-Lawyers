@@ -47,11 +47,13 @@ import {
 } from '../data/shopProducts';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
+import { usePurchases } from '../contexts/PurchaseContext';
 import { useShopAuth } from '../contexts/ShopAuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { ProductComparisonModal } from '../components/shop/ProductComparisonModal';
 import { ProductComparisonDock } from '../components/shop/ProductComparisonDock';
 import { AcademyCoursesShopBox } from '../components/shop/AcademyCoursesShopBox';
+import { ProductPurchaseActions } from '../components/shop/ProductPurchaseActions';
 
 export type ShopSortOption = 'bestselling' | 'price_low' | 'price_high' | 'rating';
 
@@ -93,6 +95,7 @@ export function Shop() {
   const navigate = useNavigate();
   const { products } = useProducts();
   const { addToCart, totalItemsCount, setIsCartOpen } = useCart();
+  const { isPurchased, isPendingPurchase } = usePurchases();
   const { adminUser, isAuthenticated, logout } = useShopAuth();
   const { isBookmarked, toggleBookmark, savedIds } = useBookmarks();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -269,6 +272,10 @@ export function Shop() {
 
   const handleAddToCart = (e: React.MouseEvent, product: ShopProduct) => {
     e.stopPropagation();
+    if (isPurchased(product.id) || isPendingPurchase(product.id)) {
+      navigate('/client-portal');
+      return;
+    }
     addToCart(product, 1);
     setAddedIds(prev => ({ ...prev, [product.id]: true }));
     setTimeout(() => {
@@ -278,6 +285,10 @@ export function Shop() {
 
   const handleInstantBuy = (e: React.MouseEvent, product: ShopProduct) => {
     e.stopPropagation();
+    if (isPurchased(product.id) || isPendingPurchase(product.id)) {
+      navigate('/client-portal');
+      return;
+    }
     navigate(`/checkout?product=${encodeURIComponent(product.slug)}`);
   };
 
@@ -1213,42 +1224,15 @@ export function Shop() {
                     </div>
                   </div>
 
-                  {/* Card Actions (Dual CTA: Add to Cart + Instant Checkout) */}
-                  <div className="px-5 pb-5 pt-0 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => handleAddToCart(e, product)}
-                      className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
-                        isAdded
-                          ? 'bg-emerald-600 text-white border-emerald-600'
-                          : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 shadow-2xs hover:border-slate-300'
-                      }`}
-                    >
-                      {isAdded ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-white" />
-                          <span>Added!</span>
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Add to Cart</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={(e) => handleInstantBuy(e, product)}
-                      className={`w-full py-2.5 px-3 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer hover:shadow-md ${
-                        pType === 'Academy Courses'
-                          ? 'bg-emerald-600 hover:bg-emerald-700'
-                          : 'bg-slate-900 hover:bg-slate-800'
-                      }`}
-                    >
-                      <span>{pType === 'Academy Courses' ? 'Enroll Now' : 'Buy Now'}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
-                    </button>
+                  {/* Card Actions (Dynamic Purchase Verification CTA) */}
+                  <div className="px-5 pb-5 pt-0">
+                    <ProductPurchaseActions
+                      product={product}
+                      isAdded={isAdded}
+                      onAddToCart={handleAddToCart}
+                      onBuyNow={handleInstantBuy}
+                      variant="card"
+                    />
                   </div>
 
                 </article>

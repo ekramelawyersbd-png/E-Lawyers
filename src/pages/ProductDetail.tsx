@@ -33,6 +33,7 @@ import { useShopAuth } from '../contexts/ShopAuthContext';
 import { useBookmarks } from '../contexts/BookmarkContext';
 import { ShopProduct, inferProductType } from '../data/shopProducts';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ProductPurchaseActions } from '../components/shop/ProductPurchaseActions';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -45,8 +46,16 @@ export function ProductDetail() {
   const isDraft = product?.status === 'draft';
 
   // Purchases context & access gate enforcer
-  const { isPurchased, simulateInstantPurchase } = usePurchases();
+  const {
+    isPurchased,
+    isPendingPurchase,
+    getPurchaseRecord,
+    downloadReceipt,
+    simulateInstantPurchase
+  } = usePurchases();
   const hasPurchased = product ? isPurchased(product.id) : false;
+  const hasPendingOrder = product ? isPendingPurchase(product.id) : false;
+  const activePurchaseRecord = product ? getPurchaseRecord(product.id) : undefined;
   const [gatedAlert, setGatedAlert] = useState<string | null>(null);
 
   // Bookmark context for saving product
@@ -97,6 +106,10 @@ export function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (hasPurchased || hasPendingOrder) {
+      navigate('/client-portal');
+      return;
+    }
     addToCart(product, quantity);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
@@ -104,12 +117,49 @@ export function ProductDetail() {
 
   const handleBuyNow = () => {
     if (!product) return;
+    if (hasPurchased || hasPendingOrder) {
+      navigate('/client-portal');
+      return;
+    }
     navigate(`/checkout?product=${encodeURIComponent(product.slug)}&qty=${quantity}`);
   };
 
   const handlePayNow = () => {
     if (!product) return;
+    if (hasPurchased || hasPendingOrder) {
+      navigate('/client-portal');
+      return;
+    }
     navigate(`/checkout?product=${encodeURIComponent(product.slug)}&qty=${quantity}`);
+  };
+
+  const handleDownloadPurchasedKit = (prod: ShopProduct) => {
+    const content = `========================================================
+ACCOUNTICCA & E-LAWYERS VERIFIED DIGITAL REPOSITORY
+========================================================
+Product Title: ${prod.title}
+Product ID: ${prod.id}
+Format: ${prod.format}
+Governing Law: ${prod.governingLaw || 'Bangladesh Jurisdictional Law'}
+Order ID: ${activePurchaseRecord?.orderId || 'VERIFIED-ACCESS'}
+Access Status: ACTIVE & VERIFIED
+
+--- OVERVIEW & INSTRUCTIONS ---
+${prod.fullDescription}
+
+--- INCLUDED DELIVERABLES ---
+${prod.features.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+--- SAMPLE CLAUSE / EXCERPT ---
+${prod.samplePreviewSnippet || 'Full verified statutory template.'}
+========================================================`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${prod.slug}-verified-kit.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleShare = () => {
@@ -726,69 +776,53 @@ export function ProductDetail() {
                     </div>
                   </div>
 
-                  {/* Quantity selector */}
-                  <div className="flex items-center gap-2.5 sm:self-center bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                    <span className="text-xs font-semibold text-slate-300">Qty:</span>
-                    <div className="flex items-center border border-slate-700 rounded-lg bg-slate-950 overflow-hidden shadow-2xs">
-                      <button
-                        type="button"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-sm transition-colors cursor-pointer"
-                        title="Decrease quantity"
-                        aria-label="Decrease quantity"
-                      >
-                        -
-                      </button>
-                      <span className="w-9 text-center font-bold text-xs text-amber-300 font-mono">
-                        {quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-sm transition-colors cursor-pointer"
-                        title="Increase quantity"
-                        aria-label="Increase quantity"
-                      >
-                        +
-                      </button>
+                  {/* Quantity selector (only shown if not already purchased/pending) */}
+                  {!hasPurchased && !hasPendingOrder && (
+                    <div className="flex items-center gap-2.5 sm:self-center bg-slate-900/90 p-2 rounded-xl border border-slate-800">
+                      <span className="text-xs font-semibold text-slate-300">Qty:</span>
+                      <div className="flex items-center border border-slate-700 rounded-lg bg-slate-950 overflow-hidden shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-sm transition-colors cursor-pointer"
+                          title="Decrease quantity"
+                          aria-label="Decrease quantity"
+                        >
+                          -
+                        </button>
+                        <span className="w-9 text-center font-bold text-xs text-amber-300 font-mono">
+                          {quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(quantity + 1)}
+                          className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-sm transition-colors cursor-pointer"
+                          title="Increase quantity"
+                          aria-label="Increase quantity"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Purchase Actions: Primary Instant Checkout & Secondary Add to Cart */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 mt-4 border-t border-slate-800/80">
-                  <button
-                    type="button"
-                    onClick={handlePayNow}
-                    className="h-12 px-6 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 active:scale-95 text-slate-950 rounded-xl text-sm font-black transition-all shadow-md hover:shadow-amber-500/20 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-slate-950" />
-                    <span>Instant Checkout</span>
-                    <ArrowRight className="w-4 h-4 text-slate-950" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    className={`h-12 px-6 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                      isAdded
-                        ? 'bg-emerald-600 text-white border-emerald-500'
-                        : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-700 shadow-2xs'
-                    }`}
-                  >
-                    {isAdded ? (
-                      <>
-                        <Check className="w-4 h-4 text-white" />
-                        <span>Added to Cart!</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="w-4 h-4 text-amber-400" />
-                        <span>Add to Cart</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                {/* Dynamic Purchase Actions based on User Purchase Verification */}
+                <ProductPurchaseActions
+                  product={product}
+                  isAdded={isAdded}
+                  onAddToCart={() => handleAddToCart()}
+                  onBuyNow={() => handlePayNow()}
+                  variant="detail"
+                  onViewProductClick={() => {
+                    const vaultEl = document.getElementById('product-access-vault');
+                    if (vaultEl) {
+                      vaultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                      handleDownloadPurchasedKit(product);
+                    }
+                  }}
+                />
 
                 {/* Trust Assurances Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 mt-4 border-t border-slate-800/80 text-xs text-slate-300">
@@ -810,6 +844,67 @@ export function ProductDetail() {
                   </div>
                 </div>
               </div>
+
+              {/* Unlocked Product Vault (Shown only when user has verified purchase) */}
+              {hasPurchased && (
+                <div
+                  id="product-access-vault"
+                  className="rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-white p-5 sm:p-6 shadow-md space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-base font-black text-slate-900">
+                            Purchased Product Unlocked
+                          </h3>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Active Access
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-0.5">
+                          Order Ref:{' '}
+                          <strong className="font-mono text-slate-800">
+                            {activePurchaseRecord?.orderId || 'VERIFIED'}
+                          </strong>{' '}
+                          • Format: {product.format} ({product.pagesOrFiles})
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadPurchasedKit(product)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download Complete Kit</span>
+                      </button>
+                      {activePurchaseRecord && (
+                        <button
+                          type="button"
+                          onClick={() => downloadReceipt(activePurchaseRecord)}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Receipt</span>
+                        </button>
+                      )}
+                      <Link
+                        to="/client-portal"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all"
+                      >
+                        <span>Go to Dashboard</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Academy Course Hub & Syllabus Navigation Card */}
               {(product.category === 'Academy Courses' || product.coursePath) && (
@@ -1099,25 +1194,36 @@ export function ProductDetail() {
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                         <span className="font-bold text-slate-900">{rel.rating}</span>
                       </div>
-                      <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
-                        {rel.title}
-                      </h3>
+                      <Link to={`/shop/${rel.slug}`}>
+                        <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
+                          {rel.title}
+                        </h3>
+                      </Link>
                       <p className="text-xs text-slate-500 line-clamp-2 mt-1">
                         {rel.shortDescription}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="font-bold text-base text-slate-900 font-mono">
-                        BDT {rel.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                      <Link
-                        to={`/shop/${rel.slug}`}
-                        className="px-3 py-1.5 bg-slate-950 hover:bg-amber-400 text-white hover:text-slate-950 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1 shadow-2xs"
-                      >
-                        <span>View Details</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
+                    <div className="pt-3 border-t border-slate-100 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-base text-slate-900 font-mono">
+                          BDT {rel.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <Link
+                          to={`/shop/${rel.slug}`}
+                          className="text-xs font-semibold text-slate-600 hover:text-emerald-800 inline-flex items-center gap-1"
+                        >
+                          <span>Details</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+
+                      <ProductPurchaseActions
+                        product={rel}
+                        onAddToCart={(_, prod) => addToCart(prod, 1)}
+                        onBuyNow={(_, prod) => navigate(`/checkout?product=${encodeURIComponent(prod.slug)}`)}
+                        variant="card"
+                      />
                     </div>
                   </div>
                 </div>

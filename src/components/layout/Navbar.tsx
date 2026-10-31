@@ -364,10 +364,10 @@ export function Navbar() {
     >
       <div 
         className={cn(
-          "w-full max-w-[1237px] mx-auto transition-all duration-300 ease-out",
+          "w-full max-w-full mx-auto transition-all duration-300 ease-out",
           isScrolled && !isOpen
-            ? "bg-white/95 backdrop-blur-xl shadow-[0_14px_38px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.04)] rounded-2xl border border-slate-200/90 ring-1 ring-slate-900/5 px-3 sm:px-6"
-            : "px-3 sm:px-6 lg:px-8"
+            ? "bg-white/95 backdrop-blur-xl shadow-[0_14px_38px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.04)] rounded-2xl border border-slate-200/90 ring-1 ring-slate-900/5 px-3 sm:px-6 lg:px-10 xl:px-12"
+            : "px-3 sm:px-6 lg:px-10 xl:px-12"
         )}
       >
         <div className={cn(

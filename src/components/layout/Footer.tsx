@@ -15,7 +15,7 @@ import { FooterNewsletter } from './FooterNewsletter';
 export function Footer() {
   return (
     <footer className="w-full bg-slate-900 text-slate-400 py-16 border-t border-slate-800 mt-12 print:hidden">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-12">
         
         {/* Business Compliance Newsletter Subscription Form */}
         <FooterNewsletter />

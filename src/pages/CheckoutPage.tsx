@@ -48,8 +48,8 @@ export const CheckoutPage: React.FC = () => {
   }, [searchParams]);
   
   const { products } = useProducts();
-  const { items, subtotal, discount, total, clearCart } = useCart();
-  const { purchaseProduct } = usePurchases();
+  const { items, subtotal, discount, total, clearCart, removeFromCart } = useCart();
+  const { purchaseProduct, isPurchased, isPendingPurchase, activeUserId, activeUserEmail } = usePurchases();
   const { user, authUser, signInWithGoogle, signInWithFacebook, logout } = useAuth();
 
   // Determine if purchasing a single product from URL or cart items
@@ -62,18 +62,39 @@ export const CheckoutPage: React.FC = () => {
     );
   }, [productSlug, products]);
 
-  const checkoutItems = singleProduct 
+  const rawCheckoutItems = singleProduct 
     ? [{ product: { ...singleProduct, price: singleProduct.price || 10 }, quantity: singleQty }] 
     : items.length > 0
       ? items.map(item => ({ ...item, product: { ...item.product, price: item.product.price || 10 } }))
       : [];
 
+  const alreadyPurchasedCheckoutItems = useMemo(
+    () => rawCheckoutItems.filter(item => isPurchased(item.product.id) || isPurchased(item.product.slug)),
+    [rawCheckoutItems, isPurchased]
+  );
+
+  const pendingCheckoutItems = useMemo(
+    () => rawCheckoutItems.filter(item => isPendingPurchase(item.product.id) || isPendingPurchase(item.product.slug)),
+    [rawCheckoutItems, isPendingPurchase]
+  );
+
+  const checkoutItems = useMemo(
+    () => rawCheckoutItems.filter(
+      item =>
+        !isPurchased(item.product.id) &&
+        !isPurchased(item.product.slug) &&
+        !isPendingPurchase(item.product.id) &&
+        !isPendingPurchase(item.product.slug)
+    ),
+    [rawCheckoutItems, isPurchased, isPendingPurchase]
+  );
+
   const rawSubtotal = checkoutItems.reduce((acc, curr) => acc + (curr.product?.price || 10) * curr.quantity, 0);
-  const orderSubtotal = rawSubtotal > 0 ? rawSubtotal : 10;
+  const orderSubtotal = rawSubtotal > 0 ? rawSubtotal : (checkoutItems.length > 0 ? 10 : 0);
   const orderDiscount = 0;
   const orderTotal = Math.max(0, orderSubtotal - orderDiscount);
 
-  const isFree = orderTotal === 0;
+  const isFree = checkoutItems.length > 0 && orderTotal === 0;
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -503,7 +524,16 @@ export const CheckoutPage: React.FC = () => {
     setCompletedOrderNumber(orderNum);
     setPurchasedProducts(prods);
     setOrderSheetSynced(syncedToSheet);
-    prods.forEach((p) => purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed'));
+    prods.forEach((p) =>
+      purchaseProduct(p.id, p.title, p.price, methodLabel, 'completed', {
+        productSlug: p.slug,
+        orderId: orderNum,
+        transactionId: resolvedTrxId,
+        userIdOverride: authenticatedUid || undefined,
+        userEmailOverride: email.trim().toLowerCase(),
+        userNameOverride: fullName.trim()
+      })
+    );
     setIsSubmitting(false);
     setIsOrderComplete(true);
     if (!singleProduct) {
@@ -605,25 +635,27 @@ Contact & Advisory: https://blog.accounticca.com/contact
                 <div>
                   <h3 className="font-extrabold text-lg">Checkout Successful &amp; Unlocked!</h3>
                   <p className="text-xs text-emerald-100 mt-1 leading-relaxed">
-                    Your digital assets have been dispatched to <strong>{email}</strong> and unlocked for instant access in your portal profile.
+                    Your digital assets have been dispatched to <strong>{email}</strong> and permanently linked to your User ID (<strong>{activeUserId || authenticatedUid || email}</strong>).
                   </p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <Link
-                  to="/student/dashboard"
+                  to="/client-portal"
                   className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-300 transition-all shrink-0"
                 >
-                  <span>Open Student Learning Portal</span>
+                  <span>Go to Dashboard</span>
                   <ExternalLink className="w-4 h-4 text-slate-900" />
                 </Link>
-                <Link
-                  to="/profile"
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-emerald-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-50 transition-all shrink-0"
-                >
-                  <span>Go to My Purchases</span>
-                  <ExternalLink className="w-4 h-4 text-emerald-700" />
-                </Link>
+                {purchasedProducts[0] && (
+                  <Link
+                    to={`/shop/${purchasedProducts[0].slug}`}
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-white text-emerald-950 font-black text-xs rounded-xl shadow-md hover:bg-emerald-50 transition-all shrink-0"
+                  >
+                    <Eye className="w-4 h-4 text-emerald-700" />
+                    <span>View Product</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -774,21 +806,24 @@ Contact & Advisory: https://blog.accounticca.com/contact
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
-                      {p.brochureUrl && (
-                        <a
-                          href={p.brochureUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-xs"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          <span>Open Resource</span>
-                        </a>
-                      )}
+                      <Link
+                        to={`/shop/${p.slug}`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-black transition-all shadow-xs"
+                      >
+                        <Eye className="w-4 h-4 text-emerald-600" />
+                        <span>View Product</span>
+                      </Link>
+                      <Link
+                        to="/client-portal"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-xs"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>Go to Dashboard</span>
+                      </Link>
                       <button
                         type="button"
                         onClick={() => handleDownloadSimulatedFile(p)}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-all shadow-xs"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-all shadow-xs cursor-pointer"
                       >
                         <Download className="w-4 h-4 text-emerald-400" />
                         <span>Download Kit</span>
@@ -799,13 +834,85 @@ Contact & Advisory: https://blog.accounticca.com/contact
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-end">
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-between flex-wrap gap-3">
+              <Link
+                to="/client-portal"
+                className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black transition-colors"
+              >
+                Go to Dashboard
+              </Link>
               <Link
                 to="/shop"
                 className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors"
               >
                 Return to Shop Catalog
               </Link>
+            </div>
+          </div>
+        ) : checkoutItems.length === 0 && (alreadyPurchasedCheckoutItems.length > 0 || pendingCheckoutItems.length > 0) ? (
+          /* Duplicate Purchase Guard Screen */
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border-2 border-emerald-200 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-extrabold uppercase tracking-wider mb-2">
+                    Duplicate Purchase Prevented
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                    You Already Own {alreadyPurchasedCheckoutItems.length === 1 ? 'This Product' : 'These Products'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
+                    Verified against User ID <strong className="font-mono text-slate-800">{activeUserId || authenticatedUid || activeUserEmail || 'Active Account'}</strong>. You have full access and do not need to pay again.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/client-portal"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold shadow-md transition-all shrink-0"
+              >
+                <span>Go to Dashboard</span>
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              {[...alreadyPurchasedCheckoutItems, ...pendingCheckoutItems].map(({ product }) => (
+                <div
+                  key={product.id}
+                  className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.title}
+                      className="w-14 h-14 rounded-xl object-cover border border-slate-200 shrink-0"
+                    />
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900">{product.title}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">{product.format} • {product.category}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <Link
+                      to={`/shop/${product.slug}`}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-extrabold transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>View Product</span>
+                    </Link>
+                    <Link
+                      to="/client-portal"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold transition-colors"
+                    >
+                      <span>Go to Dashboard</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ) : checkoutItems.length === 0 ? (

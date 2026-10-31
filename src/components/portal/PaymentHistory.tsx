@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   CreditCard,
   Download,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 import { usePurchases, TransactionRecord } from '../../contexts/PurchaseContext';
 import { generatePdfReceipt } from '../../utils/receiptGenerator';
+import { SHOP_PRODUCTS } from '../../data/shopProducts';
 
 interface PaymentHistoryProps {
   compact?: boolean;
@@ -35,7 +37,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({
   limit,
   onViewAll
 }) => {
-  const { transactions, downloadReceipt, purchaseProduct } = usePurchases();
+  const { transactions, downloadReceipt, purchaseProduct, verifyPendingTransaction, processRefund } = usePurchases();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'completed' | 'pending' | 'refunded'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -105,8 +107,13 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({
   const handleSimulateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amountNum = parseFloat(simAmount) || 2000;
-    const fakeId = `prod-custom-${Date.now().toString().slice(-4)}`;
-    purchaseProduct(fakeId, simTitle, amountNum, simMethod, simStatus);
+    const matchedShopProd = SHOP_PRODUCTS.find(
+      p => p.title.toLowerCase() === simTitle.trim().toLowerCase() || p.id === simTitle.trim()
+    );
+    const targetId = matchedShopProd ? matchedShopProd.id : `prod-custom-${Date.now().toString().slice(-4)}`;
+    purchaseProduct(targetId, matchedShopProd ? matchedShopProd.title : simTitle, amountNum, simMethod, simStatus, {
+      productSlug: matchedShopProd?.slug
+    });
     setIsSimulateModalOpen(false);
   };
 
@@ -116,21 +123,21 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Paid</span>
+            <span>Paid &amp; Active</span>
           </span>
         );
       case 'pending':
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
             <Clock className="w-3.5 h-3.5 text-amber-600" />
-            <span>Pending</span>
+            <span>Pending Verification</span>
           </span>
         );
       case 'refunded':
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
             <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-            <span>Refunded</span>
+            <span>Refunded · Access Revoked</span>
           </span>
         );
     }
@@ -278,120 +285,166 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({
             <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
               {searchQuery || selectedStatus !== 'all'
                 ? 'Try clearing your search query or switching filters.'
-                : 'Completed and pending transactions will be recorded here.'}
+                : 'Completed and pending transactions for your User ID will be recorded here.'}
             </p>
           </div>
         ) : (
           <div className="space-y-3">
-            {displayedTransactions.map((tx) => (
-              <div
-                key={tx.id}
-                onClick={() => setPreviewTransaction(tx)}
-                className="group p-4 sm:p-5 rounded-2xl border border-slate-200/80 hover:border-emerald-300 bg-white hover:bg-slate-50/60 transition-all cursor-pointer shadow-2xs"
-              >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  {/* Left: Transaction Description & Details */}
-                  <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0 group-hover:bg-emerald-50 group-hover:border-emerald-200 group-hover:text-emerald-700 transition-colors">
-                      <FileText className="w-5 h-5" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm text-slate-900 group-hover:text-emerald-900 transition-colors">
-                          {tx.productTitle}
-                        </span>
-                        {getStatusBadge(tx.status)}
+            {displayedTransactions.map((tx) => {
+              const matchedProd = SHOP_PRODUCTS.find(
+                p => p.id === tx.productId || p.slug === tx.productSlug || p.slug === tx.productId
+              );
+              return (
+                <div
+                  key={tx.id}
+                  onClick={() => setPreviewTransaction(tx)}
+                  className="group p-4 sm:p-5 rounded-2xl border border-slate-200/80 hover:border-emerald-300 bg-white hover:bg-slate-50/60 transition-all cursor-pointer shadow-2xs"
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    {/* Left: Transaction Description & Details */}
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0 group-hover:bg-emerald-50 group-hover:border-emerald-200 group-hover:text-emerald-700 transition-colors">
+                        <FileText className="w-5 h-5" />
                       </div>
 
-                      {/* Typographic Metadata Line */}
-                      <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-slate-500 mt-1.5">
-                        <span className="font-mono text-slate-600 font-semibold flex items-center gap-1">
-                          <span>{tx.transactionId}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-slate-900 group-hover:text-emerald-900 transition-colors">
+                            {tx.productTitle}
+                          </span>
+                          {getStatusBadge(tx.status)}
+                        </div>
+
+                        {/* Typographic Metadata Line */}
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-slate-500 mt-1.5">
+                          <span className="font-mono text-slate-600 font-semibold flex items-center gap-1">
+                            <span>{tx.transactionId}</span>
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(e, tx.transactionId)}
+                              className="p-0.5 text-slate-400 hover:text-slate-600 rounded"
+                              title="Copy Transaction ID"
+                            >
+                              {copiedId === tx.transactionId ? (
+                                <Check className="w-3 h-3 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                            </button>
+                          </span>
+                          <span>·</span>
+                          {tx.referenceId && (
+                            <>
+                              <span className="text-slate-600">Ref: {tx.referenceId}</span>
+                              <span>·</span>
+                            </>
+                          )}
+                          <span>{tx.paymentMethod}</span>
+                          <span>·</span>
+                          <span>
+                            {new Date(tx.date).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Amount & Actions */}
+                    <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 flex-wrap">
+                      <div className="text-left lg:text-right">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          Amount
+                        </span>
+                        <span className="text-base sm:text-lg font-black text-slate-900">
+                          ৳{tx.amount.toLocaleString('en-IN')}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {tx.status === 'completed' && matchedProd && (
+                          <Link
+                            to={`/shop/${matchedProd.slug}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>View Product</span>
+                          </Link>
+                        )}
+
+                        {tx.status === 'pending' && (
                           <button
                             type="button"
-                            onClick={(e) => handleCopy(e, tx.transactionId)}
-                            className="p-0.5 text-slate-400 hover:text-slate-600 rounded"
-                            title="Copy Transaction ID"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              verifyPendingTransaction(tx.id);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                            title="Verify payment and unlock product access"
                           >
-                            {copiedId === tx.transactionId ? (
-                              <Check className="w-3 h-3 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-3 h-3" />
-                            )}
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Verify &amp; Unlock</span>
                           </button>
-                        </span>
-                        <span>·</span>
-                        {tx.referenceId && (
-                          <>
-                            <span className="text-slate-600">Ref: {tx.referenceId}</span>
-                            <span>·</span>
-                          </>
                         )}
-                        <span>{tx.paymentMethod}</span>
-                        <span>·</span>
-                        <span>
-                          {new Date(tx.date).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </span>
+
+                        {tx.status === 'completed' && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              processRefund(tx.id);
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-[11px] font-bold transition-colors cursor-pointer"
+                            title="Refund order and revoke product access"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Refund</span>
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={(e) => handleDownload(e, tx)}
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
+                            downloadingId === tx.id
+                              ? 'bg-emerald-600 text-white border-emerald-600'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                          }`}
+                          title="Download official digital PDF receipt"
+                        >
+                          {downloadingId === tx.id ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-white" />
+                              <span>Downloaded</span>
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Receipt</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewTransaction(tx);
+                          }}
+                          className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+                          title="View Receipt Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Right: Amount & Actions */}
-                  <div className="flex items-center justify-between lg:justify-end gap-4 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
-                    <div className="text-left lg:text-right">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                        Amount
-                      </span>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
-                        ৳{tx.amount.toLocaleString('en-IN')}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => handleDownload(e, tx)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
-                          downloadingId === tx.id
-                            ? 'bg-emerald-600 text-white border-emerald-600'
-                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-                        }`}
-                        title="Download official digital PDF receipt"
-                      >
-                        {downloadingId === tx.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-white" />
-                            <span>Downloaded</span>
-                          </>
-                        ) : (
-                          <>
-                            <Download className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Download Receipt</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPreviewTransaction(tx);
-                        }}
-                        className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
-                        title="View Receipt Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

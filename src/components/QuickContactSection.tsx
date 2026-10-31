@@ -178,9 +178,9 @@ export function QuickContactSection() {
   return (
     <section 
       id="contact-form-section" 
-      className="scroll-mt-8 py-12 sm:py-16 px-4 bg-white border-t border-slate-200/80"
+      className="w-full scroll-mt-8 py-12 sm:py-16 px-4 sm:px-6 lg:px-10 xl:px-12 bg-white border-t border-[#000000]"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full max-w-full mx-auto">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>

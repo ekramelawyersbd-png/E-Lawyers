@@ -16,6 +16,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { ShopProduct, inferProductType } from '../../data/shopProducts';
+import { ProductPurchaseActions } from './ProductPurchaseActions';
 
 interface ProductComparisonModalProps {
   isOpen: boolean;
@@ -292,30 +293,15 @@ export const ProductComparisonModal: React.FC<ProductComparisonModalProps> = ({
                     <td className="p-3 font-bold text-slate-600">Quick Actions</td>
                     {products.map((p) => (
                       <td key={p.id} className="p-3">
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              onAddToCart(p);
-                            }}
-                            className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <ShoppingBag className="h-3.5 w-3.5 text-slate-600" />
-                            <span>Add to Cart</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              onClose();
-                              onInstantBuy(p);
-                            }}
-                            className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
-                          >
-                            <span>Buy Now</span>
-                            <ArrowRight className="h-3.5 w-3.5 text-amber-300" />
-                          </button>
-                        </div>
+                        <ProductPurchaseActions
+                          product={p}
+                          onAddToCart={(_, prod) => onAddToCart(prod)}
+                          onBuyNow={(_, prod) => {
+                            onClose();
+                            onInstantBuy(prod);
+                          }}
+                          variant="compact"
+                        />
                       </td>
                     ))}
                   </tr>

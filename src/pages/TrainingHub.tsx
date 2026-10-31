@@ -23,6 +23,7 @@ import { TrainingFAQ } from '../components/training/TrainingFAQ';
 import { CareerPathways } from '../components/training/CareerPathways';
 import { SEO } from '../components/SEO';
 import { getAcademyCourseDashboardPath } from '../utils/lmsPortalStore';
+import { usePurchases } from '../contexts/PurchaseContext';
 
 interface LiveClassProgram {
   id: string;
@@ -41,6 +42,7 @@ interface LiveClassProgram {
 }
 
 export function TrainingHub() {
+  const { isPurchased, isPendingPurchase } = usePurchases();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<{
     id: string;
@@ -92,6 +94,16 @@ export function TrainingHub() {
     '404': '40 Hours · High Court',
     '405': '20 Hours · Practical',
     '406': '48 Hours · Foundation'
+  };
+
+  const courseProductMap: Record<string, string> = {
+    '400': 'prod-course-vat-sd',
+    '401': 'prod-course-income-tax',
+    '402': 'prod-course-rjsc-mastery',
+    '403': 'prod-course-bar-council',
+    '404': 'prod-course-high-court',
+    '405': 'prod-course-practical-accounting',
+    '406': 'prod-course-ms-office'
   };
 
   const liveClassPrograms: LiveClassProgram[] = [
@@ -163,12 +175,12 @@ export function TrainingHub() {
         </div>
       </div>
 
-      <div className="p-2.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-lg flex flex-col items-center max-w-fit mx-auto overflow-hidden">
+      <div className="p-2.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-lg flex flex-col items-center w-full max-w-[580px] mx-auto overflow-hidden">
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Felawyerssbd%2Fvideos%2F1271548471021064%2F&show_text=false&width=560&t=0"
           width="560"
           height="314"
-          className="border-0 overflow-hidden rounded-2xl bg-black max-w-full"
+          className="border-0 overflow-hidden rounded-2xl bg-black w-full max-w-full aspect-video"
           scrolling="no"
           frameBorder="0"
           allowFullScreen={true}
@@ -200,62 +212,77 @@ export function TrainingHub() {
               Experience how our instructors break down real-world Income Tax Act 2023 calculations, online e-Return filing, VAT compliance, and RJSC corporate procedures for practitioners and learners across Bangladesh.
             </p>
 
-            {liveClassPrograms.map((program) => (
-              <div
-                key={program.id}
-                className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-5 space-y-3"
-              >
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                  <span className="font-bold text-emerald-700">{program.bengaliTag}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{program.scheduleLabel}</span>
-                  <span aria-hidden="true">·</span>
-                  <span className="font-mono tabular-nums font-semibold text-slate-800">
-                    {program.price}
-                  </span>
+            {liveClassPrograms.map((program) => {
+              const liveOwned = isPurchased(program.id) || isPurchased('prod-course-income-tax');
+              return (
+                <div
+                  key={program.id}
+                  className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-5 space-y-3"
+                >
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                    <span className="font-bold text-emerald-700">{program.bengaliTag}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{program.scheduleLabel}</span>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-mono tabular-nums font-semibold text-slate-800">
+                      {program.price}
+                    </span>
+                  </div>
+
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                    {program.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    {program.excerpt}
+                  </p>
+
+                  <div className="pt-2 flex flex-wrap items-center gap-3">
+                    <Link
+                      to={program.detailPath}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+                    >
+                      <span>{liveOwned ? 'View Product' : 'View Course Syllabus'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    {liveOwned ? (
+                      <Link
+                        to="/client-portal"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+                      >
+                        <MonitorPlay className="w-4 h-4 text-emerald-400" />
+                        <span>Go to Dashboard</span>
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          to={getAcademyCourseDashboardPath(program.title)}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+                        >
+                          <MonitorPlay className="w-4 h-4 text-emerald-600" />
+                          <span>Student Dashboard</span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourse({
+                              id: program.id,
+                              title: program.title,
+                              description: program.excerpt,
+                              price: program.price
+                            });
+                            setIsModalOpen(true);
+                          }}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                        >
+                          <span>Buy Now</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                  {program.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {program.excerpt}
-                </p>
-
-                <div className="pt-2 flex flex-wrap items-center gap-3">
-                  <Link
-                    to={program.detailPath}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
-                  >
-                    <span>View Course Syllabus</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    to={getAcademyCourseDashboardPath(program.title)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-colors whitespace-nowrap shrink-0"
-                  >
-                    <MonitorPlay className="w-4 h-4 text-emerald-600" />
-                    <span>Student Dashboard</span>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedCourse({
-                        id: program.id,
-                        title: program.title,
-                        description: program.excerpt,
-                        price: program.price
-                      });
-                      setIsModalOpen(true);
-                    }}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                  >
-                    <span>Enroll in Live Cohort</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/*Right: Embedded Facebook Videos (2 Reels 269x476 + 1 Landscape 560x314) */}
@@ -307,6 +334,9 @@ export function TrainingHub() {
                 ? '/course/personal-income-tax'
                 : `/article/${article.id}`;
             const courseDashboardPath = getAcademyCourseDashboardPath(article.title);
+            const mappedShopId = courseProductMap[article.id] || article.id;
+            const courseOwned = isPurchased(article.id) || isPurchased(mappedShopId);
+            const coursePending = isPendingPurchase(article.id) || isPendingPurchase(mappedShopId);
 
             return (
               <div
@@ -346,30 +376,59 @@ export function TrainingHub() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link
-                      to={detailPath}
-                      className="py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-semibold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
-                    >
-                      <span>Details</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCourse({
-                          id: article.id,
-                          title: article.title,
-                          description: article.excerpt,
-                          price
-                        });
-                        setIsModalOpen(true);
-                      }}
-                      className="py-2.5 px-3 bg-slate-900 text-white hover:bg-emerald-700 rounded-xl font-bold transition-colors text-xs cursor-pointer whitespace-nowrap shrink-0"
-                    >
-                      Enroll Now
-                    </button>
-                  </div>
+                  {courseOwned ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        to={detailPath}
+                        className="py-2.5 px-3 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
+                      >
+                        <span>View Product</span>
+                      </Link>
+                      <Link
+                        to="/client-portal"
+                        className="py-2.5 px-3 bg-emerald-700 text-white hover:bg-emerald-800 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
+                      >
+                        <span>Go to Dashboard</span>
+                      </Link>
+                    </div>
+                  ) : coursePending ? (
+                    <div className="space-y-1.5">
+                      <span className="block text-center text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 py-1 rounded-lg">
+                        Pending Verification
+                      </span>
+                      <Link
+                        to="/client-portal"
+                        className="w-full py-2.5 px-3 bg-amber-600 text-white hover:bg-amber-700 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap"
+                      >
+                        <span>Go to Dashboard</span>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        to={detailPath}
+                        className="py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-semibold transition-colors text-xs flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
+                      >
+                        <span>Details</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCourse({
+                            id: article.id,
+                            title: article.title,
+                            description: article.excerpt,
+                            price
+                          });
+                          setIsModalOpen(true);
+                        }}
+                        className="py-2.5 px-3 bg-slate-900 text-white hover:bg-emerald-700 rounded-xl font-bold transition-colors text-xs cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        Buy Now
+                      </button>
+                    </div>
+                  )}
 
                   <Link
                     to={courseDashboardPath}
