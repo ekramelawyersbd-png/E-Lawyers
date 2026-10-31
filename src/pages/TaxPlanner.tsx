@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { 
   Calculator, 
   ShieldAlert, 
@@ -545,28 +545,50 @@ export function TaxPlanner() {
             </button>
           </div>
 
-          {/* Lawyer / Tax Practitioner Consultation CTA */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-emerald-800">
-              <Calendar className="w-5 h-5 text-emerald-600" />
-              <h4 className="font-bold text-sm text-slate-900">Need Certified Legal or Tax Review?</h4>
+          {/* Lawyer / Tax Practitioner Consultation CTA with Live Training Image */}
+          <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
+            <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
+              <img
+                src="https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/545724939_1360666282733871_784797782317144558_n.jpg"
+                alt="Practical Income Tax Planning & Assessment Session"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-lg border border-white/20 flex items-center gap-1.5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Live Tax Advisory &amp; Workshop</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Have our accredited Supreme Court tax advocates and chartered accountants review your deductions, verify minimum tax rules, and file your statutory return.
-            </p>
-            <a
-              href={buildAppointmentUrl({
-                service: 'Individual Tax Planning & Assessment',
-                notes: `Taxable Income: ${results.taxableIncome.toLocaleString()} BDT, Estimated Liability: ${results.finalLiability.toLocaleString()} BDT, Region: ${location}`,
-                source: 'Tax Planner Results'
-              })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm group"
-            >
-              <span>Book Tax Consultation</span>
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+            <div className="p-5 sm:p-6 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-800">
+                <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
+                <h4 className="font-bold text-sm text-slate-900">Need Certified Legal or Tax Review?</h4>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Have our accredited Supreme Court tax advocates and chartered accountants review your deductions, verify minimum tax rules, and file your statutory return.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                <a
+                  href={buildAppointmentUrl({
+                    service: 'Individual Tax Planning & Assessment',
+                    notes: `Taxable Income: ${results.taxableIncome.toLocaleString()} BDT, Estimated Liability: ${results.finalLiability.toLocaleString()} BDT, Region: ${location}`,
+                    source: 'Tax Planner Results'
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs group"
+                >
+                  <span>Book Tax Consultation</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+                <Link
+                  to="/course/personal-income-tax"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors text-center shrink-0"
+                  title="View live tax return training course"
+                >
+                  <span>Masterclass</span>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {results.taxableIncome > 0 && results.finalLiability === results.minimumTax && (

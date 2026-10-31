@@ -74,6 +74,9 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
         return '/tools/resource-library';
       case 'early-filing-incentive-tool':
         return '/tools/early-filing-incentive';
+      case 'vat-apportionment-calculator':
+      case 'vat-apportionment-calculator-tool':
+        return '/tools/vat-apportionment-calculator';
       default:
         return `/tools/${id}`;
     }

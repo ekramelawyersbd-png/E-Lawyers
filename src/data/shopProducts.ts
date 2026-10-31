@@ -98,7 +98,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       'Certificate of completion upon passing the final quiz'
     ],
     samplePreviewSnippet: 'Welcome to the Personal Income Tax Masterclass 2025 Recorded Session. In this comprehensive module, we examine gross taxable income calculation, allowable exemptions under Sixth Schedule, and electronic return submission...',
-    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://pub-d893cbb677b6463eb69f13e1dbb40541.r2.dev/545724939_1360666282733871_784797782317144558_n.jpg',
     authorOrVettedBy: 'Adv. Ekram Hossain, Advocate, Supreme Court of Bangladesh & Lead Tax Counsel',
     trainingCourseId: 'personal-income-tax',
     coursePath: '/course/personal-income-tax'

@@ -29,6 +29,10 @@ import { businessRegistrationComplianceArticle } from './businessRegistrationCom
 import { companyRegistrationMoaAoaArticle } from './companyRegistrationMoaAoaArticle';
 import { sectoralTaxExemptionsArticle } from './sectoralTaxExemptionsArticle';
 import { lossCarryForwardTaxArticle } from './lossCarryForwardTaxArticle';
+import { binRegistrationBangladeshArticle } from './binRegistrationBangladeshArticle';
+import { corporateVatComplianceBangladeshArticle } from './corporateVatComplianceBangladeshArticle';
+import { inputTaxRebateBangladeshArticle } from './inputTaxRebateBangladeshArticle';
+import { identificationRegistrationSystemsArticle } from './identificationRegistrationSystemsArticle';
 
 import { teamMembers } from './teamData';
 
@@ -78,6 +82,10 @@ export const categories: { id: string; name: Category; description: string }[] =
 ];
 
 export const mockArticles: Article[] = [
+  identificationRegistrationSystemsArticle,
+  corporateVatComplianceBangladeshArticle,
+  inputTaxRebateBangladeshArticle,
+  binRegistrationBangladeshArticle,
   lossCarryForwardTaxArticle,
   sectoralTaxExemptionsArticle,
   companyRegistrationMoaAoaArticle,

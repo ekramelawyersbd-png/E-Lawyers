@@ -33,13 +33,16 @@ export function Layout() {
 
   return (
     <BreadcrumbProvider hasGlobalBar={!hideNavs && !isHomePage}>
-      <div className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`} style={{ width: '100%', maxWidth: '100%' }}>
+      <div
+        className={`min-h-screen flex flex-col ${bgThemeClass} w-full max-w-full overflow-x-clip transition-colors duration-300`}
+        style={{ width: '100%', maxWidth: '100%' }}
+      >
         {!hideNavs && <Navbar />}
         {!hideNavs && !isHomePage && <Breadcrumb />}
         <main
           className={`flex-1 w-full max-w-full ${
             isLmsPortalView
-              ? 'p-0'
+              ? 'p-0 pb-16 lg:pb-0'
               : hideNavs
               ? 'pb-8 pt-0'
               : 'pb-16 lg:pb-0'

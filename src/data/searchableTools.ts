@@ -13,6 +13,30 @@ export interface SearchableTool {
 
 export const searchableTaxTools: SearchableTool[] = [
   {
+    id: 'vat-apportionment-calculator',
+    name: 'VAT Apportionment Calculator (Section 47 Partial Input Tax Rebate)',
+    shortName: 'VAT Apportionment Calculator',
+    category: 'Tax Calculator',
+    description: 'Compute your Eligible Partial Input Tax Rebate = I × (T ÷ T_total) under Section 47 of the VAT & SD Act 2012 for mixed Standard (15%), Zero-Rated (0%), and Exempt/Reduced-Rate supplies.',
+    path: '/tools/vat-apportionment-calculator',
+    iconName: 'Calculator',
+    badge: 'Section 47 VAT Act',
+    tags: ['vat apportionment calculator', 'partial input tax rebate', 'section 47 vat', 'উপকরণ কর রেয়াত', 'input tax credit', 'mushak 9.1 part 4', 'mushak 9.1 part 5', 'common input vat', 'apportionment formula'],
+    featured: true
+  },
+  {
+    id: 'bin-registration-in-bangladesh',
+    name: 'BIN & VAT Registration Complete Guide (Mushak 2.1 & 2.3)',
+    shortName: 'BIN Registration Guide',
+    category: 'Statutory Guide',
+    description: 'Complete guide to Business Identification Number (BIN) registration in Bangladesh, BDT 50L/30L thresholds, required corporate documents, Mushak 2.1 online portal steps, ITC, and monthly VAT compliance.',
+    path: '/article/bin-registration-in-bangladesh',
+    iconName: 'FileText',
+    badge: 'VAT & SD Act 2012',
+    tags: ['bin registration', 'vat registration', 'mushak 2.1', 'mushak 2.3', 'mushak 6.3', 'mushak 9.1', 'business identification number', 'nbr vat portal', 'input tax credit', 'turnover tax'],
+    featured: true
+  },
+  {
     id: 'trade-license-guide-dncc-dscc',
     name: 'Trade License Guide (DNCC & DSCC)',
     shortName: 'Trade License Guide',

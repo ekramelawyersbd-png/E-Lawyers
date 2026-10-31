@@ -1,17 +1,32 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, PlusCircle, MessageSquare, User } from 'lucide-react';
+import { Home, ShoppingBag, Wrench, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 
 export function MobileBottomNav() {
   const location = useLocation();
   const { user } = useAuth();
-  const searchParams = new URLSearchParams(location.search);
-  const currentTab = searchParams.get('tab');
+  const { totalItemsCount } = useCart();
 
   const isHome = location.pathname === '/';
-  const isExperts = location.pathname === '/community' && currentTab === 'experts';
-  const isDiscussions = location.pathname === '/community' && (currentTab === 'discussions' || !currentTab);
-  const isProfile = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/auth');
+  const isShop = location.pathname.startsWith('/shop') || 
+    location.pathname.startsWith('/admin/shop') || 
+    location.pathname === '/checkout' || 
+    location.pathname === '/enrollment';
+  const isTools = location.pathname === '/tools' || 
+    location.pathname.startsWith('/tools/') || 
+    location.pathname === '/tax-calculator' || 
+    location.pathname === '/corporate-planner' || 
+    location.pathname === '/tax-planner';
+  const isPortal = location.pathname === '/portal' || 
+    location.pathname === '/client-portal' || 
+    location.pathname === '/student' || 
+    location.pathname.startsWith('/student/') || 
+    location.pathname === '/lms' || 
+    location.pathname === '/verify-certificate';
+  const isProfile = location.pathname.startsWith('/dashboard') || 
+    location.pathname.startsWith('/auth') || 
+    location.pathname === '/profile';
 
   return (
     <nav 
@@ -19,7 +34,7 @@ export function MobileBottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] print:hidden"
     >
       <div className="max-w-md mx-auto grid grid-cols-5 items-center justify-items-center">
-        {/* Home */}
+        {/* 1. Home */}
         <Link
           to="/"
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${
@@ -30,41 +45,47 @@ export function MobileBottomNav() {
           <span className="text-[10px] tracking-tight">Home</span>
         </Link>
 
-        {/* Experts */}
+        {/* 2. Shop */}
         <Link
-          to="/community?tab=experts"
-          className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${
-            isExperts ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          to="/shop"
+          className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors relative ${
+            isShop ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <Users className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Experts</span>
-        </Link>
-
-        {/* Ask Center Button (Emphasized) */}
-        <Link
-          to="/community?ask=true"
-          className="flex flex-col items-center justify-center min-w-[48px] min-h-[48px] -mt-3 p-1 rounded-full group"
-          title="Ask a Question"
-        >
-          <div className="w-11 h-11 rounded-full bg-emerald-700 text-white flex items-center justify-center shadow-lg shadow-emerald-700/30 group-hover:bg-emerald-800 transition-all group-hover:scale-105">
-            <PlusCircle className="w-6 h-6" />
+          <div className="relative">
+            <ShoppingBag className="w-5 h-5 mb-0.5" />
+            {totalItemsCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-emerald-600 text-white font-black text-[9px] min-w-3.5 h-3.5 px-0.5 rounded-full flex items-center justify-center ring-1 ring-white">
+                {totalItemsCount}
+              </span>
+            )}
           </div>
-          <span className="text-[10px] font-bold text-emerald-800 mt-0.5">Ask</span>
+          <span className="text-[10px] tracking-tight">Shop</span>
         </Link>
 
-        {/* Discussions */}
+        {/* 3. Tools */}
         <Link
-          to="/community?tab=discussions"
+          to="/tools"
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${
-            isDiscussions ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+            isTools ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <MessageSquare className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Discussions</span>
+          <Wrench className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] tracking-tight">Tools</span>
         </Link>
 
-        {/* Profile */}
+        {/* 4. Portal */}
+        <Link
+          to="/portal"
+          className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${
+            isPortal ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <ShieldCheck className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] tracking-tight">Portal</span>
+        </Link>
+
+        {/* 5. Profile */}
         <Link
           to={user ? '/profile' : '/auth'}
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-1 rounded-xl transition-colors ${

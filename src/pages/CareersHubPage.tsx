@@ -6,7 +6,6 @@ import {
   Headphones,
   Users,
   MapPin,
-  Calendar,
   CheckCircle2,
   ArrowRight,
   Clock,
@@ -147,139 +146,216 @@ export const CareersHubPage: React.FC = () => {
         serviceType="Job Recruitment & Career Opportunities"
       />
 
-      {/* Hero Header - Light Corporate Theme (Layered in Background) */}
-      <section className="bg-gradient-to-b from-white via-[#f8fafc] to-[#f1f5f9] text-slate-800 pt-10 pb-28 sm:pb-32 px-4 border-b border-slate-200 relative z-10 overflow-hidden">
-        {/* Subtle ultra-light background accents */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-200/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/15 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20"></div>
+      {/* Hero Header - Official E-Lawyers WE'RE HIRING Master Banner Theme */}
+      <section className="bg-gradient-to-b from-[#091b2f] via-[#0d2238] to-[#071422] text-white pt-8 sm:pt-10 pb-24 sm:pb-28 px-4 border-b border-[#167d83]/40 relative z-10 overflow-hidden">
+        {/* Ambient background glows matching banner color palette */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none -mr-28 -mt-28"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-400/15 rounded-full blur-3xl pointer-events-none -ml-28 -mb-28"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#167d83_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none"></div>
 
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* Top Brand Tagline & Status Pill */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          {/* Top Brand & WhatsApp Hotline Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white border-2 border-[#167d83]/25 flex items-center justify-center font-black text-[#167d83] text-lg shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-[#0d2642] border-2 border-emerald-400/50 flex items-center justify-center font-black text-amber-300 text-lg shadow-md ring-2 ring-emerald-500/20">
                 ELA
               </div>
               <div>
-                <span className="text-xs font-black tracking-widest text-[#10243a] uppercase block">
+                <span className="text-xs font-black tracking-widest text-white uppercase block">
                   E-Lawyers Legal &amp; Business Consultancy Firm
                 </span>
-                <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
-                  Central Careers &amp; Recruitment Portal · Panthapath, Dhaka
+                <p className="text-xs text-slate-300 flex items-center gap-1.5 mt-0.5 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                  BTI Centara Grand, Panthapath, Dhaka · Central Recruitment Portal
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50/90 border border-emerald-200 px-3.5 py-1.5 rounded-full font-bold shadow-2xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Active Recruitment · 4 Total Openings</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* WhatsApp Hotline Pill from Banner */}
+              <a
+                href="https://wa.me/8801335230170?text=Hello%20E-Lawyers%2C%20I%20am%20inquiring%20about%20the%202026%20recruitment%20drive."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/50 text-emerald-300 hover:text-white text-xs font-bold transition-all shadow-xs group"
+                title="Direct WhatsApp Helpline: +88 01335230170-81"
+              >
+                <div className="w-4 h-4 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                  <Phone className="w-2.5 h-2.5 fill-current" />
+                </div>
+                <span className="tracking-wide font-mono font-bold">+88 01335230170-81</span>
+              </a>
+
+              <span className="inline-flex items-center gap-2 text-xs text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-3.5 py-1.5 rounded-full font-bold shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Active Recruitment · 4 Career Tracks</span>
               </span>
             </div>
           </div>
 
-          {/* Hero Main Copy & Featured MTO Circular Poster */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold mb-4 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-amber-700" /> 2026 Corporate Recruitment Drive
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#10243a] mb-4 leading-[1.15]">
-                Advance Your Career at <span className="text-[#167d83]">E-Lawyers</span>
-              </h1>
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-6 font-normal">
-                E-Lawyers is a premier corporate legal and business consultancy firm in Dhaka. We are actively hiring dynamic professionals to join our corporate accounts division and client care team. Explore our open positions and submit your application online directly.
-              </p>
-
-              {/* Quick 1-Click Action Buttons to Form */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                <Link
-                  to="/Careers/mto?tab=apply"
-                  className="px-4 py-3 bg-gradient-to-r from-[#10243a] to-[#1c3c5d] hover:to-[#224b74] text-amber-300 font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-amber-400/40"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>MTO Trainee (একাধিক পদ)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-
-                <Link
-                  to="/Careers/sales-marketing?tab=apply"
-                  className="px-4 py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-emerald-500/40"
-                >
-                  <TrendingUp className="w-4 h-4 text-emerald-300" />
-                  <span>Sales &amp; Marketing (একাধিক পদ)</span>
-                </Link>
-
-                <Link
-                  to="/Careers/accountant?tab=apply"
-                  className="px-4 py-3 bg-[#167d83] hover:bg-[#136a70] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm border border-teal-600/30"
-                >
-                  <Briefcase className="w-4 h-4 text-emerald-200" />
-                  <span>Accountant (২ জন)</span>
-                </Link>
-
-                <Link
-                  to="/Careers/customer-care?tab=apply"
-                  className="px-4 py-3 bg-white hover:bg-amber-50/70 text-amber-900 font-bold rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center gap-2 text-sm border border-amber-300"
-                >
-                  <Headphones className="w-4 h-4 text-amber-800" />
-                  <span>Customer Care (Female - ২ জন)</span>
-                </Link>
-
-                <a
-                  href="#check-status"
-                  className="px-3.5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5"
-                >
-                  <Search className="w-4 h-4 text-[#167d83]" />
-                  <span>Status Desk</span>
-                </a>
-              </div>
+          {/* Hero Headline & Recruitment Overview */}
+          <div className="mb-8 text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-400/40 text-xs font-bold text-amber-300 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Official 2026 Recruitment Circular · Deadline: 31 October 2026</span>
             </div>
-
-            <div className="lg:col-span-5">
-              <Link
-                to="/Careers/mto"
-                className="block rounded-2xl overflow-hidden border-2 border-slate-200/90 hover:border-amber-400 shadow-lg hover:shadow-xl transition-all bg-white group"
-                title="View Management Trainee Officer (MTO) Circular & Apply Online"
-              >
-                <img
-                  src="https://i.ibb.co/6hrxrmG/f1096382-e31a-40c8-af4c-fb4a5e7ff605.png"
-                  alt="Management Trainee Officer (MTO) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-300"
-                />
-              </Link>
-            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+              Build Your Career with{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-teal-200">
+                E-Lawyers
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
+              Join our Accounts, Taxation, Corporate Legal &amp; Client Services divisions at BTI Centara Grand, Panthapath, Dhaka. Select your track below to view requirements or apply online.
+            </p>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-10 pt-6 pb-2 border-t border-slate-200">
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-2xl sm:text-3xl font-black text-[#167d83]">Multiple</div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">Open Vacancies</div>
+          {/* Interactive Role Action Grid - Direct 1-Click Pathways to Official Forms */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* Card 1: MTO */}
+            <Link
+              to="/Careers/mto?tab=apply"
+              className="p-4 rounded-2xl bg-gradient-to-b from-[#10243a] to-[#0c1c2e] border-2 border-blue-500/40 hover:border-amber-400 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-blue-900/60 border border-blue-400/30 text-amber-300 flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-200 border border-blue-700/50">
+                    Multiple Vacancies
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-white group-hover:text-amber-300 transition-colors leading-snug">
+                    MANAGEMENT TRAINEE OFFICER (MTO)
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    Bachelor&apos;s in Accounting, Finance, BBA, Management or Law.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
+                <span>Apply Online</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Card 2: Sales & Marketing */}
+            <Link
+              to="/Careers/sales-marketing?tab=apply"
+              className="p-4 rounded-2xl bg-gradient-to-b from-[#0a3028] to-[#06201b] border-2 border-emerald-500/40 hover:border-emerald-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-400/30 text-emerald-300 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-200 border border-emerald-700/50">
+                    Multiple Vacancies
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                    SALES &amp; MARKETING EXECUTIVE
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    Bachelor&apos;s Degree · Attractive Salary + Performance Incentives.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-emerald-300 group-hover:text-emerald-200">
+                <span>Apply Online</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Card 3: Accountant */}
+            <Link
+              to="/Careers/accountant?tab=apply"
+              className="p-4 rounded-2xl bg-gradient-to-b from-[#31230e] to-[#211709] border-2 border-amber-500/40 hover:border-amber-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-amber-900/60 border border-amber-400/30 text-amber-300 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-200 border border-amber-700/50">
+                    2 Vacancies
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-white group-hover:text-amber-300 transition-colors leading-snug">
+                    ACCOUNTANT
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    Accounting, Finance or Related Degree · Corporate Accounts.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-amber-300 group-hover:text-amber-200">
+                <span>Apply Online</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Card 4: Customer Care */}
+            <Link
+              to="/Careers/customer-care?tab=apply"
+              className="p-4 rounded-2xl bg-gradient-to-b from-[#112a3d] to-[#0a1b28] border-2 border-teal-500/40 hover:border-teal-300 text-white shadow-lg hover:shadow-xl transition-all group flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-teal-900/60 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                    <Headphones className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-teal-950/80 text-teal-200 border border-teal-700/50">
+                    2 Vacancies · Female
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-white group-hover:text-teal-300 transition-colors leading-snug">
+                    CUSTOMER CARE EXECUTIVE
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    HSC or Above · Freshers Welcome · Excellent Communication.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-teal-300 group-hover:text-teal-200">
+                <span>Apply Online</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </div>
+
+          {/* Banner Verification & Contact Information Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/10">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Application Deadline</span>
+              <span className="text-xs sm:text-sm font-black text-amber-400 mt-0.5 block">31 October 2026</span>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-2xl sm:text-3xl font-black text-[#10243a]">4</div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">Key Career Tracks</div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Official Portal</span>
+              <span className="text-xs sm:text-sm font-black text-emerald-400 mt-0.5 block">blog.accounticca.com/Careers</span>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-sm sm:text-base font-extrabold text-[#10243a] mt-1">Panthapath, Dhaka</div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">Central Workplace</div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Direct WhatsApp Helpline</span>
+              <span className="text-xs sm:text-sm font-mono font-bold text-white mt-0.5 block">+88 01335230170-81</span>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 text-center shadow-xs hover:shadow-sm hover:border-slate-300 transition-all">
-              <div className="text-sm sm:text-base font-extrabold text-amber-700 mt-1">Oct 31, 2026</div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">Application Deadline</div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Social Network</span>
+              <span className="text-xs sm:text-sm font-bold text-teal-300 mt-0.5 block">/eLawyerssBD</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content Body */}
-      <main className="w-full max-w-6xl mx-auto px-4 -mt-8 sm:-mt-10 space-y-12 relative z-20">
+      <div className="w-full max-w-6xl mx-auto px-4 -mt-8 sm:-mt-10 space-y-12 relative z-20">
 
         {/* Unified Application Navigator Banner - Moved Forward with Elevated Depth */}
         <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-slate-200/90 p-5 md:p-7 relative z-30 transition-all duration-300">
@@ -711,34 +787,9 @@ export const CareersHubPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Official Role Infographic Picture Preview */}
-                <div className="px-5 pt-5 bg-slate-50">
-                  <Link
-                    to="/Careers/customer-care"
-                    className="block relative rounded-2xl overflow-hidden border border-slate-200 hover:border-amber-400 shadow-xs hover:shadow-md transition-all group/banner"
-                    title="View Official Customer Care Recruitment Banner"
-                  >
-                    <img
-                      src="https://i.ibb.co/Tqqn8XBt/309a5625-b84f-4412-9326-1c2dd526b57d.png"
-                      alt="Customer Care Executive (Female) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
-                      referrerPolicy="no-referrer"
-                      className="w-full h-auto object-cover group-hover/banner:scale-[1.015] transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-end justify-between p-3.5">
-                      <span className="text-white text-xs font-bold flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                        View Full Announcement &amp; Circular
-                      </span>
-                      <span className="text-xs bg-[#c7a76b] text-[#10243a] px-2.5 py-1 rounded-lg font-black shadow-sm">
-                        Read Details
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-
                 {/* 4-Tile Quick Specs Matrix */}
-                <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50 border-b border-slate-200">
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
+                <div className="grid grid-cols-2 gap-2.5 p-5 bg-slate-50/90 border-b border-slate-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <GraduationCap className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Education</span>
@@ -749,7 +800,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Any academic discipline</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <Users className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Experience</span>
@@ -760,7 +811,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">Call center exp. preferred</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <DollarSign className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Remuneration</span>
@@ -771,7 +822,7 @@ export const CareersHubPage: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-0.5">+ 2 Festival Bonuses</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-amber-300 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       <MapPin className="w-3.5 h-3.5 text-[#167d83]" />
                       <span>Workplace</span>
@@ -790,7 +841,7 @@ export const CareersHubPage: React.FC = () => {
                   </p>
 
                   {/* Key Tasks List */}
-                  <div className="space-y-2 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                  <div className="space-y-2 bg-slate-50/80 p-4 rounded-xl border border-slate-200">
                     <div className="font-extrabold text-[#10243a] text-xs uppercase tracking-wider mb-1 flex items-center justify-between">
                       <span>Key Daily Responsibilities:</span>
                       <span className="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded">Client Care</span>
@@ -808,6 +859,10 @@ export const CareersHubPage: React.FC = () => {
                         <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                         <span>Managing official WhatsApp Business inquiries, caller logs, and CRM record accuracy</span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Following up with prospective clients and ensuring a welcoming front-desk / virtual experience</span>
+                      </li>
                     </ul>
                   </div>
 
@@ -821,6 +876,71 @@ export const CareersHubPage: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Official Role Recruitment Announcement Card Preview */}
+                  <div className="pt-1">
+                    <Link
+                      to="/Careers/customer-care"
+                      className="block relative rounded-2xl overflow-hidden border-2 border-amber-500/30 hover:border-amber-400 shadow-sm hover:shadow-lg transition-all group/banner bg-gradient-to-br from-[#122438] via-[#1a3854] to-[#1a6670] p-5 text-white"
+                      title="View Official Customer Care Recruitment Notice"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 font-black text-xs shadow-inner">
+                            ELA
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">Official Notice</div>
+                            <div className="text-xs font-extrabold text-white">E-Lawyers Legal &amp; Business Consultancy</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono bg-black/40 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded">
+                          Ref: EL/HR-CCE/2026
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 mb-3">
+                        <div className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+                          <span>Customer Care Executive (Female)</span>
+                          <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-400/30">
+                            ২ টি পদ
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-300">
+                          HSC / Graduate · Competitive Negotiable Salary · Panthapath Office
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-200 bg-white/5 border border-white/10 rounded-xl p-2.5 mb-2">
+                        <div><strong className="text-white">Status:</strong> Full-Time (In-Person)</div>
+                        <div><strong className="text-white">Environment:</strong> Safe &amp; Women-Friendly</div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 text-xs font-bold text-amber-200 group-hover/banner:text-white transition-colors">
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                          View Complete Job Circular &amp; Details
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-amber-300 group-hover/banner:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
+                  </div>
+
+                  {/* Balanced Workplace Box for Customer Care */}
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50/90 via-slate-50 to-teal-50/90 border border-amber-200 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-[#c7a76b] text-[#10243a] flex items-center justify-center font-black text-xs shadow-xs">
+                        CCE
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-[#10243a]">Dignified &amp; Women-Friendly Workplace</div>
+                        <div className="text-[11px] text-slate-600">Supportive corporate environment in Panthapath, Dhaka</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-amber-900 bg-white px-2.5 py-1 rounded-md border border-amber-200 whitespace-nowrap shadow-2xs">
+                      2 Openings
+                    </span>
                   </div>
                 </div>
               </div>
@@ -960,6 +1080,10 @@ export const CareersHubPage: React.FC = () => {
                         <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                         <span>Assisting legal teams with contract drafting, research, and client communication</span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Participating in structured training sessions across RJSC, NBR Tax/VAT, and advisory workflows</span>
+                      </li>
                     </ul>
                   </div>
 
@@ -975,28 +1099,51 @@ export const CareersHubPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Official Role Infographic Picture Preview */}
+                  {/* Official Role Recruitment Announcement Card Preview */}
                   <div className="pt-1">
                     <Link
                       to="/Careers/mto"
-                      className="block relative rounded-2xl overflow-hidden border border-slate-200 hover:border-amber-400 shadow-xs hover:shadow-md transition-all group/banner"
-                      title="View Official MTO Recruitment Banner"
+                      className="block relative rounded-2xl overflow-hidden border-2 border-amber-500/30 hover:border-amber-400 shadow-sm hover:shadow-lg transition-all group/banner bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#1c3c5d] p-5 text-white"
+                      title="View Official MTO Recruitment Notice"
                     >
-                      <img
-                        src="https://i.ibb.co/6hrxrmG/f1096382-e31a-40c8-af4c-fb4a5e7ff605.png"
-                        alt="Management Trainee Officer (MTO) Recruitment Notice - E-Lawyers Legal & Business Consultancy Firm"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-auto object-cover group-hover/banner:scale-[1.015] transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-end justify-between p-3.5">
-                        <span className="text-white text-xs font-bold flex items-center gap-1.5">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#ddc38f] font-black text-xs shadow-inner">
+                            ELA
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">Official Notice</div>
+                            <div className="text-xs font-extrabold text-white">E-Lawyers Legal &amp; Business Consultancy</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono bg-black/40 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded">
+                          Ref: EL/HR-MTO/2026
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 mb-3">
+                        <div className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+                          <span>Management Trainee Officer (MTO)</span>
+                          <span className="text-[11px] font-semibold text-amber-300 bg-amber-950/70 px-2 py-0.5 rounded border border-amber-400/30">
+                            একাধিক পদ
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-300">
+                          BBA / LL.B / Accounting / Finance · Rotational Program · Panthapath Office
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-200 bg-white/5 border border-white/10 rounded-xl p-2.5 mb-2">
+                        <div><strong className="text-white">Status:</strong> Full-Time (In-Person)</div>
+                        <div><strong className="text-white">Track:</strong> Multi-Division Rotation</div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 text-xs font-bold text-amber-200 group-hover/banner:text-white transition-colors">
+                        <span className="flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                          View Full Announcement &amp; Circular
+                          View Complete Job Circular &amp; Details
                         </span>
-                        <span className="text-xs bg-[#c7a76b] text-[#10243a] px-2.5 py-1 rounded-lg font-black shadow-sm">
-                          Read Details
-                        </span>
+                        <ChevronRight className="w-4 h-4 text-amber-300 group-hover/banner:translate-x-1 transition-transform" />
                       </div>
                     </Link>
                   </div>
@@ -1154,6 +1301,10 @@ export const CareersHubPage: React.FC = () => {
                         <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                         <span>Maintain CRM databases, follow-up logs, sales pipelines, and weekly conversion metrics</span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>Present service proposals for RJSC incorporation, NBR tax compliance, and retainer packages</span>
+                      </li>
                     </ul>
                   </div>
 
@@ -1167,6 +1318,55 @@ export const CareersHubPage: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Official Role Recruitment Announcement Card Preview */}
+                  <div className="pt-1">
+                    <Link
+                      to="/Careers/sales-marketing"
+                      className="block relative rounded-2xl overflow-hidden border-2 border-emerald-500/30 hover:border-emerald-400 shadow-sm hover:shadow-lg transition-all group/banner bg-gradient-to-br from-[#0a231c] via-[#0f3d32] to-[#106b53] p-5 text-white"
+                      title="View Official Sales & Marketing Recruitment Notice"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 font-black text-xs shadow-inner">
+                            ELA
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Official Notice</div>
+                            <div className="text-xs font-extrabold text-white">E-Lawyers Legal &amp; Business Consultancy</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono bg-black/40 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded">
+                          Ref: EL/HR-SME/2026
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 mb-3">
+                        <div className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+                          <span>Sales &amp; Marketing Executive</span>
+                          <span className="text-[11px] font-semibold text-amber-300 bg-emerald-950/70 px-2 py-0.5 rounded border border-amber-400/30">
+                            একাধিক পদ
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-300">
+                          BBA / Marketing / Any Discipline · Base + Commission · Panthapath Office
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-200 bg-white/5 border border-white/10 rounded-xl p-2.5 mb-2">
+                        <div><strong className="text-white">Status:</strong> Full-Time / Part-Time</div>
+                        <div><strong className="text-white">Incentive:</strong> Uncapped Commission</div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 text-xs font-bold text-emerald-200 group-hover/banner:text-white transition-colors">
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                          View Complete Job Circular &amp; Details
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-emerald-300 group-hover/banner:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
                   </div>
 
                   {/* Incentive Box */}
@@ -1651,7 +1851,7 @@ export const CareersHubPage: React.FC = () => {
             </a>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

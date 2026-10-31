@@ -911,79 +911,81 @@ export function Shop() {
           )}
 
         {/* Results Counter Summary & Active Sort Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 font-medium mb-6 pb-2 border-b border-slate-200/60">
-          <div className="flex flex-wrap items-center gap-2">
-            <span>
-              Displaying <strong className="text-slate-900 font-bold">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'solution' : 'solutions'}
-              {selectedType !== 'All Types' && <span> under <strong className="text-emerald-800">{selectedType}</strong></span>}
-              {selectedCategory !== 'All Products' && <span> in <strong className="text-slate-800">{selectedCategory}</strong></span>}
-            </span>
-            {searchQuery && (
-              <span className="truncate max-w-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                Matched: <em>"{searchQuery}"</em>
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 font-medium pb-2 border-b border-slate-200/60">
+            <div className="flex flex-wrap items-center gap-2">
+              <span>
+                Displaying <strong className="text-slate-900 font-bold">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'solution' : 'solutions'}
+                {selectedType !== 'All Types' && <span> under <strong className="text-emerald-800">{selectedType}</strong></span>}
+                {selectedCategory !== 'All Products' && <span> in <strong className="text-slate-800">{selectedCategory}</strong></span>}
               </span>
-            )}
-            {bookmarkedProductIds.size > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowOnlyBookmarked((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ml-1 ${
-                  showOnlyBookmarked
-                    ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-2xs ring-2 ring-rose-400/20'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-rose-300 hover:text-rose-600 shadow-2xs'
-                }`}
-                title={showOnlyBookmarked ? 'Show all products' : 'Show only personal bookmarked products'}
-              >
-                <Heart className={`w-3.5 h-3.5 ${showOnlyBookmarked ? 'fill-current text-rose-500' : 'text-rose-500'}`} />
-                <span>Saved ({bookmarkedProductIds.size})</span>
-              </button>
-            )}
-
-            {/* Compare Mode Multi-Select Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsCompareMode((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ml-1 ${
-                isCompareMode || compareProductIds.length > 0
-                  ? 'bg-amber-400 border-amber-400 text-slate-950 shadow-sm ring-2 ring-amber-400/30'
-                  : 'bg-white border-slate-200 text-slate-700 hover:border-amber-400/60 hover:text-amber-900 shadow-2xs'
-              }`}
-              title="Toggle Compare Mode to select multiple toolkits for side-by-side comparison"
-            >
-              <Scale className="w-3.5 h-3.5 text-slate-950" />
-              <span>Compare Mode</span>
-              {compareProductIds.length > 0 && (
-                <span className="bg-slate-950 text-amber-300 text-[10px] font-black px-1.5 py-0.2 rounded-full">
-                  {compareProductIds.length}
+              {searchQuery && (
+                <span className="truncate max-w-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                  Matched: <em>"{searchQuery}"</em>
                 </span>
               )}
-            </button>
+              {bookmarkedProductIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowOnlyBookmarked((prev) => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ml-1 ${
+                    showOnlyBookmarked
+                      ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-2xs ring-2 ring-rose-400/20'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-rose-300 hover:text-rose-600 shadow-2xs'
+                  }`}
+                  title={showOnlyBookmarked ? 'Show all products' : 'Show only personal bookmarked products'}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${showOnlyBookmarked ? 'fill-current text-rose-500' : 'text-rose-500'}`} />
+                  <span>Saved ({bookmarkedProductIds.size})</span>
+                </button>
+              )}
 
-            {compareProductIds.length >= 2 && (
+              {/* Compare Mode Multi-Select Toggle */}
               <button
                 type="button"
-                onClick={() => setIsCompareModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-slate-900 text-amber-300 border border-amber-400/40 shadow-xs hover:bg-slate-800 cursor-pointer ml-1"
-                title="Open side-by-side comparison table"
+                onClick={() => setIsCompareMode((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ml-1 ${
+                  isCompareMode || compareProductIds.length > 0
+                    ? 'bg-amber-400 border-amber-400 text-slate-950 shadow-sm ring-2 ring-amber-400/30'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-amber-400/60 hover:text-amber-900 shadow-2xs'
+                }`}
+                title="Toggle Compare Mode to select multiple toolkits for side-by-side comparison"
               >
-                <span>View Comparison Table ({compareProductIds.length})</span>
-                <ArrowRight className="w-3 h-3 text-amber-400" />
+                <Scale className="w-3.5 h-3.5 text-slate-950" />
+                <span>Compare Mode</span>
+                {compareProductIds.length > 0 && (
+                  <span className="bg-slate-950 text-amber-300 text-[10px] font-black px-1.5 py-0.2 rounded-full">
+                    {compareProductIds.length}
+                  </span>
+                )}
               </button>
-            )}
-          </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
-            <span>Ordered by:</span>
-            <button
-              type="button"
-              onClick={() => setIsSortOpen(true)}
-              className="font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
-              title="Click to change product sorting"
-            >
-              <currentSortConfig.icon className="w-3 h-3 text-amber-500" />
-              <span>{currentSortConfig.label}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
+              {compareProductIds.length >= 2 && (
+                <button
+                  type="button"
+                  onClick={() => setIsCompareModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-slate-900 text-amber-300 border border-amber-400/40 shadow-xs hover:bg-slate-800 cursor-pointer ml-1"
+                  title="Open side-by-side comparison table"
+                >
+                  <span>View Comparison Table ({compareProductIds.length})</span>
+                  <ArrowRight className="w-3 h-3 text-amber-400" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] text-slate-400">
+              <span>Ordered by:</span>
+              <button
+                type="button"
+                onClick={() => setIsSortOpen(true)}
+                className="font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                title="Click to change product sorting"
+              >
+                <currentSortConfig.icon className="w-3 h-3 text-amber-500" />
+                <span>{currentSortConfig.label}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+            </div>
           </div>
         </div>
 

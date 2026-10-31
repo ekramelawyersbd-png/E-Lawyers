@@ -630,53 +630,53 @@ export function Home() {
       </section>
 
       {/* 4. Academy Highlight Section — Accounticca Academy */}
-      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
+      <section className="py-10 sm:py-14 px-4 bg-white border-y border-slate-200/80">
         <div className="max-w-6xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-[#061e24] via-[#092d35] to-[#0c3c46]">
-            {/* Ambient glows */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white">
+            {/* Ambient subtle light glows */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <div className="relative z-10 p-6 sm:p-8 lg:p-10">
               <div className="flex flex-col lg:flex-row lg:items-center gap-8">
                 {/* LEFT: Copy + CTA */}
                 <div className="lg:w-[52%]">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[11px] font-bold uppercase tracking-wider mb-4 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                     <span>Live Cohorts Enrolling · CPD &amp; Professional Syllabus</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-[1.15] mb-3">
                     Accelerate Skills at{' '}
-                    <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
+                    <span className="text-emerald-700">
                       Accounticca Academy
                     </span>
                   </h2>
 
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-5 max-w-md">
                     Practical practitioner-led training in Bangladesh Income Tax, VAT &amp; SD Act 2012, RJSC corporate governance, and hands-on e-Return filing.
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                     <Link 
                       to="/training"
-                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      className="group inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-xl shadow-md hover:shadow-lg transition-all"
                     >
                       <span>Explore All Courses</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                     <Link 
                       to="/contact?tab=inquiry#inquiry"
-                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white/10 hover:bg-white/20 border border-emerald-400/30 hover:border-emerald-400/60 text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-sm rounded-xl transition-all shadow-2xs"
                     >
-                      <MessageSquare className="w-4 h-4 text-emerald-300" />
+                      <MessageSquare className="w-4 h-4 text-emerald-600" />
                       <span>Send an inquiry</span>
                     </Link>
                     <Link 
                       to="/contact?tab=inquiry#inquiry"
-                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 hover:border-emerald-300 text-emerald-200 hover:text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 text-emerald-900 font-bold text-sm rounded-xl transition-all shadow-2xs"
                     >
-                      <CalendarIcon className="w-4 h-4 text-emerald-300" />
+                      <CalendarIcon className="w-4 h-4 text-emerald-700" />
                       <span>Book appointment</span>
                     </Link>
                   </div>
@@ -688,92 +688,92 @@ export function Home() {
                     {/* Course 1: Personal Income Tax */}
                     <Link 
                       to="/training"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Calculator className="w-5 h-5 text-emerald-300" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Calculator className="w-5 h-5 text-emerald-700" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Personal Income Tax</div>
-                        <div className="text-[11px] text-emerald-300 font-semibold truncate">Live Cohort · e-Return Filing</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">Personal Income Tax</div>
+                        <div className="text-[11px] text-emerald-700 font-semibold truncate">Live Cohort · e-Return Filing</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-emerald-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Course 2: VAT & SD Act */}
                     <Link 
                       to="/training"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-cyan-50/70 border border-slate-200 hover:border-cyan-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 to-cyan-900 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <FileCheck className="w-5 h-5 text-cyan-300" />
+                      <div className="w-10 h-10 rounded-xl bg-cyan-100 border border-cyan-200 text-cyan-700 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <FileCheck className="w-5 h-5 text-cyan-700" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">VAT &amp; SD Masterclass</div>
-                        <div className="text-[11px] text-cyan-300 font-semibold truncate">Mushak 6.3 &amp; Withholding</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">VAT &amp; SD Masterclass</div>
+                        <div className="text-[11px] text-cyan-700 font-semibold truncate">Mushak 6.3 &amp; Withholding</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Course 3: RJSC & Company Law */}
                     <Link 
                       to="/training"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-amber-50/70 border border-slate-200 hover:border-amber-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-yellow-800 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Building2 className="w-5 h-5 text-amber-300" />
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Building2 className="w-5 h-5 text-amber-700" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">RJSC &amp; Secretarial</div>
-                        <div className="text-[11px] text-amber-300 font-semibold truncate">Incorporation &amp; Compliance</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">RJSC &amp; Secretarial</div>
+                        <div className="text-[11px] text-amber-700 font-semibold truncate">Incorporation &amp; Compliance</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Course 4: Practical Accounting */}
                     <Link 
                       to="/training"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-teal-50/70 border border-slate-200 hover:border-teal-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-700 to-emerald-950 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Award className="w-5 h-5 text-teal-300" />
+                      <div className="w-10 h-10 rounded-xl bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Award className="w-5 h-5 text-teal-700" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Practical Accounting</div>
-                        <div className="text-[11px] text-teal-300 font-semibold truncate">IFRS, Excel &amp; Tax Audit</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">Practical Accounting</div>
+                        <div className="text-[11px] text-teal-700 font-semibold truncate">IFRS, Excel &amp; Tax Audit</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-teal-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Strip */}
-              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="mt-6 pt-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   Interactive Live Cohorts · Case Studies · Course Completion Certificates
                 </span>
                 <div className="flex flex-wrap items-center gap-3">
                   <Link 
                     to="/contact?tab=inquiry#inquiry"
-                    className="text-emerald-300 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                    className="text-emerald-700 font-semibold hover:text-emerald-800 flex items-center gap-1 transition-colors"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Send an inquiry</span>
                   </Link>
-                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <span className="text-slate-300 hidden sm:inline">|</span>
                   <Link 
                     to="/contact?tab=inquiry#inquiry"
-                    className="text-teal-300 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+                    className="text-teal-700 font-semibold hover:text-teal-800 flex items-center gap-1 transition-colors"
                   >
                     <CalendarIcon className="w-3.5 h-3.5" />
                     <span>Book appointment</span>
                   </Link>
-                  <span className="text-white/20 hidden sm:inline">|</span>
+                  <span className="text-slate-300 hidden sm:inline">|</span>
                   <Link 
                     to="/verify-certificate"
-                    className="text-slate-300 font-bold hover:text-white flex items-center gap-1 transition-colors"
+                    className="text-slate-700 font-bold hover:text-emerald-700 flex items-center gap-1 transition-colors"
                   >
                     Verify Student Certificate
                     <ArrowRight className="w-3 h-3" />
@@ -942,30 +942,30 @@ export function Home() {
       </section>
 
       {/* 6. Careers Highlight Section — E-Lawyers */}
-      <section className="py-10 sm:py-14 px-4 bg-[#f3f6f9]">
+      <section className="py-10 sm:py-14 px-4 bg-white border-y border-slate-200/80">
         <div className="max-w-6xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#c7a76b]/50 bg-gradient-to-br from-[#0b1726] via-[#10243a] to-[#16445a]">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-amber-300 bg-gradient-to-br from-amber-50/80 via-slate-50 to-white">
             {/* Ambient glows */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-[#c7a76b]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <div className="relative z-10 p-6 sm:p-8 lg:p-10">
               <div className="flex flex-col lg:flex-row lg:items-center gap-8">
                 {/* LEFT: Copy + CTA */}
                 <div className="lg:w-[52%]">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-4">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>We're Hiring · 4 Career Tracks Open</span>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-[11px] font-bold uppercase tracking-wider mb-4 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>We&apos;re Hiring · 4 Career Tracks Open</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-[1.15] mb-3">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-[1.15] mb-3">
                     Build Your Career at{' '}
-                    <span className="bg-gradient-to-r from-[#ddc38f] via-[#c7a76b] to-[#ddc38f] bg-clip-text text-transparent">
+                    <span className="text-[#997a3d]">
                       E-Lawyers
                     </span>
                   </h2>
 
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 max-w-md">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-5 max-w-md">
                     Join a premier corporate legal &amp; business consultancy in Dhaka. 4 career
                     tracks now open for fresh graduates &amp; experienced professionals.
                   </p>
@@ -973,23 +973,23 @@ export function Home() {
                   <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                     <Link 
                       to="/Careers"
-                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#c7a76b] via-[#d5b67b] to-[#c7a76b] hover:from-[#d5b67b] hover:to-[#c7a76b] text-[#10243a] font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      className="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-600 via-amber-700 to-amber-600 hover:from-amber-700 hover:to-amber-800 text-white font-black text-sm rounded-xl shadow-md hover:shadow-lg transition-all"
                     >
                       <span>Explore All Careers</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                     <Link 
                       to="/contact?tab=inquiry#inquiry"
-                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white/10 hover:bg-white/20 border border-[#c7a76b]/30 hover:border-[#c7a76b]/60 text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-sm rounded-xl transition-all shadow-2xs"
                     >
-                      <MessageSquare className="w-4 h-4 text-[#ddc38f]" />
+                      <MessageSquare className="w-4 h-4 text-amber-700" />
                       <span>Send an inquiry</span>
                     </Link>
                     <Link 
                       to="/contact?tab=inquiry#inquiry"
-                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-[#c7a76b]/50 hover:border-amber-300 text-amber-200 hover:text-white font-bold text-sm rounded-xl backdrop-blur-xs transition-all shadow-sm"
+                      className="group inline-flex items-center gap-1.5 px-4 py-3 bg-amber-100/90 hover:bg-amber-200 border border-amber-300 text-amber-900 font-bold text-sm rounded-xl transition-all shadow-2xs"
                     >
-                      <CalendarIcon className="w-4 h-4 text-[#ddc38f]" />
+                      <CalendarIcon className="w-4 h-4 text-amber-700" />
                       <span>Book appointment</span>
                     </Link>
                   </div>
@@ -1001,75 +1001,75 @@ export function Home() {
                     {/* Role 1: MTO */}
                     <Link 
                       to="/Careers/mto"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-amber-50/70 border border-slate-200 hover:border-amber-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10243a] to-[#1c3c5d] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Award className="w-5 h-5 text-amber-300" />
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Award className="w-5 h-5 text-amber-800" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">MTO Trainee</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">MTO Trainee</div>
+                        <div className="text-[11px] text-amber-700 font-semibold truncate">Multiple Openings</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Role 2: Sales & Marketing */}
                     <Link 
                       to="/Careers/sales-marketing"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <LineChart className="w-5 h-5 text-emerald-300" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <LineChart className="w-5 h-5 text-emerald-800" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Sales &amp; Marketing</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">Multiple Openings</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">Sales &amp; Marketing</div>
+                        <div className="text-[11px] text-emerald-700 font-semibold truncate">Multiple Openings</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Role 3: Accountant */}
                     <Link 
                       to="/Careers/accountant"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-400/60 backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-teal-50/70 border border-slate-200 hover:border-teal-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#167d83] to-[#0c4e52] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Calculator className="w-5 h-5 text-emerald-300" />
+                      <div className="w-10 h-10 rounded-xl bg-teal-100 border border-teal-200 text-teal-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Calculator className="w-5 h-5 text-teal-800" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Accountant</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Accounts Division)</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">Accountant</div>
+                        <div className="text-[11px] text-teal-700 font-semibold truncate">২ জন (Accounts Division)</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
 
                     {/* Role 4: Customer Care */}
                     <Link 
                       to="/Careers/customer-care"
-                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c7a76b] backdrop-blur-sm transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-amber-50/70 border border-slate-200 hover:border-amber-300 shadow-2xs transition-all"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c7a76b] to-[#9e7a33] flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Users className="w-5 h-5 text-[#10243a]" />
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        <Users className="w-5 h-5 text-amber-800" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">Customer Care</div>
-                        <div className="text-[11px] text-[#ddc38f] font-semibold truncate">২ জন (Female Only)</div>
+                        <div className="text-xs font-bold text-slate-900 truncate">Customer Care</div>
+                        <div className="text-[11px] text-amber-700 font-semibold truncate">২ জন (Female Only)</div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ddc38f] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                     </Link>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Strip */}
-              <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-[#c7a76b]" />
+              <div className="mt-6 pt-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-amber-700" />
                   Panthapath, Dhaka · Full-Time In-Person Positions
                 </span>
                 <Link 
                   to="/Careers#check-status"
-                  className="text-[#ddc38f] font-bold hover:text-white flex items-center gap-1 transition-colors"
+                  className="text-amber-800 font-bold hover:text-amber-900 flex items-center gap-1 transition-colors"
                 >
                   Already applied? Check Status
                   <ArrowRight className="w-3 h-3" />
@@ -1188,25 +1188,25 @@ export function Home() {
 
           {/* Latest Legal Updates */}
           <div className="lg:col-span-4">
-            <div className="bg-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden border border-slate-800 h-full flex flex-col">
-              <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+            <div className="bg-gradient-to-b from-slate-50 via-white to-slate-50/80 rounded-3xl p-6 md:p-8 text-slate-900 shadow-md relative overflow-hidden border border-slate-200/90 h-full flex flex-col">
+              <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none text-slate-400">
                 <Scale className="w-32 h-32" />
               </div>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 relative z-10">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 relative z-10 text-slate-900">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Latest Legal Updates
               </h2>
               <div className="space-y-6 relative z-10 flex-1">
                 {legalUpdates.map((update, idx) => (
-                  <div key={idx} className="border-b border-slate-800 pb-5 last:border-0 last:pb-0">
+                  <div key={idx} className="border-b border-slate-100 pb-5 last:border-0 last:pb-0">
                     <Link to={`/article/${update.id}`} className="group block">
-                      <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-2 block">{format(new Date(update.publishedAt), 'MMM d, yyyy')}</span>
-                      <h4 className="text-base font-bold text-slate-100 group-hover:text-white leading-snug mb-2">{update.title}</h4>
-                      <p className="text-xs text-slate-400 line-clamp-2">{update.excerpt}</p>
+                      <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-widest mb-1.5 block">{format(new Date(update.publishedAt), 'MMM d, yyyy')}</span>
+                      <h4 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 leading-snug mb-1.5 transition-colors">{update.title}</h4>
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{update.excerpt}</p>
                     </Link>
                   </div>
                 ))}
               </div>
-              <Link to="/category/updates" className="mt-8 pt-4 border-t border-slate-800 text-emerald-400 text-sm font-bold flex items-center justify-center gap-2 hover:text-emerald-300 transition-colors">
+              <Link to="/category/updates" className="mt-8 pt-4 border-t border-slate-100 text-emerald-700 hover:text-emerald-800 text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                 Read All Updates <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -1400,54 +1400,54 @@ export function Home() {
           </div>
 
           {/* Right Column (5 Cols): Verified Community Experts Directory Spotlight */}
-          <div className="lg:col-span-5 bg-slate-900 rounded-2xl border border-slate-800 p-6 sm:p-7 text-white flex flex-col justify-between shadow-lg">
+          <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 text-slate-900 flex flex-col justify-between shadow-xs">
             <div>
-              <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-800">
+              <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
                     Verified Panelists
                   </div>
-                  <h3 className="text-lg font-bold text-white mt-0.5">
+                  <h3 className="text-lg font-bold text-slate-900 mt-0.5">
                     Top Legal &amp; Tax Contributors
                   </h3>
                 </div>
                 <Link
                   to="/community?tab=experts"
-                  className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+                  className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1"
                 >
                   <span>All Experts</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              <div className="divide-y divide-slate-800/80 my-2">
+              <div className="divide-y divide-slate-100 my-2">
                 {INITIAL_EXPERTS.slice(0, 3).map((expert) => (
                   <div key={expert.id} className="py-4 flex items-start gap-3.5">
                     <img
                       src={expert.avatar}
                       alt={expert.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-700 shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-sm font-bold text-white truncate">
+                        <h4 className="text-sm font-bold text-slate-900 truncate">
                           {expert.name}
                         </h4>
-                        <span className="inline-flex items-center gap-1 text-xs font-mono tabular-nums font-bold text-amber-400 shrink-0">
+                        <span className="inline-flex items-center gap-1 text-xs font-mono tabular-nums font-bold text-amber-600 shrink-0">
                           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                           <span>{expert.rating.toFixed(1)}</span>
                         </span>
                       </div>
 
-                      <p className="text-xs text-emerald-400 font-medium truncate mt-0.5">
+                      <p className="text-xs text-emerald-700 font-semibold truncate mt-0.5">
                         {expert.role}
                       </p>
 
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                      <p className="text-[11px] text-slate-500 truncate mt-0.5">
                         {expert.credentials}
                       </p>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-slate-400 font-mono tabular-nums">
+                      <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-slate-500 font-mono tabular-nums">
                         <span>{expert.experience} exp</span>
                         <span aria-hidden="true">·</span>
                         <span>{expert.answersCount} answers</span>
@@ -1461,41 +1461,41 @@ export function Home() {
             </div>
 
             {/* Bottom Callout & CTA */}
-            <div className="pt-4 mt-2 border-t border-slate-800 space-y-4">
-              <div className="grid grid-cols-3 gap-2 text-center bg-slate-800/60 rounded-xl p-3 border border-slate-800">
+            <div className="pt-4 mt-2 border-t border-slate-100 space-y-4">
+              <div className="grid grid-cols-3 gap-2 text-center bg-slate-50 rounded-xl p-3 border border-slate-200/80">
                 <div>
-                  <div className="text-base font-extrabold text-white font-mono tabular-nums">
+                  <div className="text-base font-extrabold text-slate-900 font-mono tabular-nums">
                     50+
                   </div>
-                  <div className="text-[11px] text-slate-400">Verified Experts</div>
+                  <div className="text-[11px] text-slate-500">Verified Experts</div>
                 </div>
-                <div className="border-x border-slate-700/70">
-                  <div className="text-base font-extrabold text-emerald-400 font-mono tabular-nums">
+                <div className="border-x border-slate-200">
+                  <div className="text-base font-extrabold text-emerald-700 font-mono tabular-nums">
                     1,200+
                   </div>
-                  <div className="text-[11px] text-slate-400">Solved Inquiries</div>
+                  <div className="text-[11px] text-slate-500">Solved Inquiries</div>
                 </div>
                 <div>
-                  <div className="text-base font-extrabold text-white font-mono tabular-nums">
+                  <div className="text-base font-extrabold text-slate-900 font-mono tabular-nums">
                     24h
                   </div>
-                  <div className="text-[11px] text-slate-400">Avg. Response</div>
+                  <div className="text-[11px] text-slate-500">Avg. Response</div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2.5">
                 <Link
                   to="/community"
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
                 >
                   <span>Visit /community Forum</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
                   to="/community?tab=experts"
-                  className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  className="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Meet Experts</span>
                 </Link>
               </div>
@@ -1508,7 +1508,7 @@ export function Home() {
       <QuickContactSection />
 
       {/* Customer Testimonial Carousel */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-slate-50/80 border-t border-slate-200/70 rounded-3xl mb-10">
         <Testimonials 
           variant="carousel"
           title="Client Trust & Verified Success Stories"

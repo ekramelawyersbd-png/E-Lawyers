@@ -671,18 +671,31 @@ export function Navbar() {
                 )}
               </button>
             </div>
-            {/* Search Icon / Global Search Trigger (Cmd+K) */}
+            {/* Mobile Search Trigger Icon */}
+            <div className="relative flex sm:hidden items-center">
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
+                className="h-9 w-9 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+                aria-label="Quick Search (Cmd+K/Ctrl+K)"
+                title="Quick Search (Cmd+K/Ctrl+K)"
+              >
+                <Search className="w-4 h-4 text-slate-600" />
+              </button>
+            </div>
+
+            {/* Desktop Global Search Trigger (Cmd+K / Ctrl+K) */}
             <div className="relative hidden sm:flex items-center">
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
                 className="h-9 px-3 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-emerald-50/60 hover:border-emerald-300 text-slate-600 hover:text-emerald-800 transition-all flex items-center gap-2 group cursor-pointer shadow-2xs"
-                aria-label="Search articles, tools, and courses (Cmd+K)"
-                title="Search articles, tools & courses (Press ⌘K)"
+                aria-label="Search articles, tools, and products (Cmd+K/Ctrl+K)"
+                title="Search articles, tools, and products (Cmd+K/Ctrl+K)"
               >
                 <Search className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
                 <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-800 hidden md:inline">Search...</span>
-                <kbd className="hidden lg:inline-block text-[10px] font-bold text-slate-400 bg-slate-200/80 px-1.5 py-0.5 rounded border border-slate-300">
+                <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono font-bold text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded border border-slate-300">
                   ⌘K
                 </kbd>
               </button>

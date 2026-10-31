@@ -57,6 +57,8 @@ import { CorporateComplianceMasteryQuiz } from '../components/tax/CorporateCompl
 import { CapitalGainsTaxCalculator } from '../components/tax/CapitalGainsTaxCalculator';
 import { TaxReturnChecklist } from '../components/tax/TaxReturnChecklist';
 import { TaxSummaryDashboard } from '../components/tax/TaxSummaryDashboard';
+import { VatApportionmentCalculator } from '../components/tax/VatApportionmentCalculator';
+import { IdentificationSystemsMatrix } from '../components/IdentificationSystemsMatrix';
 import { ImageGallery } from '../components/ImageGallery';
 import { CommentSection } from '../components/CommentSection';
 import { BlogSEO } from '../components/BlogSEO';
@@ -375,7 +377,14 @@ export function Article() {
         return <ImageCarousel images={carouselImages} />;
       }
       
-      if (elementChildren.some((child: any) => React.isValidElement(child) && (child.props as any)?.node?.tagName === "document-checklist")) {
+      if (
+        elementChildren.some(
+          (child: any) =>
+            React.isValidElement(child) &&
+            ((child.props as any)?.node?.tagName === "document-checklist" ||
+              (child.props as any)?.node?.tagName === "vat-apportionment-calculator")
+        )
+      ) {
         return <div className="mb-4">{children}</div>;
       }
       const highlightedChildren = highlightGlossaryInReactNodes(
@@ -861,6 +870,13 @@ export function Article() {
               </div>
             )}
 
+            {/* Interactive Identification & Registration Systems Matrix */}
+            {article.id === 'identification-and-registration-systems-overview-guide' && (
+              <div className="my-8 not-prose" id="identification-systems-matrix-tool">
+                <IdentificationSystemsMatrix />
+              </div>
+            )}
+
             {/* Interactive Legal & Accounting Glossary Companion Bar */}
             <ArticleGlossaryBar
               detectedTerms={detectedGlossaryTerms}
@@ -902,6 +918,11 @@ export function Article() {
                         showBengaliDefault={language === 'bn'}
                         className="shadow-lg hover:shadow-xl transition-shadow duration-300 ring-1 ring-slate-900/5"
                       />
+                    </div>
+                  ),
+                  "vat-apportionment-calculator": () => (
+                    <div className="my-10 not-prose scroll-mt-24" id="vat-apportionment-calculator-tool">
+                      <VatApportionmentCalculator />
                     </div>
                   )
                 } as any}

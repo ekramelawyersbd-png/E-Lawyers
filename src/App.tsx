@@ -37,6 +37,7 @@ import { EarlyFilingIncentivePage } from './pages/tools/EarlyFilingIncentivePage
 import { LossCarryForwardToolPage } from './pages/tools/LossCarryForwardToolPage';
 import { TaxSlabsExplorerPage } from './pages/tools/TaxSlabsExplorerPage';
 import { RateFinderPage } from './pages/tools/RateFinderPage';
+import { VatApportionmentCalculatorPage } from './pages/VatApportionmentCalculatorPage';
 import { TrainingHub } from './pages/TrainingHub';
 import { Team } from './pages/Team';
 import { VatGuide } from './pages/VatGuide';
@@ -322,6 +323,8 @@ export default function App() {
                 <Route path="tools/loss-carry-forward-calculator" element={<LossCarryForwardToolPage />} />
                 <Route path="tools/tax-slabs-explorer" element={<TaxSlabsExplorerPage />} />
                 <Route path="tools/rate-finder" element={<RateFinderPage />} />
+                <Route path="tools/vat-apportionment-calculator" element={<VatApportionmentCalculatorPage />} />
+                <Route path="vat-apportionment-calculator" element={<VatApportionmentCalculatorPage />} />
                 <Route path="rate-finder" element={<Navigate to="/tools/rate-finder" replace />} />
                 <Route path="training" element={<TrainingHub />} />
                 <Route path="course/personal-income-tax" element={<PersonalIncomeTaxCourse />} />
@@ -395,6 +398,11 @@ export default function App() {
                 <Route path="capital-gains-calculator" element={<Navigate to="/tools#capital-gains-tax-tool" replace />} />
                 <Route path="financial-assets-tax" element={<Navigate to="/article/financial-assets-income-tax-bangladesh-ita-2023" replace />} />
                 <Route path="financial-assets-income-tax" element={<Navigate to="/article/financial-assets-income-tax-bangladesh-ita-2023" replace />} />
+                <Route path="bin-registration-in-bangladesh" element={<Navigate to="/article/bin-registration-in-bangladesh" replace />} />
+                <Route path="vat-registration-bangladesh" element={<Navigate to="/article/bin-registration-in-bangladesh" replace />} />
+                <Route path="corporate-vat-compliance-monthly-return-protocol-bangladesh" element={<Navigate to="/article/corporate-vat-compliance-monthly-return-protocol-bangladesh" replace />} />
+                <Route path="corporate-vat-compliance-bangladesh" element={<Navigate to="/article/corporate-vat-compliance-monthly-return-protocol-bangladesh" replace />} />
+                <Route path="mushak-9-1-return-guide-bangladesh" element={<Navigate to="/article/corporate-vat-compliance-monthly-return-protocol-bangladesh" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

@@ -209,6 +209,16 @@ export function ToolsHub() {
       color: 'bg-emerald-100 text-emerald-800',
     },
     {
+      id: 'vat-apportionment-calculator',
+      name: 'VAT Apportionment Calculator (Section 47)',
+      category: 'Tax & VAT Toolkits',
+      description: 'Compute your Eligible Partial Input Tax Rebate = I × (T ÷ T_total) under Section 47 of the VAT & SD Act 2012 for mixed Standard (15%), Zero-Rated (0%), and Exempt/Reduced-Rate supplies.',
+      tooltip: 'Section 47 & Rule 28 partial input tax credit calculator for Mushak 9.1 Part-4 & Part-5.',
+      icon: <Calculator className="w-7 h-7" />,
+      path: '/tools/vat-apportionment-calculator',
+      color: 'bg-emerald-100 text-emerald-800',
+    },
+    {
       id: 'tax-slabs-explorer',
       name: 'Tax Slabs & Rates Hub',
       category: 'Tax & VAT Toolkits',

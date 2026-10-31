@@ -7,7 +7,6 @@ import {
   CheckCircle2, 
   FileCheck2, 
   Download, 
-  Printer, 
   Sparkles, 
   ArrowLeft, 
   ExternalLink,
@@ -628,49 +627,6 @@ Contact & Advisory: https://blog.accounticca.com/contact
               </div>
             </div>
 
-            <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
-              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-md">
-                <Check className="w-9 h-9 stroke-3" />
-              </div>
-              <h2 className="text-2xl font-black text-emerald-950">
-                Payment Verified &amp; Kit Ready
-              </h2>
-              <p className="text-xs sm:text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed">
-                Order Token: <strong className="font-mono bg-white px-2 py-0.5 rounded border border-emerald-300">{completedOrderNumber}</strong>
-              </p>
-              <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
-                {orderSheetSynced ? (
-                  <Link
-                    to="/workspace"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-emerald-300 text-emerald-800 text-xs font-bold hover:bg-emerald-100/60 transition-colors"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Order Automatically Synced to Workspace Google Sheet</span>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/workspace"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Recorded in Shop Ledger • Sync to Google Sheets in /workspace</span>
-                  </Link>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setShowEmailPreview((prev) => !prev)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100/60 transition-colors cursor-pointer"
-                >
-                  <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>
-                    {orderEmailResult?.transport === 'server-smtp'
-                      ? `Order Confirmation Sent to ${email}`
-                      : `Order Confirmation Prepared (${email})`}
-                  </span>
-                </button>
-              </div>
-            </div>
 
             {/* Order Confirmation Email Panel */}
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
@@ -843,15 +799,7 @@ Contact & Advisory: https://blog.accounticca.com/contact
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print Official Receipt</span>
-              </button>
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-end">
               <Link
                 to="/shop"
                 className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors"

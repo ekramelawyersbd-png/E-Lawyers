@@ -8,8 +8,18 @@ export interface BeforeInstallPromptEvent extends Event {
 const STORAGE_KEY_DISMISSED = 'pwa_prompt_dismissed_until';
 const DISMISSAL_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours dismissal cooldown
 
+let cachedHookPrompt: BeforeInstallPromptEvent | null = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e: Event) => {
+    e.preventDefault();
+    cachedHookPrompt = e as BeforeInstallPromptEvent;
+  });
+}
+
 export function usePWAInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(
+    () => cachedHookPrompt
+  );
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
   const [isIOS, setIsIOS] = useState<boolean>(false);
   const [isAndroid, setIsAndroid] = useState<boolean>(false);
